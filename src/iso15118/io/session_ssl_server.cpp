@@ -6,6 +6,7 @@
 #include <cstring>
 #include <filesystem>
 
+#include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <netinet/in.h>
@@ -97,18 +98,30 @@ SessionSSLServer::SessionSSLServer(const std::string& interface_name, const conf
     auto current_if = if_list_head;
 
     for (auto current_if = if_list_head; current_if != nullptr; current_if = current_if->ifa_next) {
+
+        // some devices may not have an address at all
+        if (current_if->ifa_addr == nullptr) {
+            continue;
+        }
+
+        // Is it ipv6?
         if (current_if->ifa_addr->sa_family != AF_INET6) {
             continue;
         }
 
+        struct sockaddr_in6* in6 = (struct sockaddr_in6*)current_if->ifa_addr;
+
+        // Is it a link-local address?
+        if (not IN6_IS_ADDR_LINKLOCAL(&in6->sin6_addr)) {
+            continue;
+        }
+
+        // Is it for the correct interface?
         if (interface_name.compare(current_if->ifa_name) != 0) {
             continue;
         }
 
-        // matching interface name and ipv6
-        // FIXME (aw): is this cast allowed (alignment)
-        const auto& socket_address = reinterpret_cast<const struct sockaddr_in6&>(*current_if->ifa_addr);
-        memcpy(&address, &socket_address, sizeof(address));
+        address = *in6;
     }
 
     freeifaddrs(if_list_head);
@@ -129,10 +142,14 @@ SessionSSLServer::SessionSSLServer(const std::string& interface_name, const conf
     // load certificate
     load_certificates(*ssl, ssl_config);
 
-    // bind to socket "fe80:0000:0000:0000:0042:acff:fe12:0008"
-    // FIXME (aw): get this ip string from somewhere instead of handcoded!
-    const auto bind_result =
-        mbedtls_net_bind(&ssl->listen_fd, "fe80::42:acff:fe12:2%eth0", "50000", MBEDTLS_NET_PROTO_TCP);
+    // IPv6 IP string
+    char ipv6_addr_str_tmp[INET6_ADDRSTRLEN];
+    inet_ntop(AF_INET6, &address.sin6_addr, ipv6_addr_str_tmp, sizeof(ipv6_addr_str_tmp));
+    std::string ipv6_addr_str(ipv6_addr_str_tmp);
+    ipv6_addr_str += "%" + interface_name;
+
+    // bind to socket
+    const auto bind_result = mbedtls_net_bind(&ssl->listen_fd, ipv6_addr_str.c_str(), "50000", MBEDTLS_NET_PROTO_TCP);
     if (bind_result != 0) {
         log_and_raise_mbed_error("Failed to mbedtls_net_bind()", bind_result);
     }

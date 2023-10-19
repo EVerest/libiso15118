@@ -24,6 +24,7 @@ struct SessionDescriptor {
 
 struct TbdConfig {
     config::SSLConfig ssl {config::CertificateBackend::EVEREST_LAYOUT, ""};
+    std::string interface_name;
 };
 
 class TbdController {

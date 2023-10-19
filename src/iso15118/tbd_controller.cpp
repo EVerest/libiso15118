@@ -30,9 +30,7 @@ void TbdController::handle_sdp_server_input() {
     }
 
     // now create new iso session
-    // io::SessionSSLServer session_server("eth0", {config::CertificateBackend::JOSEV_LAYOUT, "pki"});
-    io::SessionSSLServer session_server(
-        "eth0", config.ssl);
+    io::SessionSSLServer session_server(config.interface_name, config.ssl);
 
     const auto session_listen_fd = session_server.get_fd();
     const auto session_socket_address = session_server.get_socket_address();
