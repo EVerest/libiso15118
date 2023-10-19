@@ -6,6 +6,11 @@
 
 namespace iso15118::d20 {
 
+std::unique_ptr<MessageExchange> create_message_exchange(uint8_t* buf, const size_t len) {
+    io::StreamOutputView view = {buf, len};
+    return std::make_unique<MessageExchange>(std::move(view));
+}
+
 MessageExchange::MessageExchange(io::StreamOutputView output_) : response(std::move(output_)) {
 }
 

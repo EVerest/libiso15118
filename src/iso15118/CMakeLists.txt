@@ -22,15 +22,16 @@ target_sources(iso15118
         # FIXME (aw): distinction between 'misc' and 'shared' is not clear!
         shared/fsm_logger.cpp
 
+        io/connection_ssl.cpp
         io/logging.cpp
         io/poll_manager.cpp
         io/sdp_packet.cpp
         io/sdp_server.cpp
-        io/session_server.cpp
-        io/session_ssl_server.cpp
+        io/socket_helper.cpp
 
-        session/d20.cpp
-
+        session/iso.cpp
+        session/logger.cpp
+        
         d20/fsm.cpp
         d20/context.cpp
         d20/context_helper.cpp

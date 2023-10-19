@@ -13,33 +13,22 @@
 
 namespace iso15118::io {
 
-struct PollSet {
-    // FIXME (aw): probably it is not the responsibility of the PollSet to care about the mutex
-    PollSet(const std::map<int, PollManager::ReadCallback>&, int event_fd);
-    size_t size;
-    std::unique_ptr<struct pollfd[]> fds;
-    std::vector<PollManager::ReadCallback*> callbacks;
-};
-
-PollSet::PollSet(const std::map<int, PollManager::ReadCallback>& map, int event_fd) :
-    size(map.size() + 1), fds(std::make_unique<struct pollfd[]>(size)), callbacks(map.size(), nullptr) {
+static PollSet create_poll_set(const std::map<int, PollCallback>& map, int event_fd) {
+    const auto total_size = map.size() + 1; // including event_fd
+    decltype(PollSet::fds) fds(total_size);
+    decltype(PollSet::callbacks) callbacks(total_size);
 
     auto index = 0;
-    for (auto map_it = map.begin(); index < map.size(); index++, map_it++) {
-        fds[index].fd = map_it->first;
+    for (auto it = map.begin(); it != map.end(); ++it, ++index) {
+        fds[index].fd = it->first;
         fds[index].events = POLLIN;
-        callbacks[index] = &map_it->second;
+        callbacks[index] = &it->second;
     }
 
-    // index should be now (size - 1) which is reserved for our event_fd
     fds[index].fd = event_fd;
     fds[index].events = POLLIN;
-}
 
-static PollSet create_poll_set_with_lock(std::mutex& map_mtx, const std::map<int, PollManager::ReadCallback>& map,
-                                         int event_fd) {
-    std::lock_guard lock(map_mtx);
-    return PollSet(map, event_fd);
+    return {std::move(fds), std::move(callbacks)};
 }
 
 PollManager::PollManager() {
@@ -49,71 +38,45 @@ PollManager::PollManager() {
     }
 }
 
-void PollManager::register_fd(int fd, ReadCallback& read_callback) {
-    std::lock_guard lock(map_mtx);
-    registered_fds.emplace(fd, read_callback);
-    current_event = EventType::MODIFIED_FD;
-    eventfd_write(event_fd, 1);
+void PollManager::register_fd(int fd, PollCallback& poll_callback) {
+    registered_fds.emplace(fd, poll_callback);
+    poll_set = create_poll_set(registered_fds, event_fd);
 }
 
 void PollManager::unregister_fd(int fd) {
-    std::lock_guard lock(map_mtx);
     registered_fds.erase(fd);
-    current_event = EventType::MODIFIED_FD;
+    poll_set = create_poll_set(registered_fds, event_fd);
+}
+
+void PollManager::poll(int timeout_ms) {
+
+    auto& pollfds = poll_set.fds;
+
+    const auto ret = ::poll(pollfds.data(), pollfds.size(), timeout_ms);
+
+    if (ret == -1) {
+        log_and_throw("Poll failed\n");
+    }
+
+    // first check for event_fd
+    if (pollfds[pollfds.size() - 1].revents & POLLIN) {
+        eventfd_t tmp;
+        eventfd_read(event_fd, &tmp);
+
+        // just break;
+        return;
+    }
+
+    // check fds
+    for (auto i = 0; i < pollfds.size() - 1; ++i) {
+        if (pollfds[i].revents & POLLIN) {
+            (*poll_set.callbacks[i])();
+        }
+    }
+}
+
+void PollManager::abort() {
     eventfd_write(event_fd, 1);
-}
-
-void PollManager::start() {
-    if (loop_thread.joinable()) {
-        log_and_throw("Tried to start the PollManager, altough it is already running");
-    }
-    loop_thread = std::thread(&PollManager::loop, this);
-}
-
-void PollManager::stop() {
-    if (!loop_thread.joinable()) {
-        log_and_throw("Tried to stop the PollManager, although it wasn't started");
-    }
-
-    eventfd_write(event_fd, 1);
-    current_event = EventType::NONE;
-    loop_thread.join();
-}
-
-void PollManager::loop() {
-
-    auto set = create_poll_set_with_lock(map_mtx, registered_fds, event_fd);
-
-    while (true) {
-        const auto ret = poll(set.fds.get(), set.size, -1);
-
-        if (ret == -1) {
-            log_and_throw("Poll failed\n");
-        }
-
-        // first check for events
-        if (set.fds[set.size - 1].revents & POLLIN) {
-            eventfd_t tmp;
-            eventfd_read(event_fd, &tmp);
-
-            const auto event = current_event;
-            current_event = EventType::NONE;
-            switch (event) {
-            case EventType::STOP:
-                return;
-            case EventType::MODIFIED_FD:
-                set = create_poll_set_with_lock(map_mtx, registered_fds, event_fd);
-                continue;
-            }
-        }
-
-        // no event happened
-        for (auto i = 0; i < set.callbacks.size(); ++i) {
-            if (set.fds[i].revents & POLLIN) {
-                (*set.callbacks[i])();
-            }
-        }
-    }
 }
 
 } // namespace iso15118::io

@@ -4,36 +4,33 @@
 
 #include <functional>
 #include <map>
-#include <mutex>
-#include <thread>
+#include <vector>
 
+#include <sys/poll.h>
 namespace iso15118::io {
 
-enum class EventType : uint8_t {
-    NONE,
-    MODIFIED_FD,
-    STOP,
+using PollCallback = const std::function<void()>;
+struct PollSet {
+    std::vector<struct pollfd> fds;
+    std::vector<PollCallback*> callbacks;
 };
 
 class PollManager {
 public:
-    using ReadCallback = const std::function<void()>;
     PollManager();
-    void start();
-    void stop();
-    void register_fd(int fd, ReadCallback& read_callback);
+
+    void register_fd(int fd, PollCallback& poll_callback);
     void unregister_fd(int fd);
 
-private:
-    void loop();
-    std::thread loop_thread;
-    std::map<int, ReadCallback> registered_fds;
+    void poll(int timeout_ms);
+    void abort();
 
-    std::mutex map_mtx;
+private:
+    std::map<int, PollCallback> registered_fds;
+
+    PollSet poll_set;
 
     int event_fd{-1};
-    // FIXME (aw): the event handling is not thread-safe!!
-    EventType current_event{EventType::NONE};
 };
 
 } // namespace iso15118::io

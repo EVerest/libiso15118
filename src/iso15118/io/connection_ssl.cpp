@@ -1,17 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
-#include <iso15118/io/session_ssl_server.hpp>
+#include <iso15118/io/connection_ssl.hpp>
 
 #include <cassert>
 #include <cstring>
 #include <filesystem>
-
-#include <arpa/inet.h>
-#include <ifaddrs.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/debug.h"
@@ -21,14 +14,15 @@
 #include "mbedtls/ssl.h"
 
 #include <iso15118/detail/helper.hpp>
+#include <iso15118/detail/io/socket_helper.hpp>
 
 namespace iso15118::io {
 
 struct SSLContext {
     SSLContext();
 
-    mbedtls_net_context listen_fd;
-    mbedtls_net_context client_fd;
+    mbedtls_net_context accepting_net_ctx;
+    mbedtls_net_context connection_net_ctx;
     mbedtls_ssl_context ssl;
     mbedtls_ssl_config conf;
     mbedtls_x509_crt server_certificate;
@@ -38,8 +32,8 @@ struct SSLContext {
 };
 
 SSLContext::SSLContext() {
-    mbedtls_net_init(&listen_fd);
-    mbedtls_net_init(&client_fd);
+    mbedtls_net_init(&accepting_net_ctx);
+    mbedtls_net_init(&connection_net_ctx);
     mbedtls_ssl_init(&ssl);
     mbedtls_ssl_config_init(&conf);
     mbedtls_x509_crt_init(&server_certificate);
@@ -84,48 +78,26 @@ static void load_certificates(SSLContext& ssl, const config::SSLConfig& ssl_conf
     }
 }
 
-SessionSSLServer::SessionSSLServer(const std::string& interface_name, const config::SSLConfig& ssl_config) :
-    ssl(std::make_unique<SSLContext>()) {
-    //
-    // figure out device
-    //
-    struct ifaddrs* if_list_head;
-    const auto get_if_addrs_result = getifaddrs(&if_list_head);
+ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& interface_name,
+                             const config::SSLConfig& ssl_config) :
+    poll_manager(poll_manager_), ssl(std::make_unique<SSLContext>()) {
 
-    if (get_if_addrs_result == -1) {
-        log_and_throw("Failed to call getifaddrs");
-    }
-    auto current_if = if_list_head;
-
-    for (auto current_if = if_list_head; current_if != nullptr; current_if = current_if->ifa_next) {
-
-        // some devices may not have an address at all
-        if (current_if->ifa_addr == nullptr) {
-            continue;
-        }
-
-        // Is it ipv6?
-        if (current_if->ifa_addr->sa_family != AF_INET6) {
-            continue;
-        }
-
-        struct sockaddr_in6* in6 = (struct sockaddr_in6*)current_if->ifa_addr;
-
-        // Is it a link-local address?
-        if (not IN6_IS_ADDR_LINKLOCAL(&in6->sin6_addr)) {
-            continue;
-        }
-
-        // Is it for the correct interface?
-        if (interface_name.compare(current_if->ifa_name) != 0) {
-            continue;
-        }
-
-        address = *in6;
+    sockaddr_in6 address;
+    if (not get_first_sockaddr_in6_for_interface(interface_name, address)) {
+        const auto msg = "Failed to get ipv6 socket address for interface " + interface_name;
+        log_and_throw(msg.c_str());
     }
 
-    freeifaddrs(if_list_head);
-    address.sin6_port = htobe16(50000);
+    const auto address_name = sockaddr_in6_to_name(address);
+
+    if (not address_name) {
+        const auto msg =
+            "Failed to determine string representation of ipv6 socket address for interface " + interface_name;
+        log_and_throw(msg.c_str());
+    }
+
+    end_point.port = 50000;
+    memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
 
     //
     // mbedtls specifica
@@ -142,14 +114,8 @@ SessionSSLServer::SessionSSLServer(const std::string& interface_name, const conf
     // load certificate
     load_certificates(*ssl, ssl_config);
 
-    // IPv6 IP string
-    char ipv6_addr_str_tmp[INET6_ADDRSTRLEN];
-    inet_ntop(AF_INET6, &address.sin6_addr, ipv6_addr_str_tmp, sizeof(ipv6_addr_str_tmp));
-    std::string ipv6_addr_str(ipv6_addr_str_tmp);
-    ipv6_addr_str += "%" + interface_name;
-
-    // bind to socket
-    const auto bind_result = mbedtls_net_bind(&ssl->listen_fd, ipv6_addr_str.c_str(), "50000", MBEDTLS_NET_PROTO_TCP);
+    const auto bind_result = mbedtls_net_bind(&ssl->accepting_net_ctx, address_name.get(),
+                                              std::to_string(end_point.port).c_str(), MBEDTLS_NET_PROTO_TCP);
     if (bind_result != 0) {
         log_and_raise_mbed_error("Failed to mbedtls_net_bind()", bind_result);
     }
@@ -181,46 +147,82 @@ SessionSSLServer::SessionSSLServer(const std::string& interface_name, const conf
     if (ssl_setup_result != 0) {
         log_and_raise_mbed_error("Failed to mbedtls_ssl_setup()", ssl_setup_result);
     }
+
+    poll_manager.register_fd(ssl->accepting_net_ctx.fd, [this]() { this->handle_connect(); });
 }
 
-SessionSSLServer::SessionSSLServer(SessionSSLServer&&) = default;
+ConnectionSSL::~ConnectionSSL() = default;
 
-SessionSSLServer::~SessionSSLServer() = default;
-
-uint16_t SessionSSLServer::get_port() const {
-    return be16toh(address.sin6_port);
+void ConnectionSSL::set_event_callback(const ConnectionEventCallback& callback) {
+    this->event_callback = callback;
 }
 
-int SessionSSLServer::get_fd() const {
-    return ssl->listen_fd.fd;
+Ipv6EndPoint ConnectionSSL::get_public_endpoint() const {
+    return end_point;
 }
 
-ReadResult SessionSSLServer::read_data(size_t bytes_to_read, uint8_t* buffer, size_t buffer_len) {
+void ConnectionSSL::write(const uint8_t* buf, size_t len) {
+    assert(handshake_complete);
 
-    if (state == SessionState::ACCEPTING) {
-        const auto accept_result = mbedtls_net_accept(&ssl->listen_fd, &ssl->client_fd, nullptr, 0, nullptr);
-        if (accept_result != 0) {
-            log_and_raise_mbed_error("Failed to mbedtls_net_accept()", accept_result);
-        }
+    const auto ssl_write_result = mbedtls_ssl_write(&ssl->ssl, buf, len);
 
-        // setup callbacks for communcation
-        mbedtls_ssl_set_bio(&ssl->ssl, &ssl->client_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
+    if (ssl_write_result < 0) {
+        log_and_raise_mbed_error("Failed to mbedtls_ssl_write()", ssl_write_result);
+    } else if (ssl_write_result != len) {
+        log_and_throw("Didn't complete to write");
+    }
+}
 
-        state = SessionState::HANDSHAKE;
+ReadResult ConnectionSSL::read(uint8_t* buf, size_t len) {
+    // FIXME (aw): any assert best practices?
+    assert(handshake_complete);
 
-        // FIXME (aw): close accept socket!
+    const auto ssl_read_result = mbedtls_ssl_read(&ssl->ssl, buf, len);
 
-        // FIXME (aw): this is bogus, we want to pass this differently!
-        std::memcpy(buffer, &ssl->client_fd.fd, sizeof(int));
+    if (ssl_read_result > 0) {
+        size_t bytes_read = ssl_read_result;
+        const auto would_block = (bytes_read < len);
+        return {would_block, bytes_read};
+    }
 
-        return {ReadResult::State::ACCEPTED_SESSION, 0};
-    } else if (state == SessionState::HANDSHAKE) {
+    if ((ssl_read_result == MBEDTLS_ERR_SSL_WANT_READ) or (ssl_read_result == MBEDTLS_ERR_SSL_WANT_WRITE)) {
+        return {true, 0};
+    }
 
+    // FIXME (aw): error handling, when connection closed, i.e. ssl_read_result == 0
+    log_and_raise_mbed_error("Failed to mbedtls_ssl_read()", ssl_read_result);
+    return {false, 0};
+}
+
+void ConnectionSSL::handle_connect() {
+    const auto accept_result =
+        mbedtls_net_accept(&ssl->accepting_net_ctx, &ssl->connection_net_ctx, nullptr, 0, nullptr);
+    if (accept_result != 0) {
+        log_and_raise_mbed_error("Failed to mbedtls_net_accept()", accept_result);
+    }
+
+    // setup callbacks for communcation
+    mbedtls_ssl_set_bio(&ssl->ssl, &ssl->connection_net_ctx, mbedtls_net_send, mbedtls_net_recv, NULL);
+
+    // FIXME (aw): is it okay (according to iso15118 and mbedtls) to close the accepting socket here?
+    poll_manager.unregister_fd(ssl->accepting_net_ctx.fd);
+    mbedtls_net_free(&ssl->accepting_net_ctx);
+
+    publish_event(ConnectionEvent::ACCEPTED);
+
+    poll_manager.register_fd(ssl->connection_net_ctx.fd, [this]() { this->handle_data(); });
+}
+
+void ConnectionSSL::handle_data() {
+    if (not handshake_complete) {
+        // FIXME (aw): proper handshake handling (howto?)
         const auto ssl_handshake_result = mbedtls_ssl_handshake(&ssl->ssl);
 
         if (ssl_handshake_result != 0) {
             if ((ssl_handshake_result == MBEDTLS_ERR_SSL_WANT_READ) or
                 (ssl_handshake_result == MBEDTLS_ERR_SSL_WANT_WRITE)) {
+                // assuming we need more data, so just return
+                return;
             }
 
             log_and_raise_mbed_error("Failed to mbedtls_ssl_handshake()", ssl_handshake_result);
@@ -228,46 +230,15 @@ ReadResult SessionSSLServer::read_data(size_t bytes_to_read, uint8_t* buffer, si
             // handshake complete!
             logf("Handshake complete!\n");
 
-            state = SessionState::CONNECTED;
+            handshake_complete = true;
+
+            publish_event(ConnectionEvent::OPEN);
+
+            return;
         }
-
-        // in case the handshake is complete, we still have to data, but would need more, in order to get a proper
-        // header
-        return {ReadResult::State::WOULD_BLOCK, 0};
     }
 
-    // fall-through: should be connected
-    assert(state == SessionState::CONNECTED);
-
-    const auto ssl_read_result = mbedtls_ssl_read(&ssl->ssl, buffer, bytes_to_read);
-
-    if (ssl_read_result > 0) {
-        size_t bytes_read = ssl_read_result;
-        return {(bytes_read == bytes_to_read) ? ReadResult::State::READ_COMPLETE : ReadResult::State::WOULD_BLOCK,
-                bytes_read};
-    }
-
-    if ((ssl_read_result == MBEDTLS_ERR_SSL_WANT_READ) or (ssl_read_result == MBEDTLS_ERR_SSL_WANT_WRITE)) {
-        // this should not happen, because we know from poll, that there should be data
-        return {ReadResult::State::WOULD_BLOCK, 0};
-    }
-
-    log_and_raise_mbed_error("Failed to mbedtls_ssl_read()", ssl_read_result);
-    return {ReadResult::State::WOULD_BLOCK, 0};
-}
-
-void SessionSSLServer::write_data(const uint8_t* buffer, size_t buffer_len) {
-    if (state != SessionState::CONNECTED) {
-        log_and_throw("Tried to write data on unconnected session");
-    }
-
-    const auto ssl_write_result = mbedtls_ssl_write(&ssl->ssl, buffer, buffer_len);
-
-    if (ssl_write_result < 0) {
-        log_and_raise_mbed_error("Failed to mbedtls_ssl_write()", ssl_write_result);
-    } else if (ssl_write_result != buffer_len) {
-        log_and_throw("Didn't complete to write");
-    }
+    publish_event(ConnectionEvent::NEW_DATA);
 }
 
 } // namespace iso15118::io

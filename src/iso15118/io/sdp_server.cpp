@@ -5,15 +5,29 @@
 #include <cstring>
 #include <type_traits>
 
+#include <netdb.h>
+
 #include <exi/cb/exi_v2gtp.h>
 
 #include <iso15118/detail/helper.hpp>
 
-namespace iso15118::io {
+namespace iso15118 {
 
-PeerResponse::PeerResponse(const PeerRequest& request_, const struct sockaddr_in6& address_) :
-    request(request_), server_address(address_) {
+static void log_peer_hostname(const struct sockaddr_in6& address) {
+    char hostname[128];
+    socklen_t hostname_len = sizeof(hostname);
+
+    const auto get_if_name_result = getnameinfo(reinterpret_cast<const struct sockaddr*>(&address), sizeof(address),
+                                                hostname, hostname_len, nullptr, 0, NI_NUMERICHOST);
+
+    if (0 == get_if_name_result) {
+        logf("Got SDP request from %s\n", hostname);
+    } else {
+        logf("Got SDP request, but failed to get the address\n");
+    }
 }
+
+namespace io {
 
 SdpServer::SdpServer() {
     fd = socket(AF_INET6, SOCK_DGRAM, 0);
@@ -36,56 +50,67 @@ SdpServer::SdpServer() {
     }
 }
 
-PeerRequest SdpServer::get_peer_request() {
-    PeerRequest peer_request;
-    socklen_t peer_addr_len = sizeof(peer_request.address);
+PeerRequestContext SdpServer::get_peer_request() {
+    decltype(PeerRequestContext::address) peer_address;
+    socklen_t peer_addr_len = sizeof(peer_address);
 
     const auto read_result = recvfrom(fd, udp_buffer, sizeof(udp_buffer), 0,
-                                      reinterpret_cast<struct sockaddr*>(&peer_request.address), &peer_addr_len);
+                                      reinterpret_cast<struct sockaddr*>(&peer_address), &peer_addr_len);
     if (read_result <= 0) {
-        log_and_throw("Read on socket failed");
+        log_and_throw("Read on sdp server socket failed");
     }
+
+    if (peer_addr_len > sizeof(peer_address)) {
+        log_and_throw("Unexpected address length during read on sdp server socket");
+    }
+
+    log_peer_hostname(peer_address);
 
     if (read_result == sizeof(udp_buffer)) {
-        log_and_throw("Read success, but reached maximum size of buffer");
+        logf("Read on sdp server socket succeeded, but message is to big for the buffer");
+        return PeerRequestContext{false};
     }
-
-    logf("Received %d bytes on udp socket\n", read_result);
 
     uint32_t sdp_payload_len;
     const auto parse_sdp_result = V2GTP20_ReadHeader(udp_buffer, &sdp_payload_len, V2GTP20_SDP_REQUEST_PAYLOAD_ID);
 
     if (parse_sdp_result != V2GTP_ERROR__NO_ERROR) {
-        log_and_throw("Failed to parse sdp header");
+        // FIXME (aw): we should not die here immediately
+        logf("Sdp server received an unexpected payload");
+        return PeerRequestContext{false};
     }
 
+    PeerRequestContext peer_request{true};
+
+    // NOTE (aw): this could be moved into a constructor
     const uint8_t sdp_request_byte1 = udp_buffer[8];
     const uint8_t sdp_request_byte2 = udp_buffer[9];
     peer_request.security = static_cast<v2gtp::Security>(sdp_request_byte1);
     peer_request.transport_protocol = static_cast<v2gtp::TransportProtocol>(sdp_request_byte2);
+    memcpy(&peer_request.address, &peer_address, sizeof(peer_address));
 
     return peer_request;
 }
 
-void SdpServer::send_response(const PeerResponse& response) {
+void SdpServer::send_response(const PeerRequestContext& request, const Ipv6EndPoint& ipv6_endpoint) {
     // that worked, now response
     uint8_t v2g_packet[28];
     uint8_t* sdp_response = v2g_packet + 8;
-    // fill in our ipv6 addr (FIXME (aw): should be a specific one, not just the loopback!)
-    memcpy(sdp_response, &response.server_address.sin6_addr, sizeof(response.server_address.sin6_addr));
-    const uint16_t port = response.server_address.sin6_port;
+    memcpy(sdp_response, ipv6_endpoint.address, sizeof(ipv6_endpoint.address));
+
+    uint16_t port = htobe16(ipv6_endpoint.port);
     memcpy(sdp_response + 16, &port, sizeof(port));
 
     // FIXME (aw): which values to take here?
-    sdp_response[18] = static_cast<std::underlying_type_t<v2gtp::Security>>(response.request.security);
+    sdp_response[18] = static_cast<std::underlying_type_t<v2gtp::Security>>(request.security);
     sdp_response[19] =
-        static_cast<std::underlying_type_t<v2gtp::TransportProtocol>>(response.request.transport_protocol);
+        static_cast<std::underlying_type_t<v2gtp::TransportProtocol>>(request.transport_protocol);
 
     V2GTP20_WriteHeader(v2g_packet, 20, V2GTP20_SDP_RESPONSE_PAYLOAD_ID);
 
-    const auto peer_addr_len = sizeof(response.request.address);
+    const auto peer_addr_len = sizeof(request.address);
 
-    sendto(fd, v2g_packet, sizeof(v2g_packet), 0, reinterpret_cast<const sockaddr*>(&response.request.address),
+    sendto(fd, v2g_packet, sizeof(v2g_packet), 0, reinterpret_cast<const sockaddr*>(&request.address),
            peer_addr_len);
 }
 
@@ -129,5 +154,6 @@ void parse_sdp_request(uint8_t* packet) {
     }
 }
 #endif
+} // namespace io
 
-} // namespace iso15118::io
+} // namespace iso15118

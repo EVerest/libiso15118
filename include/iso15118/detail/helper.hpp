@@ -3,14 +3,11 @@
 #pragma once
 
 #include <cstdarg>
+#include <cstdint>
 #include <cstdio>
 #include <string>
 
-#include <netinet/in.h>
-
 namespace iso15118 {
-
-bool get_ipv6_addr(const struct sockaddr_in6& address, char* hostname, size_t hostname_len);
 
 void logf(const char* fmt, ...);
 

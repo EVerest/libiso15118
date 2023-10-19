@@ -28,7 +28,7 @@ size_t SdpPacket::get_remaining_bytes_to_read() const {
 }
 
 void SdpPacket::update_read_bytes(size_t len) {
-    if ((state == State::FINISHED) or (state == State::INVALID_HEADER) or (state == State::PAYLOAD_TO_LONG)) {
+    if ((state == State::COMPLETE) or (state == State::INVALID_HEADER) or (state == State::PAYLOAD_TO_LONG)) {
         // nothing to do here - should also not happen, right?
         return;
     }
@@ -38,7 +38,7 @@ void SdpPacket::update_read_bytes(size_t len) {
     if ((state == State::EMPTY) and (bytes_read == V2GTP_HEADER_SIZE)) {
         parse_header();
     } else if ((state == State::HEADER_READ) and (bytes_read == length)) {
-        state = State::FINISHED;
+        state = State::COMPLETE;
     }
 }
 

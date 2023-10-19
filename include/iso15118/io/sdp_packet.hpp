@@ -20,7 +20,7 @@ public:
     enum class State {
         EMPTY, // FIXME (aw): misnomer
         HEADER_READ,
-        FINISHED,
+        COMPLETE,
 
         // failed states
         INVALID_HEADER,
@@ -31,8 +31,12 @@ public:
         return state;
     }
 
+    auto is_complete() const {
+        return state == State::COMPLETE;
+    }
+
     auto get_payload_length() const {
-        return (state == State::FINISHED) ? (length - V2GTP_HEADER_SIZE) : 0;
+        return (state == State::COMPLETE) ? (length - V2GTP_HEADER_SIZE) : 0;
     }
 
     v2gtp::PayloadType get_payload_type() const;

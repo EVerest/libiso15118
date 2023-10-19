@@ -7,26 +7,12 @@
 #include <cstring>
 #include <stdexcept>
 
-#include <netdb.h>
-#include <netinet/in.h>
-
 #include <mbedtls/error.h>
 
 namespace iso15118 {
 
 void log_and_throw(const char* msg) {
     throw std::runtime_error(std::string(msg) + " (reason: " + strerror(errno) + ")");
-}
-
-bool get_ipv6_addr(const struct sockaddr_in6& address, char* hostname, size_t hostname_len) {
-    const auto get_if_name_result = getnameinfo(reinterpret_cast<const struct sockaddr*>(&address), sizeof(address),
-                                                hostname, hostname_len, nullptr, 0, NI_NUMERICHOST);
-
-    if (0 != get_if_name_result) {
-        return false;
-    }
-
-    return true;
 }
 
 static void log_and_raise(const std::string& error_msg) {

@@ -2,7 +2,12 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <iso15118/tbd_controller.hpp>
 
+#include <algorithm>
+#include <chrono>
 #include <cstdio>
+
+#include <iso15118/io/connection_ssl.hpp>
+#include <iso15118/session/iso.hpp>
 
 #include <iso15118/detail/helper.hpp>
 
@@ -16,42 +21,39 @@ TbdController::TbdController(TbdConfig config_) : config(std::move(config_)) {
 }
 
 void TbdController::loop() {
-    poll_manager.start();
-    std::this_thread::sleep_for(std::chrono::minutes(1));
+    static constexpr auto POLL_MANAGER_TIMEOUT_MS = 50;
+
+    auto next_event = get_current_time_point();
+
+    while (true) {
+        const auto poll_timeout_ms = get_timeout_ms_until(next_event, POLL_MANAGER_TIMEOUT_MS);
+        poll_manager.poll(poll_timeout_ms);
+
+        next_event = offset_time_point_by_ms(get_current_time_point(), POLL_MANAGER_TIMEOUT_MS);
+
+        for (auto& session : sessions) {
+            const auto next_session_event = session.poll();
+            next_event = std::min(next_event, next_session_event);
+        }
+        //
+    }
 }
 
 void TbdController::handle_sdp_server_input() {
-    const auto peer_request = sdp_server.get_peer_request();
-    char peer_hostname[128];
-    if (get_ipv6_addr(peer_request.address, peer_hostname, sizeof(peer_hostname)) == false) {
-        logf("Got SDP request, but failed to get the address\n");
-    } else {
-        logf("Got SDP request from %s\n", peer_hostname);
+    const auto request = sdp_server.get_peer_request();
+
+    if (not request) {
+        return;
     }
 
-    // now create new iso session
-    io::SessionSSLServer session_server(config.interface_name, config.ssl);
+    std::unique_ptr<io::IConnection> connection =
+        std::make_unique<io::ConnectionSSL>(poll_manager, config.interface_name, config.ssl);
 
-    const auto session_listen_fd = session_server.get_fd();
-    const auto session_socket_address = session_server.get_socket_address();
+    const auto ipv6_endpoint = connection->get_public_endpoint();
 
-    auto& descriptor = session_descriptors.emplace_back(std::move(session_server), session_listen_fd);
+    const auto& new_session = sessions.emplace_back(std::move(connection), SessionConfig{config.ssl});
 
-    poll_manager.register_fd(session_listen_fd, [this, &descriptor]() { handle_session_input(descriptor); });
-
-    sdp_server.send_response({peer_request, session_socket_address});
-}
-
-void TbdController::handle_session_input(SessionDescriptor& descriptor) {
-    // FIXME (aw): this is still kind of asymetric - furthermore no clear teardown strategy yet
-    const auto response = descriptor.session.handle_input();
-
-    if (response != -1) {
-        poll_manager.unregister_fd(descriptor.current_fd);
-        poll_manager.register_fd(response, [&session = descriptor.session]() { session.handle_input(); });
-    } else {
-        // should be EAGAIN, right?
-    }
+    sdp_server.send_response(request, ipv6_endpoint);
 }
 
 } // namespace iso15118

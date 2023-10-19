@@ -9,8 +9,8 @@
 #include <iso15118/message/variant.hpp>
 #include <iso15118/shared/fsm_logger.hpp>
 
-#include "session.hpp"
 #include "config.hpp"
+#include "session.hpp"
 
 namespace iso15118::d20 {
 
@@ -37,6 +37,8 @@ private:
     size_t response_size{0};
     bool response_available{false};
 };
+
+std::unique_ptr<MessageExchange> create_message_exchange(uint8_t* buf, const size_t len);
 
 class Context {
 public:
