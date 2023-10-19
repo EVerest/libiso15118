@@ -13,23 +13,29 @@ void DC_CableCheck::enter() {
 }
 
 FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType& sa, FsmEvent ev) {
-    if (ev == FsmEvent::NEW_V2GTP_MESSAGE) {
-        auto variant = ctx.get_request();
-        if (variant->get_type() != message_20::Type::DC_CableCheckReq) {
-            ctx.log("expected DC_CableCheckReq! But code type id: %d", variant->get_type());
-            return sa.PASS_ON;
-        }
 
-        const auto& req = variant->get<message_20::DC_CableCheckRequest>();
-
-        const auto& res = handle_request(req, ctx.session);
-
-        ctx.respond(res);
-
-        return sa.create_simple<DC_PreCharge>(ctx);
+    if (ev != FsmEvent::NEW_V2GTP_MESSAGE) {
+        return sa.PASS_ON;
     }
 
-    return sa.PASS_ON;
+    auto variant = ctx.get_request();
+
+    if (variant->get_type() != message_20::Type::DC_CableCheckReq) {
+        ctx.log("expected DC_CableCheckReq! But code type id: %d", variant->get_type());
+        return sa.PASS_ON;
+    }
+
+    const auto& req = variant->get<message_20::DC_CableCheckRequest>();
+
+    const auto& res = handle_request(req, ctx.session);
+
+    ctx.respond(res);
+
+    if (res.processing == message_20::Processing::Finished) {
+        return sa.create_simple<DC_PreCharge>(ctx);
+    } else {
+        return sa.HANDLED_INTERNALLY;
+    }
 }
 
 } // namespace iso15118::d20::state
