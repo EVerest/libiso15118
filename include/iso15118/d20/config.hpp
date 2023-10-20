@@ -33,7 +33,8 @@ struct Config {
     using DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::DC_CPDResEnergyTransferMode;
     using BPT_DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::BPT_DC_CPDResEnergyTransferMode;
 
-    std::variant<DC_ModeRes, BPT_DC_ModeRes> evse_parameters;
+    DC_ModeRes evse_dc_parameter;
+    BPT_DC_ModeRes evse_dc_bpt_parameter;
 
     Config();
 };

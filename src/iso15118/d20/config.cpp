@@ -11,9 +11,20 @@ Config::Config() {
     authorization_status = Config::AuthStatus::Accepted;
 
     supported_energy_transfer_services = {{
-        message_20::ServiceCategory::DC_BPT, // service_id
-        false                                // free_service
-    }};
+                                              message_20::ServiceCategory::DC, // service_id
+                                              false                            // free_service
+                                          },
+                                          {
+                                              message_20::ServiceCategory::DC_BPT, // service_id
+                                              false                                // free_service
+                                          }};
+
+    dc_parameter_list.push_back({
+        message_20::DcConnector::Extended,
+        message_20::ControlMode::Scheduled,
+        message_20::MobilityNeedsMode::ProvidedByEvcc,
+        message_20::Pricing::NoPricing,
+    });
 
     dc_bpt_parameter_list.push_back({{
                                          message_20::DcConnector::Extended,
@@ -24,7 +35,16 @@ Config::Config() {
                                      message_20::BptChannel::Unified,
                                      message_20::GeneratorMode::GridFollowing});
 
-    BPT_DC_ModeRes evse_dc_bpt_parameter = {
+    evse_dc_parameter = {
+        {22, 3},  // max_charge_power
+        {0, 0},   // min_charge_power
+        {25, 0},  // max_charge_current
+        {0, 0},   // min_charge_current
+        {900, 0}, // max_voltage
+        {0, 0},   // min_voltage
+    };
+
+    evse_dc_bpt_parameter = {
         {
             {22, 3},  // max_charge_power
             {0, 0},   // min_charge_power
@@ -38,7 +58,6 @@ Config::Config() {
         {25, 0}, // max_discharge_current
         {0, 0},  // min_discharge_current
     };
-    evse_parameters.emplace<BPT_DC_ModeRes>(evse_dc_bpt_parameter);
 }
 
 } // namespace iso15118::d20

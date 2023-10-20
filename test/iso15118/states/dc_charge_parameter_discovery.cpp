@@ -144,7 +144,7 @@ SCENARIO("DC charge parameter discovery state handling") {
 
         d20::Session session = d20::Session();
         d20::Config config = d20::Config();
-        DC_ModeRes evse_dc_bpt_parameter = {
+        DC_ModeRes evse_dc_parameter = {
             {22, 3},  // max_charge_power
             {0, 0},   // min_charge_power
             {25, 0},  // max_charge_current
@@ -153,8 +153,8 @@ SCENARIO("DC charge parameter discovery state handling") {
             {0, 0},   // min_voltage
         };
         message_20::RationalNumber power_ramp_limit = {20, 0};
-        evse_dc_bpt_parameter.power_ramp_limit.emplace<>(power_ramp_limit);
-        config.evse_parameters.emplace<DC_ModeRes>(evse_dc_bpt_parameter);
+        evse_dc_parameter.power_ramp_limit.emplace<>(power_ramp_limit);
+        config.evse_dc_parameter = evse_dc_parameter;
 
         session.selected_energy_service = message_20::ServiceCategory::DC;
         session.selected_energy_parameter_set_id = 0;
@@ -214,7 +214,7 @@ SCENARIO("DC charge parameter discovery state handling") {
             {25, 0}, // max_discharge_current
             {0, 0},  // min_discharge_current
         };
-        config.evse_parameters.emplace<BPT_DC_ModeRes>(evse_dc_bpt_parameter);
+        config.evse_dc_bpt_parameter = evse_dc_bpt_parameter;
 
         session.selected_energy_service = message_20::ServiceCategory::DC_BPT;
         session.selected_energy_parameter_set_id = 0;

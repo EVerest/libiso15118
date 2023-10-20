@@ -9,6 +9,9 @@
 
 namespace iso15118::d20::state {
 
+using DC_ModeReq = message_20::DC_ChargeParameterDiscoveryRequest::DC_CPDReqEnergyTransferMode;
+using BPT_DC_ModeReq = message_20::DC_ChargeParameterDiscoveryRequest::BPT_DC_CPDReqEnergyTransferMode;
+
 void DC_ChargeParameterDiscovery::enter() {
     ctx.log.enter_state("DC_ChargeParameterDiscovery");
 }
@@ -23,13 +26,22 @@ FsmSimpleState::HandleEventReturnType DC_ChargeParameterDiscovery::handle_event(
 
         const auto& req = variant->get<message_20::DC_ChargeParameterDiscoveryRequest>();
 
-        const auto& max_current = std::get<1>(req.transfer_mode).max_charge_current;
+        message_20::RationalNumber max_current;
+
+        if (std::holds_alternative<DC_ModeReq>(req.transfer_mode)) {
+
+            max_current = std::get<0>(req.transfer_mode).max_charge_current;
+
+        } else if (std::holds_alternative<BPT_DC_ModeReq>(req.transfer_mode)) {
+
+            max_current = std::get<1>(req.transfer_mode).max_charge_current;
+
+            const auto& max_discharge_current = std::get<1>(req.transfer_mode).max_discharge_current;
+
+            logf("Max discharge current %de%d\n", max_discharge_current.value, max_discharge_current.exponent);
+        }
 
         logf("Max charge current %de%d\n", max_current.value, max_current.exponent);
-
-        const auto& max_discharge_current = std::get<1>(req.transfer_mode).max_discharge_current;
-
-        logf("Max discharge current %de%d\n", max_discharge_current.value, max_discharge_current.exponent);
 
         const auto& res = handle_request(req, ctx.session, ctx.config);
 

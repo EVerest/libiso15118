@@ -28,7 +28,7 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
         }
 
         auto& mode = res.transfer_mode.emplace<DC_ModeRes>();
-        mode = std::get<DC_ModeRes>(config.evse_parameters);
+        mode = config.evse_dc_parameter;
 
     } else if (std::holds_alternative<BPT_DC_ModeReq>(req.transfer_mode)) {
         if (session.selected_energy_service != message_20::ServiceCategory::DC_BPT) {
@@ -36,7 +36,7 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
         }
 
         auto& mode = res.transfer_mode.emplace<BPT_DC_ModeRes>();
-        mode = std::get<BPT_DC_ModeRes>(config.evse_parameters);
+        mode = config.evse_dc_bpt_parameter;
 
     } else {
         // Not supported transfer_mode

@@ -20,9 +20,6 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
         log("Has value!\n");
     }
 
-    // FIXME (aw): remove, debug only
-    logf("Received: %d\n", std::get<1>(req.control_mode).target_voltage.value);
-
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
     }
