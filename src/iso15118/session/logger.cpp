@@ -15,10 +15,10 @@ void SessionLogger::log_event(const std::string& info) const {
     session_log_callback(this->id, std::move(event));
 }
 
-void SessionLogger::log_exi(const std::string& xml_namespace, uint8_t const* data, size_t len,
+void SessionLogger::log_exi(uint16_t payload_type, uint8_t const* data, size_t len,
                             logging::ExiMessageDirection direction) const {
     logging::ExiMessageEvent event{
-        std::chrono::system_clock::now(), xml_namespace, data, len, direction,
+        std::chrono::system_clock::now(), payload_type, data, len, direction,
     };
 
     session_log_callback(this->id, std::move(event));

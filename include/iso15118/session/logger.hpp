@@ -25,7 +25,7 @@ enum class ExiMessageDirection {
 };
 struct ExiMessageEvent {
     TimePoint time_point;
-    std::string const& xml_namespace;
+    uint16_t payload_type;
     uint8_t const* data;
     size_t len;
     ExiMessageDirection direction;
@@ -43,7 +43,7 @@ class SessionLogger {
 public:
     SessionLogger(void*);
     void log_event(const std::string& info) const;
-    void log_exi(const std::string& xml_namespace, uint8_t const* data, size_t len,
+    void log_exi(uint16_t payload_type, uint8_t const* data, size_t len,
                  logging::ExiMessageDirection direction) const;
 
 private:

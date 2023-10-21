@@ -139,7 +139,7 @@ TimePoint const& Session::poll() {
 
         message_exchange.set_request(payload_type, exi_input);
 
-        session_logger.log_exi("default", exi_input.payload, exi_input.payload_len,
+        session_logger.log_exi(static_cast<uint16_t>(payload_type), exi_input.payload, exi_input.payload_len,
                                session::logging::ExiMessageDirection::FROM_EV);
 
         fsm.handle_event(d20::FsmEvent::NEW_V2GTP_MESSAGE);
@@ -149,6 +149,11 @@ TimePoint const& Session::poll() {
         if (got_response) {
             const auto response_size = setup_response_header(response_buffer, payload_type, payload_size);
             connection->write(response_buffer, response_size);
+
+            // FIXME (aw): this is hacky ...
+            session_logger.log_exi(static_cast<uint16_t>(payload_type),
+                                   response_buffer + io::SdpPacket::V2GTP_HEADER_SIZE, payload_size,
+                                   session::logging::ExiMessageDirection::TO_EV);
         }
 
         packet = {}; // reset the packet
