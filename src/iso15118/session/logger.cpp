@@ -10,8 +10,17 @@ namespace iso15118::session {
 
 SessionLogger::SessionLogger(void* id_) : id(reinterpret_cast<std::uintptr_t>(id_)){};
 
-void SessionLogger::log_event(const std::string& info) {
+void SessionLogger::log_event(const std::string& info) const {
     logging::SimpleEvent event{std::chrono::system_clock::now(), info};
+    session_log_callback(this->id, std::move(event));
+}
+
+void SessionLogger::log_exi(const std::string& xml_namespace, uint8_t const* data, size_t len,
+                            logging::ExiMessageDirection direction) const {
+    logging::ExiMessageEvent event{
+        std::chrono::system_clock::now(), xml_namespace, data, len, direction,
+    };
+
     session_log_callback(this->id, std::move(event));
 }
 

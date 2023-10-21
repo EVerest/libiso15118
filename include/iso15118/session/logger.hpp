@@ -19,9 +19,16 @@ struct SimpleEvent {
     std::string info;
 };
 
+enum class ExiMessageDirection {
+    FROM_EV,
+    TO_EV,
+};
 struct ExiMessageEvent {
     TimePoint time_point;
-    std::string data;
+    std::string const& xml_namespace;
+    uint8_t const* data;
+    size_t len;
+    ExiMessageDirection direction;
 };
 
 using Event = std::variant<SimpleEvent, ExiMessageEvent>;
@@ -35,9 +42,9 @@ void set_session_log_callback(const Callback&);
 class SessionLogger {
 public:
     SessionLogger(void*);
-    void log_event(const std::string& info);
-    void log_exi_in();
-    void log_exi_out();
+    void log_event(const std::string& info) const;
+    void log_exi(const std::string& xml_namespace, uint8_t const* data, size_t len,
+                 logging::ExiMessageDirection direction) const;
 
 private:
     std::uintptr_t id;

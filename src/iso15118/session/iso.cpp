@@ -138,6 +138,10 @@ TimePoint const& Session::poll() {
         const io::StreamInputView exi_input = {packet.get_payload_buffer(), packet.get_payload_length()};
 
         message_exchange.set_request(payload_type, exi_input);
+
+        session_logger.log_exi("default", exi_input.payload, exi_input.payload_len,
+                               session::logging::ExiMessageDirection::FROM_EV);
+
         fsm.handle_event(d20::FsmEvent::NEW_V2GTP_MESSAGE);
 
         const auto [got_response, payload_size] = message_exchange.check_and_clear_response();
