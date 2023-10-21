@@ -37,7 +37,9 @@ void SdpPacket::update_read_bytes(size_t len) {
 
     if ((state == State::EMPTY) and (bytes_read == V2GTP_HEADER_SIZE)) {
         parse_header();
-    } else if ((state == State::HEADER_READ) and (bytes_read == length)) {
+    }
+
+    if ((state == State::HEADER_READ) and (bytes_read == length)) {
         state = State::COMPLETE;
     }
 }

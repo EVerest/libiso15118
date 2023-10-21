@@ -23,6 +23,7 @@ target_sources(iso15118
         shared/fsm_logger.cpp
 
         io/connection_ssl.cpp
+        io/connection_plain.cpp
         io/logging.cpp
         io/poll_manager.cpp
         io/sdp_packet.cpp

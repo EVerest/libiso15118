@@ -55,8 +55,6 @@ private:
     TimePoint next_session_event;
 
     void handle_connection_event(io::ConnectionEvent event);
-
-    void handle_sdp_packet();
 };
 
 } // namespace iso15118

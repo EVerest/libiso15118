@@ -19,4 +19,13 @@ void log_and_throw(const char* msg);
 
 void log_and_raise_mbed_error(const std::string& error_msg, int error_code);
 
+template <typename CallbackType, typename... Args> bool call_if_available(const CallbackType& callback, Args... args) {
+    if (not callback) {
+        false;
+    }
+
+    callback(std::forward<Args>(args)...);
+    return true;
+}
+
 } // namespace iso15118

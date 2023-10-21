@@ -46,10 +46,12 @@ void raise_invalid_packet_state(const io::SdpPacket& sdp_packet) {
 //            if it returns false, the packet is complete
 bool read_single_sdp_packet(io::IConnection& connection, io::SdpPacket& sdp_packet) {
     // NOTE (aw): not happy with this function
+    //            main problem is, that it combines too much logic of the sdp packet and io related stuff
     using PacketState = io::SdpPacket::State;
 
     assert(sdp_packet.get_state() == PacketState::EMPTY || sdp_packet.get_state() == PacketState::HEADER_READ);
 
+    // FIXME (aw): proper handling of case, where read returns 0!
     auto result = connection.read(sdp_packet.get_current_buffer_pos(), sdp_packet.get_remaining_bytes_to_read());
     sdp_packet.update_read_bytes(result.bytes_read);
 
@@ -131,7 +133,7 @@ TimePoint const& Session::poll() {
 
     // check for complete sdp packet
     if (packet.is_complete()) {
-        logf("Got complete packet!");
+        // FIXME (aw): this event loop only acts on new packets, seems to be enough for now ...
         const auto payload_type = packet.get_payload_type();
         const io::StreamInputView exi_input = {packet.get_payload_buffer(), packet.get_payload_length()};
 
@@ -151,10 +153,6 @@ TimePoint const& Session::poll() {
     // FIXME (aw): proper timeout handling!
     next_session_event = offset_time_point_by_ms(now, SESSION_IDLE_TIMEOUT_MS);
     return next_session_event;
-}
-
-void Session::handle_sdp_packet() {
-    logf("Got a complete sdp packet!");
 }
 
 void Session::handle_connection_event(io::ConnectionEvent event) {

@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cstdio>
 
+#include <iso15118/io/connection_plain.hpp>
 #include <iso15118/io/connection_ssl.hpp>
 #include <iso15118/session/iso.hpp>
 
@@ -46,8 +47,11 @@ void TbdController::handle_sdp_server_input() {
         return;
     }
 
+    // std::unique_ptr<io::IConnection> connection =
+    //     std::make_unique<io::ConnectionSSL>(poll_manager, config.interface_name, config.ssl);
+
     std::unique_ptr<io::IConnection> connection =
-        std::make_unique<io::ConnectionSSL>(poll_manager, config.interface_name, config.ssl);
+        std::make_unique<io::ConnectionPlain>(poll_manager, config.interface_name);
 
     const auto ipv6_endpoint = connection->get_public_endpoint();
 

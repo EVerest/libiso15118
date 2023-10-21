@@ -58,6 +58,11 @@ void PollManager::poll(int timeout_ms) {
         log_and_throw("Poll failed\n");
     }
 
+    if (ret == 0) {
+        // timeout
+        return;
+    }
+
     // first check for event_fd
     if (pollfds[pollfds.size() - 1].revents & POLLIN) {
         eventfd_t tmp;
