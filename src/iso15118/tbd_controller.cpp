@@ -41,17 +41,31 @@ void TbdController::loop() {
 }
 
 void TbdController::handle_sdp_server_input() {
-    const auto request = sdp_server.get_peer_request();
+    auto request = sdp_server.get_peer_request();
 
     if (not request) {
         return;
     }
 
-    // std::unique_ptr<io::IConnection> connection =
-    //     std::make_unique<io::ConnectionSSL>(poll_manager, config.interface_name, config.ssl);
+    switch (config.tls_negotiation_strategy) {
+    case config::TlsNegotiationStrategy::ACCEPT_CLIENT_OFFER:
+        // nothing to change
+        break;
+    case config::TlsNegotiationStrategy::ENFORCE_TLS:
+        request.security = io::v2gtp::Security::TLS;
+        break;
+    case config::TlsNegotiationStrategy::ENFORCE_NO_TLS:
+        request.security = io::v2gtp::Security::NO_TRANSPORT_SECURITY;
+        break;
+    }
 
-    std::unique_ptr<io::IConnection> connection =
-        std::make_unique<io::ConnectionPlain>(poll_manager, config.interface_name);
+    auto connection = [this](bool secure_connection) -> std::unique_ptr<io::IConnection> {
+        if (secure_connection) {
+            return std::make_unique<io::ConnectionSSL>(poll_manager, config.interface_name, config.ssl);
+        } else {
+            return std::make_unique<io::ConnectionPlain>(poll_manager, config.interface_name);
+        }
+    }(request.security == io::v2gtp::Security::TLS);
 
     const auto ipv6_endpoint = connection->get_public_endpoint();
 

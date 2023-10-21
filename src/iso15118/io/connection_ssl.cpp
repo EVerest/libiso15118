@@ -59,7 +59,7 @@ static void parse_key_file(mbedtls_pk_context* pk_context, const std::filesystem
 }
 
 static void load_certificates(SSLContext& ssl, const config::SSLConfig& ssl_config) {
-    if (ssl_config.backend == config::CertificateBackend::JOSEV_LAYOUT) {
+    if (ssl_config.backend == config::CertificateBackend::JOSEPPA_LAYOUT) {
         const std::filesystem::path prefix(ssl_config.config_string);
         auto chain = &ssl.server_certificate;
 

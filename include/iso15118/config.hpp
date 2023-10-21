@@ -6,9 +6,15 @@
 
 namespace iso15118::config {
 
+enum class TlsNegotiationStrategy {
+    ACCEPT_CLIENT_OFFER,
+    ENFORCE_TLS,
+    ENFORCE_NO_TLS,
+};
+
 enum class CertificateBackend {
     EVEREST_LAYOUT,
-    JOSEV_LAYOUT,
+    JOSEPPA_LAYOUT,
 };
 struct SSLConfig {
     CertificateBackend backend;
