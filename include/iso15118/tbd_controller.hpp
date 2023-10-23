@@ -5,10 +5,9 @@
 #include <list>
 #include <memory>
 
+#include "config.hpp"
 #include "io/poll_manager.hpp"
 #include "io/sdp_server.hpp"
-// #include "session/d20.hpp"
-#include "config.hpp"
 #include "session/iso.hpp"
 
 namespace iso15118 {

@@ -26,6 +26,7 @@ private:
 class SdpServer {
 public:
     SdpServer();
+    ~SdpServer();
     PeerRequestContext get_peer_request();
     void send_response(const PeerRequestContext&, const Ipv6EndPoint&);
 

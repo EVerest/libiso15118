@@ -3,9 +3,9 @@
 #include <iso15118/io/sdp_server.hpp>
 
 #include <cstring>
-#include <type_traits>
 
 #include <netdb.h>
+#include <unistd.h>
 
 #include <exi/cb/exi_v2gtp.h>
 
@@ -47,6 +47,14 @@ SdpServer::SdpServer() {
         bind(fd, reinterpret_cast<const struct sockaddr*>(&socket_address), sizeof(socket_address));
     if (bind_result == -1) {
         log_and_throw("Failed to bind to socket");
+    }
+}
+
+SdpServer::~SdpServer() {
+    // FIXME (aw): rather use some RAII class for this!
+    logf("Shutting down SDP server!");
+    if (fd != -1) {
+        close(fd);
     }
 }
 

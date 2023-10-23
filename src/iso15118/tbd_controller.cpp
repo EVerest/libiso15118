@@ -36,7 +36,6 @@ void TbdController::loop() {
             const auto next_session_event = session.poll();
             next_event = std::min(next_event, next_session_event);
         }
-        //
     }
 }
 
