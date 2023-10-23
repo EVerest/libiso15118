@@ -50,13 +50,14 @@ static void parse_crt_file(mbedtls_x509_crt* chain, const std::filesystem::path&
     }
 }
 
-static void parse_key_file(mbedtls_pk_context* pk_context, const std::filesystem::path& path, const char* password,
-                           mbedtls_ctr_drbg_context* drbg_context) {
+static void parse_key_file(mbedtls_pk_context* pk_context, const std::filesystem::path& path,
+                           const std::string& password, mbedtls_ctr_drbg_context* drbg_context) {
+    const auto password_ptr = (password.length() == 0) ? nullptr : password.c_str();
     const auto parse_key_result =
 #if MBEDTLS_VERSION_MAJOR == 3
-        mbedtls_pk_parse_keyfile(pk_context, path.c_str(), password, mbedtls_ctr_drbg_random, drbg_context);
+        mbedtls_pk_parse_keyfile(pk_context, path.c_str(), password_ptr, mbedtls_ctr_drbg_random, drbg_context);
 #else
-        mbedtls_pk_parse_keyfile(pk_context, path.c_str(), password);
+        mbedtls_pk_parse_keyfile(pk_context, path.c_str(), password_ptr);
 #endif
 
     if (parse_key_result != 0) {
@@ -73,7 +74,7 @@ static void load_certificates(SSLContext& ssl, const config::SSLConfig& ssl_conf
         parse_crt_file(chain, prefix / "seccLeafCert.pem");
         parse_crt_file(chain, prefix / "cpoSubCA2Cert.pem");
         parse_crt_file(chain, prefix / "cpoSubCA1Cert.pem");
-        parse_key_file(&ssl.pkey, prefix / "seccLeaf.key", "12345", &ssl.ctr_drbg); // FIXME (aw): hardcoded ...
+        parse_key_file(&ssl.pkey, prefix / "seccLeaf.key", ssl_config.private_key_password, &ssl.ctr_drbg);
     } else if (ssl_config.backend == config::CertificateBackend::EVEREST_LAYOUT) {
         const std::filesystem::path prefix(ssl_config.config_string);
 
@@ -81,7 +82,7 @@ static void load_certificates(SSLContext& ssl, const config::SSLConfig& ssl_conf
         parse_crt_file(chain, prefix / "client/cso/SECC_LEAF.pem");
         parse_crt_file(chain, prefix / "ca/cso/CPO_SUB_CA2.pem");
         parse_crt_file(chain, prefix / "ca/cso/CPO_SUB_CA1.pem");
-        parse_key_file(&ssl.pkey, prefix / "client/cso/SECC_LEAF.key", "123456", &ssl.ctr_drbg);
+        parse_key_file(&ssl.pkey, prefix / "client/cso/SECC_LEAF.key", ssl_config.private_key_password, &ssl.ctr_drbg);
     }
 }
 

@@ -19,6 +19,7 @@ enum class CertificateBackend {
 struct SSLConfig {
     CertificateBackend backend;
     std::string config_string;
+    std::string private_key_password;
     bool enable_ssl_logging { false };
 };
 
