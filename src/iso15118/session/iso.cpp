@@ -186,7 +186,7 @@ void Session::handle_connection_event(io::ConnectionEvent event) {
     case Event::ACCEPTED:
         assert(state.connected == false);
         state.connected = true;
-        log.event("Accepted connection");
+        log("Accepted connection on port %d", connection->get_public_endpoint().port);
         return;
 
     case Event::NEW_DATA:

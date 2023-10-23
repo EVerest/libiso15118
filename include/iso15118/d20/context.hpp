@@ -9,7 +9,7 @@
 
 #include <iso15118/message/payload_type.hpp>
 #include <iso15118/message/variant.hpp>
-#include <iso15118/shared/fsm_logger.hpp>
+#include <iso15118/session/logger.hpp>
 
 #include "config.hpp"
 #include "control_event.hpp"
@@ -50,7 +50,7 @@ std::unique_ptr<MessageExchange> create_message_exchange(uint8_t* buf, const siz
 
 class Context {
 public:
-    Context(MessageExchange&, std::optional<ControlEvent> const&);
+    Context(MessageExchange&, const std::optional<ControlEvent>&, session::SessionLogger&);
 
     std::unique_ptr<message_20::Variant> get_request();
 
@@ -58,9 +58,9 @@ public:
         message_exchange.set_response(msg);
     }
 
-    std::optional<ControlEvent> const& current_control_event;
+    session::SessionLogger& log;
 
-    const shared::FsmLogger log{"FSM20"};
+    const std::optional<ControlEvent>& current_control_event;
 
     Session session;
 

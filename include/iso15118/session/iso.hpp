@@ -54,7 +54,7 @@ private:
     d20::ControlEventQueue control_event_queue;
     std::optional<d20::ControlEvent> active_control_event{std::nullopt};
 
-    d20::Context ctx{message_exchange, active_control_event};
+    d20::Context ctx{message_exchange, active_control_event, log};
 
     d20::Fsm fsm;
 

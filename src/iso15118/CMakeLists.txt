@@ -19,9 +19,6 @@ target_sources(iso15118
         misc/helper.cpp
         misc/cb_exi.cpp
 
-        # FIXME (aw): distinction between 'misc' and 'shared' is not clear!
-        shared/fsm_logger.cpp
-
         io/connection_ssl.cpp
         io/connection_plain.cpp
         io/logging.cpp

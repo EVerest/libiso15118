@@ -40,8 +40,9 @@ std::tuple<bool, size_t, io::v2gtp::PayloadType> MessageExchange::check_and_clea
     return retval;
 }
 
-Context::Context(MessageExchange& message_exchange_, std::optional<ControlEvent> const& current_control_event_) :
-    message_exchange(message_exchange_), current_control_event{current_control_event_} {
+Context::Context(MessageExchange& message_exchange_, const std::optional<ControlEvent>& current_control_event_,
+                 session::SessionLogger& logger) :
+    log(logger), current_control_event{current_control_event_}, message_exchange(message_exchange_) {
 }
 
 std::unique_ptr<message_20::Variant> Context::get_request() {
