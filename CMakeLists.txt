@@ -17,6 +17,12 @@ true and hence downloading the schema files, YOU accept the ISO Customer \
 Licence Agreement (“Licence Agreement”), clauses 1. ISO’s Copyright, \
 7. Termination, 8. Limitations, and 9. Governing Law." OFF)
 
+option(ISO15118_LINK_CUSTOM_MBEDTLS "\
+Link against a pinned mbedtls library\
+" ON)
+
+
+add_subdirectory(3rd_party)
 add_subdirectory(input)
 add_subdirectory(src)
 

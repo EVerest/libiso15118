@@ -83,6 +83,20 @@ target_sources(iso15118
         tbd_controller.cpp    
 )
 
+if (NOT ISO15118_LINK_CUSTOM_MBEDTLS)
+    set(MBEDTLS_LINK_DEPENDENCIES
+        mbedtls
+        mbedx509
+        mbedcrypto
+    )
+else ()
+    set(MBEDTLS_LINK_DEPENDENCIES
+        mbedtls_custom
+        mbedx509_custom
+        mbedcrypto_custom
+    )
+endif ()
+
 target_link_libraries(iso15118
     PUBLIC
         # FIXME (aw): would be nice if we could make this private!
@@ -90,9 +104,7 @@ target_link_libraries(iso15118
     PRIVATE
         Threads::Threads
 
-        mbedtls
-        mbedx509
-        mbedcrypto
+        ${MBEDTLS_LINK_DEPENDENCIES}
 
         iso15118::v2gtp
         iso15118::exi_20

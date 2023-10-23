@@ -50,8 +50,15 @@ static void parse_crt_file(mbedtls_x509_crt* chain, const std::filesystem::path&
     }
 }
 
-static void parse_key_file(mbedtls_pk_context* pk_context, const std::filesystem::path& path, const char* password) {
-    const auto parse_key_result = mbedtls_pk_parse_keyfile(pk_context, path.c_str(), password);
+static void parse_key_file(mbedtls_pk_context* pk_context, const std::filesystem::path& path, const char* password,
+                           mbedtls_ctr_drbg_context* drbg_context) {
+    const auto parse_key_result =
+#if MBEDTLS_VERSION_MAJOR == 3
+        mbedtls_pk_parse_keyfile(pk_context, path.c_str(), password, mbedtls_ctr_drbg_random, drbg_context);
+#else
+        mbedtls_pk_parse_keyfile(pk_context, path.c_str(), password);
+#endif
+
     if (parse_key_result != 0) {
         const std::string error = "Failed in mbedtls_pk_parse_keyfile() with file " + path.string();
         log_and_raise_mbed_error(error.c_str(), parse_key_result);
@@ -66,7 +73,7 @@ static void load_certificates(SSLContext& ssl, const config::SSLConfig& ssl_conf
         parse_crt_file(chain, prefix / "seccLeafCert.pem");
         parse_crt_file(chain, prefix / "cpoSubCA2Cert.pem");
         parse_crt_file(chain, prefix / "cpoSubCA1Cert.pem");
-        parse_key_file(&ssl.pkey, prefix / "seccLeaf.key", "12345"); // FIXME (aw): hardcoded ...
+        parse_key_file(&ssl.pkey, prefix / "seccLeaf.key", "12345", &ssl.ctr_drbg); // FIXME (aw): hardcoded ...
     } else if (ssl_config.backend == config::CertificateBackend::EVEREST_LAYOUT) {
         const std::filesystem::path prefix(ssl_config.config_string);
 
@@ -74,13 +81,18 @@ static void load_certificates(SSLContext& ssl, const config::SSLConfig& ssl_conf
         parse_crt_file(chain, prefix / "client/cso/SECC_LEAF.pem");
         parse_crt_file(chain, prefix / "ca/cso/CPO_SUB_CA2.pem");
         parse_crt_file(chain, prefix / "ca/cso/CPO_SUB_CA1.pem");
-        parse_key_file(&ssl.pkey, prefix / "client/cso/SECC_LEAF.key", "123456");
+        parse_key_file(&ssl.pkey, prefix / "client/cso/SECC_LEAF.key", "123456", &ssl.ctr_drbg);
     }
 }
 
 ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& interface_name,
                              const config::SSLConfig& ssl_config) :
     poll_manager(poll_manager_), ssl(std::make_unique<SSLContext>()) {
+
+#if MBEDTLS_VERSION_MAJOR == 3
+    // FIXME (aw): psa stuff?
+    psa_crypto_init();
+#endif
 
     sockaddr_in6 address;
     if (not get_first_sockaddr_in6_for_interface(interface_name, address)) {
