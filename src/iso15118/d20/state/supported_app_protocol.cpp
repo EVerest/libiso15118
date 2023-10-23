@@ -29,7 +29,7 @@ void SupportedAppProtocol::enter() {
 }
 
 FsmSimpleState::HandleEventReturnType SupportedAppProtocol::handle_event(AllocatorType& sa, FsmEvent ev) {
-    if (ev == FsmEvent::NEW_V2GTP_MESSAGE) {
+    if (ev == FsmEvent::V2GTP_MESSAGE) {
         auto variant = ctx.get_request();
         if (variant->get_type() != message_20::Type::SupportedAppProtocolReq) {
             ctx.log("expected SupportedAppProtocolReq!");

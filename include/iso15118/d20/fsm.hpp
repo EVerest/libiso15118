@@ -10,7 +10,7 @@ namespace iso15118::d20 {
 
 enum class FsmEvent {
     RESET,
-    NEW_V2GTP_MESSAGE,
+    V2GTP_MESSAGE,
     CONTROL_MESSAGE,
 
     // internal events

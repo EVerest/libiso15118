@@ -17,7 +17,7 @@ void DC_ChargeParameterDiscovery::enter() {
 }
 
 FsmSimpleState::HandleEventReturnType DC_ChargeParameterDiscovery::handle_event(AllocatorType& sa, FsmEvent ev) {
-    if (ev == FsmEvent::NEW_V2GTP_MESSAGE) {
+    if (ev == FsmEvent::V2GTP_MESSAGE) {
         auto variant = ctx.get_request();
         if (variant->get_type() != message_20::Type::DC_ChargeParameterDiscoveryReq) {
             ctx.log("expected DC_ChargeParameterDiscovery! But code type id: %d", variant->get_type());

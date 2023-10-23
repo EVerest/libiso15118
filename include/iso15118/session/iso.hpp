@@ -3,6 +3,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include <iso15118/config.hpp>
 
@@ -33,10 +34,11 @@ public:
     ~Session();
 
     TimePoint const& poll();
+    void push_control_event(const d20::ControlEvent&);
 
 private:
     std::unique_ptr<io::IConnection> connection;
-    session::SessionLogger session_logger;
+    session::SessionLogger log;
 
     SessionState state;
     // input buffer
@@ -50,8 +52,9 @@ private:
 
     // control event buffer
     d20::ControlEventQueue control_event_queue;
+    std::optional<d20::ControlEvent> active_control_event{std::nullopt};
 
-    d20::Context ctx{message_exchange, control_event_queue};
+    d20::Context ctx{message_exchange, active_control_event};
 
     d20::Fsm fsm;
 

@@ -16,7 +16,7 @@ void DC_ChargeLoop::enter() {
 
 FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType& sa, FsmEvent ev) {
 
-    if (ev != FsmEvent::NEW_V2GTP_MESSAGE) {
+    if (ev != FsmEvent::V2GTP_MESSAGE) {
         return sa.PASS_ON;
     }
 

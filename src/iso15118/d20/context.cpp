@@ -14,13 +14,13 @@ std::unique_ptr<MessageExchange> create_message_exchange(uint8_t* buf, const siz
 MessageExchange::MessageExchange(io::StreamOutputView output_) : response(std::move(output_)) {
 }
 
-void MessageExchange::set_request(io::v2gtp::PayloadType payload_type, const io::StreamInputView& stream_view) {
+void MessageExchange::set_request(std::unique_ptr<message_20::Variant> new_request) {
     if (request) {
         // FIXME (aw): we might want to have a stack here?
         throw std::runtime_error("Previous V2G message has not been handled yet");
     }
 
-    request = std::make_unique<message_20::Variant>(payload_type, stream_view);
+    request = std::move(new_request);
 }
 
 std::unique_ptr<message_20::Variant> MessageExchange::get_request() {
@@ -31,8 +31,8 @@ std::unique_ptr<message_20::Variant> MessageExchange::get_request() {
     return std::move(request);
 }
 
-std::tuple<bool, size_t> MessageExchange::check_and_clear_response() {
-    auto retval = std::make_tuple(response_available, response_size);
+std::tuple<bool, size_t, io::v2gtp::PayloadType> MessageExchange::check_and_clear_response() {
+    auto retval = std::make_tuple(response_available, response_size, payload_type);
 
     response_available = false;
     response_size = 0;
@@ -40,8 +40,8 @@ std::tuple<bool, size_t> MessageExchange::check_and_clear_response() {
     return retval;
 }
 
-Context::Context(MessageExchange& message_exchange_, ControlEventQueue& control_events_) :
-    message_exchange(message_exchange_), control_events{control_events_} {
+Context::Context(MessageExchange& message_exchange_, std::optional<ControlEvent> const& current_control_event_) :
+    message_exchange(message_exchange_), current_control_event{current_control_event_} {
 }
 
 std::unique_ptr<message_20::Variant> Context::get_request() {

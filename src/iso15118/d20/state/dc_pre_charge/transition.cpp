@@ -13,7 +13,7 @@ void DC_PreCharge::enter() {
 }
 
 FsmSimpleState::HandleEventReturnType DC_PreCharge::handle_event(AllocatorType& sa, FsmEvent ev) {
-    if (ev == FsmEvent::NEW_V2GTP_MESSAGE) {
+    if (ev == FsmEvent::V2GTP_MESSAGE) {
         auto variant = ctx.get_request();
         if (variant->get_type() != message_20::Type::DC_PreChargeReq) {
             ctx.log("expected DC_PreChargeReq! But code type id: %d", variant->get_type());

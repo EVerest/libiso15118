@@ -14,7 +14,7 @@ void ServiceDiscovery::enter() {
 }
 
 FsmSimpleState::HandleEventReturnType ServiceDiscovery::handle_event(AllocatorType& sa, FsmEvent ev) {
-    if (ev == FsmEvent::NEW_V2GTP_MESSAGE) {
+    if (ev == FsmEvent::V2GTP_MESSAGE) {
         auto variant = ctx.get_request();
         if (variant->get_type() != message_20::Type::ServiceDiscoveryReq) {
             ctx.log("expected ServiceDiscoveryReq! But code type id: %d", variant->get_type());

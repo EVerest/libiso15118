@@ -13,7 +13,7 @@ void ScheduleExchange::enter() {
 }
 
 FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorType& sa, FsmEvent ev) {
-    if (ev == FsmEvent::NEW_V2GTP_MESSAGE) {
+    if (ev == FsmEvent::V2GTP_MESSAGE) {
         auto variant = ctx.get_request();
         if (variant->get_type() != message_20::Type::ScheduleExchangeReq) {
             ctx.log("expected ScheduleExchangeReq! But code type id: %d", variant->get_type());

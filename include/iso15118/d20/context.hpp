@@ -7,6 +7,7 @@
 #include <string>
 #include <tuple>
 
+#include <iso15118/message/payload_type.hpp>
 #include <iso15118/message/variant.hpp>
 #include <iso15118/shared/fsm_logger.hpp>
 
@@ -23,15 +24,16 @@ class MessageExchange {
 public:
     MessageExchange(io::StreamOutputView);
 
-    void set_request(io::v2gtp::PayloadType, const io::StreamInputView&);
+    void set_request(std::unique_ptr<message_20::Variant> new_request);
     std::unique_ptr<message_20::Variant> get_request();
 
     template <typename MessageType> void set_response(const MessageType& msg) {
         response_size = message_20::serialize(msg, response);
         response_available = true;
+        payload_type = message_20::PayloadTypeTrait<MessageType>::type;
     }
 
-    std::tuple<bool, size_t> check_and_clear_response();
+    std::tuple<bool, size_t, io::v2gtp::PayloadType> check_and_clear_response();
 
 private:
     // input
@@ -41,21 +43,22 @@ private:
     const io::StreamOutputView response;
     size_t response_size{0};
     bool response_available{false};
+    io::v2gtp::PayloadType payload_type;
 };
 
 std::unique_ptr<MessageExchange> create_message_exchange(uint8_t* buf, const size_t len);
 
 class Context {
 public:
-    Context(MessageExchange&, ControlEventQueue&);
+    Context(MessageExchange&, std::optional<ControlEvent> const&);
 
     std::unique_ptr<message_20::Variant> get_request();
-
-    std::optional<ControlEvent> get_next_control_event();
 
     template <typename MessageType> void respond(const MessageType& msg) {
         message_exchange.set_response(msg);
     }
+
+    std::optional<ControlEvent> const& current_control_event;
 
     const shared::FsmLogger log{"FSM20"};
 
@@ -65,7 +68,6 @@ public:
 
 private:
     MessageExchange& message_exchange;
-    ControlEventQueue& control_events;
 };
 
 } // namespace iso15118::d20
