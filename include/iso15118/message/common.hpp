@@ -144,4 +144,6 @@ using NumericID = uint32_t; // [1 - 4294967295]
 template <typename cb_RationalNumberType> void convert(const cb_RationalNumberType& in, RationalNumber& out);
 template <typename cb_RationalNumberType> void convert(const RationalNumber& in, cb_RationalNumberType& out);
 
+float convert_RationalNumber(const RationalNumber& in);
+
 } // namespace iso15118::message_20

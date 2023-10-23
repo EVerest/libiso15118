@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
+#include <cmath>
+
 #include <iso15118/message/common.hpp>
 
 #include <iso15118/detail/cb_exi.hpp>
@@ -86,6 +88,10 @@ template <> void convert(const MeterInfo& in, iso20_dc_MeterInfoType& out) {
 template <> void convert(const EvseStatus& in, iso20_EVSEStatusType& out) {
     out.NotificationMaxDelay = in.notification_max_delay;
     cb_convert_enum(in.notification, out.EVSENotification);
+}
+
+float convert_RationalNumber(const RationalNumber& in) {
+    return in.value * pow(10, in.exponent);
 }
 
 } // namespace iso15118::message_20

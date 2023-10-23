@@ -32,6 +32,7 @@ target_sources(iso15118
 
         session/iso.cpp
         session/logger.cpp
+        session/callbacks.cpp
         
         d20/fsm.cpp
         d20/context.cpp
