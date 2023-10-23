@@ -40,7 +40,9 @@ std::tuple<bool, size_t> MessageExchange::check_and_clear_response() {
     return retval;
 }
 
-Context::Context(MessageExchange& message_exchange_) : message_exchange(message_exchange_){};
+Context::Context(MessageExchange& message_exchange_, ControlEventQueue& control_events_) :
+    message_exchange(message_exchange_), control_events{control_events_} {
+}
 
 std::unique_ptr<message_20::Variant> Context::get_request() {
     return message_exchange.get_request();

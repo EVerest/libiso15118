@@ -7,6 +7,7 @@
 #include <iso15118/config.hpp>
 
 #include <iso15118/d20/context.hpp>
+#include <iso15118/d20/control_event_queue.hpp>
 #include <iso15118/d20/fsm.hpp>
 
 #include <iso15118/io/connection_abstract.hpp>
@@ -30,6 +31,7 @@ class Session {
 public:
     Session(std::unique_ptr<io::IConnection>, const SessionConfig&);
     ~Session();
+
     TimePoint const& poll();
 
 private:
@@ -46,7 +48,10 @@ private:
     d20::MessageExchange message_exchange{{response_buffer + io::SdpPacket::V2GTP_HEADER_SIZE,
                                            sizeof(response_buffer) - io::SdpPacket::V2GTP_HEADER_SIZE}};
 
-    d20::Context ctx{message_exchange};
+    // control event buffer
+    d20::ControlEventQueue control_event_queue;
+
+    d20::Context ctx{message_exchange, control_event_queue};
 
     d20::Fsm fsm;
 

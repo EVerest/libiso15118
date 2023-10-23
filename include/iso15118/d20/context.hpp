@@ -3,6 +3,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <tuple>
 
@@ -10,9 +11,13 @@
 #include <iso15118/shared/fsm_logger.hpp>
 
 #include "config.hpp"
+#include "control_event.hpp"
 #include "session.hpp"
 
 namespace iso15118::d20 {
+
+// forward declare
+class ControlEventQueue;
 
 class MessageExchange {
 public:
@@ -42,9 +47,11 @@ std::unique_ptr<MessageExchange> create_message_exchange(uint8_t* buf, const siz
 
 class Context {
 public:
-    Context(MessageExchange&);
+    Context(MessageExchange&, ControlEventQueue&);
 
     std::unique_ptr<message_20::Variant> get_request();
+
+    std::optional<ControlEvent> get_next_control_event();
 
     template <typename MessageType> void respond(const MessageType& msg) {
         message_exchange.set_response(msg);
@@ -58,6 +65,7 @@ public:
 
 private:
     MessageExchange& message_exchange;
+    ControlEventQueue& control_events;
 };
 
 } // namespace iso15118::d20

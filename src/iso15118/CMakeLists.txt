@@ -37,6 +37,7 @@ target_sources(iso15118
         d20/fsm.cpp
         d20/context.cpp
         d20/context_helper.cpp
+        d20/control_event_queue.cpp
         d20/session.cpp
         d20/config.cpp
 
