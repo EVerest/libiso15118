@@ -1,5 +1,12 @@
 include(ExternalProject)
 
+if (CMAKE_CROSSCOMPILING)
+    if (NOT CMAKE_TOOLCHAIN_FILE)
+        message(FATAL "Cross-compiling the custom mbedtls library without supplying CMAKE_TOOLCHAIN_FILE is not supported")
+    endif ()
+    set (CUSTOM_MBEDTLS_CROSSCOMPILE_DEF "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+endif ()
+
 set(ENABLE_TLS13_HEADER_CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/config_enable_tls13.h)
 
 set(CUSTOM_MBEDTLS_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/custom_mbedtls-build)
@@ -16,6 +23,7 @@ ExternalProject_Add(custom_mbedtls
     GIT_TAG
         mbedtls-3.5.0
     CMAKE_ARGS
+        ${CUSTOM_MBEDTLS_CROSSCOMPILE_DEF}
         -DENABLE_PROGRAMS=OFF
         -DENABLE_TESTING=OFF
         -DDISABLE_PACKAGE_CONFIG_AND_INSTALL=ON
