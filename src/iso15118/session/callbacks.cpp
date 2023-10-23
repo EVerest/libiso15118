@@ -3,12 +3,19 @@
 #include <iso15118/session/callbacks.hpp>
 
 // Todo(sl): Defince callback struct
+static std::function<void()> signal_start_cable_check_callback{nullptr};
 static std::function<void()> signal_dc_charge_loop_started_callback{nullptr};
 static std::function<void()> signal_v2g_setup_finished_callback{nullptr};
 static std::function<void(float, float)> signal_DC_EVTargetVoltageCurrent_callback{nullptr};
 static std::function<void(float, float, float)> signal_dc_ev_maximum_limits_callback{nullptr};
 
 namespace iso15118 {
+
+void signal_start_cable_check() {
+    if (signal_start_cable_check_callback) {
+        signal_start_cable_check_callback();
+    }
+}
 
 void signal_DC_EVTargetVoltageCurrent(float voltage, float current) {
     if (signal_DC_EVTargetVoltageCurrent_callback) {
@@ -29,6 +36,11 @@ void signal_dc_charge_loop_started() {
 }
 
 namespace session::callbacks {
+
+void set_start_cable_check(const std::function<void()>& callback) {
+    signal_start_cable_check_callback = callback;
+}
+
 void set_dc_ev_target_voltage_current(const std::function<void(float, float)>& callback) {
     signal_DC_EVTargetVoltageCurrent_callback = callback;
 }

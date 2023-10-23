@@ -29,6 +29,7 @@ template <typename CallbackType, typename... Args> bool call_if_available(const 
 }
 
 // Todo(sl): temp, find another destination
+void signal_start_cable_check();
 void signal_DC_EVTargetVoltageCurrent(float voltage, float current);
 void signal_v2g_setup_finished();
 void signal_dc_charge_loop_started();
