@@ -4,6 +4,8 @@
 
 #include <iso15118/detail/d20/context_helper.hpp>
 
+#include <iso15118/detail/helper.hpp>
+
 namespace iso15118::d20::state {
 
 message_20::DC_PreChargeResponse handle_request(const message_20::DC_PreChargeRequest& req,

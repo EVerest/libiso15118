@@ -7,5 +7,8 @@
 namespace iso15118::session::callbacks {
 
 void set_dc_ev_target_voltage_current(const std::function<void(float, float)>&);
+void set_v2g_setup_finished(const std::function<void()>&);
+void set_dc_charge_loop_started(const std::function<void()>&);
+void set_dc_ev_maximum_limits_callback(const std::function<void(float, float, float)>&);
 
 } // namespace iso15118::session::callbacks

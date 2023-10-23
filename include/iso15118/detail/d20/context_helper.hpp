@@ -5,11 +5,7 @@
 #include <iso15118/d20/session.hpp>
 #include <iso15118/message/common.hpp>
 
-namespace iso15118 {
-
-void signal_DC_EVTargetVoltageCurrent(float voltage, float current);
-
-namespace d20 {
+namespace iso15118::d20 {
 
 // FIXME (aw): not sure about correct signature here for RVO
 template <typename Response, typename ResponseCode> Response& response_with_code(Response& res, ResponseCode code) {
@@ -22,6 +18,5 @@ bool validate_and_setup_header(message_20::Header&, const Session&, const declty
 
 void setup_header(message_20::Header&, const Session&);
 
-} // namespace d20
+} // namespace iso15118::d20
 
-} // namespace iso15118
