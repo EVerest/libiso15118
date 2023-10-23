@@ -19,6 +19,7 @@ enum class CertificateBackend {
 struct SSLConfig {
     CertificateBackend backend;
     std::string config_string;
+    bool enable_ssl_logging { false };
 };
 
 } // namespace iso15118::config

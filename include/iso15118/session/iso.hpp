@@ -18,9 +18,7 @@
 
 namespace iso15118 {
 
-struct SessionConfig {
-    config::SSLConfig ssl;
-};
+struct SessionConfig {};
 
 struct SessionState {
     bool connected{false};

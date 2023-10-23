@@ -69,7 +69,7 @@ void TbdController::handle_sdp_server_input() {
 
     const auto ipv6_endpoint = connection->get_public_endpoint();
 
-    const auto& new_session = sessions.emplace_back(std::move(connection), SessionConfig{config.ssl});
+    const auto& new_session = sessions.emplace_back(std::move(connection), SessionConfig{});
 
     sdp_server.send_response(request, ipv6_endpoint);
 }

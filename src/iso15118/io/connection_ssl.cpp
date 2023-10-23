@@ -147,7 +147,10 @@ ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& inte
             logf("mbedtls debug (level: %d) - %s\n", debug_level, message);
         },
         stdout);
-    // mbedtls_debug_set_threshold(3);
+
+    if (ssl_config.enable_ssl_logging) {
+        mbedtls_debug_set_threshold(3);
+    }
 
     mbedtls_ssl_conf_ca_chain(&ssl->conf, ssl->server_certificate.next, nullptr);
     const auto own_cert_result = mbedtls_ssl_conf_own_cert(&ssl->conf, &ssl->server_certificate, &ssl->pkey);
