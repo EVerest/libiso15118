@@ -9,6 +9,7 @@
 #include "io/poll_manager.hpp"
 #include "io/sdp_server.hpp"
 #include "session/iso.hpp"
+#include "d20/control_event.hpp"
 
 namespace iso15118 {
 
@@ -24,6 +25,8 @@ public:
     explicit TbdController(TbdConfig);
 
     void loop();
+
+    void send_control_event(const d20::ControlEvent&);
 
 private:
     io::PollManager poll_manager;

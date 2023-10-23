@@ -12,6 +12,10 @@ struct DC_CableCheck : public FsmSimpleState {
     void enter() final;
 
     HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+
+private:
+    bool cable_check_initiated{false};
+    bool cable_check_done{false};
 };
 
 } // namespace iso15118::d20::state

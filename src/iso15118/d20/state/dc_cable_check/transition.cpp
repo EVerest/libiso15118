@@ -16,12 +16,15 @@ void DC_CableCheck::enter() {
 
 FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType& sa, FsmEvent ev) {
 
+    if (ev == FsmEvent::CONTROL_MESSAGE) {
+        // only test
+        cable_check_done = true;
+        return sa.HANDLED_INTERNALLY;
+    }
+
     if (ev != FsmEvent::V2GTP_MESSAGE) {
         return sa.PASS_ON;
     }
-
-    // TODO(SL): ugly
-    static bool first_entry_in_cable_check = true;
 
     auto variant = ctx.get_request();
 
@@ -30,19 +33,24 @@ FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType&
         return sa.PASS_ON;
     }
 
-    if (first_entry_in_cable_check) {
+    if (not cable_check_initiated) {
         signal_start_cable_check();
-        first_entry_in_cable_check = false;
+        cable_check_initiated = true;
     }
 
     const auto& req = variant->get<message_20::DC_CableCheckRequest>();
 
-    const auto& res = handle_request(req, ctx.session);
+    auto res = handle_request(req, ctx.session);
+
+    if (not cable_check_done) {
+        res.processing = message_20::Processing::Ongoing;
+    } else {
+        res.processing = message_20::Processing::Finished;
+    }
 
     ctx.respond(res);
 
-    if (res.processing == message_20::Processing::Finished) {
-        first_entry_in_cable_check = true; // Reset
+    if (cable_check_done) {
         return sa.create_simple<DC_PreCharge>(ctx);
     } else {
         return sa.HANDLED_INTERNALLY;

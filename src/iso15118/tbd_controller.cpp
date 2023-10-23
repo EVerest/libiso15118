@@ -39,6 +39,15 @@ void TbdController::loop() {
     }
 }
 
+void TbdController::send_control_event(const d20::ControlEvent& event) {
+    if (sessions.size() != 1) {
+        logf("Inconsistent state, sessions.size() != 1 -- dropping control event");
+        return;
+    }
+
+    sessions.front().push_control_event(event);
+}
+
 void TbdController::handle_sdp_server_input() {
     auto request = sdp_server.get_peer_request();
 
