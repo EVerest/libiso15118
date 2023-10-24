@@ -13,26 +13,39 @@ void DC_PreCharge::enter() {
 }
 
 FsmSimpleState::HandleEventReturnType DC_PreCharge::handle_event(AllocatorType& sa, FsmEvent ev) {
-    if (ev == FsmEvent::V2GTP_MESSAGE) {
-        auto variant = ctx.get_request();
-        if (variant->get_type() != message_20::Type::DC_PreChargeReq) {
-            ctx.log("expected DC_PreChargeReq! But code type id: %d", variant->get_type());
-            return sa.PASS_ON;
+
+    if (ev == FsmEvent::CONTROL_MESSAGE) {
+
+        if (ctx.current_control_event.has_value()) {
+            if (std::holds_alternative<iso15118::d20::PresentVoltageCurrent>(ctx.current_control_event.value())) {
+                const auto& present_voltage_current =
+                    std::get<iso15118::d20::PresentVoltageCurrent>(ctx.current_control_event.value());
+                present_voltage = present_voltage_current.get_voltage();
+            }
         }
-
-        const auto& req = variant->get<message_20::DC_PreChargeRequest>();
-
-        const auto [res, charge_target] = handle_request(req, ctx.session);
-
-        // FIXME (aw): should we always send this charge_target, even if the res errored?
-        ctx.feedback.dc_charge_target(charge_target);
-
-        ctx.respond(res);
-
-        return sa.create_simple<PowerDelivery>(ctx);
+        return sa.HANDLED_INTERNALLY;
     }
 
-    return sa.PASS_ON;
+    if (ev != FsmEvent::V2GTP_MESSAGE) {
+        return sa.PASS_ON;
+    }
+
+    auto variant = ctx.get_request();
+    if (variant->get_type() != message_20::Type::DC_PreChargeReq) {
+        ctx.log("expected DC_PreChargeReq! But code type id: %d", variant->get_type());
+        return sa.PASS_ON;
+    }
+
+    const auto& req = variant->get<message_20::DC_PreChargeRequest>();
+
+    const auto [res, charge_target] = handle_request(req, ctx.session, present_voltage);
+
+    // FIXME (aw): should we always send this charge_target, even if the res errored?
+    ctx.feedback.dc_charge_target(charge_target);
+
+    ctx.respond(res);
+
+    return sa.create_simple<PowerDelivery>(ctx);
 }
 
 } // namespace iso15118::d20::state

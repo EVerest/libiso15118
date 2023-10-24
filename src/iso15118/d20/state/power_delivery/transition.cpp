@@ -15,6 +15,18 @@ void PowerDelivery::enter() {
 
 FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType& sa, FsmEvent ev) {
 
+    if (ev == FsmEvent::CONTROL_MESSAGE) {
+
+        if (ctx.current_control_event.has_value()) {
+            if (std::holds_alternative<iso15118::d20::PresentVoltageCurrent>(ctx.current_control_event.value())) {
+                const auto& present_voltage_current =
+                    std::get<iso15118::d20::PresentVoltageCurrent>(ctx.current_control_event.value());
+                present_voltage = present_voltage_current.get_voltage();
+            }
+        }
+        return sa.HANDLED_INTERNALLY;
+    }
+
     if (ev != FsmEvent::V2GTP_MESSAGE) {
         return sa.PASS_ON;
     }
@@ -25,7 +37,7 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
 
         const auto& req = variant->get<message_20::DC_PreChargeRequest>();
 
-        const auto [res, charge_target] = handle_request(req, ctx.session);
+        const auto [res, charge_target] = handle_request(req, ctx.session, present_voltage);
 
         // FIXME (aw): should we always send this charge_target, even if the res errored?
         ctx.feedback.dc_charge_target(charge_target);

@@ -16,6 +16,19 @@ void DC_ChargeLoop::enter() {
 
 FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType& sa, FsmEvent ev) {
 
+    if (ev == FsmEvent::CONTROL_MESSAGE) {
+
+        if (ctx.current_control_event.has_value()) {
+            if (std::holds_alternative<iso15118::d20::PresentVoltageCurrent>(ctx.current_control_event.value())) {
+                const auto& present_voltage_current =
+                    std::get<iso15118::d20::PresentVoltageCurrent>(ctx.current_control_event.value());
+                present_voltage = present_voltage_current.get_voltage();
+                present_current = present_voltage_current.get_current();
+            }
+        }
+        return sa.HANDLED_INTERNALLY;
+    }
+
     if (ev != FsmEvent::V2GTP_MESSAGE) {
         return sa.PASS_ON;
     }
@@ -49,7 +62,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
 
         const auto& req = variant->get<message_20::DC_ChargeLoopRequest>();
 
-        const auto [res, charge_target] = handle_request(req, ctx.session);
+        const auto [res, charge_target] = handle_request(req, ctx.session, present_voltage, present_current);
 
         if (charge_target) {
             ctx.feedback.dc_charge_target(charge_target.value());

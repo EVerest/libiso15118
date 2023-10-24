@@ -13,7 +13,8 @@ using Dynamic_DC_Req = message_20::DC_ChargeLoopRequest::Dynamic_DC_CLReqControl
 using Dynamic_BPT_DC_Req = message_20::DC_ChargeLoopRequest::BPT_Dynamic_DC_CLReqControlMode;
 
 std::tuple<message_20::DC_ChargeLoopResponse, std::optional<session::feedback::DcChargeTarget>>
-handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& session) {
+handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& session, const float present_voltage,
+               const float present_current) {
 
     message_20::DC_ChargeLoopResponse res;
     std::optional<session::feedback::DcChargeTarget> charge_target{std::nullopt};
@@ -22,19 +23,22 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
         const auto& mode = std::get<Scheduled_DC_Req>(req.control_mode);
 
         charge_target = {
-            message_20::convert_RationalNumber(mode.target_voltage),
-            message_20::convert_RationalNumber(mode.target_current),
+            message_20::from_RationalNumber(mode.target_voltage),
+            message_20::from_RationalNumber(mode.target_current),
         };
 
     } else if (std::holds_alternative<Scheduled_BPT_DC_Req>(req.control_mode)) {
         const auto& mode = std::get<Scheduled_BPT_DC_Req>(req.control_mode);
 
         charge_target = {
-            message_20::convert_RationalNumber(mode.target_voltage),
-            message_20::convert_RationalNumber(mode.target_current),
+            message_20::from_RationalNumber(mode.target_voltage),
+            message_20::from_RationalNumber(mode.target_current),
         };
     }
 
+    res.present_voltage = iso15118::message_20::from_float(present_voltage);
+    res.present_current = iso15118::message_20::from_float(present_current);
+    
     if (std::get<0>(res.control_mode).max_charge_power) {
         log("Has value!\n");
     }

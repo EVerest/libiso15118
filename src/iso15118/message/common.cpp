@@ -90,8 +90,29 @@ template <> void convert(const EvseStatus& in, iso20_EVSEStatusType& out) {
     cb_convert_enum(in.notification, out.EVSENotification);
 }
 
-float convert_RationalNumber(const RationalNumber& in) {
+float from_RationalNumber(const RationalNumber& in) {
     return in.value * pow(10, in.exponent);
+}
+
+RationalNumber from_float(float in) {
+
+    int8_t exponent = 0;
+
+    if (std::floor(in) == in) {
+        exponent = 2;
+    }
+
+    while (exponent > -4) {
+        if ((in * pow(10, exponent)) < INT16_MAX) {
+            break;
+        }
+        exponent--;
+    }
+
+    RationalNumber out;
+    out.exponent = (int8_t)(-exponent);
+    out.value = (int16_t)(in * pow(10, exponent));
+    return out;
 }
 
 } // namespace iso15118::message_20

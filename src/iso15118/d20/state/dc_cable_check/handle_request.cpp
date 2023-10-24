@@ -7,7 +7,7 @@
 namespace iso15118::d20::state {
 
 message_20::DC_CableCheckResponse handle_request(const message_20::DC_CableCheckRequest& req,
-                                                 const d20::Session& session) {
+                                                 const d20::Session& session, bool cable_check_done) {
 
     message_20::DC_CableCheckResponse res;
 
@@ -15,7 +15,11 @@ message_20::DC_CableCheckResponse handle_request(const message_20::DC_CableCheck
         return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
     }
 
-    res.processing = message_20::Processing::Finished;
+    if (not cable_check_done) {
+        res.processing = message_20::Processing::Ongoing;
+    } else {
+        res.processing = message_20::Processing::Finished;
+    }
 
     return response_with_code(res, message_20::ResponseCode::OK);
 }

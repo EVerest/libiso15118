@@ -9,7 +9,7 @@
 namespace iso15118::d20::state {
 
 std::tuple<message_20::DC_PreChargeResponse, session::feedback::DcChargeTarget>
-handle_request(const message_20::DC_PreChargeRequest& req, const d20::Session& session) {
+handle_request(const message_20::DC_PreChargeRequest& req, const d20::Session& session, const float present_voltage) {
 
     message_20::DC_PreChargeResponse res;
     session::feedback::DcChargeTarget charge_target{};
@@ -18,11 +18,10 @@ handle_request(const message_20::DC_PreChargeRequest& req, const d20::Session& s
         return {response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession), charge_target};
     }
 
-    charge_target.voltage = iso15118::message_20::convert_RationalNumber(req.target_voltage);
+    charge_target.voltage = iso15118::message_20::from_RationalNumber(req.target_voltage);
     charge_target.current = 0;
-    
 
-    res.present_voltage = {20, 3};
+    res.present_voltage = iso15118::message_20::from_float(present_voltage);
 
     return {response_with_code(res, message_20::ResponseCode::OK), charge_target};
 }

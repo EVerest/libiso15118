@@ -17,8 +17,18 @@ void DC_CableCheck::enter() {
 FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType& sa, FsmEvent ev) {
 
     if (ev == FsmEvent::CONTROL_MESSAGE) {
-        // only test
-        cable_check_done = true;
+        // it works but ugly
+        if (ctx.current_control_event.has_value()) {
+            if (std::holds_alternative<iso15118::d20::CableCheckFinished>(ctx.current_control_event.value())) {
+                const auto& control_event =
+                    std::get<iso15118::d20::CableCheckFinished>(ctx.current_control_event.value());
+                if (control_event) {
+                    cable_check_done = true;
+                } else {
+                    cable_check_done = false;
+                }
+            }
+        }
         return sa.HANDLED_INTERNALLY;
     }
 
@@ -40,13 +50,7 @@ FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType&
 
     const auto& req = variant->get<message_20::DC_CableCheckRequest>();
 
-    auto res = handle_request(req, ctx.session);
-
-    if (not cable_check_done) {
-        res.processing = message_20::Processing::Ongoing;
-    } else {
-        res.processing = message_20::Processing::Finished;
-    }
+    auto res = handle_request(req, ctx.session, cable_check_done);
 
     ctx.respond(res);
 

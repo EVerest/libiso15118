@@ -12,6 +12,9 @@ struct PowerDelivery : public FsmSimpleState {
     void enter() final;
 
     HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+
+private:
+    float present_voltage{0};
 };
 
 } // namespace iso15118::d20::state

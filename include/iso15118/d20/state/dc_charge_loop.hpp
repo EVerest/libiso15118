@@ -12,6 +12,10 @@ struct DC_ChargeLoop : public FsmSimpleState {
     void enter() final;
 
     HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+
+private:
+    float present_voltage{0};
+    float present_current{0};
 };
 
 } // namespace iso15118::d20::state
