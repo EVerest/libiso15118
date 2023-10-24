@@ -2,12 +2,17 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #pragma once
 
+#include <optional>
+#include <tuple>
+
 #include <iso15118/d20/session.hpp>
 #include <iso15118/message/dc_charge_loop.hpp>
 
+#include <iso15118/session/feedback.hpp>
+
 namespace iso15118::d20::state {
 
-message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoopRequest& req,
-                                                 const d20::Session& session);
+std::tuple<message_20::DC_ChargeLoopResponse, std::optional<session::feedback::DcChargeTarget>>
+handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& session);
 
 } // namespace iso15118::d20::state

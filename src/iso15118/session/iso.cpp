@@ -26,7 +26,7 @@ static void log_sdp_packet(const iso15118::io::SdpPacket& sdp) {
 
 static void log_packet_from_car(const iso15118::io::SdpPacket& packet, session::SessionLogger& logger) {
     logger.exi(static_cast<uint16_t>(packet.get_payload_type()), packet.get_payload_buffer(),
-                   packet.get_payload_length(), session::logging::ExiMessageDirection::FROM_EV);
+               packet.get_payload_length(), session::logging::ExiMessageDirection::FROM_EV);
 }
 
 static std::unique_ptr<message_20::Variant> make_variant_from_packet(const iso15118::io::SdpPacket& packet) {
@@ -113,8 +113,9 @@ static size_t setup_response_header(uint8_t* buffer, iso15118::io::v2gtp::Payloa
     return size + iso15118::io::SdpPacket::V2GTP_HEADER_SIZE;
 }
 
-Session::Session(std::unique_ptr<io::IConnection> connection_, const SessionConfig& config) :
-    connection(std::move(connection_)), log(this) {
+Session::Session(std::unique_ptr<io::IConnection> connection_, const SessionConfig& config,
+                 const session::feedback::Callbacks& callbacks) :
+    connection(std::move(connection_)), log(this), ctx(message_exchange, active_control_event, callbacks, log) {
 
     next_session_event = offset_time_point_by_ms(get_current_time_point(), SESSION_IDLE_TIMEOUT_MS);
     connection->set_event_callback([this](io::ConnectionEvent event) { this->handle_connection_event(event); });
@@ -163,7 +164,6 @@ TimePoint const& Session::poll() {
         const auto res = fsm.handle_event(d20::FsmEvent::V2GTP_MESSAGE);
     }
 
-
     const auto [got_response, payload_size, payload_type] = message_exchange.check_and_clear_response();
 
     if (got_response) {
@@ -171,8 +171,8 @@ TimePoint const& Session::poll() {
         connection->write(response_buffer, response_size);
 
         // FIXME (aw): this is hacky ...
-        log.exi(static_cast<uint16_t>(payload_type), response_buffer + io::SdpPacket::V2GTP_HEADER_SIZE,
-                               payload_size, session::logging::ExiMessageDirection::TO_EV);
+        log.exi(static_cast<uint16_t>(payload_type), response_buffer + io::SdpPacket::V2GTP_HEADER_SIZE, payload_size,
+                session::logging::ExiMessageDirection::TO_EV);
     }
 
     // FIXME (aw): proper timeout handling!

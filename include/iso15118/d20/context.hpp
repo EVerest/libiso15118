@@ -9,6 +9,7 @@
 
 #include <iso15118/message/payload_type.hpp>
 #include <iso15118/message/variant.hpp>
+#include <iso15118/session/feedback.hpp>
 #include <iso15118/session/logger.hpp>
 
 #include "config.hpp"
@@ -50,7 +51,9 @@ std::unique_ptr<MessageExchange> create_message_exchange(uint8_t* buf, const siz
 
 class Context {
 public:
-    Context(MessageExchange&, const std::optional<ControlEvent>&, session::SessionLogger&);
+    // FIXME (aw): bundle arguments
+    Context(MessageExchange&, const std::optional<ControlEvent>&, session::feedback::Callbacks,
+            session::SessionLogger&);
 
     std::unique_ptr<message_20::Variant> get_request();
 
@@ -58,9 +61,11 @@ public:
         message_exchange.set_response(msg);
     }
 
-    session::SessionLogger& log;
-
     const std::optional<ControlEvent>& current_control_event;
+
+    const session::Feedback feedback;
+
+    session::SessionLogger& log;
 
     Session session;
 

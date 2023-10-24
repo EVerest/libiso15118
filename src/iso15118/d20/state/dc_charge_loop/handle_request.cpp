@@ -12,25 +12,27 @@ using Scheduled_BPT_DC_Req = message_20::DC_ChargeLoopRequest::BPT_Scheduled_DC_
 using Dynamic_DC_Req = message_20::DC_ChargeLoopRequest::Dynamic_DC_CLReqControlMode;
 using Dynamic_BPT_DC_Req = message_20::DC_ChargeLoopRequest::BPT_Dynamic_DC_CLReqControlMode;
 
-message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoopRequest& req,
-                                                 const d20::Session& session) {
+std::tuple<message_20::DC_ChargeLoopResponse, std::optional<session::feedback::DcChargeTarget>>
+handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& session) {
 
     message_20::DC_ChargeLoopResponse res;
+    std::optional<session::feedback::DcChargeTarget> charge_target{std::nullopt};
 
     if (std::holds_alternative<Scheduled_DC_Req>(req.control_mode)) {
         const auto& mode = std::get<Scheduled_DC_Req>(req.control_mode);
 
-        const float target_voltage = message_20::convert_RationalNumber(mode.target_voltage);
-        const float target_current = message_20::convert_RationalNumber(mode.target_current);
+        charge_target = {
+            message_20::convert_RationalNumber(mode.target_voltage),
+            message_20::convert_RationalNumber(mode.target_current),
+        };
 
-        signal_DC_EVTargetVoltageCurrent(target_voltage, target_current);
     } else if (std::holds_alternative<Scheduled_BPT_DC_Req>(req.control_mode)) {
         const auto& mode = std::get<Scheduled_BPT_DC_Req>(req.control_mode);
 
-        const float target_voltage = message_20::convert_RationalNumber(mode.target_voltage);
-        const float target_current = message_20::convert_RationalNumber(mode.target_current);
-
-        signal_DC_EVTargetVoltageCurrent(target_voltage, target_current);
+        charge_target = {
+            message_20::convert_RationalNumber(mode.target_voltage),
+            message_20::convert_RationalNumber(mode.target_current),
+        };
     }
 
     if (std::get<0>(res.control_mode).max_charge_power) {
@@ -42,10 +44,10 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
     }
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
+        return {response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession), charge_target};
     }
 
-    return response_with_code(res, message_20::ResponseCode::OK);
+    return {response_with_code(res, message_20::ResponseCode::OK), charge_target};
 }
 
 } // namespace iso15118::d20::state

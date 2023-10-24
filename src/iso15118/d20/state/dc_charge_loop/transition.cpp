@@ -21,6 +21,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
     }
 
     // TODO(SL): ugly
+    // FIXME (aw): never use statics like this!
     static bool first_entry_in_charge_loop = true;
 
     auto variant = ctx.get_request();
@@ -42,13 +43,17 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
     } else if (variant->get_type() == message_20::Type::DC_ChargeLoopReq) {
 
         if (first_entry_in_charge_loop) {
-            signal_dc_charge_loop_started();
+            ctx.feedback.signal(session::feedback::Signal::CHARGE_LOOP_STARTED);
             first_entry_in_charge_loop = false;
         }
-        
+
         const auto& req = variant->get<message_20::DC_ChargeLoopRequest>();
 
-        const auto& res = handle_request(req, ctx.session);
+        const auto [res, charge_target] = handle_request(req, ctx.session);
+
+        if (charge_target) {
+            ctx.feedback.dc_charge_target(charge_target.value());
+        }
 
         ctx.respond(res);
 

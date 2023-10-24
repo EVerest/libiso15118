@@ -13,10 +13,6 @@ message_20::PowerDeliveryResponse handle_request(const message_20::PowerDelivery
 
     message_20::PowerDeliveryResponse res;
 
-    if (req.charge_progress == message_20::PowerDeliveryRequest::Progress::Start) {
-        signal_v2g_setup_finished();
-    }
-
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
     }

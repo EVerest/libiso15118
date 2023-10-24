@@ -22,7 +22,10 @@ FsmSimpleState::HandleEventReturnType DC_PreCharge::handle_event(AllocatorType& 
 
         const auto& req = variant->get<message_20::DC_PreChargeRequest>();
 
-        const auto& res = handle_request(req, ctx.session);
+        const auto [res, charge_target] = handle_request(req, ctx.session);
+
+        // FIXME (aw): should we always send this charge_target, even if the res errored?
+        ctx.feedback.dc_charge_target(charge_target);
 
         ctx.respond(res);
 

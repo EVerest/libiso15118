@@ -16,6 +16,7 @@
 #include <iso15118/io/sdp_packet.hpp>
 #include <iso15118/io/time.hpp>
 
+#include <iso15118/session/feedback.hpp>
 #include <iso15118/session/logger.hpp>
 
 namespace iso15118 {
@@ -30,7 +31,7 @@ struct SessionState {
 
 class Session {
 public:
-    Session(std::unique_ptr<io::IConnection>, const SessionConfig&);
+    Session(std::unique_ptr<io::IConnection>, const SessionConfig&, const session::feedback::Callbacks&);
     ~Session();
 
     TimePoint const& poll();
@@ -54,7 +55,7 @@ private:
     d20::ControlEventQueue control_event_queue;
     std::optional<d20::ControlEvent> active_control_event{std::nullopt};
 
-    d20::Context ctx{message_exchange, active_control_event, log};
+    d20::Context ctx;
 
     d20::Fsm fsm;
 

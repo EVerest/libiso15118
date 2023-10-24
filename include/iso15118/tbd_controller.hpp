@@ -9,6 +9,7 @@
 #include "io/poll_manager.hpp"
 #include "io/sdp_server.hpp"
 #include "session/iso.hpp"
+#include "session/feedback.hpp"
 #include "d20/control_event.hpp"
 
 namespace iso15118 {
@@ -21,8 +22,7 @@ struct TbdConfig {
 
 class TbdController {
 public:
-    TbdController();
-    explicit TbdController(TbdConfig);
+    TbdController(TbdConfig, session::feedback::Callbacks);
 
     void loop();
 
@@ -38,6 +38,7 @@ private:
     void handle_sdp_server_input();
 
     const TbdConfig config;
+    const session::feedback::Callbacks callbacks;
 };
 
 } // namespace iso15118

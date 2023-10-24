@@ -14,10 +14,8 @@
 
 namespace iso15118 {
 
-TbdController::TbdController() : TbdController(TbdConfig()) {
-}
-
-TbdController::TbdController(TbdConfig config_) : config(std::move(config_)) {
+TbdController::TbdController(TbdConfig config_, session::feedback::Callbacks callbacks_) :
+    config(std::move(config_)), callbacks(std::move(callbacks_)) {
     poll_manager.register_fd(sdp_server.get_fd(), [this]() { handle_sdp_server_input(); });
 }
 
@@ -77,7 +75,7 @@ void TbdController::handle_sdp_server_input() {
 
     const auto ipv6_endpoint = connection->get_public_endpoint();
 
-    const auto& new_session = sessions.emplace_back(std::move(connection), SessionConfig{});
+    const auto& new_session = sessions.emplace_back(std::move(connection), SessionConfig{}, callbacks);
 
     sdp_server.send_response(request, ipv6_endpoint);
 }

@@ -34,7 +34,7 @@ FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType&
     }
 
     if (not cable_check_initiated) {
-        signal_start_cable_check();
+        ctx.feedback.signal(session::feedback::Signal::START_CABLE_CHECK);
         cable_check_initiated = true;
     }
 

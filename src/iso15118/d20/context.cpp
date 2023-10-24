@@ -41,8 +41,11 @@ std::tuple<bool, size_t, io::v2gtp::PayloadType> MessageExchange::check_and_clea
 }
 
 Context::Context(MessageExchange& message_exchange_, const std::optional<ControlEvent>& current_control_event_,
-                 session::SessionLogger& logger) :
-    log(logger), current_control_event{current_control_event_}, message_exchange(message_exchange_) {
+                 session::feedback::Callbacks feedback_callbacks, session::SessionLogger& logger) :
+    current_control_event{current_control_event_},
+    feedback(std::move(feedback_callbacks)),
+    log(logger),
+    message_exchange(message_exchange_) {
 }
 
 std::unique_ptr<message_20::Variant> Context::get_request() {
