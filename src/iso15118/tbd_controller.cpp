@@ -38,8 +38,8 @@ void TbdController::loop() {
 }
 
 void TbdController::send_control_event(const d20::ControlEvent& event) {
-    if (sessions.size() != 1) {
-        logf("Inconsistent state, sessions.size() != 1 -- dropping control event");
+    if (sessions.size() > 1) {
+        logf("Inconsistent state, sessions.size() > 1 -- dropping control event");
         return;
     }
 
