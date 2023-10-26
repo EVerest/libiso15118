@@ -7478,6 +7478,32 @@ static int encode_iso20_ParameterSetType(exi_bitstream_t* stream, const struct i
                     error = encode_iso20_ParameterType(stream, &ParameterSetType->Parameter.array[Parameter_currentIndex++]);
                     if (error == EXI_ERROR__NO_ERROR)
                     {
+                        grammar_id = 176;
+                    }
+                }
+            }
+            else
+            {
+                error = exi_basetypes_encoder_nbit_uint(stream, 2, 1);
+                if (error == EXI_ERROR__NO_ERROR)
+                {
+                    // Event: END Element; next=3
+                    done = 1;
+                    grammar_id = 3;
+                }
+            }
+            break;
+        case 176:
+            // Grammar: ID=176; read/write bits=2; START (Parameter), END Element
+            if (Parameter_currentIndex < ParameterSetType->Parameter.arrayLen)
+            {
+                error = exi_basetypes_encoder_nbit_uint(stream, 2, 0);
+                if (error == EXI_ERROR__NO_ERROR)
+                {
+                    // Event: START (ParameterType); next=2
+                    error = encode_iso20_ParameterType(stream, &ParameterSetType->Parameter.array[Parameter_currentIndex++]);
+                    if (error == EXI_ERROR__NO_ERROR)
+                    {
                         grammar_id = 2;
                     }
                 }

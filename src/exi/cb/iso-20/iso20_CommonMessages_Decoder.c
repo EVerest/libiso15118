@@ -8669,7 +8669,7 @@ static int decode_iso20_ParameterSetType(exi_bitstream_t* stream, struct iso20_P
                 case 0:
                     // Event: START (Parameter, ParameterType (ParameterType)); next=171
                     // decode: element array
-                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_5_ARRAY_SIZE)
+                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_10_ARRAY_SIZE)
                     {
                         error = decode_iso20_ParameterType(stream, &ParameterSetType->Parameter.array[ParameterSetType->Parameter.arrayLen++]);
                     }
@@ -8695,7 +8695,7 @@ static int decode_iso20_ParameterSetType(exi_bitstream_t* stream, struct iso20_P
                 case 0:
                     // Event: START (Parameter, ParameterType (ParameterType)); next=172
                     // decode: element array
-                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_5_ARRAY_SIZE)
+                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_10_ARRAY_SIZE)
                     {
                         error = decode_iso20_ParameterType(stream, &ParameterSetType->Parameter.array[ParameterSetType->Parameter.arrayLen++]);
                     }
@@ -8726,7 +8726,7 @@ static int decode_iso20_ParameterSetType(exi_bitstream_t* stream, struct iso20_P
                 case 0:
                     // Event: START (Parameter, ParameterType (ParameterType)); next=173
                     // decode: element array
-                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_5_ARRAY_SIZE)
+                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_10_ARRAY_SIZE)
                     {
                         error = decode_iso20_ParameterType(stream, &ParameterSetType->Parameter.array[ParameterSetType->Parameter.arrayLen++]);
                     }
@@ -8757,7 +8757,7 @@ static int decode_iso20_ParameterSetType(exi_bitstream_t* stream, struct iso20_P
                 case 0:
                     // Event: START (Parameter, ParameterType (ParameterType)); next=174
                     // decode: element array
-                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_5_ARRAY_SIZE)
+                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_10_ARRAY_SIZE)
                     {
                         error = decode_iso20_ParameterType(stream, &ParameterSetType->Parameter.array[ParameterSetType->Parameter.arrayLen++]);
                     }
@@ -8788,7 +8788,7 @@ static int decode_iso20_ParameterSetType(exi_bitstream_t* stream, struct iso20_P
                 case 0:
                     // Event: START (Parameter, ParameterType (ParameterType)); next=175
                     // decode: element array
-                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_5_ARRAY_SIZE)
+                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_10_ARRAY_SIZE)
                     {
                         error = decode_iso20_ParameterType(stream, &ParameterSetType->Parameter.array[ParameterSetType->Parameter.arrayLen++]);
                     }
@@ -8810,6 +8810,37 @@ static int decode_iso20_ParameterSetType(exi_bitstream_t* stream, struct iso20_P
             }
             break;
         case 175:
+            // Grammar: ID=175; read/write bits=2; START (Parameter), next=176
+            error = exi_basetypes_decoder_nbit_uint(stream, 2, &eventCode);
+            if (error == 0)
+            {
+                switch(eventCode)
+                {
+                case 0:
+                    // Event: START (Parameter, ParameterType (ParameterType)); next=2
+                    // decode: element array
+                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_10_ARRAY_SIZE)
+                    {
+                        error = decode_iso20_ParameterType(stream, &ParameterSetType->Parameter.array[ParameterSetType->Parameter.arrayLen++]);
+                    }
+                    else
+                    {
+                        error = EXI_ERROR__ARRAY_OUT_OF_BOUNDS;
+                    }
+                    grammar_id = 176;
+                    break;
+                case 1:
+                    // Event: END Element; next=3
+                    done = 1;
+                    grammar_id = 3;
+                    break;
+                default:
+                    error = EXI_ERROR__UNKNOWN_EVENT_CODE;
+                    break;
+                }
+            }
+            break;
+        case 176:
             // Grammar: ID=175; read/write bits=2; START (Parameter), END Element
             error = exi_basetypes_decoder_nbit_uint(stream, 2, &eventCode);
             if (error == 0)
@@ -8819,7 +8850,7 @@ static int decode_iso20_ParameterSetType(exi_bitstream_t* stream, struct iso20_P
                 case 0:
                     // Event: START (Parameter, ParameterType (ParameterType)); next=2
                     // decode: element array
-                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_5_ARRAY_SIZE)
+                    if (ParameterSetType->Parameter.arrayLen < iso20_ParameterType_10_ARRAY_SIZE)
                     {
                         error = decode_iso20_ParameterType(stream, &ParameterSetType->Parameter.array[ParameterSetType->Parameter.arrayLen++]);
                     }

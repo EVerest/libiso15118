@@ -69,7 +69,7 @@ extern "C" {
 #define iso20_PriceRuleStackType_64_ARRAY_SIZE 64
 #define iso20_OverstayRuleType_5_ARRAY_SIZE 5
 #define iso20_AdditionalServiceType_5_ARRAY_SIZE 5
-#define iso20_ParameterType_5_ARRAY_SIZE 5
+#define iso20_ParameterType_10_ARRAY_SIZE 10
 #define iso20_nameType_128_ARRAY_SIZE 128
 #define iso20_ProviderID_CHARACTER_SIZE 80 + ASCII_EXTRA_CHAR
 #define iso20_MeterID_CHARACTER_SIZE 32 + ASCII_EXTRA_CHAR
@@ -1198,7 +1198,7 @@ struct iso20_ParameterSetType {
     uint16_t ParameterSetID;
     // Parameter, ParameterType
     struct {
-        struct iso20_ParameterType array[iso20_ParameterType_5_ARRAY_SIZE];
+        struct iso20_ParameterType array[iso20_ParameterType_10_ARRAY_SIZE];
         uint16_t arrayLen;
     } Parameter;
 };
