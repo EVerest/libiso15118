@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -30,12 +30,11 @@
  *****************************************************************************/
 static int exi_basetypes_encoder_write_unsigned(exi_bitstream_t* stream, exi_unsigned_t* exi_unsigned)
 {
-    int error;
-
     uint8_t* current_octet = exi_unsigned->octets;
 
     for (size_t n = 0; n < exi_unsigned->octets_count; n++)
     {
+        int error;
         error = exi_bitstream_write_octet(stream, *current_octet);
         if (error != EXI_ERROR__NO_ERROR)
         {
@@ -65,19 +64,18 @@ int exi_basetypes_encoder_bool(exi_bitstream_t* stream, int value)
 /*****************************************************************************
  * interface functions - bytes, binary
  *****************************************************************************/
-int exi_basetypes_encoder_bytes(exi_bitstream_t* stream, size_t bytes_len, uint8_t* bytes, size_t bytes_size)
+int exi_basetypes_encoder_bytes(exi_bitstream_t* stream, size_t bytes_len, const uint8_t* bytes, size_t bytes_size)
 {
-    int error;
-
     if (bytes_len > bytes_size)
     {
         return EXI_ERROR__BYTE_BUFFER_TOO_SMALL;
     }
 
-    uint8_t* current_byte = bytes;
+    uint8_t* current_byte = (uint8_t*)bytes;
 
     for (size_t n = 0; n < bytes_len; n++)
     {
+        int error;
         error = exi_bitstream_write_octet(stream, *current_byte);
         if (error != EXI_ERROR__NO_ERROR)
         {
@@ -246,10 +244,9 @@ int exi_basetypes_encoder_integer_64(exi_bitstream_t* stream, int64_t value)
 /*****************************************************************************
  * interface functions - characters, string
  *****************************************************************************/
-int exi_basetypes_encoder_characters(exi_bitstream_t* stream, size_t characters_len, exi_character_t* characters, size_t characters_size)
+int exi_basetypes_encoder_characters(exi_bitstream_t* stream, size_t characters_len, const exi_character_t* characters, size_t characters_size)
 {
     const uint8_t ASCII_MAX_VALUE = 127;
-    int error;
 
     if (characters_len > characters_size)
     {
@@ -260,6 +257,7 @@ int exi_basetypes_encoder_characters(exi_bitstream_t* stream, size_t characters_
 
     for (size_t n = 0; n < characters_len; n++)
     {
+        int error;
         if (*current_char > ASCII_MAX_VALUE)
         {
             return EXI_ERROR__UNSUPPORTED_CHARACTER_VALUE;

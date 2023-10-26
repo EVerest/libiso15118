@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -49,12 +49,12 @@ void V2GTP20_WriteHeader(uint8_t* stream_data, uint32_t stream_payload_length, u
     stream_data[7] = (uint8_t)(stream_payload_length & 0xFFu);
 }
 
-int V2GTP_ReadHeader(uint8_t* stream_data, uint32_t* stream_payload_length)
+int V2GTP_ReadHeader(const uint8_t* stream_data, uint32_t* stream_payload_length)
 {
     return V2GTP20_ReadHeader(stream_data, stream_payload_length, V2GTP20_SAP_PAYLOAD_ID);
 }
 
-int V2GTP20_ReadHeader(uint8_t* stream_data, uint32_t* stream_payload_length, uint16_t v2gtp20_payload_id)
+int V2GTP20_ReadHeader(const uint8_t* stream_data, uint32_t* stream_payload_length, uint16_t v2gtp20_payload_id)
 {
     uint16_t payload_id;
 

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -87,7 +87,7 @@ int exi_basetypes_convert_from_unsigned(exi_unsigned_t* exi_unsigned, uint32_t* 
 
     for (size_t n = 0; n < exi_unsigned->octets_count; n++)
     {
-        *value = (uint32_t)(*value + ((*current_octet & EXI_BASETYPES_OCTET_SEQ_VALUE_MASK) << (n * 7)));
+        *value = *value + ((uint32_t)(*current_octet & EXI_BASETYPES_OCTET_SEQ_VALUE_MASK) << (n * 7));
 
         current_octet++;
     }
@@ -107,7 +107,7 @@ int exi_basetypes_convert_64_from_unsigned(exi_unsigned_t* exi_unsigned, uint64_
 
     for (size_t n = 0; n < exi_unsigned->octets_count; n++)
     {
-        *value = (uint64_t)(*value + ((*current_octet & EXI_BASETYPES_OCTET_SEQ_VALUE_MASK) << (n * 7)));
+        *value = *value + ((uint64_t)(*current_octet & EXI_BASETYPES_OCTET_SEQ_VALUE_MASK) << (n * 7));
 
         current_octet++;
     }

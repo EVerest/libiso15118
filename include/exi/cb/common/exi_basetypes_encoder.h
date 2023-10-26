@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -57,7 +57,7 @@ int exi_basetypes_encoder_bool(exi_bitstream_t* stream, int value);
  * \return                      NO_ERROR or error code
  *
  */
-int exi_basetypes_encoder_bytes(exi_bitstream_t* stream, size_t bytes_len, uint8_t* bytes, size_t bytes_size);
+int exi_basetypes_encoder_bytes(exi_bitstream_t* stream, size_t bytes_len, const uint8_t* bytes, size_t bytes_size);
 
 /**
  * \brief       encoder for n-bit unsigned integer
@@ -118,7 +118,7 @@ int exi_basetypes_encoder_integer_64(exi_bitstream_t* stream, int64_t value);
  * \return                      NO_ERROR or error code
  *
  */
-int exi_basetypes_encoder_characters(exi_bitstream_t* stream, size_t characters_len, exi_character_t* characters, size_t characters_size);
+int exi_basetypes_encoder_characters(exi_bitstream_t* stream, size_t characters_len, const exi_character_t* characters, size_t characters_size);
 
 
 #ifdef __cplusplus

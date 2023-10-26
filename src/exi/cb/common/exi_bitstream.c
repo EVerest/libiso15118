@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -118,7 +118,7 @@ void exi_bitstream_reset(exi_bitstream_t* stream)
     stream->bit_count = 0;
 }
 
-size_t exi_bitstream_get_length(exi_bitstream_t* stream)
+size_t exi_bitstream_get_length(const exi_bitstream_t* stream)
 {
     size_t length = stream->byte_pos;
 
@@ -139,11 +139,11 @@ int exi_bitstream_write_bits(exi_bitstream_t* stream, size_t bit_count, uint32_t
         return EXI_ERROR__BIT_COUNT_LARGER_THAN_TYPE_SIZE;
     }
 
-    uint8_t bit;
     int error = EXI_ERROR__NO_ERROR;
 
     for (size_t n = 0; n < bit_count; n++)
     {
+        uint8_t bit;
         bit = (value & (1u << (bit_count - n - 1))) > 0;
 
         error = exi_bitstream_write_bit(stream, bit);
@@ -170,11 +170,11 @@ int exi_bitstream_read_bits(exi_bitstream_t* stream, size_t bit_count, uint32_t*
         return EXI_ERROR__BIT_COUNT_LARGER_THAN_TYPE_SIZE;
     }
 
-    uint8_t bit;
     int error = EXI_ERROR__NO_ERROR;
 
     for (size_t n = 0; n < bit_count; n++)
     {
+        uint8_t bit;
         error = exi_bitstream_read_bit(stream, &bit);
         if (error != EXI_ERROR__NO_ERROR)
         {
@@ -190,11 +190,11 @@ int exi_bitstream_read_octet(exi_bitstream_t* stream, uint8_t* value)
 {
     *value = 0;
 
-    uint8_t bit;
     int error = EXI_ERROR__NO_ERROR;
 
     for (int n = 0; n < 8; n++)
     {
+        uint8_t bit;
         error = exi_bitstream_read_bit(stream, &bit);
         if (error != EXI_ERROR__NO_ERROR)
         {

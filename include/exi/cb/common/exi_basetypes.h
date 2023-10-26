@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -39,7 +39,7 @@ extern "C" {
 #define ASCII_EXTRA_CHAR 1
 #define ASCII_CHAR_TERMINATOR '\0'
 
-#define EXI_STRING_MAX_LEN 50
+#define EXI_STRING_MAX_LEN 64
 #define EXI_BYTE_ARRAY_MAX_LEN 350
 
 #define EXI_BASETYPES_MAX_OCTETS_SUPPORTED 10

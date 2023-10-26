@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -80,8 +80,8 @@ void V2GTP20_WriteHeader(uint8_t* stream_data, uint32_t stream_payload_length, u
  * @retval  on success V2GTP_ERROR__NO_ERROR otherwise an error code
  *
  */
-int V2GTP_ReadHeader(uint8_t* stream_data, uint32_t* stream_payload_length);
-int V2GTP20_ReadHeader(uint8_t* stream_data, uint32_t* stream_payload_length, uint16_t v2gtp20_payload_id);
+int V2GTP_ReadHeader(const uint8_t* stream_data, uint32_t* stream_payload_length);
+int V2GTP20_ReadHeader(const uint8_t* stream_data, uint32_t* stream_payload_length, uint16_t v2gtp20_payload_id);
 
 
 #ifdef __cplusplus

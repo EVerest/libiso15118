@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -77,8 +77,8 @@ void init_iso20_exiDocument(struct iso20_exiDocument* exiDoc) {
     exiDoc->RSAKeyValue_isUsed = 0u;
 }
 void init_iso20_TransformType(struct iso20_TransformType* TransformType) {
-    TransformType->ANY.bytesLen = 0u;
-    TransformType->XPath.charactersLen = 0u;
+    TransformType->ANY_isUsed = 0u;
+    TransformType->XPath_isUsed = 0u;
 }
 
 void init_iso20_PowerScheduleEntryType(struct iso20_PowerScheduleEntryType* PowerScheduleEntryType) {
@@ -95,12 +95,12 @@ void init_iso20_TransformsType(struct iso20_TransformsType* TransformsType) {
 }
 
 void init_iso20_DSAKeyValueType(struct iso20_DSAKeyValueType* DSAKeyValueType) {
-    DSAKeyValueType->P.bytesLen = 0u;
-    DSAKeyValueType->Q.bytesLen = 0u;
-    DSAKeyValueType->G.bytesLen = 0u;
-    DSAKeyValueType->J.bytesLen = 0u;
-    DSAKeyValueType->Seed.bytesLen = 0u;
-    DSAKeyValueType->PgenCounter.bytesLen = 0u;
+    DSAKeyValueType->P_isUsed = 0u;
+    DSAKeyValueType->Q_isUsed = 0u;
+    DSAKeyValueType->G_isUsed = 0u;
+    DSAKeyValueType->J_isUsed = 0u;
+    DSAKeyValueType->Seed_isUsed = 0u;
+    DSAKeyValueType->PgenCounter_isUsed = 0u;
 }
 
 void init_iso20_X509IssuerSerialType(struct iso20_X509IssuerSerialType* X509IssuerSerialType) {
@@ -116,7 +116,7 @@ void init_iso20_EVPriceRuleStackType(struct iso20_EVPriceRuleStackType* EVPriceR
 }
 
 void init_iso20_DigestMethodType(struct iso20_DigestMethodType* DigestMethodType) {
-    DigestMethodType->ANY.bytesLen = 0u;
+    DigestMethodType->ANY_isUsed = 0u;
 }
 
 void init_iso20_RSAKeyValueType(struct iso20_RSAKeyValueType* RSAKeyValueType) {
@@ -135,11 +135,11 @@ void init_iso20_PowerScheduleEntryListType(struct iso20_PowerScheduleEntryListTy
 }
 
 void init_iso20_CanonicalizationMethodType(struct iso20_CanonicalizationMethodType* CanonicalizationMethodType) {
-    CanonicalizationMethodType->ANY.bytesLen = 0u;
+    CanonicalizationMethodType->ANY_isUsed = 0u;
 }
 
 void init_iso20_TaxRuleType(struct iso20_TaxRuleType* TaxRuleType) {
-    TaxRuleType->TaxRuleName.charactersLen = 0u;
+    TaxRuleType->TaxRuleName_isUsed = 0u;
     TaxRuleType->TaxIncludedInPrice_isUsed = 0u;
 }
 
@@ -161,14 +161,14 @@ void init_iso20_PowerScheduleType(struct iso20_PowerScheduleType* PowerScheduleT
 }
 
 void init_iso20_SignatureMethodType(struct iso20_SignatureMethodType* SignatureMethodType) {
-    SignatureMethodType->ANY.bytesLen = 0u;
     SignatureMethodType->HMACOutputLength_isUsed = 0u;
+    SignatureMethodType->ANY_isUsed = 0u;
 }
 
 void init_iso20_KeyValueType(struct iso20_KeyValueType* KeyValueType) {
-    KeyValueType->ANY.bytesLen = 0u;
     KeyValueType->DSAKeyValue_isUsed = 0u;
     KeyValueType->RSAKeyValue_isUsed = 0u;
+    KeyValueType->ANY_isUsed = 0u;
 }
 
 void init_iso20_EVPowerScheduleEntryListType(struct iso20_EVPowerScheduleEntryListType* EVPowerScheduleEntryListType) {
@@ -189,16 +189,16 @@ void init_iso20_RetrievalMethodType(struct iso20_RetrievalMethodType* RetrievalM
 }
 
 void init_iso20_OverstayRuleType(struct iso20_OverstayRuleType* OverstayRuleType) {
-    OverstayRuleType->OverstayRuleDescription.charactersLen = 0u;
+    OverstayRuleType->OverstayRuleDescription_isUsed = 0u;
 }
 
 void init_iso20_X509DataType(struct iso20_X509DataType* X509DataType) {
-    X509DataType->X509SKI.bytesLen = 0u;
-    X509DataType->X509SubjectName.charactersLen = 0u;
-    X509DataType->X509Certificate.bytesLen = 0u;
-    X509DataType->X509CRL.bytesLen = 0u;
-    X509DataType->ANY.bytesLen = 0u;
     X509DataType->X509IssuerSerial_isUsed = 0u;
+    X509DataType->X509SKI_isUsed = 0u;
+    X509DataType->X509SubjectName_isUsed = 0u;
+    X509DataType->X509Certificate_isUsed = 0u;
+    X509DataType->X509CRL_isUsed = 0u;
+    X509DataType->ANY_isUsed = 0u;
 }
 
 void init_iso20_EVPriceRuleStackListType(struct iso20_EVPriceRuleStackListType* EVPriceRuleStackListType) {
@@ -206,9 +206,8 @@ void init_iso20_EVPriceRuleStackListType(struct iso20_EVPriceRuleStackListType* 
 }
 
 void init_iso20_PGPDataType(struct iso20_PGPDataType* PGPDataType) {
-    PGPDataType->choice_1.PGPKeyPacket.bytesLen = 0u;
-    PGPDataType->choice_2.ANY.bytesLen = 0u;
-    PGPDataType->choice_2.ANY.bytesLen = 0u;
+    PGPDataType->choice_1_isUsed = 0u;
+    PGPDataType->choice_2_isUsed = 0u;
 }
 
 void init_iso20_RationalNumberType(struct iso20_RationalNumberType* RationalNumberType) {
@@ -216,10 +215,11 @@ void init_iso20_RationalNumberType(struct iso20_RationalNumberType* RationalNumb
 }
 
 void init_iso20_SPKIDataType(struct iso20_SPKIDataType* SPKIDataType) {
-    SPKIDataType->ANY.bytesLen = 0u;
+    SPKIDataType->ANY_isUsed = 0u;
 }
 
 void init_iso20_SignedInfoType(struct iso20_SignedInfoType* SignedInfoType) {
+    SignedInfoType->Reference.arrayLen = 0u;
     SignedInfoType->Id_isUsed = 0u;
 }
 
@@ -232,16 +232,16 @@ void init_iso20_SignatureValueType(struct iso20_SignatureValueType* SignatureVal
 }
 
 void init_iso20_SubCertificatesType(struct iso20_SubCertificatesType* SubCertificatesType) {
-    SubCertificatesType->Certificate.bytesLen = 0u;
+    SubCertificatesType->Certificate.arrayLen = 0u;
 }
 
 void init_iso20_ParameterType(struct iso20_ParameterType* ParameterType) {
-    ParameterType->finiteString.charactersLen = 0u;
     ParameterType->boolValue_isUsed = 0u;
     ParameterType->byteValue_isUsed = 0u;
     ParameterType->shortValue_isUsed = 0u;
     ParameterType->intValue_isUsed = 0u;
     ParameterType->rationalNumber_isUsed = 0u;
+    ParameterType->finiteString_isUsed = 0u;
 }
 
 void init_iso20_EVAbsolutePriceScheduleType(struct iso20_EVAbsolutePriceScheduleType* EVAbsolutePriceScheduleType) {
@@ -258,21 +258,22 @@ void init_iso20_DetailedCostType(struct iso20_DetailedCostType* DetailedCostType
 }
 
 void init_iso20_KeyInfoType(struct iso20_KeyInfoType* KeyInfoType) {
-    KeyInfoType->KeyName.charactersLen = 0u;
-    KeyInfoType->MgmtData.charactersLen = 0u;
-    KeyInfoType->ANY.bytesLen = 0u;
     KeyInfoType->Id_isUsed = 0u;
+    KeyInfoType->KeyName_isUsed = 0u;
     KeyInfoType->KeyValue_isUsed = 0u;
     KeyInfoType->RetrievalMethod_isUsed = 0u;
     KeyInfoType->X509Data_isUsed = 0u;
     KeyInfoType->PGPData_isUsed = 0u;
     KeyInfoType->SPKIData_isUsed = 0u;
+    KeyInfoType->MgmtData_isUsed = 0u;
+    KeyInfoType->ANY_isUsed = 0u;
 }
 
 void init_iso20_ObjectType(struct iso20_ObjectType* ObjectType) {
-    ObjectType->MimeType.charactersLen = 0u;
     ObjectType->Encoding_isUsed = 0u;
     ObjectType->Id_isUsed = 0u;
+    ObjectType->MimeType_isUsed = 0u;
+    ObjectType->ANY_isUsed = 0u;
 }
 
 void init_iso20_PriceLevelScheduleEntryListType(struct iso20_PriceLevelScheduleEntryListType* PriceLevelScheduleEntryListType) {
@@ -314,7 +315,7 @@ void init_iso20_ScheduleTupleType(struct iso20_ScheduleTupleType* ScheduleTupleT
 }
 
 void init_iso20_SupportedProvidersListType(struct iso20_SupportedProvidersListType* SupportedProvidersListType) {
-    SupportedProvidersListType->ProviderID.charactersLen = 0u;
+    SupportedProvidersListType->ProviderID.arrayLen = 0u;
 }
 
 void init_iso20_ContractCertificateChainType(struct iso20_ContractCertificateChainType* ContractCertificateChainType) {
@@ -326,10 +327,10 @@ void init_iso20_Dynamic_EVPPTControlModeType(struct iso20_Dynamic_EVPPTControlMo
 }
 
 void init_iso20_MeterInfoType(struct iso20_MeterInfoType* MeterInfoType) {
-    MeterInfoType->MeterSignature.bytesLen = 0u;
     MeterInfoType->BPT_DischargedEnergyReadingWh_isUsed = 0u;
     MeterInfoType->CapacitiveEnergyReadingVARh_isUsed = 0u;
     MeterInfoType->BPT_InductiveEnergyReadingVARh_isUsed = 0u;
+    MeterInfoType->MeterSignature_isUsed = 0u;
     MeterInfoType->MeterStatus_isUsed = 0u;
     MeterInfoType->MeterTimestamp_isUsed = 0u;
 }
@@ -353,8 +354,8 @@ void init_iso20_ReceiptType(struct iso20_ReceiptType* ReceiptType) {
 }
 
 void init_iso20_AbsolutePriceScheduleType(struct iso20_AbsolutePriceScheduleType* AbsolutePriceScheduleType) {
-    AbsolutePriceScheduleType->PriceScheduleDescription.charactersLen = 0u;
     AbsolutePriceScheduleType->Id_isUsed = 0u;
+    AbsolutePriceScheduleType->PriceScheduleDescription_isUsed = 0u;
     AbsolutePriceScheduleType->MinimumCost_isUsed = 0u;
     AbsolutePriceScheduleType->MaximumCost_isUsed = 0u;
     AbsolutePriceScheduleType->TaxRules_isUsed = 0u;
@@ -375,8 +376,8 @@ void init_iso20_EVEnergyOfferType(struct iso20_EVEnergyOfferType* EVEnergyOfferT
 }
 
 void init_iso20_PriceLevelScheduleType(struct iso20_PriceLevelScheduleType* PriceLevelScheduleType) {
-    PriceLevelScheduleType->PriceScheduleDescription.charactersLen = 0u;
     PriceLevelScheduleType->Id_isUsed = 0u;
+    PriceLevelScheduleType->PriceScheduleDescription_isUsed = 0u;
 }
 
 void init_iso20_Scheduled_SMDTControlModeType(struct iso20_Scheduled_SMDTControlModeType* Scheduled_SMDTControlModeType) {
@@ -388,8 +389,8 @@ void init_iso20_MessageHeaderType(struct iso20_MessageHeaderType* MessageHeaderT
 }
 
 void init_iso20_SignaturePropertyType(struct iso20_SignaturePropertyType* SignaturePropertyType) {
-    SignaturePropertyType->ANY.bytesLen = 0u;
     SignaturePropertyType->Id_isUsed = 0u;
+    SignaturePropertyType->ANY_isUsed = 0u;
 }
 
 void init_iso20_ServiceIDListType(struct iso20_ServiceIDListType* ServiceIDListType) {
@@ -475,13 +476,13 @@ void init_iso20_Dynamic_SEResControlModeType(struct iso20_Dynamic_SEResControlMo
 }
 
 void init_iso20_EMAIDListType(struct iso20_EMAIDListType* EMAIDListType) {
-    EMAIDListType->EMAID.charactersLen = 0u;
+    EMAIDListType->EMAID.arrayLen = 0u;
 }
 
 void init_iso20_SignedInstallationDataType(struct iso20_SignedInstallationDataType* SignedInstallationDataType) {
-    SignedInstallationDataType->SECP521_EncryptedPrivateKey.bytesLen = 0u;
-    SignedInstallationDataType->X448_EncryptedPrivateKey.bytesLen = 0u;
-    SignedInstallationDataType->TPM_EncryptedPrivateKey.bytesLen = 0u;
+    SignedInstallationDataType->SECP521_EncryptedPrivateKey_isUsed = 0u;
+    SignedInstallationDataType->X448_EncryptedPrivateKey_isUsed = 0u;
+    SignedInstallationDataType->TPM_EncryptedPrivateKey_isUsed = 0u;
 }
 
 void init_iso20_PnC_ASResAuthorizationModeType(struct iso20_PnC_ASResAuthorizationModeType* PnC_ASResAuthorizationModeType) {
@@ -572,8 +573,8 @@ void init_iso20_MeteringConfirmationResType(struct iso20_MeteringConfirmationRes
 }
 
 void init_iso20_SessionStopReqType(struct iso20_SessionStopReqType* SessionStopReqType) {
-    SessionStopReqType->EVTerminationCode.charactersLen = 0u;
-    SessionStopReqType->EVTerminationExplanation.charactersLen = 0u;
+    SessionStopReqType->EVTerminationCode_isUsed = 0u;
+    SessionStopReqType->EVTerminationExplanation_isUsed = 0u;
 }
 
 void init_iso20_SessionStopResType(struct iso20_SessionStopResType* SessionStopResType) {
@@ -617,11 +618,47 @@ void init_iso20_CLResControlModeType(struct iso20_CLResControlModeType* CLResCon
 }
 
 void init_iso20_ManifestType(struct iso20_ManifestType* ManifestType) {
+    ManifestType->Reference.arrayLen = 0u;
     ManifestType->Id_isUsed = 0u;
 }
 
 void init_iso20_SignaturePropertiesType(struct iso20_SignaturePropertiesType* SignaturePropertiesType) {
     SignaturePropertiesType->Id_isUsed = 0u;
+}
+
+// init for fragment
+void init_iso20_exiFragment(struct iso20_exiFragment* exiFrag) {
+    exiFrag->AuthorizationReq_isUsed = 0u;
+    exiFrag->CertificateInstallationReq_isUsed = 0u;
+    exiFrag->CertificateInstallationRes_isUsed = 0u;
+    exiFrag->MeteringConfirmationReq_isUsed = 0u;
+    exiFrag->SignedInfo_isUsed = 0u;
+}
+
+// init for xmldsig fragment
+void init_iso20_xmldsigFragment(struct iso20_xmldsigFragment* xmldsigFrag) {
+    xmldsigFrag->CanonicalizationMethod_isUsed = 0u;
+    xmldsigFrag->DSAKeyValue_isUsed = 0u;
+    xmldsigFrag->DigestMethod_isUsed = 0u;
+    xmldsigFrag->KeyInfo_isUsed = 0u;
+    xmldsigFrag->KeyValue_isUsed = 0u;
+    xmldsigFrag->Manifest_isUsed = 0u;
+    xmldsigFrag->Object_isUsed = 0u;
+    xmldsigFrag->PGPData_isUsed = 0u;
+    xmldsigFrag->RSAKeyValue_isUsed = 0u;
+    xmldsigFrag->Reference_isUsed = 0u;
+    xmldsigFrag->RetrievalMethod_isUsed = 0u;
+    xmldsigFrag->SPKIData_isUsed = 0u;
+    xmldsigFrag->Signature_isUsed = 0u;
+    xmldsigFrag->SignatureMethod_isUsed = 0u;
+    xmldsigFrag->SignatureProperties_isUsed = 0u;
+    xmldsigFrag->SignatureProperty_isUsed = 0u;
+    xmldsigFrag->SignatureValue_isUsed = 0u;
+    xmldsigFrag->SignedInfo_isUsed = 0u;
+    xmldsigFrag->Transform_isUsed = 0u;
+    xmldsigFrag->Transforms_isUsed = 0u;
+    xmldsigFrag->X509Data_isUsed = 0u;
+    xmldsigFrag->X509IssuerSerial_isUsed = 0u;
 }
 
 

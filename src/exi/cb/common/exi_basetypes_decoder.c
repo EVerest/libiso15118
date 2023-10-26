@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -31,7 +31,6 @@
 static int exi_basetypes_decoder_read_unsigned(exi_bitstream_t* stream, exi_unsigned_t* exi_unsigned)
 {
     const uint8_t MSB = (1u << 7);
-    int error;
 
     int found_sequence_end = 0;
     uint8_t* current_octet = exi_unsigned->octets;
@@ -39,6 +38,7 @@ static int exi_basetypes_decoder_read_unsigned(exi_bitstream_t* stream, exi_unsi
 
     while (exi_unsigned->octets_count < EXI_BASETYPES_MAX_OCTETS_SUPPORTED)
     {
+        int error;
         error = exi_bitstream_read_octet(stream, current_octet);
         if (error != EXI_ERROR__NO_ERROR)
         {
@@ -82,7 +82,6 @@ int exi_basetypes_decoder_bool(exi_bitstream_t* stream, int* value)
  *****************************************************************************/
 int exi_basetypes_decoder_bytes(exi_bitstream_t* stream, size_t bytes_len, uint8_t* bytes, size_t bytes_size)
 {
-    int error;
 
     if (bytes_len > bytes_size)
     {
@@ -93,6 +92,7 @@ int exi_basetypes_decoder_bytes(exi_bitstream_t* stream, size_t bytes_len, uint8
 
     for (size_t n = 0; n < bytes_len; n++)
     {
+        int error;
         error = exi_bitstream_read_octet(stream, current_byte);
         if (error != EXI_ERROR__NO_ERROR)
         {
@@ -308,7 +308,6 @@ int exi_basetypes_decoder_integer_64(exi_bitstream_t* stream, int64_t* value)
 int exi_basetypes_decoder_characters(exi_bitstream_t* stream, size_t characters_len, exi_character_t* characters, size_t characters_size)
 {
     const uint8_t ASCII_MAX_VALUE = 127;
-    int error;
 
     if (characters_len + EXTRA_CHAR > characters_size)
     {
@@ -319,6 +318,7 @@ int exi_basetypes_decoder_characters(exi_bitstream_t* stream, size_t characters_
 
     for (size_t n = 0; n < characters_len; n++)
     {
+        int error;
         error = exi_bitstream_read_octet(stream, current_char);
         if (error != EXI_ERROR__NO_ERROR)
         {

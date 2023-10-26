@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -44,6 +44,7 @@ extern "C" {
 #define iso20_dc_DigestValueType_BYTES_SIZE EXI_BYTE_ARRAY_MAX_LEN
 #define iso20_dc_base64Binary_BYTES_SIZE EXI_BYTE_ARRAY_MAX_LEN
 #define iso20_dc_X509SubjectName_CHARACTER_SIZE EXI_STRING_MAX_LEN + ASCII_EXTRA_CHAR
+#define iso20_dc_ReferenceType_4_ARRAY_SIZE 4
 #define iso20_dc_SignatureValueType_BYTES_SIZE EXI_BYTE_ARRAY_MAX_LEN
 #define iso20_dc_KeyName_CHARACTER_SIZE EXI_STRING_MAX_LEN + ASCII_EXTRA_CHAR
 #define iso20_dc_MgmtData_CHARACTER_SIZE EXI_STRING_MAX_LEN + ASCII_EXTRA_CHAR
@@ -51,7 +52,7 @@ extern "C" {
 #define iso20_dc_MimeType_CHARACTER_SIZE EXI_STRING_MAX_LEN + ASCII_EXTRA_CHAR
 #define iso20_dc_sessionIDType_BYTES_SIZE 8
 #define iso20_dc_Target_CHARACTER_SIZE EXI_STRING_MAX_LEN + ASCII_EXTRA_CHAR
-#define iso20_dc_MeterID_CHARACTER_SIZE 32
+#define iso20_dc_MeterID_CHARACTER_SIZE 32 + ASCII_EXTRA_CHAR
 #define iso20_dc_meterSignatureType_BYTES_SIZE 64
 #define iso20_dc_DetailedTaxType_10_ARRAY_SIZE 10
 
@@ -505,6 +506,7 @@ struct iso20_dc_PGPDataType {
 
 
         } choice_1;
+        unsigned int choice_1_isUsed:1;
 
         // sequence of choice 2
         struct {
@@ -523,6 +525,7 @@ struct iso20_dc_PGPDataType {
 
 
         } choice_2;
+        unsigned int choice_2_isUsed:1;
 
 
     };
@@ -550,7 +553,7 @@ struct iso20_dc_SPKIDataType {
 
 // Element: definition=complex; name={http://www.w3.org/2000/09/xmldsig#}SignedInfo; type={http://www.w3.org/2000/09/xmldsig#}SignedInfoType; base type=; content type=ELEMENT-ONLY;
 //          abstract=False; final=False;
-// Particle: Id, ID (0, 1); CanonicalizationMethod, CanonicalizationMethodType (1, 1); SignatureMethod, SignatureMethodType (1, 1); Reference, ReferenceType (1, 1);
+// Particle: Id, ID (0, 1); CanonicalizationMethod, CanonicalizationMethodType (1, 1); SignatureMethod, SignatureMethodType (1, 1); Reference, ReferenceType (1, 4);
 struct iso20_dc_SignedInfoType {
     // Attribute: Id, ID (base: NCName)
     struct {
@@ -563,8 +566,10 @@ struct iso20_dc_SignedInfoType {
     // SignatureMethod, SignatureMethodType
     struct iso20_dc_SignatureMethodType SignatureMethod;
     // Reference, ReferenceType
-    struct iso20_dc_ReferenceType Reference;
-
+    struct {
+        struct iso20_dc_ReferenceType array[iso20_dc_ReferenceType_4_ARRAY_SIZE];
+        uint16_t arrayLen;
+    } Reference;
 };
 
 // Element: definition=complex; name={http://www.w3.org/2000/09/xmldsig#}SignatureValue; type={http://www.w3.org/2000/09/xmldsig#}SignatureValueType; base type=base64Binary; content type=simple;
@@ -635,7 +640,7 @@ struct iso20_dc_KeyInfoType {
 
 // Element: definition=complex; name={http://www.w3.org/2000/09/xmldsig#}Object; type={http://www.w3.org/2000/09/xmldsig#}ObjectType; base type=; content type=mixed;
 //          abstract=False; final=False;
-// Particle: Encoding, anyURI (0, 1); Id, ID (0, 1); MimeType, string (0, 1); ANY, anyType (1, 1);
+// Particle: Encoding, anyURI (0, 1); Id, ID (0, 1); MimeType, string (0, 1); ANY, anyType (0, 1)(old 1, 1);
 struct iso20_dc_ObjectType {
     // Attribute: Encoding, anyURI
     struct {
@@ -660,6 +665,7 @@ struct iso20_dc_ObjectType {
         uint8_t bytes[iso20_dc_anyType_BYTES_SIZE];
         uint16_t bytesLen;
     } ANY;
+    unsigned int ANY_isUsed:1;
 
 
 };
@@ -891,6 +897,32 @@ struct iso20_dc_MeterInfoType {
 
 };
 
+// Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLReqControlMode; type={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLReqControlModeType; base type=Dynamic_CLReqControlModeType; content type=ELEMENT-ONLY;
+//          abstract=False; final=False; derivation=extension;
+// Particle: DepartureTime, unsignedInt (0, 1); EVTargetEnergyRequest, RationalNumberType (1, 1); EVMaximumEnergyRequest, RationalNumberType (1, 1); EVMinimumEnergyRequest, RationalNumberType (1, 1); EVMaximumChargePower, RationalNumberType (1, 1); EVMinimumChargePower, RationalNumberType (1, 1); EVMaximumChargeCurrent, RationalNumberType (1, 1); EVMaximumVoltage, RationalNumberType (1, 1); EVMinimumVoltage, RationalNumberType (1, 1);
+struct iso20_dc_Dynamic_DC_CLReqControlModeType {
+    // DepartureTime, unsignedInt (base: unsignedLong)
+    uint32_t DepartureTime;
+    unsigned int DepartureTime_isUsed:1;
+    // EVTargetEnergyRequest, RationalNumberType
+    struct iso20_dc_RationalNumberType EVTargetEnergyRequest;
+    // EVMaximumEnergyRequest, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMaximumEnergyRequest;
+    // EVMinimumEnergyRequest, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMinimumEnergyRequest;
+    // EVMaximumChargePower, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMaximumChargePower;
+    // EVMinimumChargePower, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMinimumChargePower;
+    // EVMaximumChargeCurrent, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMaximumChargeCurrent;
+    // EVMaximumVoltage, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMaximumVoltage;
+    // EVMinimumVoltage, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMinimumVoltage;
+
+};
+
 // Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLReqControlMode; type={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLReqControlModeType; base type=Scheduled_CLReqControlModeType; content type=ELEMENT-ONLY;
 //          abstract=False; final=False; derivation=extension;
 // Particle: EVTargetEnergyRequest, RationalNumberType (0, 1); EVMaximumEnergyRequest, RationalNumberType (0, 1); EVMinimumEnergyRequest, RationalNumberType (0, 1); EVTargetCurrent, RationalNumberType (1, 1); EVTargetVoltage, RationalNumberType (1, 1); EVMaximumChargePower, RationalNumberType (0, 1); EVMinimumChargePower, RationalNumberType (0, 1); EVMaximumChargeCurrent, RationalNumberType (0, 1); EVMaximumVoltage, RationalNumberType (0, 1); EVMinimumVoltage, RationalNumberType (0, 1);
@@ -926,32 +958,6 @@ struct iso20_dc_Scheduled_DC_CLReqControlModeType {
 
 };
 
-// Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLReqControlMode; type={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLReqControlModeType; base type=Dynamic_CLReqControlModeType; content type=ELEMENT-ONLY;
-//          abstract=False; final=False; derivation=extension;
-// Particle: DepartureTime, unsignedInt (0, 1); EVTargetEnergyRequest, RationalNumberType (1, 1); EVMaximumEnergyRequest, RationalNumberType (1, 1); EVMinimumEnergyRequest, RationalNumberType (1, 1); EVMaximumChargePower, RationalNumberType (1, 1); EVMinimumChargePower, RationalNumberType (1, 1); EVMaximumChargeCurrent, RationalNumberType (1, 1); EVMaximumVoltage, RationalNumberType (1, 1); EVMinimumVoltage, RationalNumberType (1, 1);
-struct iso20_dc_Dynamic_DC_CLReqControlModeType {
-    // DepartureTime, unsignedInt (base: unsignedLong)
-    uint32_t DepartureTime;
-    unsigned int DepartureTime_isUsed:1;
-    // EVTargetEnergyRequest, RationalNumberType
-    struct iso20_dc_RationalNumberType EVTargetEnergyRequest;
-    // EVMaximumEnergyRequest, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMaximumEnergyRequest;
-    // EVMinimumEnergyRequest, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMinimumEnergyRequest;
-    // EVMaximumChargePower, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMaximumChargePower;
-    // EVMinimumChargePower, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMinimumChargePower;
-    // EVMaximumChargeCurrent, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMaximumChargeCurrent;
-    // EVMaximumVoltage, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMaximumVoltage;
-    // EVMinimumVoltage, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMinimumVoltage;
-
-};
-
 // Element: definition=complex; name={urn:iso:std:iso:15118:-20:CommonTypes}CLReqControlMode; type={urn:iso:std:iso:15118:-20:CommonTypes}CLReqControlModeType; base type=; content type=empty;
 //          abstract=False; final=False;
 // Particle: 
@@ -984,25 +990,6 @@ struct iso20_dc_ReceiptType {
     } TaxCosts;
 };
 
-// Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLResControlMode; type={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLResControlModeType; base type=Scheduled_CLResControlModeType; content type=ELEMENT-ONLY;
-//          abstract=False; final=False; derivation=extension;
-// Particle: EVSEMaximumChargePower, RationalNumberType (0, 1); EVSEMinimumChargePower, RationalNumberType (0, 1); EVSEMaximumChargeCurrent, RationalNumberType (0, 1); EVSEMaximumVoltage, RationalNumberType (0, 1);
-struct iso20_dc_Scheduled_DC_CLResControlModeType {
-    // EVSEMaximumChargePower, RationalNumberType
-    struct iso20_dc_RationalNumberType EVSEMaximumChargePower;
-    unsigned int EVSEMaximumChargePower_isUsed:1;
-    // EVSEMinimumChargePower, RationalNumberType
-    struct iso20_dc_RationalNumberType EVSEMinimumChargePower;
-    unsigned int EVSEMinimumChargePower_isUsed:1;
-    // EVSEMaximumChargeCurrent, RationalNumberType
-    struct iso20_dc_RationalNumberType EVSEMaximumChargeCurrent;
-    unsigned int EVSEMaximumChargeCurrent_isUsed:1;
-    // EVSEMaximumVoltage, RationalNumberType
-    struct iso20_dc_RationalNumberType EVSEMaximumVoltage;
-    unsigned int EVSEMaximumVoltage_isUsed:1;
-
-};
-
 // Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLResControlMode; type={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLResControlModeType; base type=Dynamic_CLResControlModeType; content type=ELEMENT-ONLY;
 //          abstract=False; final=False; derivation=extension;
 // Particle: DepartureTime, unsignedInt (0, 1); MinimumSOC, percentValueType (0, 1); TargetSOC, percentValueType (0, 1); AckMaxDelay, unsignedShort (0, 1); EVSEMaximumChargePower, RationalNumberType (1, 1); EVSEMinimumChargePower, RationalNumberType (1, 1); EVSEMaximumChargeCurrent, RationalNumberType (1, 1); EVSEMaximumVoltage, RationalNumberType (1, 1);
@@ -1027,6 +1014,25 @@ struct iso20_dc_Dynamic_DC_CLResControlModeType {
     struct iso20_dc_RationalNumberType EVSEMaximumChargeCurrent;
     // EVSEMaximumVoltage, RationalNumberType
     struct iso20_dc_RationalNumberType EVSEMaximumVoltage;
+
+};
+
+// Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLResControlMode; type={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLResControlModeType; base type=Scheduled_CLResControlModeType; content type=ELEMENT-ONLY;
+//          abstract=False; final=False; derivation=extension;
+// Particle: EVSEMaximumChargePower, RationalNumberType (0, 1); EVSEMinimumChargePower, RationalNumberType (0, 1); EVSEMaximumChargeCurrent, RationalNumberType (0, 1); EVSEMaximumVoltage, RationalNumberType (0, 1);
+struct iso20_dc_Scheduled_DC_CLResControlModeType {
+    // EVSEMaximumChargePower, RationalNumberType
+    struct iso20_dc_RationalNumberType EVSEMaximumChargePower;
+    unsigned int EVSEMaximumChargePower_isUsed:1;
+    // EVSEMinimumChargePower, RationalNumberType
+    struct iso20_dc_RationalNumberType EVSEMinimumChargePower;
+    unsigned int EVSEMinimumChargePower_isUsed:1;
+    // EVSEMaximumChargeCurrent, RationalNumberType
+    struct iso20_dc_RationalNumberType EVSEMaximumChargeCurrent;
+    unsigned int EVSEMaximumChargeCurrent_isUsed:1;
+    // EVSEMaximumVoltage, RationalNumberType
+    struct iso20_dc_RationalNumberType EVSEMaximumVoltage;
+    unsigned int EVSEMaximumVoltage_isUsed:1;
 
 };
 
@@ -1429,7 +1435,7 @@ struct iso20_dc_DC_ChargeLoopResType {
 
 // Element: definition=complex; name={http://www.w3.org/2000/09/xmldsig#}Manifest; type={http://www.w3.org/2000/09/xmldsig#}ManifestType; base type=; content type=ELEMENT-ONLY;
 //          abstract=False; final=False;
-// Particle: Id, ID (0, 1); Reference, ReferenceType (1, 1);
+// Particle: Id, ID (0, 1); Reference, ReferenceType (1, 4);
 struct iso20_dc_ManifestType {
     // Attribute: Id, ID (base: NCName)
     struct {
@@ -1438,8 +1444,10 @@ struct iso20_dc_ManifestType {
     } Id;
     unsigned int Id_isUsed:1;
     // Reference, ReferenceType
-    struct iso20_dc_ReferenceType Reference;
-
+    struct {
+        struct iso20_dc_ReferenceType array[iso20_dc_ReferenceType_4_ARRAY_SIZE];
+        uint16_t arrayLen;
+    } Reference;
 };
 
 // Element: definition=complex; name={http://www.w3.org/2000/09/xmldsig#}SignatureProperties; type={http://www.w3.org/2000/09/xmldsig#}SignaturePropertiesType; base type=; content type=ELEMENT-ONLY;
@@ -1555,62 +1563,124 @@ struct iso20_dc_exiDocument {
     unsigned int RSAKeyValue_isUsed:1;
 };
 
+// elements of EXI fragment
+struct iso20_dc_exiFragment {
+    union {
+        struct iso20_dc_DC_ChargeParameterDiscoveryResType DC_ChargeParameterDiscoveryRes;
+        struct iso20_dc_SignedInfoType SignedInfo;
+    };
+    unsigned int DC_ChargeParameterDiscoveryRes_isUsed:1;
+    unsigned int SignedInfo_isUsed:1;
+};
+
+// elements of xmldsig fragment
+struct iso20_dc_xmldsigFragment {
+    union {
+        struct iso20_dc_CanonicalizationMethodType CanonicalizationMethod;
+        struct iso20_dc_DSAKeyValueType DSAKeyValue;
+        struct iso20_dc_DigestMethodType DigestMethod;
+        struct iso20_dc_KeyInfoType KeyInfo;
+        struct iso20_dc_KeyValueType KeyValue;
+        struct iso20_dc_ManifestType Manifest;
+        struct iso20_dc_ObjectType Object;
+        struct iso20_dc_PGPDataType PGPData;
+        struct iso20_dc_RSAKeyValueType RSAKeyValue;
+        struct iso20_dc_ReferenceType Reference;
+        struct iso20_dc_RetrievalMethodType RetrievalMethod;
+        struct iso20_dc_SPKIDataType SPKIData;
+        struct iso20_dc_SignatureType Signature;
+        struct iso20_dc_SignatureMethodType SignatureMethod;
+        struct iso20_dc_SignaturePropertiesType SignatureProperties;
+        struct iso20_dc_SignaturePropertyType SignatureProperty;
+        struct iso20_dc_SignatureValueType SignatureValue;
+        struct iso20_dc_SignedInfoType SignedInfo;
+        struct iso20_dc_TransformType Transform;
+        struct iso20_dc_TransformsType Transforms;
+        struct iso20_dc_X509DataType X509Data;
+        struct iso20_dc_X509IssuerSerialType X509IssuerSerial;
+    };
+    unsigned int CanonicalizationMethod_isUsed:1;
+    unsigned int DSAKeyValue_isUsed:1;
+    unsigned int DigestMethod_isUsed:1;
+    unsigned int KeyInfo_isUsed:1;
+    unsigned int KeyValue_isUsed:1;
+    unsigned int Manifest_isUsed:1;
+    unsigned int Object_isUsed:1;
+    unsigned int PGPData_isUsed:1;
+    unsigned int RSAKeyValue_isUsed:1;
+    unsigned int Reference_isUsed:1;
+    unsigned int RetrievalMethod_isUsed:1;
+    unsigned int SPKIData_isUsed:1;
+    unsigned int Signature_isUsed:1;
+    unsigned int SignatureMethod_isUsed:1;
+    unsigned int SignatureProperties_isUsed:1;
+    unsigned int SignatureProperty_isUsed:1;
+    unsigned int SignatureValue_isUsed:1;
+    unsigned int SignedInfo_isUsed:1;
+    unsigned int Transform_isUsed:1;
+    unsigned int Transforms_isUsed:1;
+    unsigned int X509Data_isUsed:1;
+    unsigned int X509IssuerSerial_isUsed:1;
+};
+
 // init for structs
-void init_iso20_dc_exiDocument( struct iso20_dc_exiDocument* exiDoc );
-void init_iso20_dc_DC_ChargeParameterDiscoveryReqType( struct iso20_dc_DC_ChargeParameterDiscoveryReqType* DC_ChargeParameterDiscoveryReq );
-void init_iso20_dc_DC_ChargeParameterDiscoveryResType( struct iso20_dc_DC_ChargeParameterDiscoveryResType* DC_ChargeParameterDiscoveryRes );
-void init_iso20_dc_DC_CableCheckReqType( struct iso20_dc_DC_CableCheckReqType* DC_CableCheckReq );
-void init_iso20_dc_DC_CableCheckResType( struct iso20_dc_DC_CableCheckResType* DC_CableCheckRes );
-void init_iso20_dc_DC_PreChargeReqType( struct iso20_dc_DC_PreChargeReqType* DC_PreChargeReq );
-void init_iso20_dc_DC_PreChargeResType( struct iso20_dc_DC_PreChargeResType* DC_PreChargeRes );
-void init_iso20_dc_DC_ChargeLoopReqType( struct iso20_dc_DC_ChargeLoopReqType* DC_ChargeLoopReq );
-void init_iso20_dc_DC_ChargeLoopResType( struct iso20_dc_DC_ChargeLoopResType* DC_ChargeLoopRes );
-void init_iso20_dc_DC_WeldingDetectionReqType( struct iso20_dc_DC_WeldingDetectionReqType* DC_WeldingDetectionReq );
-void init_iso20_dc_DC_WeldingDetectionResType( struct iso20_dc_DC_WeldingDetectionResType* DC_WeldingDetectionRes );
-void init_iso20_dc_DC_CPDReqEnergyTransferModeType( struct iso20_dc_DC_CPDReqEnergyTransferModeType* DC_CPDReqEnergyTransferMode );
-void init_iso20_dc_DC_CPDResEnergyTransferModeType( struct iso20_dc_DC_CPDResEnergyTransferModeType* DC_CPDResEnergyTransferMode );
-void init_iso20_dc_BPT_DC_CPDReqEnergyTransferModeType( struct iso20_dc_BPT_DC_CPDReqEnergyTransferModeType* BPT_DC_CPDReqEnergyTransferMode );
-void init_iso20_dc_BPT_DC_CPDResEnergyTransferModeType( struct iso20_dc_BPT_DC_CPDResEnergyTransferModeType* BPT_DC_CPDResEnergyTransferMode );
-void init_iso20_dc_Scheduled_DC_CLReqControlModeType( struct iso20_dc_Scheduled_DC_CLReqControlModeType* Scheduled_DC_CLReqControlMode );
-void init_iso20_dc_Scheduled_DC_CLResControlModeType( struct iso20_dc_Scheduled_DC_CLResControlModeType* Scheduled_DC_CLResControlMode );
-void init_iso20_dc_BPT_Scheduled_DC_CLReqControlModeType( struct iso20_dc_BPT_Scheduled_DC_CLReqControlModeType* BPT_Scheduled_DC_CLReqControlMode );
-void init_iso20_dc_BPT_Scheduled_DC_CLResControlModeType( struct iso20_dc_BPT_Scheduled_DC_CLResControlModeType* BPT_Scheduled_DC_CLResControlMode );
-void init_iso20_dc_Dynamic_DC_CLReqControlModeType( struct iso20_dc_Dynamic_DC_CLReqControlModeType* Dynamic_DC_CLReqControlMode );
-void init_iso20_dc_Dynamic_DC_CLResControlModeType( struct iso20_dc_Dynamic_DC_CLResControlModeType* Dynamic_DC_CLResControlMode );
-void init_iso20_dc_BPT_Dynamic_DC_CLReqControlModeType( struct iso20_dc_BPT_Dynamic_DC_CLReqControlModeType* BPT_Dynamic_DC_CLReqControlMode );
-void init_iso20_dc_BPT_Dynamic_DC_CLResControlModeType( struct iso20_dc_BPT_Dynamic_DC_CLResControlModeType* BPT_Dynamic_DC_CLResControlMode );
-void init_iso20_dc_CLReqControlModeType( struct iso20_dc_CLReqControlModeType* CLReqControlMode );
-void init_iso20_dc_CLResControlModeType( struct iso20_dc_CLResControlModeType* CLResControlMode );
-void init_iso20_dc_SignatureType( struct iso20_dc_SignatureType* Signature );
-void init_iso20_dc_SignatureValueType( struct iso20_dc_SignatureValueType* SignatureValue );
-void init_iso20_dc_SignedInfoType( struct iso20_dc_SignedInfoType* SignedInfo );
-void init_iso20_dc_CanonicalizationMethodType( struct iso20_dc_CanonicalizationMethodType* CanonicalizationMethod );
-void init_iso20_dc_SignatureMethodType( struct iso20_dc_SignatureMethodType* SignatureMethod );
-void init_iso20_dc_ReferenceType( struct iso20_dc_ReferenceType* Reference );
-void init_iso20_dc_TransformsType( struct iso20_dc_TransformsType* Transforms );
-void init_iso20_dc_TransformType( struct iso20_dc_TransformType* Transform );
-void init_iso20_dc_DigestMethodType( struct iso20_dc_DigestMethodType* DigestMethod );
-void init_iso20_dc_KeyInfoType( struct iso20_dc_KeyInfoType* KeyInfo );
-void init_iso20_dc_KeyValueType( struct iso20_dc_KeyValueType* KeyValue );
-void init_iso20_dc_RetrievalMethodType( struct iso20_dc_RetrievalMethodType* RetrievalMethod );
-void init_iso20_dc_X509DataType( struct iso20_dc_X509DataType* X509Data );
-void init_iso20_dc_PGPDataType( struct iso20_dc_PGPDataType* PGPData );
-void init_iso20_dc_SPKIDataType( struct iso20_dc_SPKIDataType* SPKIData );
-void init_iso20_dc_ObjectType( struct iso20_dc_ObjectType* Object );
-void init_iso20_dc_ManifestType( struct iso20_dc_ManifestType* Manifest );
-void init_iso20_dc_SignaturePropertiesType( struct iso20_dc_SignaturePropertiesType* SignatureProperties );
-void init_iso20_dc_SignaturePropertyType( struct iso20_dc_SignaturePropertyType* SignatureProperty );
-void init_iso20_dc_DSAKeyValueType( struct iso20_dc_DSAKeyValueType* DSAKeyValue );
-void init_iso20_dc_RSAKeyValueType( struct iso20_dc_RSAKeyValueType* RSAKeyValue );
-void init_iso20_dc_X509IssuerSerialType( struct iso20_dc_X509IssuerSerialType* X509IssuerSerialType );
-void init_iso20_dc_RationalNumberType( struct iso20_dc_RationalNumberType* RationalNumberType );
-void init_iso20_dc_DetailedCostType( struct iso20_dc_DetailedCostType* DetailedCostType );
-void init_iso20_dc_DetailedTaxType( struct iso20_dc_DetailedTaxType* DetailedTaxType );
-void init_iso20_dc_MessageHeaderType( struct iso20_dc_MessageHeaderType* MessageHeaderType );
-void init_iso20_dc_DisplayParametersType( struct iso20_dc_DisplayParametersType* DisplayParametersType );
-void init_iso20_dc_EVSEStatusType( struct iso20_dc_EVSEStatusType* EVSEStatusType );
-void init_iso20_dc_MeterInfoType( struct iso20_dc_MeterInfoType* MeterInfoType );
-void init_iso20_dc_ReceiptType( struct iso20_dc_ReceiptType* ReceiptType );
+void init_iso20_dc_exiDocument(struct iso20_dc_exiDocument* exiDoc);
+void init_iso20_dc_DC_ChargeParameterDiscoveryReqType(struct iso20_dc_DC_ChargeParameterDiscoveryReqType* DC_ChargeParameterDiscoveryReq);
+void init_iso20_dc_DC_ChargeParameterDiscoveryResType(struct iso20_dc_DC_ChargeParameterDiscoveryResType* DC_ChargeParameterDiscoveryRes);
+void init_iso20_dc_DC_CableCheckReqType(struct iso20_dc_DC_CableCheckReqType* DC_CableCheckReq);
+void init_iso20_dc_DC_CableCheckResType(struct iso20_dc_DC_CableCheckResType* DC_CableCheckRes);
+void init_iso20_dc_DC_PreChargeReqType(struct iso20_dc_DC_PreChargeReqType* DC_PreChargeReq);
+void init_iso20_dc_DC_PreChargeResType(struct iso20_dc_DC_PreChargeResType* DC_PreChargeRes);
+void init_iso20_dc_DC_ChargeLoopReqType(struct iso20_dc_DC_ChargeLoopReqType* DC_ChargeLoopReq);
+void init_iso20_dc_DC_ChargeLoopResType(struct iso20_dc_DC_ChargeLoopResType* DC_ChargeLoopRes);
+void init_iso20_dc_DC_WeldingDetectionReqType(struct iso20_dc_DC_WeldingDetectionReqType* DC_WeldingDetectionReq);
+void init_iso20_dc_DC_WeldingDetectionResType(struct iso20_dc_DC_WeldingDetectionResType* DC_WeldingDetectionRes);
+void init_iso20_dc_DC_CPDReqEnergyTransferModeType(struct iso20_dc_DC_CPDReqEnergyTransferModeType* DC_CPDReqEnergyTransferMode);
+void init_iso20_dc_DC_CPDResEnergyTransferModeType(struct iso20_dc_DC_CPDResEnergyTransferModeType* DC_CPDResEnergyTransferMode);
+void init_iso20_dc_BPT_DC_CPDReqEnergyTransferModeType(struct iso20_dc_BPT_DC_CPDReqEnergyTransferModeType* BPT_DC_CPDReqEnergyTransferMode);
+void init_iso20_dc_BPT_DC_CPDResEnergyTransferModeType(struct iso20_dc_BPT_DC_CPDResEnergyTransferModeType* BPT_DC_CPDResEnergyTransferMode);
+void init_iso20_dc_Scheduled_DC_CLReqControlModeType(struct iso20_dc_Scheduled_DC_CLReqControlModeType* Scheduled_DC_CLReqControlMode);
+void init_iso20_dc_Scheduled_DC_CLResControlModeType(struct iso20_dc_Scheduled_DC_CLResControlModeType* Scheduled_DC_CLResControlMode);
+void init_iso20_dc_BPT_Scheduled_DC_CLReqControlModeType(struct iso20_dc_BPT_Scheduled_DC_CLReqControlModeType* BPT_Scheduled_DC_CLReqControlMode);
+void init_iso20_dc_BPT_Scheduled_DC_CLResControlModeType(struct iso20_dc_BPT_Scheduled_DC_CLResControlModeType* BPT_Scheduled_DC_CLResControlMode);
+void init_iso20_dc_Dynamic_DC_CLReqControlModeType(struct iso20_dc_Dynamic_DC_CLReqControlModeType* Dynamic_DC_CLReqControlMode);
+void init_iso20_dc_Dynamic_DC_CLResControlModeType(struct iso20_dc_Dynamic_DC_CLResControlModeType* Dynamic_DC_CLResControlMode);
+void init_iso20_dc_BPT_Dynamic_DC_CLReqControlModeType(struct iso20_dc_BPT_Dynamic_DC_CLReqControlModeType* BPT_Dynamic_DC_CLReqControlMode);
+void init_iso20_dc_BPT_Dynamic_DC_CLResControlModeType(struct iso20_dc_BPT_Dynamic_DC_CLResControlModeType* BPT_Dynamic_DC_CLResControlMode);
+void init_iso20_dc_CLReqControlModeType(struct iso20_dc_CLReqControlModeType* CLReqControlMode);
+void init_iso20_dc_CLResControlModeType(struct iso20_dc_CLResControlModeType* CLResControlMode);
+void init_iso20_dc_SignatureType(struct iso20_dc_SignatureType* Signature);
+void init_iso20_dc_SignatureValueType(struct iso20_dc_SignatureValueType* SignatureValue);
+void init_iso20_dc_SignedInfoType(struct iso20_dc_SignedInfoType* SignedInfo);
+void init_iso20_dc_CanonicalizationMethodType(struct iso20_dc_CanonicalizationMethodType* CanonicalizationMethod);
+void init_iso20_dc_SignatureMethodType(struct iso20_dc_SignatureMethodType* SignatureMethod);
+void init_iso20_dc_ReferenceType(struct iso20_dc_ReferenceType* Reference);
+void init_iso20_dc_TransformsType(struct iso20_dc_TransformsType* Transforms);
+void init_iso20_dc_TransformType(struct iso20_dc_TransformType* Transform);
+void init_iso20_dc_DigestMethodType(struct iso20_dc_DigestMethodType* DigestMethod);
+void init_iso20_dc_KeyInfoType(struct iso20_dc_KeyInfoType* KeyInfo);
+void init_iso20_dc_KeyValueType(struct iso20_dc_KeyValueType* KeyValue);
+void init_iso20_dc_RetrievalMethodType(struct iso20_dc_RetrievalMethodType* RetrievalMethod);
+void init_iso20_dc_X509DataType(struct iso20_dc_X509DataType* X509Data);
+void init_iso20_dc_PGPDataType(struct iso20_dc_PGPDataType* PGPData);
+void init_iso20_dc_SPKIDataType(struct iso20_dc_SPKIDataType* SPKIData);
+void init_iso20_dc_ObjectType(struct iso20_dc_ObjectType* Object);
+void init_iso20_dc_ManifestType(struct iso20_dc_ManifestType* Manifest);
+void init_iso20_dc_SignaturePropertiesType(struct iso20_dc_SignaturePropertiesType* SignatureProperties);
+void init_iso20_dc_SignaturePropertyType(struct iso20_dc_SignaturePropertyType* SignatureProperty);
+void init_iso20_dc_DSAKeyValueType(struct iso20_dc_DSAKeyValueType* DSAKeyValue);
+void init_iso20_dc_RSAKeyValueType(struct iso20_dc_RSAKeyValueType* RSAKeyValue);
+void init_iso20_dc_X509IssuerSerialType(struct iso20_dc_X509IssuerSerialType* X509IssuerSerialType);
+void init_iso20_dc_RationalNumberType(struct iso20_dc_RationalNumberType* RationalNumberType);
+void init_iso20_dc_DetailedCostType(struct iso20_dc_DetailedCostType* DetailedCostType);
+void init_iso20_dc_DetailedTaxType(struct iso20_dc_DetailedTaxType* DetailedTaxType);
+void init_iso20_dc_MessageHeaderType(struct iso20_dc_MessageHeaderType* MessageHeaderType);
+void init_iso20_dc_DisplayParametersType(struct iso20_dc_DisplayParametersType* DisplayParametersType);
+void init_iso20_dc_EVSEStatusType(struct iso20_dc_EVSEStatusType* EVSEStatusType);
+void init_iso20_dc_MeterInfoType(struct iso20_dc_MeterInfoType* MeterInfoType);
+void init_iso20_dc_ReceiptType(struct iso20_dc_ReceiptType* ReceiptType);
+void init_iso20_dc_exiFragment(struct iso20_dc_exiFragment* exiFrag);
+void init_iso20_dc_xmldsigFragment(struct iso20_dc_xmldsigFragment* xmldsigFrag);
 
 
 #ifdef __cplusplus

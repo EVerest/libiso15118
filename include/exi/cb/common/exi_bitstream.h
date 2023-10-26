@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -90,7 +90,7 @@ void exi_bitstream_reset(exi_bitstream_t* stream);
  * \return                  length of stream
  *
  */
-size_t exi_bitstream_get_length(exi_bitstream_t* stream);
+size_t exi_bitstream_get_length(const exi_bitstream_t* stream);
 
 /**
  * \brief       bitstream write bits

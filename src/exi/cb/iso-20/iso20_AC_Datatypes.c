@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 /*
- * Copyright (C) 2022-2023 chargebyte GmbH
- * Copyright (C) 2022-2023 Contributors to EVerest
+ * Copyright (C) 2022 - 2023 chargebyte GmbH
+ * Copyright (C) 2022 - 2023 Contributors to EVerest
  */
 
 /*****************************************************
@@ -65,8 +65,8 @@ void init_iso20_ac_exiDocument(struct iso20_ac_exiDocument* exiDoc) {
     exiDoc->RSAKeyValue_isUsed = 0u;
 }
 void init_iso20_ac_TransformType(struct iso20_ac_TransformType* TransformType) {
-    TransformType->ANY.bytesLen = 0u;
-    TransformType->XPath.charactersLen = 0u;
+    TransformType->ANY_isUsed = 0u;
+    TransformType->XPath_isUsed = 0u;
 }
 
 void init_iso20_ac_TransformsType(struct iso20_ac_TransformsType* TransformsType) {
@@ -74,12 +74,12 @@ void init_iso20_ac_TransformsType(struct iso20_ac_TransformsType* TransformsType
 }
 
 void init_iso20_ac_DSAKeyValueType(struct iso20_ac_DSAKeyValueType* DSAKeyValueType) {
-    DSAKeyValueType->P.bytesLen = 0u;
-    DSAKeyValueType->Q.bytesLen = 0u;
-    DSAKeyValueType->G.bytesLen = 0u;
-    DSAKeyValueType->J.bytesLen = 0u;
-    DSAKeyValueType->Seed.bytesLen = 0u;
-    DSAKeyValueType->PgenCounter.bytesLen = 0u;
+    DSAKeyValueType->P_isUsed = 0u;
+    DSAKeyValueType->Q_isUsed = 0u;
+    DSAKeyValueType->G_isUsed = 0u;
+    DSAKeyValueType->J_isUsed = 0u;
+    DSAKeyValueType->Seed_isUsed = 0u;
+    DSAKeyValueType->PgenCounter_isUsed = 0u;
 }
 
 void init_iso20_ac_X509IssuerSerialType(struct iso20_ac_X509IssuerSerialType* X509IssuerSerialType) {
@@ -87,7 +87,7 @@ void init_iso20_ac_X509IssuerSerialType(struct iso20_ac_X509IssuerSerialType* X5
 }
 
 void init_iso20_ac_DigestMethodType(struct iso20_ac_DigestMethodType* DigestMethodType) {
-    DigestMethodType->ANY.bytesLen = 0u;
+    DigestMethodType->ANY_isUsed = 0u;
 }
 
 void init_iso20_ac_RSAKeyValueType(struct iso20_ac_RSAKeyValueType* RSAKeyValueType) {
@@ -95,18 +95,18 @@ void init_iso20_ac_RSAKeyValueType(struct iso20_ac_RSAKeyValueType* RSAKeyValueT
 }
 
 void init_iso20_ac_CanonicalizationMethodType(struct iso20_ac_CanonicalizationMethodType* CanonicalizationMethodType) {
-    CanonicalizationMethodType->ANY.bytesLen = 0u;
+    CanonicalizationMethodType->ANY_isUsed = 0u;
 }
 
 void init_iso20_ac_SignatureMethodType(struct iso20_ac_SignatureMethodType* SignatureMethodType) {
-    SignatureMethodType->ANY.bytesLen = 0u;
     SignatureMethodType->HMACOutputLength_isUsed = 0u;
+    SignatureMethodType->ANY_isUsed = 0u;
 }
 
 void init_iso20_ac_KeyValueType(struct iso20_ac_KeyValueType* KeyValueType) {
-    KeyValueType->ANY.bytesLen = 0u;
     KeyValueType->DSAKeyValue_isUsed = 0u;
     KeyValueType->RSAKeyValue_isUsed = 0u;
+    KeyValueType->ANY_isUsed = 0u;
 }
 
 void init_iso20_ac_ReferenceType(struct iso20_ac_ReferenceType* ReferenceType) {
@@ -123,25 +123,25 @@ void init_iso20_ac_RetrievalMethodType(struct iso20_ac_RetrievalMethodType* Retr
 }
 
 void init_iso20_ac_X509DataType(struct iso20_ac_X509DataType* X509DataType) {
-    X509DataType->X509SKI.bytesLen = 0u;
-    X509DataType->X509SubjectName.charactersLen = 0u;
-    X509DataType->X509Certificate.bytesLen = 0u;
-    X509DataType->X509CRL.bytesLen = 0u;
-    X509DataType->ANY.bytesLen = 0u;
     X509DataType->X509IssuerSerial_isUsed = 0u;
+    X509DataType->X509SKI_isUsed = 0u;
+    X509DataType->X509SubjectName_isUsed = 0u;
+    X509DataType->X509Certificate_isUsed = 0u;
+    X509DataType->X509CRL_isUsed = 0u;
+    X509DataType->ANY_isUsed = 0u;
 }
 
 void init_iso20_ac_PGPDataType(struct iso20_ac_PGPDataType* PGPDataType) {
-    PGPDataType->choice_1.PGPKeyPacket.bytesLen = 0u;
-    PGPDataType->choice_2.ANY.bytesLen = 0u;
-    PGPDataType->choice_2.ANY.bytesLen = 0u;
+    PGPDataType->choice_1_isUsed = 0u;
+    PGPDataType->choice_2_isUsed = 0u;
 }
 
 void init_iso20_ac_SPKIDataType(struct iso20_ac_SPKIDataType* SPKIDataType) {
-    SPKIDataType->ANY.bytesLen = 0u;
+    SPKIDataType->ANY_isUsed = 0u;
 }
 
 void init_iso20_ac_SignedInfoType(struct iso20_ac_SignedInfoType* SignedInfoType) {
+    SignedInfoType->Reference.arrayLen = 0u;
     SignedInfoType->Id_isUsed = 0u;
 }
 
@@ -150,21 +150,22 @@ void init_iso20_ac_SignatureValueType(struct iso20_ac_SignatureValueType* Signat
 }
 
 void init_iso20_ac_KeyInfoType(struct iso20_ac_KeyInfoType* KeyInfoType) {
-    KeyInfoType->KeyName.charactersLen = 0u;
-    KeyInfoType->MgmtData.charactersLen = 0u;
-    KeyInfoType->ANY.bytesLen = 0u;
     KeyInfoType->Id_isUsed = 0u;
+    KeyInfoType->KeyName_isUsed = 0u;
     KeyInfoType->KeyValue_isUsed = 0u;
     KeyInfoType->RetrievalMethod_isUsed = 0u;
     KeyInfoType->X509Data_isUsed = 0u;
     KeyInfoType->PGPData_isUsed = 0u;
     KeyInfoType->SPKIData_isUsed = 0u;
+    KeyInfoType->MgmtData_isUsed = 0u;
+    KeyInfoType->ANY_isUsed = 0u;
 }
 
 void init_iso20_ac_ObjectType(struct iso20_ac_ObjectType* ObjectType) {
-    ObjectType->MimeType.charactersLen = 0u;
     ObjectType->Encoding_isUsed = 0u;
     ObjectType->Id_isUsed = 0u;
+    ObjectType->MimeType_isUsed = 0u;
+    ObjectType->ANY_isUsed = 0u;
 }
 
 void init_iso20_ac_RationalNumberType(struct iso20_ac_RationalNumberType* RationalNumberType) {
@@ -190,8 +191,8 @@ void init_iso20_ac_MessageHeaderType(struct iso20_ac_MessageHeaderType* MessageH
 }
 
 void init_iso20_ac_SignaturePropertyType(struct iso20_ac_SignaturePropertyType* SignaturePropertyType) {
-    SignaturePropertyType->ANY.bytesLen = 0u;
     SignaturePropertyType->Id_isUsed = 0u;
+    SignaturePropertyType->ANY_isUsed = 0u;
 }
 
 void init_iso20_ac_AC_CPDReqEnergyTransferModeType(struct iso20_ac_AC_CPDReqEnergyTransferModeType* AC_CPDReqEnergyTransferModeType) {
@@ -264,10 +265,10 @@ void init_iso20_ac_CLReqControlModeType(struct iso20_ac_CLReqControlModeType* CL
 }
 
 void init_iso20_ac_MeterInfoType(struct iso20_ac_MeterInfoType* MeterInfoType) {
-    MeterInfoType->MeterSignature.bytesLen = 0u;
     MeterInfoType->BPT_DischargedEnergyReadingWh_isUsed = 0u;
     MeterInfoType->CapacitiveEnergyReadingVARh_isUsed = 0u;
     MeterInfoType->BPT_InductiveEnergyReadingVARh_isUsed = 0u;
+    MeterInfoType->MeterSignature_isUsed = 0u;
     MeterInfoType->MeterStatus_isUsed = 0u;
     MeterInfoType->MeterTimestamp_isUsed = 0u;
 }
@@ -278,6 +279,18 @@ void init_iso20_ac_ReceiptType(struct iso20_ac_ReceiptType* ReceiptType) {
     ReceiptType->OccupancyCosts_isUsed = 0u;
     ReceiptType->AdditionalServicesCosts_isUsed = 0u;
     ReceiptType->OverstayCosts_isUsed = 0u;
+}
+
+void init_iso20_ac_Scheduled_AC_CLResControlModeType(struct iso20_ac_Scheduled_AC_CLResControlModeType* Scheduled_AC_CLResControlModeType) {
+    Scheduled_AC_CLResControlModeType->EVSETargetActivePower_isUsed = 0u;
+    Scheduled_AC_CLResControlModeType->EVSETargetActivePower_L2_isUsed = 0u;
+    Scheduled_AC_CLResControlModeType->EVSETargetActivePower_L3_isUsed = 0u;
+    Scheduled_AC_CLResControlModeType->EVSETargetReactivePower_isUsed = 0u;
+    Scheduled_AC_CLResControlModeType->EVSETargetReactivePower_L2_isUsed = 0u;
+    Scheduled_AC_CLResControlModeType->EVSETargetReactivePower_L3_isUsed = 0u;
+    Scheduled_AC_CLResControlModeType->EVSEPresentActivePower_isUsed = 0u;
+    Scheduled_AC_CLResControlModeType->EVSEPresentActivePower_L2_isUsed = 0u;
+    Scheduled_AC_CLResControlModeType->EVSEPresentActivePower_L3_isUsed = 0u;
 }
 
 void init_iso20_ac_Dynamic_AC_CLResControlModeType(struct iso20_ac_Dynamic_AC_CLResControlModeType* Dynamic_AC_CLResControlModeType) {
@@ -293,18 +306,6 @@ void init_iso20_ac_Dynamic_AC_CLResControlModeType(struct iso20_ac_Dynamic_AC_CL
     Dynamic_AC_CLResControlModeType->EVSEPresentActivePower_isUsed = 0u;
     Dynamic_AC_CLResControlModeType->EVSEPresentActivePower_L2_isUsed = 0u;
     Dynamic_AC_CLResControlModeType->EVSEPresentActivePower_L3_isUsed = 0u;
-}
-
-void init_iso20_ac_Scheduled_AC_CLResControlModeType(struct iso20_ac_Scheduled_AC_CLResControlModeType* Scheduled_AC_CLResControlModeType) {
-    Scheduled_AC_CLResControlModeType->EVSETargetActivePower_isUsed = 0u;
-    Scheduled_AC_CLResControlModeType->EVSETargetActivePower_L2_isUsed = 0u;
-    Scheduled_AC_CLResControlModeType->EVSETargetActivePower_L3_isUsed = 0u;
-    Scheduled_AC_CLResControlModeType->EVSETargetReactivePower_isUsed = 0u;
-    Scheduled_AC_CLResControlModeType->EVSETargetReactivePower_L2_isUsed = 0u;
-    Scheduled_AC_CLResControlModeType->EVSETargetReactivePower_L3_isUsed = 0u;
-    Scheduled_AC_CLResControlModeType->EVSEPresentActivePower_isUsed = 0u;
-    Scheduled_AC_CLResControlModeType->EVSEPresentActivePower_L2_isUsed = 0u;
-    Scheduled_AC_CLResControlModeType->EVSEPresentActivePower_L3_isUsed = 0u;
 }
 
 void init_iso20_ac_CLResControlModeType(struct iso20_ac_CLResControlModeType* CLResControlModeType) {
@@ -438,11 +439,44 @@ void init_iso20_ac_BPT_Dynamic_AC_CLResControlModeType(struct iso20_ac_BPT_Dynam
 }
 
 void init_iso20_ac_ManifestType(struct iso20_ac_ManifestType* ManifestType) {
+    ManifestType->Reference.arrayLen = 0u;
     ManifestType->Id_isUsed = 0u;
 }
 
 void init_iso20_ac_SignaturePropertiesType(struct iso20_ac_SignaturePropertiesType* SignaturePropertiesType) {
     SignaturePropertiesType->Id_isUsed = 0u;
+}
+
+// init for fragment
+void init_iso20_ac_exiFragment(struct iso20_ac_exiFragment* exiFrag) {
+    exiFrag->AC_ChargeParameterDiscoveryRes_isUsed = 0u;
+    exiFrag->SignedInfo_isUsed = 0u;
+}
+
+// init for xmldsig fragment
+void init_iso20_ac_xmldsigFragment(struct iso20_ac_xmldsigFragment* xmldsigFrag) {
+    xmldsigFrag->CanonicalizationMethod_isUsed = 0u;
+    xmldsigFrag->DSAKeyValue_isUsed = 0u;
+    xmldsigFrag->DigestMethod_isUsed = 0u;
+    xmldsigFrag->KeyInfo_isUsed = 0u;
+    xmldsigFrag->KeyValue_isUsed = 0u;
+    xmldsigFrag->Manifest_isUsed = 0u;
+    xmldsigFrag->Object_isUsed = 0u;
+    xmldsigFrag->PGPData_isUsed = 0u;
+    xmldsigFrag->RSAKeyValue_isUsed = 0u;
+    xmldsigFrag->Reference_isUsed = 0u;
+    xmldsigFrag->RetrievalMethod_isUsed = 0u;
+    xmldsigFrag->SPKIData_isUsed = 0u;
+    xmldsigFrag->Signature_isUsed = 0u;
+    xmldsigFrag->SignatureMethod_isUsed = 0u;
+    xmldsigFrag->SignatureProperties_isUsed = 0u;
+    xmldsigFrag->SignatureProperty_isUsed = 0u;
+    xmldsigFrag->SignatureValue_isUsed = 0u;
+    xmldsigFrag->SignedInfo_isUsed = 0u;
+    xmldsigFrag->Transform_isUsed = 0u;
+    xmldsigFrag->Transforms_isUsed = 0u;
+    xmldsigFrag->X509Data_isUsed = 0u;
+    xmldsigFrag->X509IssuerSerial_isUsed = 0u;
 }
 
 
