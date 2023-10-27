@@ -34,19 +34,13 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
             message_20::from_RationalNumber(mode.target_voltage),
             message_20::from_RationalNumber(mode.target_current),
         };
+
+        // res.control_mode = message_20::DC_ChargeLoopResponse::BPT_Scheduled_DC_CLResControlMode();
     }
 
     res.present_voltage = iso15118::message_20::from_float(present_voltage);
     res.present_current = iso15118::message_20::from_float(present_current);
     
-    if (std::get<0>(res.control_mode).max_charge_power) {
-        log("Has value!\n");
-    }
-
-    if (std::get<0>(res.control_mode).max_voltage) {
-        log("Has value!\n");
-    }
-
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return {response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession), charge_target};
     }
