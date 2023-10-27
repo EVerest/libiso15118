@@ -12594,11 +12594,11 @@ static int encode_iso20_dc_DC_ChargeLoopResType(exi_bitstream_t* stream, const s
                 error = exi_basetypes_encoder_nbit_uint(stream, 3, 0);
                 if (error == EXI_ERROR__NO_ERROR)
                 {
-                    // Event: START (BPT_Dynamic_DC_CLResControlMode, Dynamic_DC_CLResControlModeType); next=300
+                    // Event: START (BPT_Dynamic_DC_CLResControlMode, Dynamic_DC_CLResControlModeType); next=2
                     error = encode_iso20_dc_BPT_Dynamic_DC_CLResControlModeType(stream, &DC_ChargeLoopResType->BPT_Dynamic_DC_CLResControlMode);
                     if (error == EXI_ERROR__NO_ERROR)
                     {
-                        grammar_id = 300;
+                        grammar_id = 2;
                     }
                 }
             }
@@ -12607,11 +12607,11 @@ static int encode_iso20_dc_DC_ChargeLoopResType(exi_bitstream_t* stream, const s
                 error = exi_basetypes_encoder_nbit_uint(stream, 3, 1);
                 if (error == EXI_ERROR__NO_ERROR)
                 {
-                    // Event: START (BPT_Scheduled_DC_CLResControlMode, Scheduled_DC_CLResControlModeType); next=300
+                    // Event: START (BPT_Scheduled_DC_CLResControlMode, Scheduled_DC_CLResControlModeType); next=2
                     error = encode_iso20_dc_BPT_Scheduled_DC_CLResControlModeType(stream, &DC_ChargeLoopResType->BPT_Scheduled_DC_CLResControlMode);
                     if (error == EXI_ERROR__NO_ERROR)
                     {
-                        grammar_id = 300;
+                        grammar_id = 2;
                     }
                 }
             }

@@ -214,7 +214,7 @@ struct ControlModeVisitor {
         auto& out = res.BPT_Scheduled_DC_CLResControlMode;
         init_iso20_dc_BPT_Scheduled_DC_CLResControlModeType(&out);
         convert(in, out);
-        CB_SET_USED(res.BPT_Dynamic_DC_CLResControlMode);
+        CB_SET_USED(res.BPT_Scheduled_DC_CLResControlMode);
     }
     void operator()(const DynamicCM& in) {
         auto& out = res.Dynamic_DC_CLResControlMode;

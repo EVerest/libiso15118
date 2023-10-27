@@ -12,6 +12,9 @@ using Scheduled_BPT_DC_Req = message_20::DC_ChargeLoopRequest::BPT_Scheduled_DC_
 using Dynamic_DC_Req = message_20::DC_ChargeLoopRequest::Dynamic_DC_CLReqControlMode;
 using Dynamic_BPT_DC_Req = message_20::DC_ChargeLoopRequest::BPT_Dynamic_DC_CLReqControlMode;
 
+using Scheduled_DC_Res = message_20::DC_ChargeLoopResponse::Scheduled_DC_CLResControlMode;
+using Scheduled_BPT_DC_Res = message_20::DC_ChargeLoopResponse::BPT_Scheduled_DC_CLResControlMode;
+
 std::tuple<message_20::DC_ChargeLoopResponse, std::optional<session::feedback::DcChargeTarget>>
 handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& session, const float present_voltage,
                const float present_current) {
@@ -20,22 +23,34 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
     std::optional<session::feedback::DcChargeTarget> charge_target{std::nullopt};
 
     if (std::holds_alternative<Scheduled_DC_Req>(req.control_mode)) {
-        const auto& mode = std::get<Scheduled_DC_Req>(req.control_mode);
+
+        if (session.selected_energy_service != message_20::ServiceCategory::DC) {
+            return {response_with_code(res, message_20::ResponseCode::FAILED), charge_target};
+        }
+
+        const auto& req_mode = std::get<Scheduled_DC_Req>(req.control_mode);
 
         charge_target = {
-            message_20::from_RationalNumber(mode.target_voltage),
-            message_20::from_RationalNumber(mode.target_current),
+            message_20::from_RationalNumber(req_mode.target_voltage),
+            message_20::from_RationalNumber(req_mode.target_current),
         };
+
+        auto& mode = res.control_mode.emplace<Scheduled_DC_Res>();
 
     } else if (std::holds_alternative<Scheduled_BPT_DC_Req>(req.control_mode)) {
-        const auto& mode = std::get<Scheduled_BPT_DC_Req>(req.control_mode);
+
+        if (session.selected_energy_service != message_20::ServiceCategory::DC_BPT) {
+            return {response_with_code(res, message_20::ResponseCode::FAILED), charge_target};
+        }
+
+        const auto& req_mode = std::get<Scheduled_BPT_DC_Req>(req.control_mode);
 
         charge_target = {
-            message_20::from_RationalNumber(mode.target_voltage),
-            message_20::from_RationalNumber(mode.target_current),
+            message_20::from_RationalNumber(req_mode.target_voltage),
+            message_20::from_RationalNumber(req_mode.target_current),
         };
 
-        // res.control_mode = message_20::DC_ChargeLoopResponse::BPT_Scheduled_DC_CLResControlMode();
+        auto& mode = res.control_mode.emplace<Scheduled_BPT_DC_Res>();
     }
 
     res.present_voltage = iso15118::message_20::from_float(present_voltage);
