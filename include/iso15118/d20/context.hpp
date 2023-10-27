@@ -61,7 +61,21 @@ public:
         message_exchange.set_response(msg);
     }
 
-    const std::optional<ControlEvent>& current_control_event;
+    const auto& get_control_event() {
+        return current_control_event;
+    }
+
+    template <typename T> T const* get_control_event() {
+        if (not current_control_event.has_value()) {
+            return nullptr;
+        }
+
+        if (not std::holds_alternative<T>(*current_control_event)) {
+            return nullptr;
+        }
+
+        return &std::get<T>(*current_control_event);
+    }
 
     const session::Feedback feedback;
 
@@ -72,6 +86,7 @@ public:
     Config config;
 
 private:
+    const std::optional<ControlEvent>& current_control_event;
     MessageExchange& message_exchange;
 };
 

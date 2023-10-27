@@ -17,18 +17,14 @@ void DC_CableCheck::enter() {
 FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType& sa, FsmEvent ev) {
 
     if (ev == FsmEvent::CONTROL_MESSAGE) {
-        // it works but ugly
-        if (ctx.current_control_event.has_value()) {
-            if (std::holds_alternative<iso15118::d20::CableCheckFinished>(ctx.current_control_event.value())) {
-                const auto& control_event =
-                    std::get<iso15118::d20::CableCheckFinished>(ctx.current_control_event.value());
-                if (control_event) {
-                    cable_check_done = true;
-                } else {
-                    cable_check_done = false;
-                }
-            }
+        const auto control_data = ctx.get_control_event<CableCheckFinished>();
+        if (not control_data) {
+            // FIXME (aw): error handling
+            return sa.HANDLED_INTERNALLY;
         }
+
+        cable_check_done = *control_data;
+
         return sa.HANDLED_INTERNALLY;
     }
 

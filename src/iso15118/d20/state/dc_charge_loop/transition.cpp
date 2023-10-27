@@ -17,15 +17,15 @@ void DC_ChargeLoop::enter() {
 FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType& sa, FsmEvent ev) {
 
     if (ev == FsmEvent::CONTROL_MESSAGE) {
-
-        if (ctx.current_control_event.has_value()) {
-            if (std::holds_alternative<iso15118::d20::PresentVoltageCurrent>(ctx.current_control_event.value())) {
-                const auto& present_voltage_current =
-                    std::get<iso15118::d20::PresentVoltageCurrent>(ctx.current_control_event.value());
-                present_voltage = present_voltage_current.get_voltage();
-                present_current = present_voltage_current.get_current();
-            }
+        const auto control_data = ctx.get_control_event<PresentVoltageCurrent>();
+        if (not control_data) {
+            // FIXME (aw): error handling
+            return sa.HANDLED_INTERNALLY;
         }
+
+        present_voltage = control_data->voltage;
+        present_current = control_data->current;
+
         return sa.HANDLED_INTERNALLY;
     }
 

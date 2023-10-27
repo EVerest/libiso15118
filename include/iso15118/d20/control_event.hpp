@@ -18,23 +18,11 @@ private:
     bool success;
 };
 
-class PresentVoltageCurrent {
-public:
-    explicit PresentVoltageCurrent(float voltage_, float current_) : voltage(voltage_), current(current_) {
-    }
-
-    float get_voltage() const {
-        return voltage;
-    }
-
-    float get_current() const {
-        return current;
-    }
-
-private:
+struct PresentVoltageCurrent {
     float voltage;
     float current;
 };
 
 using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent>;
+
 } // namespace iso15118::d20
