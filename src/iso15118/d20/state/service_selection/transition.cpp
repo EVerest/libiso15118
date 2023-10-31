@@ -28,7 +28,7 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
 
         logf("Requested info about ServiceID: %d\n", req.service);
 
-        const auto& res = handle_request(req, ctx.session, ctx.config);
+        const auto res = handle_request(req, ctx.session, ctx.config);
 
         ctx.respond(res);
 
@@ -38,7 +38,7 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
 
         const auto& req = variant->get<message_20::ServiceSelectionRequest>();
 
-        const auto& res = handle_request(req, ctx.session, ctx.config);
+        const auto res = handle_request(req, ctx.session, ctx.config);
 
         ctx.respond(res);
 

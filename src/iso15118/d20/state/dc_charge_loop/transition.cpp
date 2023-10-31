@@ -43,7 +43,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
 
         const auto& req = variant->get<message_20::PowerDeliveryRequest>();
 
-        const auto& res = handle_request(req, ctx.session);
+        const auto res = handle_request(req, ctx.session);
 
         ctx.respond(res);
 

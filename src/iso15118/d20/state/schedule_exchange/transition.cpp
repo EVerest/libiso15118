@@ -22,7 +22,7 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
 
         const auto& req = variant->get<message_20::ScheduleExchangeRequest>();
 
-        const auto& res = handle_request(req, ctx.session);
+        const auto res = handle_request(req, ctx.session);
 
         ctx.respond(res);
 

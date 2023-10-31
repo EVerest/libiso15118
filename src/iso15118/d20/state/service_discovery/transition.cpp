@@ -30,7 +30,7 @@ FsmSimpleState::HandleEventReturnType ServiceDiscovery::handle_event(AllocatorTy
             }
         }
 
-        const auto& res = handle_request(req, ctx.session, ctx.config);
+        const auto res = handle_request(req, ctx.session, ctx.config);
 
         ctx.respond(res);
 

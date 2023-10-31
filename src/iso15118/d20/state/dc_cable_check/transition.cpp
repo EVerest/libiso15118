@@ -46,7 +46,7 @@ FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType&
 
     const auto& req = variant->get<message_20::DC_CableCheckRequest>();
 
-    auto res = handle_request(req, ctx.session, cable_check_done);
+    const auto res = handle_request(req, ctx.session, cable_check_done);
 
     ctx.respond(res);
 

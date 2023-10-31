@@ -29,7 +29,7 @@ FsmSimpleState::HandleEventReturnType ServiceDetail::handle_event(AllocatorType&
 
     logf("Requested info about ServiceID: %d\n", req.service);
 
-    const auto& res = handle_request(req, ctx.session, ctx.config);
+    const auto res = handle_request(req, ctx.session, ctx.config);
 
     ctx.respond(res);
 

@@ -25,7 +25,7 @@ FsmSimpleState::HandleEventReturnType AuthorizationSetup::handle_event(Allocator
 
         const auto& req = variant->get<message_20::AuthorizationSetupRequest>();
 
-        const auto& res = handle_request(req, ctx.session, ctx.config);
+        const auto res = handle_request(req, ctx.session, ctx.config);
 
         logf("Timestamp: %d\n", req.header.timestamp);
 

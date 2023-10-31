@@ -22,7 +22,7 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
     if (variant->get_type() == message_20::Type::AuthorizationReq) {
         const auto& req = variant->get<message_20::AuthorizationRequest>();
 
-        const auto& res = handle_request(req, ctx.session, ctx.config);
+        const auto res = handle_request(req, ctx.session, ctx.config);
 
         ctx.respond(res);
 
