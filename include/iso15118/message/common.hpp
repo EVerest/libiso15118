@@ -94,6 +94,12 @@ enum class EvseNotification {
     MeteringConfirmation,
 };
 
+enum class ChargingSession {
+    Pause,
+    Terminate,
+    ServiceRenegotiation,
+};
+
 struct RationalNumber {
     int16_t value{0};
     int8_t exponent{0};

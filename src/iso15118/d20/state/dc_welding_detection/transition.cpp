@@ -2,9 +2,9 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <iso15118/d20/state/dc_welding_detection.hpp>
 
-#include <iso15118/detail/d20/state/dc_welding_detection.hpp>
+#include <iso15118/d20/state/session_stop.hpp>
 
-#include <iso15118/message/dc_welding_detection.hpp>
+#include <iso15118/detail/d20/state/dc_welding_detection.hpp>
 
 namespace iso15118::d20::state {
 
@@ -46,8 +46,7 @@ FsmSimpleState::HandleEventReturnType DC_WeldingDetection::handle_event(Allocato
         return sa.HANDLED_INTERNALLY;
     }
 
-    return sa.PASS_ON; // Todo(sl): Add session_stop state
-
+    return sa.create_simple<SessionStop>(ctx);
 }
 
 } // namespace iso15118::d20::state

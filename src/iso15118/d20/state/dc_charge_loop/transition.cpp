@@ -2,6 +2,8 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <iso15118/d20/state/dc_charge_loop.hpp>
 
+#include <iso15118/d20/state/dc_welding_detection.hpp>
+
 #include <iso15118/detail/d20/state/dc_charge_loop.hpp>
 
 #include <iso15118/detail/d20/state/power_delivery.hpp>
@@ -51,6 +53,10 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
         first_entry_in_charge_loop = true;
 
         // Todo(sl): React properly to Start, Stop, Standby and ScheduleRenegotiation
+        if (req.charge_progress == message_20::PowerDeliveryRequest::Progress::Stop) {
+            return sa.create_simple<DC_WeldingDetection>(ctx);
+        }
+
         return sa.HANDLED_INTERNALLY;
 
     } else if (variant->get_type() == message_20::Type::DC_ChargeLoopReq) {
