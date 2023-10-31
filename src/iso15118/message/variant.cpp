@@ -82,6 +82,8 @@ static void handle_dc(VariantAccess& va) {
         insert_type(va, doc.DC_PreChargeReq);
     } else if (doc.DC_ChargeLoopReq_isUsed) {
         insert_type(va, doc.DC_ChargeLoopReq);
+    } else if (doc.DC_WeldingDetectionReq_isUsed) {
+        insert_type(va, doc.DC_WeldingDetectionReq);
     } else {
         va.error = "chosen message type unhandled";
     }

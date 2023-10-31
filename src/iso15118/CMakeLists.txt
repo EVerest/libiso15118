@@ -62,6 +62,8 @@ target_sources(iso15118
         d20/state/power_delivery/transition.cpp
         d20/state/dc_charge_loop/handle_request.cpp
         d20/state/dc_charge_loop/transition.cpp
+        d20/state/dc_welding_detection/handle_request.cpp
+        d20/state/dc_welding_detection/transition.cpp
 
         message/variant.cpp
         message/supported_app_protocol.cpp
@@ -78,6 +80,7 @@ target_sources(iso15118
         message/dc_pre_charge.cpp
         message/power_delivery.cpp
         message/dc_charge_loop.cpp
+        message/dc_welding_detection.cpp
 
         tbd_controller.cpp    
 )
