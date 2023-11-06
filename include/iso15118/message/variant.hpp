@@ -23,7 +23,9 @@ public:
     ~Variant();
 
     Type get_type() const;
+
     const std::string& get_error() const;
+
     template <typename T> const T& get() const {
         static_assert(TypeTrait<T>::type != Type::None, "Unhandled type!");
         if (TypeTrait<T>::type != type) {
@@ -31,6 +33,15 @@ public:
         }
 
         return *static_cast<T*>(data);
+    }
+
+    template <typename T> T const* get_if() const {
+        static_assert(TypeTrait<T>::type != Type::None, "Unhandled type!");
+        if (TypeTrait<T>::type != type) {
+            return nullptr;
+        }
+
+        return static_cast<T*>(data);
     }
 
 private:
