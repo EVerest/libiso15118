@@ -46,8 +46,7 @@ target_sources(iso15118
         d20/state/service_detail.cpp
         d20/state/service_selection.cpp
         d20/state/dc_charge_parameter_discovery.cpp
-        d20/state/schedule_exchange/handle_request.cpp
-        d20/state/schedule_exchange/transition.cpp
+        d20/state/schedule_exchange.cpp
         d20/state/dc_cable_check/handle_request.cpp
         d20/state/dc_cable_check/transition.cpp
         d20/state/dc_pre_charge/handle_request.cpp
