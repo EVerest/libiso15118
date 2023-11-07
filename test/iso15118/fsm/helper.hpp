@@ -18,7 +18,7 @@ public:
 
         msg_exch.set_request(payload_type, {output_buffer, encoded_size});
 
-        return state.handle_event(state_allocator, iso15118::d20::FsmEvent::NEW_V2GTP_MESSAGE);
+        return state.handle_event(state_allocator, iso15118::d20::FsmEvent::V2GTP_MESSAGE);
     }
 
     template <typename StateType> bool next_simple_state_is() {
