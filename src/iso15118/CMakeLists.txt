@@ -40,8 +40,7 @@ target_sources(iso15118
 
         d20/state/supported_app_protocol.cpp
         d20/state/session_setup.cpp
-        d20/state/authorization_setup/handle_request.cpp
-        d20/state/authorization_setup/transition.cpp
+        d20/state/authorization_setup.cpp
         d20/state/authorization.cpp
         d20/state/service_discovery/handle_request.cpp
         d20/state/service_discovery/transition.cpp
