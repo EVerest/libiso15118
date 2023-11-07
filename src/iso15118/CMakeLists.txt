@@ -44,8 +44,7 @@ target_sources(iso15118
         d20/state/authorization.cpp
         d20/state/service_discovery.cpp
         d20/state/service_detail.cpp
-        d20/state/service_selection/handle_request.cpp
-        d20/state/service_selection/transition.cpp
+        d20/state/service_selection.cpp
         d20/state/dc_charge_parameter_discovery/handle_request.cpp
         d20/state/dc_charge_parameter_discovery/transition.cpp
         d20/state/schedule_exchange/handle_request.cpp
