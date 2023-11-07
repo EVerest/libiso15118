@@ -49,8 +49,7 @@ target_sources(iso15118
         d20/state/schedule_exchange.cpp
         d20/state/dc_cable_check.cpp
         d20/state/dc_pre_charge.cpp
-        d20/state/power_delivery/handle_request.cpp
-        d20/state/power_delivery/transition.cpp
+        d20/state/power_delivery.cpp
         d20/state/dc_charge_loop/handle_request.cpp
         d20/state/dc_charge_loop/transition.cpp
         d20/state/dc_welding_detection/handle_request.cpp
