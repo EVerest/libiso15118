@@ -16,6 +16,8 @@ struct DC_ChargeLoop : public FsmSimpleState {
 private:
     float present_voltage{0};
     float present_current{0};
+
+    bool first_entry_in_charge_loop{true};
 };
 
 } // namespace iso15118::d20::state
