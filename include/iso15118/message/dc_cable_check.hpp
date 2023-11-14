@@ -11,6 +11,9 @@ struct DC_CableCheckRequest {
 };
 
 struct DC_CableCheckResponse {
+
+    DC_CableCheckResponse() : processing(Processing::Ongoing){};
+
     Header header;
     ResponseCode response_code;
 
