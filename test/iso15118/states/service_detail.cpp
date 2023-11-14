@@ -17,7 +17,7 @@ SCENARIO("Service detail state handling") {
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::DC;
 
-        const auto& res = d20::state::handle_request(req, d20::Session(), d20::Config());
+        const auto res = d20::state::handle_request(req, d20::Session(), d20::Config());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -45,7 +45,7 @@ SCENARIO("Service detail state handling") {
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::AC;
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: FAILED_ServiceIDInvalid, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_ServiceIDInvalid);
@@ -79,7 +79,7 @@ SCENARIO("Service detail state handling") {
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::DC;
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -129,7 +129,7 @@ SCENARIO("Service detail state handling") {
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::DC_BPT;
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -190,7 +190,7 @@ SCENARIO("Service detail state handling") {
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::DC;
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -258,7 +258,7 @@ SCENARIO("Service detail state handling") {
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::DC;
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);

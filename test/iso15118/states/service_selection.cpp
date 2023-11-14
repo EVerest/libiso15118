@@ -17,7 +17,7 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC_BPT;
         req.selected_energy_transfer_service.parameter_set_id = 0;
 
-        const auto& res = d20::state::handle_request(req, d20::Session(), d20::Config());
+        const auto res = d20::state::handle_request(req, d20::Session(), d20::Config());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -45,7 +45,7 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
         req.selected_energy_transfer_service.parameter_set_id = 1;
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: FAILED_ServiceSelectionInvalid, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_ServiceSelectionInvalid);
@@ -72,7 +72,7 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::AC;
         req.selected_energy_transfer_service.parameter_set_id = 0;
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: FAILED_NoEnergyTransferServiceSelected, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_NoEnergyTransferServiceSelected);
@@ -98,7 +98,7 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
         req.selected_energy_transfer_service.parameter_set_id = 0;
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -124,7 +124,7 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
         req.selected_energy_transfer_service.parameter_set_id = 0;
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);

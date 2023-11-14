@@ -29,7 +29,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto& res = d20::state::handle_request(req, d20::Session(), d20::Config());
+        const auto res = d20::state::handle_request(req, d20::Session(), d20::Config());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -71,7 +71,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto& res = d20::state::handle_request(req, session, d20::Config());
+        const auto res = d20::state::handle_request(req, session, d20::Config());
 
         THEN("ResponseCode: FAILED_WrongChargeParameter, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_WrongChargeParameter);
@@ -117,7 +117,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        const auto& res = d20::state::handle_request(req, session, d20::Config());
+        const auto res = d20::state::handle_request(req, session, d20::Config());
 
         THEN("ResponseCode: FAILED_WrongChargeParameter, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_WrongChargeParameter);
@@ -171,7 +171,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -235,7 +235,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -266,7 +266,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         }
     }
 
-    GIVEN("Bad Case: EV Parameter does not fit in evse parameters -FAILED_WrongChargeParameter") {
+    GIVEN("Bad Case: EV Parameter does not fit in evse parameters - FAILED_WrongChargeParameter") {
     }
 
     // GIVEN("Bad Case - sequence error") {} // todo(sl): not here

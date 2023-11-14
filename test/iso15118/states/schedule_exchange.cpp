@@ -22,7 +22,7 @@ SCENARIO("Schedule Exchange state handling") {
         // Todo
         auto& req_out = req.control_mode.emplace<Scheduled_ModeReq>();
 
-        const auto& res = d20::state::handle_request(req, d20::Session());
+        const auto res = d20::state::handle_request(req, d20::Session());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -36,7 +36,7 @@ SCENARIO("Schedule Exchange state handling") {
             const auto& schedule_tuple = res_control_mode.schedule_tuple[0];
             REQUIRE(schedule_tuple.schedule_tuple_id == 0);
             REQUIRE(schedule_tuple.discharging_schedule.has_value() == false);
-                }
+        }
     }
 
     GIVEN("Good case - Scheduled Mode") {

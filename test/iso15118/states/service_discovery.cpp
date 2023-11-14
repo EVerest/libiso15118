@@ -15,7 +15,7 @@ SCENARIO("Service discovery state handling") {
         req.header.session_id = session.id;
         req.header.timestamp = 1691411798;
 
-        const auto& res = d20::state::handle_request(req, d20::Session(), d20::Config());
+        const auto res = d20::state::handle_request(req, d20::Session(), d20::Config());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -40,7 +40,7 @@ SCENARIO("Service discovery state handling") {
         config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false},
                                                      {message_20::ServiceCategory::DC_BPT, false}};
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: OK, energy_transfer_service_list: DC & DC_WPT, vaslist: empty") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -71,7 +71,7 @@ SCENARIO("Service discovery state handling") {
 
         config.supported_vas_services = {{message_20::ServiceCategory::ParkingStatus, true}};
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: OK, energy_transfer_service_list: DC & DC_BPT, vaslist: ParkingStatus") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -108,7 +108,7 @@ SCENARIO("Service discovery state handling") {
 
         config.supported_vas_services = {{message_20::ServiceCategory::ParkingStatus, true}};
 
-        const auto& res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, config);
 
         THEN("ResponseCode: OK, energy_transfer_service_list: DC, vaslist: empty") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
