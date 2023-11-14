@@ -59,11 +59,7 @@ FsmSimpleState::HandleEventReturnType DC_PreCharge::handle_event(AllocatorType& 
 
         ctx.respond(res);
 
-        if (req->processing == message_20::Processing::Finished) {
-            return sa.create_simple<PowerDelivery>(ctx);
-        }
-
-        return sa.HANDLED_INTERNALLY;
+        return sa.create_simple<PowerDelivery>(ctx);
 
     } else {
         ctx.log("expected DC_PreChargeReq! But code type id: %d", variant->get_type());
