@@ -79,6 +79,9 @@ FsmSimpleState::HandleEventReturnType AuthorizationSetup::handle_event(Allocator
             return sa.PASS_ON;
         }
 
+        // Todo(sl): PnC is currently not supported
+        ctx.feedback.signal(session::feedback::Signal::REQUIRE_AUTH_EIM);
+
         return sa.create_simple<Authorization>(ctx);
     } else {
         ctx.log("expected AuthorizationSetupReq! But code type id: %d", variant->get_type());

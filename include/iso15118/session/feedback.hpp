@@ -9,9 +9,15 @@ namespace iso15118::session {
 namespace feedback {
 
 enum class Signal {
+    REQUIRE_AUTH_EIM,
     START_CABLE_CHECK,
     SETUP_FINISHED,
     CHARGE_LOOP_STARTED,
+    CHARGE_LOOP_FINISHED,
+    DC_OPEN_CONTACTOR,
+    DLINK_TERMINATE,
+    DLINK_ERROR,
+    DLINK_PAUSE,
 };
 
 struct DcChargeTarget {

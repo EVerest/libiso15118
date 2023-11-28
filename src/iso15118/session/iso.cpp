@@ -179,6 +179,7 @@ TimePoint const& Session::poll() {
         if (session_stopped) {
             connection->close();
             session_stopped = false; // reset
+            ctx.feedback.signal(session::feedback::Signal::DLINK_TERMINATE);
         }
     }
 

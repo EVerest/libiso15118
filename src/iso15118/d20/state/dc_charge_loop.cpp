@@ -106,6 +106,8 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
 
         // Todo(sl): React properly to Start, Stop, Standby and ScheduleRenegotiation
         if (req->charge_progress == message_20::PowerDeliveryRequest::Progress::Stop) {
+            ctx.feedback.signal(session::feedback::Signal::CHARGE_LOOP_FINISHED);
+            ctx.feedback.signal(session::feedback::Signal::DC_OPEN_CONTACTOR);
             return sa.create_simple<DC_WeldingDetection>(ctx);
         }
 
