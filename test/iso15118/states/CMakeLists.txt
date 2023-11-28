@@ -88,3 +88,13 @@ target_link_libraries(test_dc_pre_charge
 
 catch_discover_tests(test_dc_pre_charge)
 
+add_executable(test_power_delivery power_delivery.cpp)
+
+target_link_libraries(test_power_delivery
+    PRIVATE
+        iso15118
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(test_power_delivery)
+
