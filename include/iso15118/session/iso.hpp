@@ -61,6 +61,8 @@ private:
 
     TimePoint next_session_event;
 
+    bool session_stopped{false};
+
     void handle_connection_event(io::ConnectionEvent event);
 };
 

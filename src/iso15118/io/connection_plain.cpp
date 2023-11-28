@@ -7,6 +7,8 @@
 
 #include <unistd.h>
 
+#include <thread>
+
 #include <iso15118/detail/helper.hpp>
 #include <iso15118/detail/io/socket_helper.hpp>
 
@@ -98,7 +100,7 @@ void ConnectionPlain::handle_connect() {
     }
 
     poll_manager.unregister_fd(fd);
-    close(fd);
+    ::close(fd);
 
     call_if_available(event_callback, ConnectionEvent::ACCEPTED);
 
@@ -113,6 +115,34 @@ void ConnectionPlain::handle_data() {
     assert(connection_open);
 
     call_if_available(event_callback, ConnectionEvent::NEW_DATA);
+}
+
+void ConnectionPlain::close() {
+
+    /* tear down TCP connection gracefully */
+    logf("Closing TCP connection\n");
+
+    const auto shutdown_result = shutdown(fd, SHUT_RDWR);
+
+    if (shutdown_result == -1) {
+        log_and_throw("shutdown() failed");
+    }
+
+    // Waiting for client closing the connection
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    poll_manager.unregister_fd(fd);
+
+    const auto close_shutdown = ::close(fd);
+
+    if (close_shutdown == -1) {
+        log_and_throw("close() failed");
+    }
+
+    logf("TCP connection closed gracefully");
+
+    connection_open = false;
+    call_if_available(event_callback, ConnectionEvent::CLOSED);
 }
 
 } // namespace iso15118::io

@@ -257,4 +257,28 @@ void ConnectionSSL::handle_data() {
     publish_event(ConnectionEvent::NEW_DATA);
 }
 
+void ConnectionSSL::close() {
+
+    /* tear down TLS connection gracefully */
+    logf("Closing TLS connection\n");
+
+    poll_manager.unregister_fd(ssl->connection_net_ctx.fd);
+
+    const auto ssl_close_result = mbedtls_ssl_close_notify(&ssl->ssl);
+
+    if (ssl_close_result != 0) {
+        if ((ssl_close_result != MBEDTLS_ERR_SSL_WANT_READ) and (ssl_close_result != MBEDTLS_ERR_SSL_WANT_WRITE)) {
+            log_and_raise_mbed_error("Failed to mbedtls_ssl_close_notify()", ssl_close_result);
+        }
+    } else {
+        logf("TLS connection closed gracefully\n");
+    }
+
+    publish_event(ConnectionEvent::CLOSED);
+
+    mbedtls_net_free(&ssl->connection_net_ctx);
+
+    mbedtls_ssl_free(&ssl->ssl);
+}
+
 } // namespace iso15118::io

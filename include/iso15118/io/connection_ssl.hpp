@@ -22,6 +22,8 @@ public:
     void write(const uint8_t* buf, size_t len) final;
     ReadResult read(uint8_t* buf, size_t len) final;
 
+    void close() final;
+
     ~ConnectionSSL();
 
 private:

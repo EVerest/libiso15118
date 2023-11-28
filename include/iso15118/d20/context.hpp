@@ -52,7 +52,7 @@ std::unique_ptr<MessageExchange> create_message_exchange(uint8_t* buf, const siz
 class Context {
 public:
     // FIXME (aw): bundle arguments
-    Context(MessageExchange&, const std::optional<ControlEvent>&, session::feedback::Callbacks,
+    Context(MessageExchange&, const std::optional<ControlEvent>&, session::feedback::Callbacks, bool&,
             session::SessionLogger&);
 
     std::unique_ptr<message_20::Variant> get_request();
@@ -84,6 +84,8 @@ public:
     Session session;
 
     Config config;
+
+    bool& session_stopped;
 
 private:
     const std::optional<ControlEvent>& current_control_event;

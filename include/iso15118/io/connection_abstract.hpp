@@ -13,6 +13,7 @@ enum class ConnectionEvent {
     ACCEPTED,
     OPEN,
     NEW_DATA,
+    CLOSED,
 };
 
 using ConnectionEventCallback = std::function<void(ConnectionEvent)>;
@@ -29,6 +30,8 @@ struct IConnection {
 
     virtual void write(const uint8_t* buf, size_t len) = 0;
     virtual ReadResult read(uint8_t* buf, size_t len) = 0;
+
+    virtual void close() = 0;
 
     virtual ~IConnection() = default;
 };

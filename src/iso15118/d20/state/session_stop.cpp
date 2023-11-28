@@ -38,9 +38,14 @@ FsmSimpleState::HandleEventReturnType SessionStop::handle_event(AllocatorType& s
 
         ctx.respond(res);
 
-        return sa.PASS_ON; // Todo(sl): Stop TCP/TLS
+        // Todo(sl): Tell the reason why the charger is stopping. Shutdown, Error, etc.
+        ctx.session_stopped = true;
+
+        return sa.PASS_ON; 
     } else {
-        ctx.log("expected DC_WeldingDetection! But code type id: %d", variant->get_type());
+        ctx.log("expected SessionStop! But code type id: %d", variant->get_type());
+
+        ctx.session_stopped = true;
         return sa.PASS_ON;
     }
 }

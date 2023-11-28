@@ -19,4 +19,3 @@ bool validate_and_setup_header(message_20::Header&, const Session&, const declty
 void setup_header(message_20::Header&, const Session&);
 
 } // namespace iso15118::d20
-
