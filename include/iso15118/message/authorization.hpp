@@ -10,6 +10,12 @@
 
 namespace iso15118::message_20 {
 
+enum class AuthStatus {
+    Accepted = 0,
+    Pending = 1,
+    Rejected = 2,
+};
+
 struct AuthorizationRequest {
 
     // Todo(sl): Refactor in common

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../fsm.hpp"
+#include <iso15118/message/authorization.hpp>
 
 namespace iso15118::d20::state {
 
@@ -12,6 +13,9 @@ struct Authorization : public FsmSimpleState {
     void enter() final;
 
     HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+
+private:
+    message_20::AuthStatus authorization_status{message_20::AuthStatus::Pending};
 };
 
 } // namespace iso15118::d20::state

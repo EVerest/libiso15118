@@ -17,13 +17,6 @@ struct Config {
     bool cert_install_service;
     std::vector<message_20::Authorization> authorization_services;
 
-    enum class AuthStatus {
-        Accepted = 0,
-        Pending = 1,
-        Rejected = 2,
-    };
-    AuthStatus authorization_status;
-
     std::vector<message_20::ServiceDiscoveryResponse::Service> supported_energy_transfer_services;
     std::vector<message_20::ServiceDiscoveryResponse::Service> supported_vas_services;
 

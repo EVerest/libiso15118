@@ -8,8 +8,6 @@ Config::Config() {
     cert_install_service = false;
     authorization_services.push_back(message_20::Authorization::EIM);
 
-    authorization_status = Config::AuthStatus::Accepted;
-
     supported_energy_transfer_services = {{
                                               message_20::ServiceCategory::DC, // service_id
                                               false                            // free_service

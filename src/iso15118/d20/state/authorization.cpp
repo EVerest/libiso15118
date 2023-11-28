@@ -12,6 +12,8 @@
 
 namespace iso15118::d20::state {
 
+using AuthStatus = message_20::AuthStatus;
+
 static bool find_auth_service_in_offered_services(const message_20::Authorization& req_selected_auth_service,
                                                   const d20::Session& session) {
     return std::find(session.offered_auth_services.begin(), session.offered_auth_services.end(),
@@ -19,7 +21,8 @@ static bool find_auth_service_in_offered_services(const message_20::Authorizatio
 }
 
 message_20::AuthorizationResponse handle_request(const message_20::AuthorizationRequest& req,
-                                                 const d20::Session& session, const d20::Config& config) {
+                                                 const d20::Session& session,
+                                                 const message_20::AuthStatus& authorization_status) {
 
     message_20::AuthorizationResponse res = message_20::AuthorizationResponse();
 
@@ -37,9 +40,7 @@ message_20::AuthorizationResponse handle_request(const message_20::Authorization
 
     switch (req.selected_authorization_service) {
     case message_20::Authorization::EIM:
-        using AuthStatus = d20::Config::AuthStatus;
-
-        switch (config.authorization_status) {
+        switch (authorization_status) {
         case AuthStatus::Accepted:
             res.evse_processing = message_20::Processing::Finished;
             response_code = message_20::ResponseCode::OK;
@@ -73,6 +74,23 @@ void Authorization::enter() {
 }
 
 FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType& sa, FsmEvent ev) {
+
+    if (ev == FsmEvent::CONTROL_MESSAGE) {
+        const auto control_data = ctx.get_control_event<AuthorizationResponse>();
+        if (not control_data) {
+            // FIXME (aw): error handling
+            return sa.HANDLED_INTERNALLY;
+        }
+
+        if (*control_data) {
+            authorization_status = AuthStatus::Accepted;
+        } else {
+            authorization_status = AuthStatus::Rejected;
+        }
+
+        return sa.HANDLED_INTERNALLY;
+    }
+
     if (ev != FsmEvent::V2GTP_MESSAGE) {
         return sa.PASS_ON;
     }
@@ -80,7 +98,7 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
     const auto variant = ctx.get_request();
 
     if (const auto req = variant->get_if<message_20::AuthorizationRequest>()) {
-        const auto res = handle_request(*req, ctx.session, ctx.config);
+        const auto res = handle_request(*req, ctx.session, authorization_status);
 
         ctx.respond(res);
 
@@ -89,7 +107,8 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
             return sa.PASS_ON;
         }
 
-        if (ctx.config.authorization_status == d20::Config::AuthStatus::Accepted) {
+        if (authorization_status == AuthStatus::Accepted) {
+            authorization_status = AuthStatus::Pending; // reset
             return sa.create_simple<ServiceDiscovery>(ctx);
         } else {
             return sa.HANDLED_INTERNALLY;

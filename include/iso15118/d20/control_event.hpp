@@ -23,6 +23,19 @@ struct PresentVoltageCurrent {
     float current;
 };
 
-using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent>;
+class AuthorizationResponse {
+public:
+    explicit AuthorizationResponse(bool authorized_) : authorized(authorized_) {
+    }
+
+    operator bool() const {
+        return authorized;
+    }
+
+private:
+    bool authorized;
+};
+
+using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse>;
 
 } // namespace iso15118::d20
