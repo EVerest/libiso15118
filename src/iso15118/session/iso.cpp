@@ -178,6 +178,7 @@ TimePoint const& Session::poll() {
 
         if (session_stopped) {
             connection->close();
+            session_stopped = false; // reset
         }
     }
 

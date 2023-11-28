@@ -82,9 +82,15 @@ FsmSimpleState::HandleEventReturnType DC_ChargeParameterDiscovery::handle_event(
 
         ctx.respond(res);
 
+        if (res.response_code >= message_20::ResponseCode::FAILED) {
+            ctx.session_stopped = true;
+            return sa.PASS_ON;
+        }
+
         return sa.create_simple<ScheduleExchange>(ctx);
     } else {
         ctx.log("expected DC_ChargeParameterDiscovery! But code type id: %d", variant->get_type());
+        ctx.session_stopped = true;
         return sa.PASS_ON;
     }
 }

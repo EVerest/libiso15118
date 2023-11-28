@@ -38,9 +38,15 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
 
         ctx.respond(res);
 
+        if (res.response_code >= message_20::ResponseCode::FAILED) {
+            ctx.session_stopped = true;
+            return sa.PASS_ON;
+        }
+
         return sa.create_simple<DC_CableCheck>(ctx);
     } else {
         ctx.log("expected ScheduleExchangeReq! But code type id: %d", variant->get_type());
+        ctx.session_stopped = true;
         return sa.PASS_ON;
     }
 }

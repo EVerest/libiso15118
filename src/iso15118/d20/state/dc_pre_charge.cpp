@@ -59,10 +59,16 @@ FsmSimpleState::HandleEventReturnType DC_PreCharge::handle_event(AllocatorType& 
 
         ctx.respond(res);
 
+        if (res.response_code >= message_20::ResponseCode::FAILED) {
+            ctx.session_stopped = true;
+            return sa.PASS_ON;
+        }
+
         return sa.create_simple<PowerDelivery>(ctx);
 
     } else {
         ctx.log("expected DC_PreChargeReq! But code type id: %d", variant->get_type());
+        ctx.session_stopped = true;
         return sa.PASS_ON;
     }
 }

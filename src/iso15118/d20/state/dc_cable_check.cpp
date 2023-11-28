@@ -61,6 +61,11 @@ FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType&
 
         ctx.respond(res);
 
+        if (res.response_code >= message_20::ResponseCode::FAILED) {
+            ctx.session_stopped = true;
+            return sa.PASS_ON;
+        }
+
         if (cable_check_done) {
             return sa.create_simple<DC_PreCharge>(ctx);
         } else {
@@ -68,6 +73,7 @@ FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType&
         }
     } else {
         ctx.log("expected DC_CableCheckReq! But code type id: %d", variant->get_type());
+        ctx.session_stopped = true;
         return sa.PASS_ON;
     }
 }

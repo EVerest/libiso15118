@@ -84,6 +84,11 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
 
         ctx.respond(res);
 
+        if (res.response_code >= message_20::ResponseCode::FAILED) {
+            ctx.session_stopped = true;
+            return sa.PASS_ON;
+        }
+
         if (ctx.config.authorization_status == d20::Config::AuthStatus::Accepted) {
             return sa.create_simple<ServiceDiscovery>(ctx);
         } else {
@@ -91,6 +96,7 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
         }
     } else {
         ctx.log("expected AuthorizationReq! But code type id: %d", variant->get_type());
+        ctx.session_stopped = true;
         return sa.PASS_ON;
     }
 }

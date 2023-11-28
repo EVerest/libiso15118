@@ -89,15 +89,26 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
 
         ctx.respond(res);
 
+        if (res.response_code >= message_20::ResponseCode::FAILED) {
+            ctx.session_stopped = true;
+            return sa.PASS_ON;
+        }
+
         return sa.HANDLED_INTERNALLY;
     } else if (const auto req = variant->get_if<message_20::ServiceSelectionRequest>()) {
         const auto res = handle_request(*req, ctx.session, ctx.config);
 
         ctx.respond(res);
 
+        if (res.response_code >= message_20::ResponseCode::FAILED) {
+            ctx.session_stopped = true;
+            return sa.PASS_ON;
+        }
+
         return sa.create_simple<DC_ChargeParameterDiscovery>(ctx);
     } else {
         ctx.log("expected ServiceDetailReq! But code type id: %d", variant->get_type());
+        ctx.session_stopped = true;
         return sa.PASS_ON;
     }
 }

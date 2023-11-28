@@ -51,6 +51,11 @@ FsmSimpleState::HandleEventReturnType DC_WeldingDetection::handle_event(Allocato
 
         ctx.respond(res);
 
+        if (res.response_code >= message_20::ResponseCode::FAILED) {
+            ctx.session_stopped = true;
+            return sa.PASS_ON;
+        }
+
         if (req->processing == message_20::Processing::Ongoing) {
             return sa.HANDLED_INTERNALLY;
         }
@@ -58,6 +63,7 @@ FsmSimpleState::HandleEventReturnType DC_WeldingDetection::handle_event(Allocato
         return sa.create_simple<SessionStop>(ctx);
     } else {
         ctx.log("expected DC_WeldingDetection! But code type id: %d", variant->get_type());
+        ctx.session_stopped = true;
         return sa.PASS_ON;
     }
 }
