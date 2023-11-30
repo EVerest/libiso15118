@@ -9,6 +9,6 @@
 namespace iso15118::d20::state {
 
 message_20::ServiceSelectionResponse handle_request(const message_20::ServiceSelectionRequest& req,
-                                                    const d20::Session& session, const d20::Config& config);
+                                                    d20::Session& session, const d20::Config& config);
 
 } // namespace iso15118::d20::state

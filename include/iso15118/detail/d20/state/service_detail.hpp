@@ -8,7 +8,7 @@
 
 namespace iso15118::d20::state {
 
-message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetailRequest& req,
-                                                 const d20::Session& session, const d20::Config& config);
+message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetailRequest& req, d20::Session& session,
+                                                 const d20::Config& config);
 
 } // namespace iso15118::d20::state

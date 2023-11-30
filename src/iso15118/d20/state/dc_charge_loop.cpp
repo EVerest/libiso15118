@@ -27,7 +27,7 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
 
     if (std::holds_alternative<Scheduled_DC_Req>(req.control_mode)) {
 
-        if (session.selected_energy_service != message_20::ServiceCategory::DC) {
+        if (session.get_selected_energy_service() != message_20::ServiceCategory::DC) {
             return {response_with_code(res, message_20::ResponseCode::FAILED), charge_target};
         }
 
@@ -42,7 +42,7 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
 
     } else if (std::holds_alternative<Scheduled_BPT_DC_Req>(req.control_mode)) {
 
-        if (session.selected_energy_service != message_20::ServiceCategory::DC_BPT) {
+        if (session.get_selected_energy_service() != message_20::ServiceCategory::DC_BPT) {
             return {response_with_code(res, message_20::ResponseCode::FAILED), charge_target};
         }
 

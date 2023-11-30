@@ -17,7 +17,9 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC_BPT;
         req.selected_energy_transfer_service.parameter_set_id = 0;
 
-        const auto res = d20::state::handle_request(req, d20::Session(), d20::Config());
+        session = d20::Session();
+
+        const auto res = d20::state::handle_request(req, session, d20::Config());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -32,12 +34,14 @@ SCENARIO("Service selection state handling") {
 
         config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false}};
 
-        config.dc_parameter_list = {{
+        message_20::DcParameterList list = {
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc,
             message_20::Pricing::NoPricing,
-        }};
+        };
+
+        session.save_offered_parameter_list(0, list);
 
         message_20::ServiceSelectionRequest req;
         req.header.session_id = session.id;
@@ -59,12 +63,14 @@ SCENARIO("Service selection state handling") {
 
         config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false}};
 
-        config.dc_parameter_list = {{
+        message_20::DcParameterList list = {
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc,
             message_20::Pricing::NoPricing,
-        }};
+        };
+
+        session.save_offered_parameter_list(0, list);
 
         message_20::ServiceSelectionRequest req;
         req.header.session_id = session.id;
@@ -85,12 +91,14 @@ SCENARIO("Service selection state handling") {
 
         config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false}};
 
-        config.dc_parameter_list = {{
+        message_20::DcParameterList list = {
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc,
             message_20::Pricing::NoPricing,
-        }};
+        };
+
+        session.save_offered_parameter_list(0, list);
 
         message_20::ServiceSelectionRequest req;
         req.header.session_id = session.id;
@@ -111,12 +119,14 @@ SCENARIO("Service selection state handling") {
 
         config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false}};
 
-        config.dc_parameter_list = {{
+        message_20::DcParameterList list = {
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc,
             message_20::Pricing::NoPricing,
-        }};
+        };
+
+        session.save_offered_parameter_list(0, list);
 
         message_20::ServiceSelectionRequest req;
         req.header.session_id = session.id;
@@ -128,8 +138,40 @@ SCENARIO("Service selection state handling") {
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
-            REQUIRE(session.selected_energy_service == message_20::ServiceCategory::DC);
-            REQUIRE(session.selected_energy_parameter_set_id == 0);
+            REQUIRE(session.get_selected_energy_service() == message_20::ServiceCategory::DC);
+            REQUIRE(session.get_selected_control_mode() == message_20::ControlMode::Scheduled);
+        }
+    }
+
+    GIVEN("Good case - DC_BPT") {
+        d20::Session session = d20::Session();
+        d20::Config config = d20::Config();
+
+        config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC_BPT, false}};
+
+        message_20::DcBptParameterList list = {{
+                                                message_20::DcConnector::Extended,
+                                                message_20::ControlMode::Scheduled,
+                                                message_20::MobilityNeedsMode::ProvidedByEvcc,
+                                                message_20::Pricing::NoPricing,
+                                            },
+                                            message_20::BptChannel::Unified,
+                                            message_20::GeneratorMode::GridFollowing};
+
+        session.save_offered_parameter_list(0, list);
+
+        message_20::ServiceSelectionRequest req;
+        req.header.session_id = session.id;
+        req.header.timestamp = 1691411798;
+        req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC_BPT;
+        req.selected_energy_transfer_service.parameter_set_id = 0;
+
+        const auto res = d20::state::handle_request(req, session, config);
+
+        THEN("ResponseCode: OK") {
+            REQUIRE(res.response_code == message_20::ResponseCode::OK);
+            REQUIRE(session.get_selected_energy_service() == message_20::ServiceCategory::DC_BPT);
+            REQUIRE(session.get_selected_control_mode() == message_20::ControlMode::Scheduled);
         }
     }
 

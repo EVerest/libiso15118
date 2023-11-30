@@ -13,7 +13,7 @@
 namespace iso15118::d20::state {
 
 message_20::AuthorizationSetupResponse handle_request(const message_20::AuthorizationSetupRequest& req,
-                                                      const d20::Session& session, const d20::Config& config) {
+                                                      d20::Session& session, const d20::Config& config) {
 
     auto res = message_20::AuthorizationSetupResponse(); // default mandatory values [V2G20-736]
 
@@ -24,18 +24,13 @@ message_20::AuthorizationSetupResponse handle_request(const message_20::Authoriz
     res.certificate_installation_service = config.cert_install_service;
 
     if (config.authorization_services.empty()) {
-        log("Warning: authorization_services was not set. Setting EIM as auth_mode");
+        logf("Warning: authorization_services was not set. Setting EIM as auth_mode\n");
         res.authorization_services = {message_20::Authorization::EIM};
     } else {
         res.authorization_services = config.authorization_services;
     }
 
-    auto& session_offered_auth_services =
-        const_cast<std::vector<message_20::Authorization>&>(session.offered_auth_services);
-
-    for (auto& service : res.authorization_services) {
-        session_offered_auth_services.push_back(service);
-    }
+    session.save_offered_auth_services(res.authorization_services);
 
     if (res.authorization_services.size() == 1 && res.authorization_services[0] == message_20::Authorization::EIM) {
         res.authorization_mode.emplace<message_20::AuthorizationSetupResponse::EIM_ASResAuthorizationMode>();

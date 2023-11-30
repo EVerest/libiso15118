@@ -54,10 +54,12 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Bad Case: e.g. dc transfer mod instead of dc_bpt transfer mod - FAILED_WrongChargeParameter") {
 
-        d20::Session session = d20::Session();
+        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+            message_20::ServiceCategory::DC_BPT, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
+            message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing,
+            message_20::BptChannel::Unified, message_20::GeneratorMode::GridFollowing);
 
-        session.selected_energy_service = message_20::ServiceCategory::DC_BPT;
-        session.selected_energy_parameter_set_id = 0;
+        d20::Session session = d20::Session(service_parameters);
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.id;
@@ -96,10 +98,11 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Bad Case: e.g. DC_BPT transfer mod instead of dc transfer mod - FAILED_WrongChargeParameter") {
 
-        d20::Session session = d20::Session();
+        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+            message_20::ServiceCategory::DC, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
+            message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing);
 
-        session.selected_energy_service = message_20::ServiceCategory::DC;
-        session.selected_energy_parameter_set_id = 0;
+        d20::Session session = d20::Session(service_parameters);
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.id;
@@ -142,7 +145,11 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Good Case: DC") {
 
-        d20::Session session = d20::Session();
+        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+            message_20::ServiceCategory::DC, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
+            message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing);
+
+        d20::Session session = d20::Session(service_parameters);
         d20::Config config = d20::Config();
         DC_ModeRes evse_dc_parameter = {
             {22, 3},  // max_charge_power
@@ -155,9 +162,6 @@ SCENARIO("DC charge parameter discovery state handling") {
         message_20::RationalNumber power_ramp_limit = {20, 0};
         evse_dc_parameter.power_ramp_limit.emplace<>(power_ramp_limit);
         config.evse_dc_parameter = evse_dc_parameter;
-
-        session.selected_energy_service = message_20::ServiceCategory::DC;
-        session.selected_energy_parameter_set_id = 0;
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.id;
@@ -197,7 +201,13 @@ SCENARIO("DC charge parameter discovery state handling") {
     }
 
     GIVEN("Good Case: DC_BPT") {
-        d20::Session session = d20::Session();
+
+        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+            message_20::ServiceCategory::DC_BPT, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
+            message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing,
+            message_20::BptChannel::Unified, message_20::GeneratorMode::GridFollowing);
+
+        d20::Session session = d20::Session(service_parameters);
         d20::Config config = d20::Config();
 
         BPT_DC_ModeRes evse_dc_bpt_parameter = {
@@ -215,9 +225,6 @@ SCENARIO("DC charge parameter discovery state handling") {
             {0, 0},  // min_discharge_current
         };
         config.evse_dc_bpt_parameter = evse_dc_bpt_parameter;
-
-        session.selected_energy_service = message_20::ServiceCategory::DC_BPT;
-        session.selected_energy_parameter_set_id = 0;
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.id;

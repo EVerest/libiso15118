@@ -15,7 +15,9 @@ SCENARIO("Authorization setup state handling") {
         req.header.session_id = session.id;
         req.header.timestamp = 1691411798;
 
-        const auto res = d20::state::handle_request(req, d20::Session(), d20::Config());
+        session = d20::Session();
+
+        const auto res = d20::state::handle_request(req, session, d20::Config());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -48,7 +50,7 @@ SCENARIO("Authorization setup state handling") {
             REQUIRE(res.authorization_services[0] == message_20::Authorization::EIM);
             REQUIRE(std::holds_alternative<message_20::AuthorizationSetupResponse::EIM_ASResAuthorizationMode>(
                 res.authorization_mode));
-            REQUIRE(session.offered_auth_services[0] == message_20::Authorization::EIM);
+            REQUIRE(session.get_offered_auth_services()[0] == message_20::Authorization::EIM);
         }
     }
 
@@ -76,7 +78,7 @@ SCENARIO("Authorization setup state handling") {
             const auto& auth_mode =
                 std::get<message_20::AuthorizationSetupResponse::PnC_ASResAuthorizationMode>(res.authorization_mode);
             REQUIRE(auth_mode.gen_challenge.empty() == false);
-            REQUIRE(session.offered_auth_services[0] == message_20::Authorization::PnC);
+            REQUIRE(session.get_offered_auth_services()[0] == message_20::Authorization::PnC);
         }
     }
 
@@ -108,10 +110,10 @@ SCENARIO("Authorization setup state handling") {
                 std::get<message_20::AuthorizationSetupResponse::PnC_ASResAuthorizationMode>(res.authorization_mode);
             REQUIRE(auth_mode.gen_challenge.empty() == false);
 
-            REQUIRE((session.offered_auth_services[0] == message_20::Authorization::EIM ||
-                     session.offered_auth_services[0] == message_20::Authorization::PnC));
-            REQUIRE((session.offered_auth_services[1] == message_20::Authorization::EIM ||
-                     session.offered_auth_services[1] == message_20::Authorization::PnC));
+            REQUIRE((session.get_offered_auth_services()[0] == message_20::Authorization::EIM ||
+                     session.get_offered_auth_services()[0] == message_20::Authorization::PnC));
+            REQUIRE((session.get_offered_auth_services()[1] == message_20::Authorization::EIM ||
+                     session.get_offered_auth_services()[1] == message_20::Authorization::PnC));
         }
     }
 

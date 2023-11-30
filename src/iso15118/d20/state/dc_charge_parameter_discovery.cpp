@@ -26,7 +26,7 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
     }
 
     if (std::holds_alternative<DC_ModeReq>(req.transfer_mode)) {
-        if (session.selected_energy_service != message_20::ServiceCategory::DC) {
+        if (session.get_selected_energy_service() != message_20::ServiceCategory::DC) {
             return response_with_code(res, message_20::ResponseCode::FAILED_WrongChargeParameter);
         }
 
@@ -34,7 +34,7 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
         mode = config.evse_dc_parameter;
 
     } else if (std::holds_alternative<BPT_DC_ModeReq>(req.transfer_mode)) {
-        if (session.selected_energy_service != message_20::ServiceCategory::DC_BPT) {
+        if (session.get_selected_energy_service() != message_20::ServiceCategory::DC_BPT) {
             return response_with_code(res, message_20::ResponseCode::FAILED_WrongChargeParameter);
         }
 

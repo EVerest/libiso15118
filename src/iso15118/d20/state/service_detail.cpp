@@ -10,8 +10,8 @@
 
 namespace iso15118::d20::state {
 
-message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetailRequest& req,
-                                                 const d20::Session& session, const d20::Config& config) {
+message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetailRequest& req, d20::Session& session,
+                                                 const d20::Config& config) {
 
     message_20::ServiceDetailResponse res;
 
@@ -47,12 +47,14 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
     case message_20::ServiceCategory::DC:
         res.service = message_20::ServiceCategory::DC;
         for (auto& parameter_set : config.dc_parameter_list) {
+            session.save_offered_parameter_list(id, parameter_set);
             res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id++, parameter_set));
         }
         break;
     case message_20::ServiceCategory::DC_BPT:
         res.service = message_20::ServiceCategory::DC_BPT;
         for (auto& parameter_set : config.dc_bpt_parameter_list) {
+            session.save_offered_parameter_list(id, parameter_set);
             res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id++, parameter_set));
         }
         break;
