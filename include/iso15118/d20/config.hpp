@@ -8,7 +8,6 @@
 
 #include <iso15118/message/common.hpp>
 #include <iso15118/message/service_discovery.hpp>
-#include <iso15118/message/service_detail.hpp>
 #include <iso15118/message/dc_charge_parameter_discovery.hpp>
 
 namespace iso15118::d20 {
