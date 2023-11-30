@@ -11,7 +11,7 @@
 namespace iso15118::d20::state {
 
 message_20::ServiceSelectionResponse handle_request(const message_20::ServiceSelectionRequest& req,
-                                                    d20::Session& session, const d20::Config& config) {
+                                                    d20::Session& session) {
 
     message_20::ServiceSelectionResponse res;
 
@@ -21,8 +21,8 @@ message_20::ServiceSelectionResponse handle_request(const message_20::ServiceSel
 
     bool energy_service_found = false;
 
-    for (auto& energy_service : config.supported_energy_transfer_services) {
-        if (energy_service.service_id == req.selected_energy_transfer_service.service_id) {
+    for (auto& energy_service : session.offered_services.energy_services) {
+        if (energy_service == req.selected_energy_transfer_service.service_id) {
             energy_service_found = true;
             break;
         }
@@ -35,7 +35,7 @@ message_20::ServiceSelectionResponse handle_request(const message_20::ServiceSel
     // Todo(sl): check supported_vas_list service id
 
     if (not session.find_parameter_set_id(req.selected_energy_transfer_service.service_id,
-                                      req.selected_energy_transfer_service.parameter_set_id)) {
+                                          req.selected_energy_transfer_service.parameter_set_id)) {
         return response_with_code(res, message_20::ResponseCode::FAILED_ServiceSelectionInvalid);
     }
 
@@ -75,7 +75,7 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
 
         return sa.HANDLED_INTERNALLY;
     } else if (const auto req = variant->get_if<message_20::ServiceSelectionRequest>()) {
-        const auto res = handle_request(*req, ctx.session, ctx.config);
+        const auto res = handle_request(*req, ctx.session);
 
         ctx.respond(res);
 

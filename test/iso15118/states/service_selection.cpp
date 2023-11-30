@@ -19,7 +19,7 @@ SCENARIO("Service selection state handling") {
 
         session = d20::Session();
 
-        const auto res = d20::state::handle_request(req, session, d20::Config());
+        const auto res = d20::state::handle_request(req, session);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -30,18 +30,13 @@ SCENARIO("Service selection state handling") {
 
         d20::Session session = d20::Session();
 
-        d20::Config config = d20::Config();
-
-        config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false}};
-
-        message_20::DcParameterList list = {
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
+        session.offered_services.dc_parameter_list[0] = {
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc,
             message_20::Pricing::NoPricing,
         };
-
-        session.save_offered_parameter_list(0, list);
 
         message_20::ServiceSelectionRequest req;
         req.header.session_id = session.id;
@@ -49,7 +44,7 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
         req.selected_energy_transfer_service.parameter_set_id = 1;
 
-        const auto res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session);
 
         THEN("ResponseCode: FAILED_ServiceSelectionInvalid, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_ServiceSelectionInvalid);
@@ -61,16 +56,13 @@ SCENARIO("Service selection state handling") {
         d20::Session session = d20::Session();
         d20::Config config = d20::Config();
 
-        config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false}};
-
-        message_20::DcParameterList list = {
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
+        session.offered_services.dc_parameter_list[0] = {
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc,
             message_20::Pricing::NoPricing,
         };
-
-        session.save_offered_parameter_list(0, list);
 
         message_20::ServiceSelectionRequest req;
         req.header.session_id = session.id;
@@ -78,7 +70,7 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::AC;
         req.selected_energy_transfer_service.parameter_set_id = 0;
 
-        const auto res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session);
 
         THEN("ResponseCode: FAILED_NoEnergyTransferServiceSelected, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_NoEnergyTransferServiceSelected);
@@ -89,16 +81,13 @@ SCENARIO("Service selection state handling") {
         d20::Session session = d20::Session();
         d20::Config config = d20::Config();
 
-        config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false}};
-
-        message_20::DcParameterList list = {
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
+        session.offered_services.dc_parameter_list[0] = {
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc,
             message_20::Pricing::NoPricing,
         };
-
-        session.save_offered_parameter_list(0, list);
 
         message_20::ServiceSelectionRequest req;
         req.header.session_id = session.id;
@@ -106,7 +95,7 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
         req.selected_energy_transfer_service.parameter_set_id = 0;
 
-        const auto res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -117,16 +106,13 @@ SCENARIO("Service selection state handling") {
         d20::Session session = d20::Session();
         d20::Config config = d20::Config();
 
-        config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false}};
-
-        message_20::DcParameterList list = {
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
+        session.offered_services.dc_parameter_list[0] = {
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc,
             message_20::Pricing::NoPricing,
         };
-
-        session.save_offered_parameter_list(0, list);
 
         message_20::ServiceSelectionRequest req;
         req.header.session_id = session.id;
@@ -134,7 +120,7 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
         req.selected_energy_transfer_service.parameter_set_id = 0;
 
-        const auto res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -147,18 +133,15 @@ SCENARIO("Service selection state handling") {
         d20::Session session = d20::Session();
         d20::Config config = d20::Config();
 
-        config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC_BPT, false}};
-
-        message_20::DcBptParameterList list = {{
-                                                message_20::DcConnector::Extended,
-                                                message_20::ControlMode::Scheduled,
-                                                message_20::MobilityNeedsMode::ProvidedByEvcc,
-                                                message_20::Pricing::NoPricing,
-                                            },
-                                            message_20::BptChannel::Unified,
-                                            message_20::GeneratorMode::GridFollowing};
-
-        session.save_offered_parameter_list(0, list);
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC_BPT};
+        session.offered_services.dc_bpt_parameter_list[0] = {{
+                                                                 message_20::DcConnector::Extended,
+                                                                 message_20::ControlMode::Scheduled,
+                                                                 message_20::MobilityNeedsMode::ProvidedByEvcc,
+                                                                 message_20::Pricing::NoPricing,
+                                                             },
+                                                             message_20::BptChannel::Unified,
+                                                             message_20::GeneratorMode::GridFollowing};
 
         message_20::ServiceSelectionRequest req;
         req.header.session_id = session.id;
@@ -166,7 +149,7 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC_BPT;
         req.selected_energy_transfer_service.parameter_set_id = 0;
 
-        const auto res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);

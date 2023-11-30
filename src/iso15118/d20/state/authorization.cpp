@@ -16,7 +16,7 @@ using AuthStatus = message_20::AuthStatus;
 
 static bool find_auth_service_in_offered_services(const message_20::Authorization& req_selected_auth_service,
                                                   const d20::Session& session) {
-    auto offered_auth_services = session.get_offered_auth_services();
+    auto& offered_auth_services = session.offered_services.auth_services;
     return std::find(offered_auth_services.begin(), offered_auth_services.end(), req_selected_auth_service) !=
            offered_auth_services.end();
 }

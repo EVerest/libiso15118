@@ -15,7 +15,9 @@ SCENARIO("Service discovery state handling") {
         req.header.session_id = session.id;
         req.header.timestamp = 1691411798;
 
-        const auto res = d20::state::handle_request(req, d20::Session(), d20::Config());
+        session = d20::Session();
+
+        const auto res = d20::state::handle_request(req, session, d20::Config());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);

@@ -21,15 +21,15 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
 
     bool service_found = false;
 
-    for (auto& energy_service : config.supported_energy_transfer_services) {
-        if (energy_service.service_id == req.service) {
+    for (auto& energy_service : session.offered_services.energy_services) {
+        if (energy_service == req.service) {
             service_found = true;
             break;
         }
     }
 
-    for (auto& vas_service : config.supported_vas_services) {
-        if (vas_service.service_id == req.service) {
+    for (auto& vas_service : session.offered_services.vas_services) {
+        if (vas_service == req.service) {
             service_found = true;
             break;
         }
@@ -47,14 +47,14 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
     case message_20::ServiceCategory::DC:
         res.service = message_20::ServiceCategory::DC;
         for (auto& parameter_set : config.dc_parameter_list) {
-            session.save_offered_parameter_list(id, parameter_set);
+            session.offered_services.dc_parameter_list[id] = parameter_set;
             res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id++, parameter_set));
         }
         break;
     case message_20::ServiceCategory::DC_BPT:
         res.service = message_20::ServiceCategory::DC_BPT;
         for (auto& parameter_set : config.dc_bpt_parameter_list) {
-            session.save_offered_parameter_list(id, parameter_set);
+            session.offered_services.dc_bpt_parameter_list[id] = parameter_set;
             res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id++, parameter_set));
         }
         break;

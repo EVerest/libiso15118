@@ -30,7 +30,7 @@ SCENARIO("Authorization state handling") {
     GIVEN("Warning - Authorization selection is invalid") {
 
         d20::Session session = d20::Session();
-        session.save_offered_auth_services({message_20::Authorization::PnC});
+        session.offered_services.auth_services = {message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;
         req.header.session_id = session.id;
@@ -52,7 +52,7 @@ SCENARIO("Authorization state handling") {
     GIVEN("Warning - EIM Authorization Failure") { // [V2G20-2219]
 
         d20::Session session = d20::Session();
-        session.save_offered_auth_services({message_20::Authorization::EIM, message_20::Authorization::PnC});
+        session.offered_services.auth_services = {message_20::Authorization::EIM, message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;
         req.header.session_id = session.id;
@@ -72,7 +72,7 @@ SCENARIO("Authorization state handling") {
     GIVEN("Good case - EIM waiting for authorization") {
 
         d20::Session session = d20::Session();
-        session.save_offered_auth_services({message_20::Authorization::EIM, message_20::Authorization::PnC});
+        session.offered_services.auth_services = {message_20::Authorization::EIM, message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;
         req.header.session_id = session.id;
@@ -92,7 +92,7 @@ SCENARIO("Authorization state handling") {
     GIVEN("Good case - EIM authorized") {
 
         d20::Session session = d20::Session();
-        session.save_offered_auth_services({message_20::Authorization::EIM, message_20::Authorization::PnC});
+        session.offered_services.auth_services = {message_20::Authorization::EIM, message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;
         req.header.session_id = session.id;

@@ -30,7 +30,7 @@ message_20::AuthorizationSetupResponse handle_request(const message_20::Authoriz
         res.authorization_services = config.authorization_services;
     }
 
-    session.save_offered_auth_services(res.authorization_services);
+    session.offered_services.auth_services = res.authorization_services;
 
     if (res.authorization_services.size() == 1 && res.authorization_services[0] == message_20::Authorization::EIM) {
         res.authorization_mode.emplace<message_20::AuthorizationSetupResponse::EIM_ASResAuthorizationMode>();

@@ -17,7 +17,7 @@ static bool find_service_id(const std::vector<uint16_t>& req_service_ids, const 
 }
 
 message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDiscoveryRequest& req,
-                                                    const d20::Session& session, const d20::Config& config) {
+                                                    d20::Session& session, const d20::Config& config) {
 
     message_20::ServiceDiscoveryResponse res = message_20::ServiceDiscoveryResponse();
 
@@ -39,11 +39,13 @@ message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDis
         for (auto& energy_service : config.supported_energy_transfer_services) {
             if (find_service_id(req.supported_service_ids.value(), static_cast<uint16_t>(energy_service.service_id))) {
                 energy_services_list.push_back(energy_service);
+                session.offered_services.energy_services.push_back(energy_service.service_id);
             }
         }
         for (auto& vas_service : config.supported_vas_services) {
             if (find_service_id(req.supported_service_ids.value(), static_cast<uint16_t>(vas_service.service_id))) {
                 vas_services_list.push_back(vas_service);
+                session.offered_services.vas_services.push_back(vas_service.service_id);
             }
         }
     } else {
@@ -54,6 +56,7 @@ message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDis
     for (auto& conf_energy_service : energy_services_list) {
         auto& energy_service = res.energy_transfer_service_list.emplace_back();
         energy_service = conf_energy_service;
+        session.offered_services.energy_services.push_back(conf_energy_service.service_id);
     }
 
     if (vas_services_list.empty() == false) {
@@ -62,6 +65,7 @@ message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDis
         for (auto& conf_vas_service : vas_services_list) {
             auto& vas_service = vas_service_list.emplace_back();
             vas_service = conf_vas_service;
+            session.offered_services.vas_services.push_back(conf_vas_service.service_id);
         }
     }
 

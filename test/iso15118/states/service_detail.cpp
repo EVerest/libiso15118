@@ -39,15 +39,14 @@ SCENARIO("Service detail state handling") {
     GIVEN("Bad Case - FAILED_ServiceIDInvalid") {
 
         d20::Session session = d20::Session();
-        d20::Config config;
-        config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC_BPT, false}};
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC_BPT};
 
         message_20::ServiceDetailRequest req;
         req.header.session_id = session.id;
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::AC;
 
-        const auto res = d20::state::handle_request(req, session, config);
+        const auto res = d20::state::handle_request(req, session, d20::Config());
 
         THEN("ResponseCode: FAILED_ServiceIDInvalid, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_ServiceIDInvalid);
@@ -65,10 +64,11 @@ SCENARIO("Service detail state handling") {
     }
 
     GIVEN("Good Case - DC Service") {
-        d20::Session session = d20::Session();
-        d20::Config config;
-        config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false}};
 
+        d20::Session session = d20::Session();
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
+
+        d20::Config config;
         config.dc_parameter_list = {{
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
@@ -112,9 +112,9 @@ SCENARIO("Service detail state handling") {
 
     GIVEN("Good Case - DC_BPT Service") {
         d20::Session session = d20::Session();
-        d20::Config config;
-        config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC_BPT, false}};
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC_BPT};
 
+        d20::Config config;
         config.dc_bpt_parameter_list = {{
             {
                 message_20::DcConnector::Extended,
@@ -171,9 +171,9 @@ SCENARIO("Service detail state handling") {
     GIVEN("Good Case - 2x DC Services") {
 
         d20::Session session = d20::Session();
-        d20::Config config;
-        config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false}};
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
 
+        d20::Config config;
         config.dc_parameter_list = {{
                                         message_20::DcConnector::Extended,
                                         message_20::ControlMode::Scheduled,
@@ -245,9 +245,9 @@ SCENARIO("Service detail state handling") {
     GIVEN("Bad Case - DC Service: Scheduled Mode: 1, MobilityNeedsMode: 2 change to 1") {
 
         d20::Session session = d20::Session();
-        d20::Config config;
-        config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false}};
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
 
+        d20::Config config;
         config.dc_parameter_list = {{
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,

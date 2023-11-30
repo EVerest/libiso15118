@@ -50,7 +50,7 @@ SCENARIO("Authorization setup state handling") {
             REQUIRE(res.authorization_services[0] == message_20::Authorization::EIM);
             REQUIRE(std::holds_alternative<message_20::AuthorizationSetupResponse::EIM_ASResAuthorizationMode>(
                 res.authorization_mode));
-            REQUIRE(session.get_offered_auth_services()[0] == message_20::Authorization::EIM);
+            REQUIRE(session.offered_services.auth_services[0] == message_20::Authorization::EIM);
         }
     }
 
@@ -78,7 +78,7 @@ SCENARIO("Authorization setup state handling") {
             const auto& auth_mode =
                 std::get<message_20::AuthorizationSetupResponse::PnC_ASResAuthorizationMode>(res.authorization_mode);
             REQUIRE(auth_mode.gen_challenge.empty() == false);
-            REQUIRE(session.get_offered_auth_services()[0] == message_20::Authorization::PnC);
+            REQUIRE(session.offered_services.auth_services[0] == message_20::Authorization::PnC);
         }
     }
 
@@ -110,10 +110,10 @@ SCENARIO("Authorization setup state handling") {
                 std::get<message_20::AuthorizationSetupResponse::PnC_ASResAuthorizationMode>(res.authorization_mode);
             REQUIRE(auth_mode.gen_challenge.empty() == false);
 
-            REQUIRE((session.get_offered_auth_services()[0] == message_20::Authorization::EIM ||
-                     session.get_offered_auth_services()[0] == message_20::Authorization::PnC));
-            REQUIRE((session.get_offered_auth_services()[1] == message_20::Authorization::EIM ||
-                     session.get_offered_auth_services()[1] == message_20::Authorization::PnC));
+            REQUIRE((session.offered_services.auth_services[0] == message_20::Authorization::EIM ||
+                     session.offered_services.auth_services[0] == message_20::Authorization::PnC));
+            REQUIRE((session.offered_services.auth_services[1] == message_20::Authorization::EIM ||
+                     session.offered_services.auth_services[1] == message_20::Authorization::PnC));
         }
     }
 
