@@ -68,8 +68,12 @@ class Session {
 
 public:
     Session();
-    Session(SelectedServiceParameters service_parameters_) : selected_services(service_parameters_){};
-    Session(OfferedServices services_) : offered_services(services_){};
+    Session(SelectedServiceParameters);
+    Session(OfferedServices);
+
+    std::array<uint8_t, ID_LENGTH> get_id() const {
+        return id;
+    }
 
     bool find_parameter_set_id(const message_20::ServiceCategory service, int16_t id);
 
@@ -85,15 +89,15 @@ public:
 
     ~Session();
 
-    // NOTE (aw): could be const
-    std::array<uint8_t, ID_LENGTH> id{};
-
     std::vector<message_20::ServiceCategory> selected_vas_services;
     std::vector<uint16_t> selected_vas_parameter_set_id;
 
     OfferedServices offered_services;
 
 private:
+    // NOTE (aw): could be const
+    std::array<uint8_t, ID_LENGTH> id{};
+
     SelectedServiceParameters selected_services;
 };
 

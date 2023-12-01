@@ -12,7 +12,7 @@ SCENARIO("Service selection state handling") {
         d20::Session session = d20::Session();
 
         message_20::ServiceSelectionRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC_BPT;
         req.selected_energy_transfer_service.parameter_set_id = 0;
@@ -39,7 +39,7 @@ SCENARIO("Service selection state handling") {
         };
 
         message_20::ServiceSelectionRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
         req.selected_energy_transfer_service.parameter_set_id = 1;
@@ -65,7 +65,7 @@ SCENARIO("Service selection state handling") {
         };
 
         message_20::ServiceSelectionRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::AC;
         req.selected_energy_transfer_service.parameter_set_id = 0;
@@ -90,7 +90,7 @@ SCENARIO("Service selection state handling") {
         };
 
         message_20::ServiceSelectionRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
         req.selected_energy_transfer_service.parameter_set_id = 0;
@@ -115,7 +115,7 @@ SCENARIO("Service selection state handling") {
         };
 
         message_20::ServiceSelectionRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
         req.selected_energy_transfer_service.parameter_set_id = 0;
@@ -144,7 +144,7 @@ SCENARIO("Service selection state handling") {
                                                              message_20::GeneratorMode::GridFollowing};
 
         message_20::ServiceSelectionRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC_BPT;
         req.selected_energy_transfer_service.parameter_set_id = 0;

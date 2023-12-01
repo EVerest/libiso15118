@@ -16,7 +16,7 @@ SCENARIO("Schedule Exchange state handling") {
         d20::Session session = d20::Session();
 
         message_20::ScheduleExchangeRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         // Todo

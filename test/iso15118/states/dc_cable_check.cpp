@@ -13,7 +13,7 @@ SCENARIO("DC cable check state handling") {
 
         message_20::DC_CableCheckRequest req;
 
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         const auto res = d20::state::handle_request(req, d20::Session(), false);
@@ -28,7 +28,7 @@ SCENARIO("DC cable check state handling") {
         d20::Session session = d20::Session();
 
         message_20::DC_CableCheckRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         const auto res = d20::state::handle_request(req, session, false);
@@ -43,7 +43,7 @@ SCENARIO("DC cable check state handling") {
         d20::Session session = d20::Session();
 
         message_20::DC_CableCheckRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         const auto res = d20::state::handle_request(req, session, true);

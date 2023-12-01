@@ -11,7 +11,7 @@ SCENARIO("Power delivery state handling") {
         d20::Session session = d20::Session();
 
         message_20::PowerDeliveryRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         req.processing = message_20::Processing::Ongoing;
@@ -28,7 +28,7 @@ SCENARIO("Power delivery state handling") {
         d20::Session session = d20::Session();
 
         message_20::PowerDeliveryRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         req.processing = message_20::Processing::Ongoing;

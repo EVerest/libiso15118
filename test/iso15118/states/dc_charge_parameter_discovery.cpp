@@ -18,7 +18,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         d20::Session session = d20::Session();
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         auto& req_out = req.transfer_mode.emplace<DC_ModeReq>();
@@ -62,7 +62,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         d20::Session session = d20::Session(service_parameters);
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         auto& req_out = req.transfer_mode.emplace<DC_ModeReq>();
@@ -105,7 +105,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         d20::Session session = d20::Session(service_parameters);
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         auto& req_out = req.transfer_mode.emplace<BPT_DC_ModeReq>();
@@ -164,7 +164,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         config.evse_dc_parameter = evse_dc_parameter;
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         auto& req_out = req.transfer_mode.emplace<DC_ModeReq>();
@@ -227,7 +227,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         config.evse_dc_bpt_parameter = evse_dc_bpt_parameter;
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         auto& req_out = req.transfer_mode.emplace<BPT_DC_ModeReq>();

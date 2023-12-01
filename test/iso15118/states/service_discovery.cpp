@@ -12,7 +12,7 @@ SCENARIO("Service discovery state handling") {
         d20::Session session = d20::Session();
 
         message_20::ServiceDiscoveryRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         session = d20::Session();
@@ -34,7 +34,7 @@ SCENARIO("Service discovery state handling") {
         d20::Session session = d20::Session();
 
         message_20::ServiceDiscoveryRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         d20::Config config;
@@ -63,7 +63,7 @@ SCENARIO("Service discovery state handling") {
         d20::Session session = d20::Session();
 
         message_20::ServiceDiscoveryRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         d20::Config config;
@@ -96,7 +96,7 @@ SCENARIO("Service discovery state handling") {
         d20::Session session = d20::Session();
 
         message_20::ServiceDiscoveryRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         auto& supported_service_ids = req.supported_service_ids.emplace();

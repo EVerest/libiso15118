@@ -14,7 +14,7 @@ SCENARIO("DC Pre charge state handling") {
 
         message_20::DC_PreChargeRequest req;
 
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.processing = message_20::Processing::Ongoing;
         req.present_voltage = {0, 0};
@@ -36,7 +36,7 @@ SCENARIO("DC Pre charge state handling") {
 
         message_20::DC_PreChargeRequest req;
 
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.processing = message_20::Processing::Ongoing;
         req.present_voltage = {0, 0};

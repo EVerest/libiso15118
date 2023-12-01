@@ -40,7 +40,7 @@ FsmSimpleState::HandleEventReturnType SessionSetup::handle_event(AllocatorType& 
         if (session_is_zero(req.header)) {
             ctx.session = Session();
             response.response_code = message_20::ResponseCode::OK_NewSessionEstablished;
-        } else if (req.header.session_id == ctx.session.id) {
+        } else if (req.header.session_id == ctx.session.get_id()) {
             response.response_code = message_20::ResponseCode::OK_OldSessionJoined;
         } else {
             ctx.session = Session();

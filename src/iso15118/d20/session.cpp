@@ -16,6 +16,25 @@ Session::Session() {
     }
 }
 
+Session::Session(SelectedServiceParameters service_parameters_) : selected_services(service_parameters_) {
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<uint8_t> distribution(0x00, 0xff);
+
+    for (auto& item : id) {
+        item = distribution(generator);
+    }
+}
+Session::Session(OfferedServices services_) : offered_services(services_) {
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<uint8_t> distribution(0x00, 0xff);
+
+    for (auto& item : id) {
+        item = distribution(generator);
+    }
+}
+
 Session::~Session() = default;
 
 bool Session::find_parameter_set_id(const message_20::ServiceCategory service, int16_t id) {
@@ -36,6 +55,7 @@ bool Session::find_parameter_set_id(const message_20::ServiceCategory service, i
         break;
 
     default:
+        // Todo(sl): logf AC, WPT, ACDP is not supported
         break;
     }
 
@@ -70,6 +90,7 @@ void Session::selected_service_parameters(const message_20::ServiceCategory serv
         break;
 
     default:
+        // Todo(sl): logf AC, WPT, ACDP is not supported
         break;
     }
 }

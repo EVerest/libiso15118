@@ -13,7 +13,7 @@ SCENARIO("Authorization state handling") {
         d20::Session session = d20::Session();
 
         message_20::AuthorizationRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         req.selected_authorization_service = message_20::Authorization::EIM;
@@ -33,7 +33,7 @@ SCENARIO("Authorization state handling") {
         session.offered_services.auth_services = {message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         req.selected_authorization_service = message_20::Authorization::EIM;
@@ -55,7 +55,7 @@ SCENARIO("Authorization state handling") {
         session.offered_services.auth_services = {message_20::Authorization::EIM, message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         req.selected_authorization_service = message_20::Authorization::EIM;
@@ -75,7 +75,7 @@ SCENARIO("Authorization state handling") {
         session.offered_services.auth_services = {message_20::Authorization::EIM, message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         req.selected_authorization_service = message_20::Authorization::EIM;
@@ -95,7 +95,7 @@ SCENARIO("Authorization state handling") {
         session.offered_services.auth_services = {message_20::Authorization::EIM, message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         req.selected_authorization_service = message_20::Authorization::EIM;

@@ -13,7 +13,7 @@ SCENARIO("Service detail state handling") {
         d20::Session session = d20::Session();
 
         message_20::ServiceDetailRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::DC;
 
@@ -42,7 +42,7 @@ SCENARIO("Service detail state handling") {
         session.offered_services.energy_services = {message_20::ServiceCategory::DC_BPT};
 
         message_20::ServiceDetailRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::AC;
 
@@ -77,7 +77,7 @@ SCENARIO("Service detail state handling") {
         }};
 
         message_20::ServiceDetailRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::DC;
 
@@ -127,7 +127,7 @@ SCENARIO("Service detail state handling") {
         }};
 
         message_20::ServiceDetailRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::DC_BPT;
 
@@ -188,7 +188,7 @@ SCENARIO("Service detail state handling") {
                                     }};
 
         message_20::ServiceDetailRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::DC;
 
@@ -256,7 +256,7 @@ SCENARIO("Service detail state handling") {
         }};
 
         message_20::ServiceDetailRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::DC;
 

@@ -12,7 +12,7 @@ SCENARIO("Authorization setup state handling") {
         d20::Session session = d20::Session();
 
         message_20::AuthorizationSetupRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         session = d20::Session();
@@ -34,7 +34,7 @@ SCENARIO("Authorization setup state handling") {
         d20::Session session = d20::Session();
 
         message_20::AuthorizationSetupRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         d20::Config config;
@@ -59,7 +59,7 @@ SCENARIO("Authorization setup state handling") {
         d20::Session session = d20::Session();
 
         message_20::AuthorizationSetupRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         d20::Config config;
@@ -87,7 +87,7 @@ SCENARIO("Authorization setup state handling") {
         d20::Session session = d20::Session();
 
         message_20::AuthorizationSetupRequest req;
-        req.header.session_id = session.id;
+        req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
         d20::Config config;

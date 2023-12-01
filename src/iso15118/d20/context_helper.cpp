@@ -15,11 +15,11 @@ bool validate_and_setup_header(message_20::Header& header, const Session& cur_se
 
     setup_header(header, cur_session);
 
-    return (cur_session.id == req_session_id);
+    return (cur_session.get_id() == req_session_id);
 }
 
 void setup_header(message_20::Header& header, const Session& cur_session) {
-    header.session_id = cur_session.id;
+    header.session_id = cur_session.get_id();
     setup_timestamp(header);
 }
 
