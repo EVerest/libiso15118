@@ -134,6 +134,31 @@ enum class GeneratorMode {
     GridForming = 2,
 };
 
+enum class Protocol {
+    Ftp,
+    Http,
+    Https,
+};
+
+enum class Port {
+    Port20 = 20,
+    Port21 = 21,
+    Port80 = 80,
+    Port443 = 443,
+};
+
+enum class IntendedService {
+    VehicleCheckIn = 1,
+    VehicleCheckOut = 2,
+};
+
+enum class ParkingStatus {
+    AutoInternal = 1,
+    AutoExternal = 2,
+    ManualInternal = 3,
+    ManualExternal = 4,
+};
+
 struct RationalNumber {
     int16_t value{0};
     int8_t exponent{0};
@@ -172,6 +197,16 @@ struct DcParameterList {
 struct DcBptParameterList : DcParameterList {
     BptChannel bpt_channel;
     GeneratorMode generator_mode;
+};
+
+struct InternetParameterList {
+    Protocol protocol;
+    Port port;
+};
+
+struct ParkingParameterList {
+    IntendedService intended_service;
+    ParkingStatus parking_status;
 };
 
 struct Scheduled_CLReqControlMode {
@@ -216,5 +251,7 @@ template <typename cb_RationalNumberType> void convert(const RationalNumber& in,
 
 float from_RationalNumber(const RationalNumber& in);
 RationalNumber from_float(float in);
+
+std::string from_Protocol(const Protocol& in);
 
 } // namespace iso15118::message_20

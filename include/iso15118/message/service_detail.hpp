@@ -31,6 +31,8 @@ struct ServiceDetailResponse {
         ParameterSet();
         ParameterSet(uint16_t _id, const DcParameterList& list);
         ParameterSet(uint16_t _id, const DcBptParameterList& list);
+        ParameterSet(uint16_t _id, const InternetParameterList& list);
+        ParameterSet(uint16_t _id, const ParkingParameterList& list);
     };
 
     Header header;

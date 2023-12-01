@@ -89,6 +89,28 @@ ServiceDetailResponse::ParameterSet::ParameterSet(uint16_t _id, const DcBptParam
     generator_mode.value = static_cast<int32_t>(list.generator_mode);
 }
 
+ServiceDetailResponse::ParameterSet::ParameterSet(uint16_t _id, const InternetParameterList& list) {
+    id = _id;
+
+    auto& protocol = parameter.emplace_back();
+    protocol.name = "Protocol";
+    protocol.value = message_20::from_Protocol(list.protocol);
+
+    auto& port = parameter.emplace_back();
+    port.name = "Port";
+    port.value = static_cast<int32_t>(list.port);
+}
+
+ServiceDetailResponse::ParameterSet::ParameterSet(uint16_t _id, const ParkingParameterList& list) {
+    id = _id;
+    auto& intended_service = parameter.emplace_back();
+    intended_service.name = "IntendedService";
+    intended_service.value = static_cast<int32_t>(list.intended_service);
+    auto& parking_status = parameter.emplace_back();
+    parking_status.name = "ParkingStatusType";
+    parking_status.value = static_cast<int32_t>(list.parking_status);
+}
+
 template <> void convert(const struct iso20_ServiceDetailReqType& in, ServiceDetailRequest& out) {
     convert(in.Header, out.header);
     out.service = static_cast<ServiceCategory>(in.ServiceID);

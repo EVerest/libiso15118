@@ -115,4 +115,17 @@ RationalNumber from_float(float in) {
     return out;
 }
 
+std::string from_Protocol(const Protocol& in) {
+
+    switch (in) {
+    case Protocol::Ftp:
+        return std::string("ftp");
+    case Protocol::Http:
+        return std::string("http");
+    case Protocol::Https:
+        return std::string("https");
+    }
+    return "";
+}
+
 } // namespace iso15118::message_20

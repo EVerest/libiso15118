@@ -20,6 +20,8 @@ struct OfferedServices {
 
     std::map<uint8_t, message_20::DcParameterList> dc_parameter_list;
     std::map<uint8_t, message_20::DcBptParameterList> dc_bpt_parameter_list;
+    std::map<uint8_t, message_20::InternetParameterList> internet_parameter_list;
+    std::map<uint8_t, message_20::ParkingParameterList> parking_parameter_list;
 };
 
 struct SelectedServiceParameters {
@@ -61,6 +63,29 @@ struct SelectedServiceParameters {
     };
 };
 
+struct SelectedVasParameter {
+    std::vector<message_20::ServiceCategory> selected_vas_services;
+
+    message_20::Protocol internet_protocol;
+    message_20::Port internet_port;
+
+    message_20::IntendedService parking_intended_service;
+    message_20::ParkingStatus parking_status;
+
+    SelectedVasParameter(){};
+
+    SelectedVasParameter(message_20::Protocol protocol_, message_20::Port port_,
+                         message_20::IntendedService intended_service_, message_20::ParkingStatus parking_status_) :
+        internet_protocol(protocol_),
+        internet_port(port_),
+        parking_intended_service(intended_service_),
+        parking_status(parking_status_){};
+    SelectedVasParameter(message_20::Protocol protocol_, message_20::Port port_) :
+        internet_protocol(protocol_), internet_port(port_){};
+    SelectedVasParameter(message_20::IntendedService intended_service_, message_20::ParkingStatus parking_status_) :
+        parking_intended_service(intended_service_), parking_status(parking_status_){};
+};
+
 class Session {
 
     // todo(sl): move to a common defs file
@@ -88,9 +113,6 @@ public:
     }
 
     ~Session();
-
-    std::vector<message_20::ServiceCategory> selected_vas_services;
-    std::vector<uint16_t> selected_vas_parameter_set_id;
 
     OfferedServices offered_services;
 
