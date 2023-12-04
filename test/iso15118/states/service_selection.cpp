@@ -158,11 +158,111 @@ SCENARIO("Service selection state handling") {
         }
     }
 
-    // GIVEN("Bad case: selected_vas_list false service id - FAILED_ServiceSelectionInvalid") {} // todo(sl): Adding
-    // check vas_list
+    GIVEN("Bad case: selected_vas_list false service id - FAILED_ServiceSelectionInvalid") {
+        d20::Session session = d20::Session();
+        d20::Config config = d20::Config();
 
-    // GIVEN("Bad case: selected_vas_list false parameter set id - FAILED_ServiceSelectionInvalid") {} // todo(sl):
-    // Adding check vas_list
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
+        session.offered_services.dc_parameter_list[0] = {
+            message_20::DcConnector::Extended,
+            message_20::ControlMode::Scheduled,
+            message_20::MobilityNeedsMode::ProvidedByEvcc,
+            message_20::Pricing::NoPricing,
+        };
+
+        session.offered_services.vas_services = {message_20::ServiceCategory::Internet};
+        session.offered_services.internet_parameter_list[0] = {
+            message_20::Protocol::Http,
+            message_20::Port::Port80,
+        };
+
+        message_20::ServiceSelectionRequest req;
+        req.header.session_id = session.get_id();
+        req.header.timestamp = 1691411798;
+        req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
+        req.selected_energy_transfer_service.parameter_set_id = 0;
+
+        req.selected_vas_list = {{message_20::ServiceCategory::ParkingStatus, 0}};
+
+        const auto res = d20::state::handle_request(req, session);
+
+        THEN("ResponseCode: FAILED_ServiceSelectionInvalid, mandatory fields should be set") {
+            REQUIRE(res.response_code == message_20::ResponseCode::FAILED_ServiceSelectionInvalid);
+        }
+    }
+
+    GIVEN("Bad case: selected_vas_list false parameter set id - FAILED_ServiceSelectionInvalid") {
+        d20::Session session = d20::Session();
+        d20::Config config = d20::Config();
+
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
+        session.offered_services.dc_parameter_list[0] = {
+            message_20::DcConnector::Extended,
+            message_20::ControlMode::Scheduled,
+            message_20::MobilityNeedsMode::ProvidedByEvcc,
+            message_20::Pricing::NoPricing,
+        };
+
+        session.offered_services.vas_services = {message_20::ServiceCategory::Internet};
+        session.offered_services.internet_parameter_list[0] = {
+            message_20::Protocol::Http,
+            message_20::Port::Port80,
+        };
+
+        message_20::ServiceSelectionRequest req;
+        req.header.session_id = session.get_id();
+        req.header.timestamp = 1691411798;
+        req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
+        req.selected_energy_transfer_service.parameter_set_id = 0;
+
+        req.selected_vas_list = {{message_20::ServiceCategory::Internet, 1}};
+
+        const auto res = d20::state::handle_request(req, session);
+
+        THEN("ResponseCode: FAILED_ServiceSelectionInvalid, mandatory fields should be set") {
+            REQUIRE(res.response_code == message_20::ResponseCode::FAILED_ServiceSelectionInvalid);
+        }
+    }
+
+    GIVEN("Good case - DC & Internet & Parking") {
+        d20::Session session = d20::Session();
+        d20::Config config = d20::Config();
+
+        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
+        session.offered_services.dc_parameter_list[0] = {
+            message_20::DcConnector::Extended,
+            message_20::ControlMode::Scheduled,
+            message_20::MobilityNeedsMode::ProvidedByEvcc,
+            message_20::Pricing::NoPricing,
+        };
+
+        session.offered_services.vas_services = {message_20::ServiceCategory::Internet,
+                                                 message_20::ServiceCategory::ParkingStatus};
+        session.offered_services.internet_parameter_list[0] = {
+            message_20::Protocol::Http,
+            message_20::Port::Port80,
+        };
+
+        session.offered_services.parking_parameter_list[0] = {
+            message_20::IntendedService::VehicleCheckIn,
+            message_20::ParkingStatus::ManualExternal,
+        };
+
+        message_20::ServiceSelectionRequest req;
+        req.header.session_id = session.get_id();
+        req.header.timestamp = 1691411798;
+        req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::DC;
+        req.selected_energy_transfer_service.parameter_set_id = 0;
+
+        req.selected_vas_list = {{message_20::ServiceCategory::Internet, 0},
+                                 {message_20::ServiceCategory::ParkingStatus, 0}};
+
+        const auto res = d20::state::handle_request(req, session);
+
+        THEN("ResponseCode: OK") {
+            REQUIRE(res.response_code == message_20::ResponseCode::OK);
+        }
+    }
 
     // GIVEN("Bad case - FAILED_NoServiceRenegotiationSupported") {} // todo(sl): pause/resume not supported yet
 

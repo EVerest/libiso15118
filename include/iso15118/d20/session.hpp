@@ -64,26 +64,13 @@ struct SelectedServiceParameters {
 };
 
 struct SelectedVasParameter {
-    std::vector<message_20::ServiceCategory> selected_vas_services;
+    std::vector<message_20::ServiceCategory> vas_services;
 
     message_20::Protocol internet_protocol;
     message_20::Port internet_port;
 
     message_20::IntendedService parking_intended_service;
     message_20::ParkingStatus parking_status;
-
-    SelectedVasParameter(){};
-
-    SelectedVasParameter(message_20::Protocol protocol_, message_20::Port port_,
-                         message_20::IntendedService intended_service_, message_20::ParkingStatus parking_status_) :
-        internet_protocol(protocol_),
-        internet_port(port_),
-        parking_intended_service(intended_service_),
-        parking_status(parking_status_){};
-    SelectedVasParameter(message_20::Protocol protocol_, message_20::Port port_) :
-        internet_protocol(protocol_), internet_port(port_){};
-    SelectedVasParameter(message_20::IntendedService intended_service_, message_20::ParkingStatus parking_status_) :
-        parking_intended_service(intended_service_), parking_status(parking_status_){};
 };
 
 class Session {
@@ -112,6 +99,8 @@ public:
         return selected_services.selected_control_mode;
     }
 
+    // TODO(sl): Define get_selected_*() if necessary
+
     ~Session();
 
     OfferedServices offered_services;
@@ -121,6 +110,7 @@ private:
     std::array<uint8_t, ID_LENGTH> id{};
 
     SelectedServiceParameters selected_services;
+    SelectedVasParameter selected_vas_services;
 };
 
 } // namespace iso15118::d20

@@ -20,6 +20,7 @@ message_20::ServiceSelectionResponse handle_request(const message_20::ServiceSel
     }
 
     bool energy_service_found = false;
+    bool vas_services_found = false;
 
     for (auto& energy_service : session.offered_services.energy_services) {
         if (energy_service == req.selected_energy_transfer_service.service_id) {
@@ -32,19 +33,41 @@ message_20::ServiceSelectionResponse handle_request(const message_20::ServiceSel
         return response_with_code(res, message_20::ResponseCode::FAILED_NoEnergyTransferServiceSelected);
     }
 
-    // Todo(sl): check supported_vas_list service id
+    if (req.selected_vas_list.has_value()) {
+        auto& selected_vas_list = req.selected_vas_list.value();
+
+        for (auto& vas_service : selected_vas_list) {
+            if (std::find(session.offered_services.vas_services.begin(), session.offered_services.vas_services.end(),
+                          vas_service.service_id) == session.offered_services.vas_services.end()) {
+                vas_services_found = false;
+                break;
+            }
+            vas_services_found = true;
+        }
+
+        if (not vas_services_found) {
+            return response_with_code(res, message_20::ResponseCode::FAILED_ServiceSelectionInvalid);
+        }
+    }
 
     if (not session.find_parameter_set_id(req.selected_energy_transfer_service.service_id,
                                           req.selected_energy_transfer_service.parameter_set_id)) {
         return response_with_code(res, message_20::ResponseCode::FAILED_ServiceSelectionInvalid);
     }
 
-    // Todo(sl): check supported_vas_list parameter set id
-
     session.selected_service_parameters(req.selected_energy_transfer_service.service_id,
                                         req.selected_energy_transfer_service.parameter_set_id);
 
-    // TODO(sl): Really important: Save the vas selected services in session!!!
+    if (req.selected_vas_list.has_value()) {
+        auto& selected_vas_list = req.selected_vas_list.value();
+
+        for (auto& vas_service : selected_vas_list) {
+            if (not session.find_parameter_set_id(vas_service.service_id, vas_service.parameter_set_id)) {
+                return response_with_code(res, message_20::ResponseCode::FAILED_ServiceSelectionInvalid);
+            }
+            session.selected_service_parameters(vas_service.service_id, vas_service.parameter_set_id);
+        }
+    }
 
     return response_with_code(res, message_20::ResponseCode::OK);
 }
