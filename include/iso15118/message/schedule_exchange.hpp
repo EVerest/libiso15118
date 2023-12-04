@@ -79,6 +79,7 @@ struct ScheduleExchangeResponse {
     static constexpr auto OVERSTAY_RULE_LENGTH = 5;
     static constexpr auto ADDITIONAL_SERVICE_LENGTH = 5;
     static constexpr auto PRICE_LEVEL_SCHEDULE_LENGTH = 1024;
+    static constexpr auto SCHEDULED_POWER_DURATION_S = 86400;
 
     Header header;
     ResponseCode response_code;
@@ -189,7 +190,7 @@ struct ScheduleExchangeResponse {
     };
 
     struct ScheduleTuple {
-        NumericID schedule_tuple_id;
+        NumericID schedule_tuple_id; // 1 - 255
         ChargingSchedule charging_schedule;
         std::optional<ChargingSchedule> discharging_schedule;
     };
