@@ -83,6 +83,9 @@ struct ScheduleExchangeResponse {
     Header header;
     ResponseCode response_code;
 
+    ScheduleExchangeResponse() :
+        processing(Processing::Finished), control_mode(std::in_place_type<Dynamic_SEResControlMode>){};
+
     Processing processing;
     std::optional<bool> go_to_pause;
 

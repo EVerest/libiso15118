@@ -58,15 +58,15 @@ target_link_libraries(test_dc_charge_parameter_discovery
 
 catch_discover_tests(test_dc_charge_parameter_discovery)
 
-# add_executable(test_schedule_exchange schedule_exchange.cpp)
+add_executable(test_schedule_exchange schedule_exchange.cpp)
 
-# target_link_libraries(test_schedule_exchange
-#     PRIVATE
-#         iso15118
-#         Catch2::Catch2WithMain
-# )
+target_link_libraries(test_schedule_exchange
+    PRIVATE
+        iso15118
+        Catch2::Catch2WithMain
+)
 
-# catch_discover_tests(test_schedule_exchange)
+catch_discover_tests(test_schedule_exchange)
 
 add_executable(test_dc_cable_check dc_cable_check.cpp)
 

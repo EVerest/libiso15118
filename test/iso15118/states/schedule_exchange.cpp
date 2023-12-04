@@ -10,6 +10,8 @@ SCENARIO("Schedule Exchange state handling") {
 
     using Scheduled_ModeReq = message_20::ScheduleExchangeRequest::Scheduled_SEReqControlMode;
     using Scheduled_ModeRes = message_20::ScheduleExchangeResponse::Scheduled_SEResControlMode;
+    using Dynamic_ModeReq = message_20::ScheduleExchangeRequest::Dynamic_SEReqControlMode;
+    using Dynamic_ModeRes = message_20::ScheduleExchangeResponse::Dynamic_SEResControlMode;
 
     GIVEN("Bad case - Unknown session") {
 
@@ -29,13 +31,9 @@ SCENARIO("Schedule Exchange state handling") {
 
             REQUIRE(res.processing == message_20::Processing::Finished);
 
-            REQUIRE(std::holds_alternative<Scheduled_ModeRes>(res.control_mode) == true);
-            const auto& res_control_mode = std::get<Scheduled_ModeRes>(res.control_mode);
-            REQUIRE(res_control_mode.schedule_tuple.size() == 1);
-
-            const auto& schedule_tuple = res_control_mode.schedule_tuple[0];
-            REQUIRE(schedule_tuple.schedule_tuple_id == 0);
-            REQUIRE(schedule_tuple.discharging_schedule.has_value() == false);
+            REQUIRE(std::holds_alternative<Dynamic_ModeRes>(res.control_mode) == true);
+            const auto& res_control_mode = std::get<Dynamic_ModeRes>(res.control_mode);
+            REQUIRE(std::holds_alternative<std::monostate>(res_control_mode.price_schedule) == true);
         }
     }
 
