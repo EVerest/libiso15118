@@ -98,15 +98,14 @@ RationalNumber from_float(float in) {
 
     int8_t exponent = 0;
 
-    if (std::floor(in) == in) {
+    if (in - std::floor(in) != 0) {
         exponent = 2;
     }
 
-    while (exponent > -4) {
+    for (;exponent > -4; exponent--) {
         if ((in * pow(10, exponent)) < INT16_MAX) {
             break;
         }
-        exponent--;
     }
 
     RationalNumber out;

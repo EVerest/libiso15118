@@ -10,7 +10,7 @@ SCENARIO("DC Pre charge state handling") {
 
     GIVEN("Bad case - Unknown session") {
 
-        d20::Session session = d20::Session();
+        auto session = d20::Session();
 
         message_20::DC_PreChargeRequest req;
 
@@ -32,7 +32,7 @@ SCENARIO("DC Pre charge state handling") {
     }
 
     GIVEN("Good Case") {
-                d20::Session session = d20::Session();
+        auto session = d20::Session();
 
         message_20::DC_PreChargeRequest req;
 
@@ -42,13 +42,13 @@ SCENARIO("DC Pre charge state handling") {
         req.present_voltage = {0, 0};
         req.target_voltage = {400, 0};
 
-        const float present_voltage = 400;
+        const float present_voltage = 400.1;
 
         const auto [res, charge_target] = d20::state::handle_request(req, session, present_voltage);
 
-        THEN("ResponseCode: OK, present_voltage should be 400V") {
+        THEN("ResponseCode: OK, present_voltage should be 400.1V") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
-            REQUIRE(res.present_voltage.value == 4000);
+            REQUIRE(res.present_voltage.value == 4001);
             REQUIRE(res.present_voltage.exponent == -1);
         }
     }
