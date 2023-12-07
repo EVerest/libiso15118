@@ -10,6 +10,13 @@ namespace iso15118::d20::state {
 
 message_20::SessionStopResponse handle_request(const message_20::SessionStopRequest& req, const d20::Session& session) {
 
+    if (req.ev_termination_code.has_value()) {
+        logf("EV termination code: %s\n", req.ev_termination_code.value().c_str());
+    }
+    if (req.ev_termination_explanation.has_value()) {
+        logf("EV Termination explanation: %s\n", req.ev_termination_explanation.value().c_str());
+    }
+
     message_20::SessionStopResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
@@ -21,7 +28,7 @@ message_20::SessionStopResponse handle_request(const message_20::SessionStopRequ
         return response_with_code(res, message_20::ResponseCode::FAILED_NoServiceRenegotiationSupported);
     }
 
-    // Todo(sl): Check req.charging_session, ev_termination_code & ev_termination_explanation
+    // Todo(sl): Check req.charging_session
 
     return response_with_code(res, message_20::ResponseCode::OK);
 }

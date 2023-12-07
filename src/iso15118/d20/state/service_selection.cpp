@@ -6,6 +6,7 @@
 #include <iso15118/detail/d20/context_helper.hpp>
 #include <iso15118/detail/d20/state/service_detail.hpp>
 #include <iso15118/detail/d20/state/service_selection.hpp>
+#include <iso15118/detail/d20/state/session_stop.hpp>
 #include <iso15118/detail/helper.hpp>
 
 namespace iso15118::d20::state {
@@ -108,6 +109,13 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
         }
 
         return sa.create_simple<DC_ChargeParameterDiscovery>(ctx);
+    } else if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {
+        const auto res = handle_request(*req, ctx.session);
+
+        ctx.respond(res);
+        ctx.session_stopped = true;
+
+        return sa.PASS_ON;
     } else {
         ctx.log("expected ServiceDetailReq! But code type id: %d", variant->get_type());
         ctx.session_stopped = true;
