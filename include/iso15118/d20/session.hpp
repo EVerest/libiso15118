@@ -105,6 +105,8 @@ public:
 
     OfferedServices offered_services;
 
+    bool service_renegotiation_supported{false};
+
 private:
     // NOTE (aw): could be const
     std::array<uint8_t, ID_LENGTH> id{};
