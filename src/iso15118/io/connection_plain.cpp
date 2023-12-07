@@ -122,6 +122,9 @@ void ConnectionPlain::close() {
     /* tear down TCP connection gracefully */
     logf("Closing TCP connection\n");
 
+    // Wait for 5 seconds [V2G20-1643]
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+
     const auto shutdown_result = shutdown(fd, SHUT_RDWR);
 
     if (shutdown_result == -1) {
@@ -129,7 +132,7 @@ void ConnectionPlain::close() {
     }
 
     // Waiting for client closing the connection
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
     poll_manager.unregister_fd(fd);
 
