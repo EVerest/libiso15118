@@ -16,6 +16,11 @@ message_20::SessionStopResponse handle_request(const message_20::SessionStopRequ
         return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
     }
 
+    if (req.charging_session == message_20::ChargingSession::ServiceRenegotiation &&
+        session.service_renegotiation_supported == false) {
+        return response_with_code(res, message_20::ResponseCode::FAILED_NoServiceRenegotiationSupported);
+    }
+
     // Todo(sl): Check req.charging_session, ev_termination_code & ev_termination_explanation
 
     return response_with_code(res, message_20::ResponseCode::OK);
@@ -41,7 +46,7 @@ FsmSimpleState::HandleEventReturnType SessionStop::handle_event(AllocatorType& s
         // Todo(sl): Tell the reason why the charger is stopping. Shutdown, Error, etc.
         ctx.session_stopped = true;
 
-        return sa.PASS_ON; 
+        return sa.PASS_ON;
     } else {
         ctx.log("expected SessionStop! But code type id: %d", variant->get_type());
 

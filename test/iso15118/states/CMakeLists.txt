@@ -108,3 +108,12 @@ target_link_libraries(test_dc_welding_detection
 
 catch_discover_tests(test_dc_welding_detection)
 
+add_executable(test_session_stop session_stop.cpp)
+
+target_link_libraries(test_session_stop
+    PRIVATE
+        iso15118
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(test_session_stop)
