@@ -10,8 +10,6 @@
 
 namespace iso15118::message_20 {
 
-// todo(sl): Adding internet and parking status service
-
 struct ServiceDetailRequest {
     Header header;
     ServiceCategory service;
@@ -20,8 +18,7 @@ struct ServiceDetailRequest {
 struct ServiceDetailResponse {
     struct Parameter {
         std::string name;
-        std::variant<bool, int8_t, int16_t, int32_t, std::string, RationalNumber>
-            value; // todo(sl): refactor because ISO-20 use only int32_t values
+        std::variant<bool, int8_t, int16_t, int32_t, std::string, RationalNumber> value;
     };
 
     struct ParameterSet {
