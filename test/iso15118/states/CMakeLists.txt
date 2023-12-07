@@ -98,3 +98,13 @@ target_link_libraries(test_power_delivery
 
 catch_discover_tests(test_power_delivery)
 
+add_executable(test_dc_welding_detection dc_welding_detection.cpp)
+
+target_link_libraries(test_dc_welding_detection
+    PRIVATE
+        iso15118
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(test_dc_welding_detection)
+
