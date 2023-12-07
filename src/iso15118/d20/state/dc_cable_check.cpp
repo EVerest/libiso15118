@@ -5,6 +5,7 @@
 
 #include <iso15118/detail/d20/context_helper.hpp>
 #include <iso15118/detail/d20/state/dc_cable_check.hpp>
+#include <iso15118/detail/d20/state/session_stop.hpp>
 #include <iso15118/detail/helper.hpp>
 
 namespace iso15118::d20::state {
@@ -71,6 +72,13 @@ FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType&
         } else {
             return sa.HANDLED_INTERNALLY;
         }
+    } else if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {
+        const auto res = handle_request(*req, ctx.session);
+
+        ctx.respond(res);
+        ctx.session_stopped = true;
+
+        return sa.PASS_ON;
     } else {
         ctx.log("expected DC_CableCheckReq! But code type id: %d", variant->get_type());
         ctx.session_stopped = true;

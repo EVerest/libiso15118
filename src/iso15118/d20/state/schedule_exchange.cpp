@@ -7,6 +7,7 @@
 
 #include <iso15118/detail/d20/context_helper.hpp>
 #include <iso15118/detail/d20/state/schedule_exchange.hpp>
+#include <iso15118/detail/d20/state/session_stop.hpp>
 #include <iso15118/detail/helper.hpp>
 
 namespace iso15118::d20::state {
@@ -21,7 +22,7 @@ message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleEx
         return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
     }
 
-    // Todo(SL): Publish data from request? 
+    // Todo(SL): Publish data from request?
 
     if (session.get_selected_control_mode() == message_20::ControlMode::Scheduled &&
         std::holds_alternative<message_20::ScheduleExchangeRequest::Scheduled_SEReqControlMode>(req.control_mode)) {
@@ -99,6 +100,13 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
         }
 
         return sa.create_simple<DC_CableCheck>(ctx);
+    } else if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {
+        const auto res = handle_request(*req, ctx.session);
+
+        ctx.respond(res);
+        ctx.session_stopped = true;
+
+        return sa.PASS_ON;
     } else {
         ctx.log("expected ScheduleExchangeReq! But code type id: %d", variant->get_type());
         ctx.session_stopped = true;

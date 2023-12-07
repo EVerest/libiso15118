@@ -3,12 +3,11 @@
 #include <algorithm>
 
 #include <iso15118/d20/state/authorization.hpp>
-
 #include <iso15118/d20/state/service_discovery.hpp>
 
-#include <iso15118/detail/d20/state/authorization.hpp>
-
 #include <iso15118/detail/d20/context_helper.hpp>
+#include <iso15118/detail/d20/state/authorization.hpp>
+#include <iso15118/detail/d20/state/session_stop.hpp>
 
 namespace iso15118::d20::state {
 
@@ -114,6 +113,12 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
         } else {
             return sa.HANDLED_INTERNALLY;
         }
+    } else if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {
+        const auto res = handle_request(*req, ctx.session);
+        ctx.respond(res);
+
+        ctx.session_stopped = true;
+        return sa.PASS_ON;
     } else {
         ctx.log("expected AuthorizationReq! But code type id: %d", variant->get_type());
         ctx.session_stopped = true;
