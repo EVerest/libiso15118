@@ -63,6 +63,11 @@ FsmSimpleState::HandleEventReturnType DC_WeldingDetection::handle_event(Allocato
         return sa.create_simple<SessionStop>(ctx);
     } else {
         ctx.log("expected DC_WeldingDetection! But code type id: %d", variant->get_type());
+
+        // Sequence Error
+        const message_20::Type req_type = variant->get_type();
+        send_sequence_error(req_type, ctx);
+
         ctx.session_stopped = true;
         return sa.PASS_ON;
     }

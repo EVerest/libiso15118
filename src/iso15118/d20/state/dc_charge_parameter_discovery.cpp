@@ -99,6 +99,11 @@ FsmSimpleState::HandleEventReturnType DC_ChargeParameterDiscovery::handle_event(
     } else {
         ctx.log("expected DC_ChargeParameterDiscovery! But code type id: %d", variant->get_type());
         ctx.session_stopped = true;
+
+        // Sequence Error
+        const message_20::Type req_type = variant->get_type();
+        send_sequence_error(req_type, ctx);
+
         return sa.PASS_ON;
     }
 }

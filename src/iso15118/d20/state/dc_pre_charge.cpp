@@ -76,6 +76,11 @@ FsmSimpleState::HandleEventReturnType DC_PreCharge::handle_event(AllocatorType& 
         return sa.PASS_ON;
     } else {
         ctx.log("expected DC_PreChargeReq! But code type id: %d", variant->get_type());
+
+        // Sequence Error
+        const message_20::Type req_type = variant->get_type();
+        send_sequence_error(req_type, ctx);
+
         ctx.session_stopped = true;
         return sa.PASS_ON;
     }
