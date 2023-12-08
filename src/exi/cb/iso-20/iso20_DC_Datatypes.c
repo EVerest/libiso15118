@@ -235,10 +235,6 @@ void init_iso20_dc_MeterInfoType(struct iso20_dc_MeterInfoType* MeterInfoType) {
     MeterInfoType->MeterTimestamp_isUsed = 0u;
 }
 
-void init_iso20_dc_Dynamic_DC_CLReqControlModeType(struct iso20_dc_Dynamic_DC_CLReqControlModeType* Dynamic_DC_CLReqControlModeType) {
-    Dynamic_DC_CLReqControlModeType->DepartureTime_isUsed = 0u;
-}
-
 void init_iso20_dc_Scheduled_DC_CLReqControlModeType(struct iso20_dc_Scheduled_DC_CLReqControlModeType* Scheduled_DC_CLReqControlModeType) {
     Scheduled_DC_CLReqControlModeType->EVTargetEnergyRequest_isUsed = 0u;
     Scheduled_DC_CLReqControlModeType->EVMaximumEnergyRequest_isUsed = 0u;
@@ -248,6 +244,10 @@ void init_iso20_dc_Scheduled_DC_CLReqControlModeType(struct iso20_dc_Scheduled_D
     Scheduled_DC_CLReqControlModeType->EVMaximumChargeCurrent_isUsed = 0u;
     Scheduled_DC_CLReqControlModeType->EVMaximumVoltage_isUsed = 0u;
     Scheduled_DC_CLReqControlModeType->EVMinimumVoltage_isUsed = 0u;
+}
+
+void init_iso20_dc_Dynamic_DC_CLReqControlModeType(struct iso20_dc_Dynamic_DC_CLReqControlModeType* Dynamic_DC_CLReqControlModeType) {
+    Dynamic_DC_CLReqControlModeType->DepartureTime_isUsed = 0u;
 }
 
 void init_iso20_dc_CLReqControlModeType(struct iso20_dc_CLReqControlModeType* CLReqControlModeType) {
@@ -262,18 +262,18 @@ void init_iso20_dc_ReceiptType(struct iso20_dc_ReceiptType* ReceiptType) {
     ReceiptType->OverstayCosts_isUsed = 0u;
 }
 
-void init_iso20_dc_Dynamic_DC_CLResControlModeType(struct iso20_dc_Dynamic_DC_CLResControlModeType* Dynamic_DC_CLResControlModeType) {
-    Dynamic_DC_CLResControlModeType->DepartureTime_isUsed = 0u;
-    Dynamic_DC_CLResControlModeType->MinimumSOC_isUsed = 0u;
-    Dynamic_DC_CLResControlModeType->TargetSOC_isUsed = 0u;
-    Dynamic_DC_CLResControlModeType->AckMaxDelay_isUsed = 0u;
-}
-
 void init_iso20_dc_Scheduled_DC_CLResControlModeType(struct iso20_dc_Scheduled_DC_CLResControlModeType* Scheduled_DC_CLResControlModeType) {
     Scheduled_DC_CLResControlModeType->EVSEMaximumChargePower_isUsed = 0u;
     Scheduled_DC_CLResControlModeType->EVSEMinimumChargePower_isUsed = 0u;
     Scheduled_DC_CLResControlModeType->EVSEMaximumChargeCurrent_isUsed = 0u;
     Scheduled_DC_CLResControlModeType->EVSEMaximumVoltage_isUsed = 0u;
+}
+
+void init_iso20_dc_Dynamic_DC_CLResControlModeType(struct iso20_dc_Dynamic_DC_CLResControlModeType* Dynamic_DC_CLResControlModeType) {
+    Dynamic_DC_CLResControlModeType->DepartureTime_isUsed = 0u;
+    Dynamic_DC_CLResControlModeType->MinimumSOC_isUsed = 0u;
+    Dynamic_DC_CLResControlModeType->TargetSOC_isUsed = 0u;
+    Dynamic_DC_CLResControlModeType->AckMaxDelay_isUsed = 0u;
 }
 
 void init_iso20_dc_CLResControlModeType(struct iso20_dc_CLResControlModeType* CLResControlModeType) {

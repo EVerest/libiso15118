@@ -24385,794 +24385,875 @@ int decode_iso20_exiFragment(exi_bitstream_t* stream, struct iso20_exiFragment* 
             {
             case 0:
                 // AbsolutePriceSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+                error = decode_iso20_AbsolutePriceScheduleType(stream, &exiFrag->AbsolutePriceSchedule);
+                exiFrag->AbsolutePriceSchedule_isUsed = 1u;
                 break;
             case 1:
-                // AdditionalSelectedServices (urn:iso:std:iso:15118:-20:CommonMessages)
+                // AckMaxDelay (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 2:
-                // AdditionalService (urn:iso:std:iso:15118:-20:CommonMessages)
+                // AdditionalSelectedServices (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 3:
-                // AdditionalServicesCosts (urn:iso:std:iso:15118:-20:CommonTypes)
+                // AdditionalService (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 4:
-                // Amount (urn:iso:std:iso:15118:-20:CommonTypes)
+                // AdditionalServicesCosts (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 5:
-                // AppliesMinimumMaximumCost (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Amount (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 6:
-                // AppliesToEnergyFee (urn:iso:std:iso:15118:-20:CommonMessages)
+                // AppliesMinimumMaximumCost (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 7:
-                // AppliesToOverstayFee (urn:iso:std:iso:15118:-20:CommonMessages)
+                // AppliesToEnergyFee (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 8:
-                // AppliesToParkingFee (urn:iso:std:iso:15118:-20:CommonMessages)
+                // AppliesToOverstayFee (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 9:
-                // AuthorizationReq (urn:iso:std:iso:15118:-20:CommonMessages)
-                error = decode_iso20_AuthorizationReqType(stream, &exiFrag->AuthorizationReq);
-                exiFrag->AuthorizationReq_isUsed = 1u;
+                // AppliesToParkingFee (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 10:
-                // AuthorizationRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                // AuthorizationReq (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 11:
-                // AuthorizationServices (urn:iso:std:iso:15118:-20:CommonMessages)
+                // AuthorizationRes (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 12:
-                // AuthorizationSetupReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                // AuthorizationServices (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 13:
-                // AuthorizationSetupRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                // AuthorizationSetupReq (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 14:
-                // AvailableEnergy (urn:iso:std:iso:15118:-20:CommonMessages)
+                // AuthorizationSetupRes (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 15:
-                // BPT_ChannelSelection (urn:iso:std:iso:15118:-20:CommonMessages)
+                // AvailableEnergy (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 16:
-                // BPT_DischargedEnergyReadingWh (urn:iso:std:iso:15118:-20:CommonTypes)
+                // BPT_ChannelSelection (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 17:
-                // BPT_InductiveEnergyReadingVARh (urn:iso:std:iso:15118:-20:CommonTypes)
+                // BPT_DischargedEnergyReadingWh (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 18:
-                // CLReqControlMode (urn:iso:std:iso:15118:-20:CommonTypes)
+                // BPT_InductiveEnergyReadingVARh (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 19:
-                // CLResControlMode (urn:iso:std:iso:15118:-20:CommonTypes)
+                // BatteryEnergyCapacity (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 20:
-                // CPSCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
+                // CLReqControlMode (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 21:
-                // CanonicalizationMethod (http://www.w3.org/2000/09/xmldsig#)
+                // CLResControlMode (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 22:
-                // CapacitiveEnergyReadingVARh (urn:iso:std:iso:15118:-20:CommonTypes)
+                // CPSCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 23:
-                // CarbonDioxideEmission (urn:iso:std:iso:15118:-20:CommonMessages)
+                // CanonicalizationMethod (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 24:
-                // Certificate (urn:iso:std:iso:15118:-20:CommonMessages)
+                // CapacitiveEnergyReadingVARh (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 25:
+                // CarbonDioxideEmission (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 26:
+                // Certificate (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 27:
                 // CertificateInstallationReq (urn:iso:std:iso:15118:-20:CommonMessages)
                 error = decode_iso20_CertificateInstallationReqType(stream, &exiFrag->CertificateInstallationReq);
                 exiFrag->CertificateInstallationReq_isUsed = 1u;
                 break;
-            case 26:
-                // CertificateInstallationRes (urn:iso:std:iso:15118:-20:CommonMessages)
-                error = decode_iso20_CertificateInstallationResType(stream, &exiFrag->CertificateInstallationRes);
-                exiFrag->CertificateInstallationRes_isUsed = 1u;
-                break;
-            case 27:
-                // CertificateInstallationService (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
             case 28:
-                // ChargeProgress (urn:iso:std:iso:15118:-20:CommonMessages)
+                // CertificateInstallationRes (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 29:
-                // ChargedEnergyReadingWh (urn:iso:std:iso:15118:-20:CommonTypes)
+                // CertificateInstallationService (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 30:
-                // ChargingSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ChargeProgress (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 31:
-                // ChargingSession (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ChargedEnergyReadingWh (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 32:
-                // CheckOutTime (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ChargingComplete (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 33:
-                // ContractCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ChargingSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 34:
-                // CostPerUnit (urn:iso:std:iso:15118:-20:CommonTypes)
+                // ChargingSession (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 35:
-                // Currency (urn:iso:std:iso:15118:-20:CommonMessages)
+                // CheckOutTime (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 36:
-                // DHPublicKey (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ContractCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 37:
-                // DSAKeyValue (http://www.w3.org/2000/09/xmldsig#)
+                // CostPerUnit (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 38:
-                // DepartureTime (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Currency (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 39:
-                // DeviceLocation (urn:iso:std:iso:15118:-20:CommonMessages)
+                // DHPublicKey (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 40:
-                // DeviceOffset (urn:iso:std:iso:15118:-20:CommonMessages)
+                // DSAKeyValue (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 41:
-                // DigestMethod (http://www.w3.org/2000/09/xmldsig#)
+                // DepartureTime (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 42:
-                // DigestValue (http://www.w3.org/2000/09/xmldsig#)
+                // DepartureTime (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 43:
-                // DischargingSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+                // DeviceLocation (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 44:
-                // Duration (urn:iso:std:iso:15118:-20:CommonMessages)
+                // DeviceOffset (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 45:
-                // Dynamic_EVPPTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // DigestMethod (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 46:
-                // Dynamic_SEReqControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // DigestValue (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 47:
-                // Dynamic_SEResControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // DischargingSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 48:
-                // Dynamic_SMDTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // DisplayParameters (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 49:
-                // ECDHCurve (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Duration (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 50:
-                // EIM_AReqAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Dynamic_EVPPTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 51:
-                // EIM_ASResAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Dynamic_SEReqControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 52:
-                // EMAID (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Dynamic_SEResControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 53:
-                // EVAbsolutePriceSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Dynamic_SMDTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 54:
-                // EVCCID (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ECDHCurve (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 55:
-                // EVCheckInStatus (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EIM_AReqAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 56:
-                // EVCheckOutStatus (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EIM_ASResAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 57:
-                // EVEnergyOffer (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EMAID (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 58:
-                // EVMaximumEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVAbsolutePriceSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 59:
-                // EVMaximumV2XEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVCCID (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 60:
-                // EVMinimumEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVCheckInStatus (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 61:
-                // EVMinimumV2XEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVCheckOutStatus (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 62:
-                // EVPowerProfile (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVEnergyOffer (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 63:
-                // EVPowerProfileEntries (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVMaximumEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 64:
-                // EVPowerProfileEntry (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVMaximumEnergyRequest (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 65:
-                // EVPowerSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVMaximumV2XEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 66:
-                // EVPowerScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVMinimumEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 67:
-                // EVPowerScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVMinimumEnergyRequest (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 68:
-                // EVPriceRule (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVMinimumV2XEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 69:
-                // EVPriceRuleStack (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVPowerProfile (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 70:
-                // EVPriceRuleStacks (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVPowerProfileEntries (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 71:
-                // EVProcessing (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVPowerProfileEntry (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 72:
-                // EVSECheckOutStatus (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVPowerSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 73:
-                // EVSEID (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVPowerScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 74:
-                // EVSENotification (urn:iso:std:iso:15118:-20:CommonTypes)
+                // EVPowerScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 75:
-                // EVSEProcessing (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVPriceRule (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 76:
-                // EVSEStatus (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVPriceRuleStack (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 77:
-                // EVTargetEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVPriceRuleStacks (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 78:
-                // EVTerminationCode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVProcessing (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 79:
-                // EVTerminationExplanation (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVSECheckOutStatus (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 80:
-                // EnergyCosts (urn:iso:std:iso:15118:-20:CommonTypes)
+                // EVSEID (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 81:
-                // EnergyFee (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVSENotification (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 82:
-                // EnergyTransferServiceList (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVSEProcessing (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 83:
-                // Exponent (http://www.w3.org/2000/09/xmldsig#)
+                // EVSEStatus (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 84:
-                // Exponent (urn:iso:std:iso:15118:-20:CommonTypes)
+                // EVSEStatus (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 85:
-                // FreeService (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVTargetEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 86:
-                // G (http://www.w3.org/2000/09/xmldsig#)
+                // EVTargetEnergyRequest (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 87:
-                // GenChallenge (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVTerminationCode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 88:
-                // GoToPause (urn:iso:std:iso:15118:-20:CommonMessages)
+                // EVTerminationExplanation (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 89:
-                // HMACOutputLength (http://www.w3.org/2000/09/xmldsig#)
+                // EnergyCosts (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 90:
-                // Header (urn:iso:std:iso:15118:-20:CommonTypes)
+                // EnergyFee (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 91:
-                // J (http://www.w3.org/2000/09/xmldsig#)
+                // EnergyTransferServiceList (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 92:
-                // KeyInfo (http://www.w3.org/2000/09/xmldsig#)
+                // Exponent (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 93:
-                // KeyName (http://www.w3.org/2000/09/xmldsig#)
+                // Exponent (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 94:
-                // KeyValue (http://www.w3.org/2000/09/xmldsig#)
+                // FreeService (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 95:
-                // Language (urn:iso:std:iso:15118:-20:CommonMessages)
+                // G (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 96:
-                // ListOfRootCertificateIDs (urn:iso:std:iso:15118:-20:CommonMessages)
+                // GenChallenge (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 97:
-                // Manifest (http://www.w3.org/2000/09/xmldsig#)
+                // GoToPause (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 98:
-                // MaximumContractCertificateChains (urn:iso:std:iso:15118:-20:CommonMessages)
+                // HMACOutputLength (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 99:
-                // MaximumCost (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Header (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 100:
-                // MaximumSupportingPoints (urn:iso:std:iso:15118:-20:CommonMessages)
+                // InletHot (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 101:
-                // MeterID (urn:iso:std:iso:15118:-20:CommonTypes)
+                // J (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 102:
-                // MeterInfo (urn:iso:std:iso:15118:-20:CommonMessages)
+                // KeyInfo (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 103:
-                // MeterSignature (urn:iso:std:iso:15118:-20:CommonTypes)
+                // KeyName (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 104:
-                // MeterStatus (urn:iso:std:iso:15118:-20:CommonTypes)
+                // KeyValue (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 105:
-                // MeterTimestamp (urn:iso:std:iso:15118:-20:CommonTypes)
+                // Language (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 106:
+                // ListOfRootCertificateIDs (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 107:
+                // Manifest (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 108:
+                // MaximumContractCertificateChains (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 109:
+                // MaximumCost (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 110:
+                // MaximumSOC (urn:iso:std:iso:15118:-20:CommonTypes)
+                break;
+            case 111:
+                // MaximumSupportingPoints (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 112:
+                // MeterID (urn:iso:std:iso:15118:-20:CommonTypes)
+                break;
+            case 113:
+                // MeterInfo (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 114:
+                // MeterInfo (urn:iso:std:iso:15118:-20:CommonTypes)
+                break;
+            case 115:
+                // MeterInfoRequested (urn:iso:std:iso:15118:-20:CommonTypes)
+                break;
+            case 116:
+                // MeterSignature (urn:iso:std:iso:15118:-20:CommonTypes)
+                break;
+            case 117:
+                // MeterStatus (urn:iso:std:iso:15118:-20:CommonTypes)
+                break;
+            case 118:
+                // MeterTimestamp (urn:iso:std:iso:15118:-20:CommonTypes)
+                break;
+            case 119:
                 // MeteringConfirmationReq (urn:iso:std:iso:15118:-20:CommonMessages)
                 error = decode_iso20_MeteringConfirmationReqType(stream, &exiFrag->MeteringConfirmationReq);
                 exiFrag->MeteringConfirmationReq_isUsed = 1u;
                 break;
-            case 107:
+            case 120:
                 // MeteringConfirmationRes (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
-            case 108:
+            case 121:
                 // MgmtData (http://www.w3.org/2000/09/xmldsig#)
                 break;
-            case 109:
+            case 122:
                 // MinimumCost (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
-            case 110:
+            case 123:
                 // MinimumSOC (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
-            case 111:
-                // Modulus (http://www.w3.org/2000/09/xmldsig#)
-                break;
-            case 112:
-                // NotificationMaxDelay (urn:iso:std:iso:15118:-20:CommonTypes)
-                break;
-            case 113:
-                // NumberOfPriceLevels (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 114:
-                // OEMProvisioningCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 115:
-                // Object (http://www.w3.org/2000/09/xmldsig#)
-                break;
-            case 116:
-                // OccupancyCosts (urn:iso:std:iso:15118:-20:CommonTypes)
-                break;
-            case 117:
-                // OverstayCosts (urn:iso:std:iso:15118:-20:CommonTypes)
-                break;
-            case 118:
-                // OverstayFee (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 119:
-                // OverstayFeePeriod (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 120:
-                // OverstayPowerThreshold (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 121:
-                // OverstayRule (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 122:
-                // OverstayRuleDescription (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 123:
-                // OverstayRules (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
             case 124:
-                // OverstayTimeThreshold (urn:iso:std:iso:15118:-20:CommonMessages)
+                // MinimumSOC (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 125:
-                // P (http://www.w3.org/2000/09/xmldsig#)
+                // Modulus (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 126:
-                // PGPData (http://www.w3.org/2000/09/xmldsig#)
+                // NotificationMaxDelay (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 127:
-                // PGPKeyID (http://www.w3.org/2000/09/xmldsig#)
+                // NumberOfPriceLevels (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 128:
-                // PGPKeyPacket (http://www.w3.org/2000/09/xmldsig#)
+                // OEMProvisioningCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 129:
-                // Parameter (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Object (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 130:
-                // ParameterSet (urn:iso:std:iso:15118:-20:CommonMessages)
+                // OccupancyCosts (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 131:
-                // ParameterSetID (urn:iso:std:iso:15118:-20:CommonMessages)
+                // OverstayCosts (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 132:
-                // ParkingFee (urn:iso:std:iso:15118:-20:CommonMessages)
+                // OverstayFee (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 133:
-                // ParkingFeePeriod (urn:iso:std:iso:15118:-20:CommonMessages)
+                // OverstayFeePeriod (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 134:
-                // ParkingMethod (urn:iso:std:iso:15118:-20:CommonMessages)
+                // OverstayPowerThreshold (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 135:
-                // ParkingSpace (urn:iso:std:iso:15118:-20:CommonMessages)
+                // OverstayRule (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 136:
-                // PgenCounter (http://www.w3.org/2000/09/xmldsig#)
+                // OverstayRuleDescription (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 137:
-                // PnC_AReqAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // OverstayRules (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 138:
-                // PnC_ASResAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // OverstayTimeThreshold (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 139:
-                // Power (urn:iso:std:iso:15118:-20:CommonMessages)
+                // P (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 140:
-                // PowerDeliveryReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PGPData (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 141:
-                // PowerDeliveryRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PGPKeyID (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 142:
-                // PowerRangeStart (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PGPKeyPacket (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 143:
-                // PowerSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Parameter (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 144:
-                // PowerScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ParameterSet (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 145:
-                // PowerScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ParameterSetID (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 146:
-                // PowerTolerance (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ParkingFee (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 147:
-                // PowerToleranceAcceptance (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ParkingFeePeriod (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 148:
-                // Power_L2 (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ParkingMethod (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 149:
-                // Power_L3 (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ParkingSpace (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 150:
-                // PriceAlgorithm (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PgenCounter (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 151:
-                // PriceLevel (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PnC_AReqAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                error = decode_iso20_PnC_AReqAuthorizationModeType(stream, &exiFrag->PnC_AReqAuthorizationMode);
+                exiFrag->PnC_AReqAuthorizationMode_isUsed = 1u;
                 break;
             case 152:
-                // PriceLevelSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PnC_ASResAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 153:
-                // PriceLevelScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Power (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 154:
-                // PriceLevelScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PowerDeliveryReq (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 155:
-                // PriceRule (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PowerDeliveryRes (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 156:
-                // PriceRuleStack (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PowerRangeStart (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 157:
-                // PriceRuleStacks (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PowerSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 158:
-                // PriceScheduleDescription (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PowerScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 159:
-                // PriceScheduleID (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PowerScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 160:
-                // PrioritizedEMAIDs (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PowerTolerance (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 161:
-                // ProviderID (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PowerToleranceAcceptance (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 162:
-                // Q (http://www.w3.org/2000/09/xmldsig#)
+                // Power_L2 (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 163:
-                // RSAKeyValue (http://www.w3.org/2000/09/xmldsig#)
+                // Power_L3 (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 164:
-                // Receipt (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PresentSOC (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 165:
-                // Reference (http://www.w3.org/2000/09/xmldsig#)
+                // PriceAlgorithm (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 166:
-                // RemainingContractCertificateChains (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PriceLevel (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 167:
-                // RenewableGenerationPercentage (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PriceLevelSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 168:
-                // ResponseCode (urn:iso:std:iso:15118:-20:CommonTypes)
+                // PriceLevelScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 169:
-                // RetrievalMethod (http://www.w3.org/2000/09/xmldsig#)
+                // PriceLevelScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 170:
-                // RootCertificateID (urn:iso:std:iso:15118:-20:CommonTypes)
+                // PriceRule (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 171:
-                // SECP521_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PriceRuleStack (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 172:
-                // SPKIData (http://www.w3.org/2000/09/xmldsig#)
+                // PriceRuleStacks (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 173:
-                // SPKISexp (http://www.w3.org/2000/09/xmldsig#)
+                // PriceScheduleDescription (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 174:
-                // ScheduleExchangeReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PriceScheduleID (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 175:
-                // ScheduleExchangeRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                // PrioritizedEMAIDs (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 176:
-                // ScheduleTuple (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ProviderID (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 177:
-                // ScheduleTupleID (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Q (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 178:
-                // Scheduled_EVPPTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // RSAKeyValue (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 179:
-                // Scheduled_SEReqControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Receipt (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 180:
-                // Scheduled_SEResControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Receipt (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 181:
-                // Scheduled_SMDTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Reference (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 182:
-                // Seed (http://www.w3.org/2000/09/xmldsig#)
+                // RemainingContractCertificateChains (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 183:
-                // SelectedAuthorizationService (urn:iso:std:iso:15118:-20:CommonMessages)
+                // RemainingTimeToMaximumSOC (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 184:
-                // SelectedEnergyTransferService (urn:iso:std:iso:15118:-20:CommonMessages)
+                // RemainingTimeToMinimumSOC (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 185:
-                // SelectedScheduleTupleID (urn:iso:std:iso:15118:-20:CommonMessages)
+                // RemainingTimeToTargetSOC (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 186:
-                // SelectedService (urn:iso:std:iso:15118:-20:CommonMessages)
+                // RenewableGenerationPercentage (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 187:
-                // SelectedVASList (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ResponseCode (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 188:
-                // Service (urn:iso:std:iso:15118:-20:CommonMessages)
+                // RetrievalMethod (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 189:
-                // ServiceDetailReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                // RootCertificateID (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 190:
-                // ServiceDetailRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                // SECP521_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 191:
-                // ServiceDiscoveryReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                // SPKIData (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 192:
-                // ServiceDiscoveryRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                // SPKISexp (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 193:
-                // ServiceFee (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ScheduleExchangeReq (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 194:
-                // ServiceID (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ScheduleExchangeRes (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 195:
-                // ServiceName (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ScheduleTuple (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 196:
-                // ServiceParameterList (urn:iso:std:iso:15118:-20:CommonMessages)
+                // ScheduleTupleID (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 197:
-                // ServiceRenegotiationSupported (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Scheduled_EVPPTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 198:
-                // ServiceSelectionReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Scheduled_SEReqControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 199:
-                // ServiceSelectionRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Scheduled_SEResControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 200:
-                // SessionID (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Scheduled_SMDTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 201:
-                // SessionID (urn:iso:std:iso:15118:-20:CommonTypes)
+                // Seed (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 202:
-                // SessionSetupReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                // SelectedAuthorizationService (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 203:
-                // SessionSetupRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                // SelectedEnergyTransferService (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 204:
-                // SessionStopReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                // SelectedScheduleTupleID (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 205:
-                // SessionStopRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                // SelectedService (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 206:
-                // Signature (http://www.w3.org/2000/09/xmldsig#)
+                // SelectedVASList (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 207:
-                // SignatureMethod (http://www.w3.org/2000/09/xmldsig#)
+                // Service (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 208:
-                // SignatureProperties (http://www.w3.org/2000/09/xmldsig#)
+                // ServiceDetailReq (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 209:
-                // SignatureProperty (http://www.w3.org/2000/09/xmldsig#)
+                // ServiceDetailRes (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 210:
-                // SignatureValue (http://www.w3.org/2000/09/xmldsig#)
+                // ServiceDiscoveryReq (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 211:
+                // ServiceDiscoveryRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 212:
+                // ServiceFee (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 213:
+                // ServiceID (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 214:
+                // ServiceName (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 215:
+                // ServiceParameterList (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 216:
+                // ServiceRenegotiationSupported (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 217:
+                // ServiceSelectionReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 218:
+                // ServiceSelectionRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 219:
+                // SessionID (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 220:
+                // SessionID (urn:iso:std:iso:15118:-20:CommonTypes)
+                break;
+            case 221:
+                // SessionSetupReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 222:
+                // SessionSetupRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 223:
+                // SessionStopReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 224:
+                // SessionStopRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 225:
+                // Signature (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 226:
+                // SignatureMethod (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 227:
+                // SignatureProperties (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 228:
+                // SignatureProperty (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 229:
+                // SignatureValue (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 230:
                 // SignedInfo (http://www.w3.org/2000/09/xmldsig#)
                 error = decode_iso20_SignedInfoType(stream, &exiFrag->SignedInfo);
                 exiFrag->SignedInfo_isUsed = 1u;
                 break;
-            case 212:
-                // SignedInstallationData (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 213:
-                // SignedMeteringData (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 214:
-                // StartTime (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 215:
-                // SubCertificates (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 216:
-                // SupportedProviders (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 217:
-                // SupportedServiceIDs (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 218:
-                // TPM_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 219:
-                // TargetDistance (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 220:
-                // TargetSOC (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 221:
-                // TaxCosts (urn:iso:std:iso:15118:-20:CommonTypes)
-                break;
-            case 222:
-                // TaxIncludedInPrice (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 223:
-                // TaxRate (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 224:
-                // TaxRule (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 225:
-                // TaxRuleID (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 226:
-                // TaxRuleID (urn:iso:std:iso:15118:-20:CommonTypes)
-                break;
-            case 227:
-                // TaxRuleName (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 228:
-                // TaxRules (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 229:
-                // TimeAnchor (urn:iso:std:iso:15118:-20:CommonMessages)
-                break;
-            case 230:
-                // TimeAnchor (urn:iso:std:iso:15118:-20:CommonTypes)
-                break;
             case 231:
-                // TimeStamp (urn:iso:std:iso:15118:-20:CommonTypes)
+                // SignedInstallationData (urn:iso:std:iso:15118:-20:CommonMessages)
+                error = decode_iso20_SignedInstallationDataType(stream, &exiFrag->SignedInstallationData);
+                exiFrag->SignedInstallationData_isUsed = 1u;
                 break;
             case 232:
-                // Transform (http://www.w3.org/2000/09/xmldsig#)
+                // SignedMeteringData (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 233:
-                // Transforms (http://www.w3.org/2000/09/xmldsig#)
+                // StartTime (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 234:
-                // VASList (urn:iso:std:iso:15118:-20:CommonMessages)
+                // SubCertificates (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 235:
-                // Value (urn:iso:std:iso:15118:-20:CommonTypes)
+                // SupportedProviders (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 236:
-                // VehicleCheckInReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                // SupportedServiceIDs (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 237:
-                // VehicleCheckInRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                // TPM_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 238:
-                // VehicleCheckOutReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                // TargetDistance (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 239:
-                // VehicleCheckOutRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                // TargetOffsetX (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 240:
-                // VehicleFrame (urn:iso:std:iso:15118:-20:CommonMessages)
+                // TargetOffsetY (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 241:
-                // VehicleTravel (urn:iso:std:iso:15118:-20:CommonMessages)
+                // TargetSOC (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 242:
-                // X448_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
+                // TargetSOC (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 243:
-                // X509CRL (http://www.w3.org/2000/09/xmldsig#)
+                // TaxCosts (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 244:
-                // X509Certificate (http://www.w3.org/2000/09/xmldsig#)
+                // TaxIncludedInPrice (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 245:
-                // X509Data (http://www.w3.org/2000/09/xmldsig#)
+                // TaxRate (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 246:
-                // X509IssuerName (http://www.w3.org/2000/09/xmldsig#)
+                // TaxRule (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 247:
-                // X509IssuerSerial (http://www.w3.org/2000/09/xmldsig#)
+                // TaxRuleID (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 248:
-                // X509SKI (http://www.w3.org/2000/09/xmldsig#)
+                // TaxRuleID (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 249:
-                // X509SerialNumber (http://www.w3.org/2000/09/xmldsig#)
+                // TaxRuleName (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 250:
-                // X509SubjectName (http://www.w3.org/2000/09/xmldsig#)
+                // TaxRules (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 251:
-                // XPath (http://www.w3.org/2000/09/xmldsig#)
+                // TimeAnchor (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 252:
-                // Y (http://www.w3.org/2000/09/xmldsig#)
+                // TimeAnchor (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 253:
-                // boolValue (urn:iso:std:iso:15118:-20:CommonMessages)
+                // TimeStamp (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 254:
-                // byteValue (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Transform (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 255:
-                // finiteString (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Transforms (http://www.w3.org/2000/09/xmldsig#)
                 break;
             case 256:
-                // intValue (urn:iso:std:iso:15118:-20:CommonMessages)
+                // VASList (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             case 257:
-                // rationalNumber (urn:iso:std:iso:15118:-20:CommonMessages)
+                // Value (urn:iso:std:iso:15118:-20:CommonTypes)
                 break;
             case 258:
+                // VehicleCheckInReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 259:
+                // VehicleCheckInRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 260:
+                // VehicleCheckOutReq (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 261:
+                // VehicleCheckOutRes (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 262:
+                // VehicleFrame (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 263:
+                // VehicleTravel (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 264:
+                // X448_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 265:
+                // X509CRL (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 266:
+                // X509Certificate (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 267:
+                // X509Data (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 268:
+                // X509IssuerName (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 269:
+                // X509IssuerSerial (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 270:
+                // X509SKI (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 271:
+                // X509SerialNumber (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 272:
+                // X509SubjectName (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 273:
+                // XPath (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 274:
+                // Y (http://www.w3.org/2000/09/xmldsig#)
+                break;
+            case 275:
+                // boolValue (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 276:
+                // byteValue (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 277:
+                // finiteString (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 278:
+                // intValue (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 279:
+                // rationalNumber (urn:iso:std:iso:15118:-20:CommonMessages)
+                break;
+            case 280:
                 // shortValue (urn:iso:std:iso:15118:-20:CommonMessages)
                 break;
             default:
                 error = EXI_ERROR__UNSUPPORTED_SUB_EVENT;
                 break;
+            }
+
+            if (error == EXI_ERROR__NO_ERROR)
+            {
+                // End Fragment
+                error = exi_basetypes_decoder_nbit_uint(stream, 9, &eventCode);
+                if (error == EXI_ERROR__NO_ERROR)
+                {
+                    if (eventCode != 282)
+                    {
+                        error = EXI_ERROR__INCORRECT_END_FRAGMENT_VALUE;
+                    }
+                }
             }
         }
     }
@@ -25377,6 +25458,19 @@ int decode_iso20_xmldsigFragment(exi_bitstream_t* stream, struct iso20_xmldsigFr
             default:
                 error = EXI_ERROR__UNSUPPORTED_SUB_EVENT;
                 break;
+            }
+
+            if (error == EXI_ERROR__NO_ERROR)
+            {
+                // End Fragment
+                error = exi_basetypes_decoder_nbit_uint(stream, 6, &eventCode);
+                if (error == EXI_ERROR__NO_ERROR)
+                {
+                    if (eventCode != 46)
+                    {
+                        error = EXI_ERROR__INCORRECT_END_FRAGMENT_VALUE;
+                    }
+                }
             }
         }
     }

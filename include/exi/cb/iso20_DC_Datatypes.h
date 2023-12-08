@@ -897,32 +897,6 @@ struct iso20_dc_MeterInfoType {
 
 };
 
-// Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLReqControlMode; type={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLReqControlModeType; base type=Dynamic_CLReqControlModeType; content type=ELEMENT-ONLY;
-//          abstract=False; final=False; derivation=extension;
-// Particle: DepartureTime, unsignedInt (0, 1); EVTargetEnergyRequest, RationalNumberType (1, 1); EVMaximumEnergyRequest, RationalNumberType (1, 1); EVMinimumEnergyRequest, RationalNumberType (1, 1); EVMaximumChargePower, RationalNumberType (1, 1); EVMinimumChargePower, RationalNumberType (1, 1); EVMaximumChargeCurrent, RationalNumberType (1, 1); EVMaximumVoltage, RationalNumberType (1, 1); EVMinimumVoltage, RationalNumberType (1, 1);
-struct iso20_dc_Dynamic_DC_CLReqControlModeType {
-    // DepartureTime, unsignedInt (base: unsignedLong)
-    uint32_t DepartureTime;
-    unsigned int DepartureTime_isUsed:1;
-    // EVTargetEnergyRequest, RationalNumberType
-    struct iso20_dc_RationalNumberType EVTargetEnergyRequest;
-    // EVMaximumEnergyRequest, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMaximumEnergyRequest;
-    // EVMinimumEnergyRequest, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMinimumEnergyRequest;
-    // EVMaximumChargePower, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMaximumChargePower;
-    // EVMinimumChargePower, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMinimumChargePower;
-    // EVMaximumChargeCurrent, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMaximumChargeCurrent;
-    // EVMaximumVoltage, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMaximumVoltage;
-    // EVMinimumVoltage, RationalNumberType
-    struct iso20_dc_RationalNumberType EVMinimumVoltage;
-
-};
-
 // Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLReqControlMode; type={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLReqControlModeType; base type=Scheduled_CLReqControlModeType; content type=ELEMENT-ONLY;
 //          abstract=False; final=False; derivation=extension;
 // Particle: EVTargetEnergyRequest, RationalNumberType (0, 1); EVMaximumEnergyRequest, RationalNumberType (0, 1); EVMinimumEnergyRequest, RationalNumberType (0, 1); EVTargetCurrent, RationalNumberType (1, 1); EVTargetVoltage, RationalNumberType (1, 1); EVMaximumChargePower, RationalNumberType (0, 1); EVMinimumChargePower, RationalNumberType (0, 1); EVMaximumChargeCurrent, RationalNumberType (0, 1); EVMaximumVoltage, RationalNumberType (0, 1); EVMinimumVoltage, RationalNumberType (0, 1);
@@ -958,6 +932,32 @@ struct iso20_dc_Scheduled_DC_CLReqControlModeType {
 
 };
 
+// Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLReqControlMode; type={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLReqControlModeType; base type=Dynamic_CLReqControlModeType; content type=ELEMENT-ONLY;
+//          abstract=False; final=False; derivation=extension;
+// Particle: DepartureTime, unsignedInt (0, 1); EVTargetEnergyRequest, RationalNumberType (1, 1); EVMaximumEnergyRequest, RationalNumberType (1, 1); EVMinimumEnergyRequest, RationalNumberType (1, 1); EVMaximumChargePower, RationalNumberType (1, 1); EVMinimumChargePower, RationalNumberType (1, 1); EVMaximumChargeCurrent, RationalNumberType (1, 1); EVMaximumVoltage, RationalNumberType (1, 1); EVMinimumVoltage, RationalNumberType (1, 1);
+struct iso20_dc_Dynamic_DC_CLReqControlModeType {
+    // DepartureTime, unsignedInt (base: unsignedLong)
+    uint32_t DepartureTime;
+    unsigned int DepartureTime_isUsed:1;
+    // EVTargetEnergyRequest, RationalNumberType
+    struct iso20_dc_RationalNumberType EVTargetEnergyRequest;
+    // EVMaximumEnergyRequest, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMaximumEnergyRequest;
+    // EVMinimumEnergyRequest, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMinimumEnergyRequest;
+    // EVMaximumChargePower, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMaximumChargePower;
+    // EVMinimumChargePower, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMinimumChargePower;
+    // EVMaximumChargeCurrent, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMaximumChargeCurrent;
+    // EVMaximumVoltage, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMaximumVoltage;
+    // EVMinimumVoltage, RationalNumberType
+    struct iso20_dc_RationalNumberType EVMinimumVoltage;
+
+};
+
 // Element: definition=complex; name={urn:iso:std:iso:15118:-20:CommonTypes}CLReqControlMode; type={urn:iso:std:iso:15118:-20:CommonTypes}CLReqControlModeType; base type=; content type=empty;
 //          abstract=False; final=False;
 // Particle: 
@@ -990,6 +990,25 @@ struct iso20_dc_ReceiptType {
     } TaxCosts;
 };
 
+// Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLResControlMode; type={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLResControlModeType; base type=Scheduled_CLResControlModeType; content type=ELEMENT-ONLY;
+//          abstract=False; final=False; derivation=extension;
+// Particle: EVSEMaximumChargePower, RationalNumberType (0, 1); EVSEMinimumChargePower, RationalNumberType (0, 1); EVSEMaximumChargeCurrent, RationalNumberType (0, 1); EVSEMaximumVoltage, RationalNumberType (0, 1);
+struct iso20_dc_Scheduled_DC_CLResControlModeType {
+    // EVSEMaximumChargePower, RationalNumberType
+    struct iso20_dc_RationalNumberType EVSEMaximumChargePower;
+    unsigned int EVSEMaximumChargePower_isUsed:1;
+    // EVSEMinimumChargePower, RationalNumberType
+    struct iso20_dc_RationalNumberType EVSEMinimumChargePower;
+    unsigned int EVSEMinimumChargePower_isUsed:1;
+    // EVSEMaximumChargeCurrent, RationalNumberType
+    struct iso20_dc_RationalNumberType EVSEMaximumChargeCurrent;
+    unsigned int EVSEMaximumChargeCurrent_isUsed:1;
+    // EVSEMaximumVoltage, RationalNumberType
+    struct iso20_dc_RationalNumberType EVSEMaximumVoltage;
+    unsigned int EVSEMaximumVoltage_isUsed:1;
+
+};
+
 // Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLResControlMode; type={urn:iso:std:iso:15118:-20:DC}Dynamic_DC_CLResControlModeType; base type=Dynamic_CLResControlModeType; content type=ELEMENT-ONLY;
 //          abstract=False; final=False; derivation=extension;
 // Particle: DepartureTime, unsignedInt (0, 1); MinimumSOC, percentValueType (0, 1); TargetSOC, percentValueType (0, 1); AckMaxDelay, unsignedShort (0, 1); EVSEMaximumChargePower, RationalNumberType (1, 1); EVSEMinimumChargePower, RationalNumberType (1, 1); EVSEMaximumChargeCurrent, RationalNumberType (1, 1); EVSEMaximumVoltage, RationalNumberType (1, 1);
@@ -1014,25 +1033,6 @@ struct iso20_dc_Dynamic_DC_CLResControlModeType {
     struct iso20_dc_RationalNumberType EVSEMaximumChargeCurrent;
     // EVSEMaximumVoltage, RationalNumberType
     struct iso20_dc_RationalNumberType EVSEMaximumVoltage;
-
-};
-
-// Element: definition=complex; name={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLResControlMode; type={urn:iso:std:iso:15118:-20:DC}Scheduled_DC_CLResControlModeType; base type=Scheduled_CLResControlModeType; content type=ELEMENT-ONLY;
-//          abstract=False; final=False; derivation=extension;
-// Particle: EVSEMaximumChargePower, RationalNumberType (0, 1); EVSEMinimumChargePower, RationalNumberType (0, 1); EVSEMaximumChargeCurrent, RationalNumberType (0, 1); EVSEMaximumVoltage, RationalNumberType (0, 1);
-struct iso20_dc_Scheduled_DC_CLResControlModeType {
-    // EVSEMaximumChargePower, RationalNumberType
-    struct iso20_dc_RationalNumberType EVSEMaximumChargePower;
-    unsigned int EVSEMaximumChargePower_isUsed:1;
-    // EVSEMinimumChargePower, RationalNumberType
-    struct iso20_dc_RationalNumberType EVSEMinimumChargePower;
-    unsigned int EVSEMinimumChargePower_isUsed:1;
-    // EVSEMaximumChargeCurrent, RationalNumberType
-    struct iso20_dc_RationalNumberType EVSEMaximumChargeCurrent;
-    unsigned int EVSEMaximumChargeCurrent_isUsed:1;
-    // EVSEMaximumVoltage, RationalNumberType
-    struct iso20_dc_RationalNumberType EVSEMaximumVoltage;
-    unsigned int EVSEMaximumVoltage_isUsed:1;
 
 };
 
