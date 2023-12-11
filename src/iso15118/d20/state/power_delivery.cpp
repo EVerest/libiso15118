@@ -5,7 +5,6 @@
 #include <iso15118/d20/state/session_stop.hpp>
 
 #include <iso15118/detail/d20/context_helper.hpp>
-#include <iso15118/detail/d20/error.hpp>
 #include <iso15118/detail/d20/state/dc_pre_charge.hpp>
 #include <iso15118/detail/d20/state/power_delivery.hpp>
 #include <iso15118/detail/helper.hpp>
@@ -87,44 +86,7 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
 
         // Sequence Error
         const message_20::Type req_type = variant->get_type();
-
-        if (req_type == message_20::Type::SessionSetupReq) {
-            const auto res = handle_sequence_error<message_20::SessionSetupResponse>(ctx.session);
-            ctx.respond(res);
-        } else if (req_type == message_20::Type::AuthorizationSetupReq) {
-            const auto res = handle_sequence_error<message_20::AuthorizationSetupResponse>(ctx.session);
-            ctx.respond(res);
-        } else if (req_type == message_20::Type::AuthorizationReq) {
-            const auto res = handle_sequence_error<message_20::AuthorizationResponse>(ctx.session);
-            ctx.respond(res);
-        } else if (req_type == message_20::Type::ServiceDiscoveryReq) {
-            const auto res = handle_sequence_error<message_20::ServiceDiscoveryResponse>(ctx.session);
-            ctx.respond(res);
-        } else if (req_type == message_20::Type::ServiceDetailReq) {
-            const auto res = handle_sequence_error<message_20::ServiceDetailResponse>(ctx.session);
-            ctx.respond(res);
-        } else if (req_type == message_20::Type::ServiceSelectionReq) {
-            const auto res = handle_sequence_error<message_20::ServiceSelectionResponse>(ctx.session);
-            ctx.respond(res);
-        } else if (req_type == message_20::Type::DC_ChargeParameterDiscoveryReq) {
-            const auto res = handle_sequence_error<message_20::DC_ChargeParameterDiscoveryResponse>(ctx.session);
-            ctx.respond(res);
-        } else if (req_type == message_20::Type::ScheduleExchangeReq) {
-            const auto res = handle_sequence_error<message_20::ScheduleExchangeResponse>(ctx.session);
-            ctx.respond(res);
-        } else if (req_type == message_20::Type::DC_CableCheckReq) {
-            const auto res = handle_sequence_error<message_20::DC_CableCheckResponse>(ctx.session);
-            ctx.respond(res);
-        } else if (req_type == message_20::Type::DC_ChargeLoopReq) {
-            const auto res = handle_sequence_error<message_20::DC_ChargeLoopResponse>(ctx.session);
-            ctx.respond(res);
-        } else if (req_type == message_20::Type::DC_WeldingDetectionReq) {
-            const auto res = handle_sequence_error<message_20::DC_WeldingDetectionResponse>(ctx.session);
-            ctx.respond(res);
-        } else if (req_type == message_20::Type::SessionStopReq) {
-            const auto res = handle_sequence_error<message_20::SessionStopResponse>(ctx.session);
-            ctx.respond(res);
-        }
+        send_sequence_error(req_type, ctx);
 
         ctx.session_stopped = true;
         return sa.PASS_ON;

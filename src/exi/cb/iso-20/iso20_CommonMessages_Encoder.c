@@ -19829,569 +19829,624 @@ int encode_iso20_exiFragment(exi_bitstream_t* stream, struct iso20_exiFragment* 
     if (error == EXI_ERROR__NO_ERROR)
     {
         // AbsolutePriceSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
-        if (0 == 1)
+        if (exiFrag->AbsolutePriceSchedule_isUsed == 1)
         {
-            error = EXI_ERROR__NOT_IMPLEMENTED_YET;
-        }
-        // AdditionalSelectedServices (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 1
-        // AdditionalService (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 2
-        // AdditionalServicesCosts (urn:iso:std:iso:15118:-20:CommonTypes)
-        // event 3
-        // Amount (urn:iso:std:iso:15118:-20:CommonTypes)
-        // event 4
-        // AppliesMinimumMaximumCost (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 5
-        // AppliesToEnergyFee (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 6
-        // AppliesToOverstayFee (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 7
-        // AppliesToParkingFee (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 8
-        // AuthorizationReq (urn:iso:std:iso:15118:-20:CommonMessages)
-        else if (exiFrag->AuthorizationReq_isUsed == 1)
-        {
-            // encode event 9
-            error = exi_basetypes_encoder_nbit_uint(stream, 9, 9);
+            // encode event 0
+            error = exi_basetypes_encoder_nbit_uint(stream, 9, 0);
             if (error == EXI_ERROR__NO_ERROR)
             {
-                error = encode_iso20_AuthorizationReqType(stream, &exiFrag->AuthorizationReq);
+                error = encode_iso20_AbsolutePriceScheduleType(stream, &exiFrag->AbsolutePriceSchedule);
             }
         }
-        // AuthorizationRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // AckMaxDelay (urn:iso:std:iso:15118:-20:CommonTypes)
+        // event 1
+        // AdditionalSelectedServices (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 2
+        // AdditionalService (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 3
+        // AdditionalServicesCosts (urn:iso:std:iso:15118:-20:CommonTypes)
+        // event 4
+        // Amount (urn:iso:std:iso:15118:-20:CommonTypes)
+        // event 5
+        // AppliesMinimumMaximumCost (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 6
+        // AppliesToEnergyFee (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 7
+        // AppliesToOverstayFee (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 8
+        // AppliesToParkingFee (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 9
+        // AuthorizationReq (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 10
-        // AuthorizationServices (urn:iso:std:iso:15118:-20:CommonMessages)
+        // AuthorizationRes (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 11
-        // AuthorizationSetupReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // AuthorizationServices (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 12
-        // AuthorizationSetupRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // AuthorizationSetupReq (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 13
-        // AvailableEnergy (urn:iso:std:iso:15118:-20:CommonMessages)
+        // AuthorizationSetupRes (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 14
-        // BPT_ChannelSelection (urn:iso:std:iso:15118:-20:CommonMessages)
+        // AvailableEnergy (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 15
-        // BPT_DischargedEnergyReadingWh (urn:iso:std:iso:15118:-20:CommonTypes)
+        // BPT_ChannelSelection (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 16
-        // BPT_InductiveEnergyReadingVARh (urn:iso:std:iso:15118:-20:CommonTypes)
+        // BPT_DischargedEnergyReadingWh (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 17
-        // CLReqControlMode (urn:iso:std:iso:15118:-20:CommonTypes)
+        // BPT_InductiveEnergyReadingVARh (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 18
-        // CLResControlMode (urn:iso:std:iso:15118:-20:CommonTypes)
+        // BatteryEnergyCapacity (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 19
-        // CPSCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
+        // CLReqControlMode (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 20
-        // CanonicalizationMethod (http://www.w3.org/2000/09/xmldsig#)
+        // CLResControlMode (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 21
-        // CapacitiveEnergyReadingVARh (urn:iso:std:iso:15118:-20:CommonTypes)
+        // CPSCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 22
-        // CarbonDioxideEmission (urn:iso:std:iso:15118:-20:CommonMessages)
+        // CanonicalizationMethod (http://www.w3.org/2000/09/xmldsig#)
         // event 23
-        // Certificate (urn:iso:std:iso:15118:-20:CommonMessages)
+        // CapacitiveEnergyReadingVARh (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 24
+        // CarbonDioxideEmission (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 25
+        // Certificate (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 26
         // CertificateInstallationReq (urn:iso:std:iso:15118:-20:CommonMessages)
         else if (exiFrag->CertificateInstallationReq_isUsed == 1)
         {
-            // encode event 25
-            error = exi_basetypes_encoder_nbit_uint(stream, 9, 25);
+            // encode event 27
+            error = exi_basetypes_encoder_nbit_uint(stream, 9, 27);
             if (error == EXI_ERROR__NO_ERROR)
             {
                 error = encode_iso20_CertificateInstallationReqType(stream, &exiFrag->CertificateInstallationReq);
             }
         }
         // CertificateInstallationRes (urn:iso:std:iso:15118:-20:CommonMessages)
-        else if (exiFrag->CertificateInstallationRes_isUsed == 1)
-        {
-            // encode event 26
-            error = exi_basetypes_encoder_nbit_uint(stream, 9, 26);
-            if (error == EXI_ERROR__NO_ERROR)
-            {
-                error = encode_iso20_CertificateInstallationResType(stream, &exiFrag->CertificateInstallationRes);
-            }
-        }
-        // CertificateInstallationService (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 27
-        // ChargeProgress (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 28
-        // ChargedEnergyReadingWh (urn:iso:std:iso:15118:-20:CommonTypes)
+        // CertificateInstallationService (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 29
-        // ChargingSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ChargeProgress (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 30
-        // ChargingSession (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ChargedEnergyReadingWh (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 31
-        // CheckOutTime (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ChargingComplete (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 32
-        // ContractCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ChargingSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 33
-        // CostPerUnit (urn:iso:std:iso:15118:-20:CommonTypes)
+        // ChargingSession (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 34
-        // Currency (urn:iso:std:iso:15118:-20:CommonMessages)
+        // CheckOutTime (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 35
-        // DHPublicKey (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ContractCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 36
-        // DSAKeyValue (http://www.w3.org/2000/09/xmldsig#)
+        // CostPerUnit (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 37
-        // DepartureTime (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Currency (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 38
-        // DeviceLocation (urn:iso:std:iso:15118:-20:CommonMessages)
+        // DHPublicKey (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 39
-        // DeviceOffset (urn:iso:std:iso:15118:-20:CommonMessages)
+        // DSAKeyValue (http://www.w3.org/2000/09/xmldsig#)
         // event 40
-        // DigestMethod (http://www.w3.org/2000/09/xmldsig#)
+        // DepartureTime (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 41
-        // DigestValue (http://www.w3.org/2000/09/xmldsig#)
+        // DepartureTime (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 42
-        // DischargingSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+        // DeviceLocation (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 43
-        // Duration (urn:iso:std:iso:15118:-20:CommonMessages)
+        // DeviceOffset (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 44
-        // Dynamic_EVPPTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // DigestMethod (http://www.w3.org/2000/09/xmldsig#)
         // event 45
-        // Dynamic_SEReqControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // DigestValue (http://www.w3.org/2000/09/xmldsig#)
         // event 46
-        // Dynamic_SEResControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // DischargingSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 47
-        // Dynamic_SMDTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // DisplayParameters (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 48
-        // ECDHCurve (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Duration (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 49
-        // EIM_AReqAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Dynamic_EVPPTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 50
-        // EIM_ASResAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Dynamic_SEReqControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 51
-        // EMAID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Dynamic_SEResControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 52
-        // EVAbsolutePriceSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Dynamic_SMDTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 53
-        // EVCCID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ECDHCurve (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 54
-        // EVCheckInStatus (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EIM_AReqAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 55
-        // EVCheckOutStatus (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EIM_ASResAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 56
-        // EVEnergyOffer (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EMAID (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 57
-        // EVMaximumEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVAbsolutePriceSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 58
-        // EVMaximumV2XEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVCCID (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 59
-        // EVMinimumEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVCheckInStatus (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 60
-        // EVMinimumV2XEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVCheckOutStatus (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 61
-        // EVPowerProfile (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVEnergyOffer (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 62
-        // EVPowerProfileEntries (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVMaximumEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 63
-        // EVPowerProfileEntry (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVMaximumEnergyRequest (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 64
-        // EVPowerSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVMaximumV2XEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 65
-        // EVPowerScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVMinimumEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 66
-        // EVPowerScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVMinimumEnergyRequest (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 67
-        // EVPriceRule (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVMinimumV2XEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 68
-        // EVPriceRuleStack (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVPowerProfile (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 69
-        // EVPriceRuleStacks (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVPowerProfileEntries (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 70
-        // EVProcessing (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVPowerProfileEntry (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 71
-        // EVSECheckOutStatus (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVPowerSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 72
-        // EVSEID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVPowerScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 73
-        // EVSENotification (urn:iso:std:iso:15118:-20:CommonTypes)
+        // EVPowerScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 74
-        // EVSEProcessing (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVPriceRule (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 75
-        // EVSEStatus (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVPriceRuleStack (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 76
-        // EVTargetEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVPriceRuleStacks (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 77
-        // EVTerminationCode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVProcessing (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 78
-        // EVTerminationExplanation (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVSECheckOutStatus (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 79
-        // EnergyCosts (urn:iso:std:iso:15118:-20:CommonTypes)
+        // EVSEID (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 80
-        // EnergyFee (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVSENotification (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 81
-        // EnergyTransferServiceList (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVSEProcessing (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 82
-        // Exponent (http://www.w3.org/2000/09/xmldsig#)
+        // EVSEStatus (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 83
-        // Exponent (urn:iso:std:iso:15118:-20:CommonTypes)
+        // EVSEStatus (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 84
-        // FreeService (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVTargetEnergyRequest (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 85
-        // G (http://www.w3.org/2000/09/xmldsig#)
+        // EVTargetEnergyRequest (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 86
-        // GenChallenge (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVTerminationCode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 87
-        // GoToPause (urn:iso:std:iso:15118:-20:CommonMessages)
+        // EVTerminationExplanation (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 88
-        // HMACOutputLength (http://www.w3.org/2000/09/xmldsig#)
+        // EnergyCosts (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 89
-        // Header (urn:iso:std:iso:15118:-20:CommonTypes)
+        // EnergyFee (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 90
-        // J (http://www.w3.org/2000/09/xmldsig#)
+        // EnergyTransferServiceList (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 91
-        // KeyInfo (http://www.w3.org/2000/09/xmldsig#)
+        // Exponent (http://www.w3.org/2000/09/xmldsig#)
         // event 92
-        // KeyName (http://www.w3.org/2000/09/xmldsig#)
+        // Exponent (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 93
-        // KeyValue (http://www.w3.org/2000/09/xmldsig#)
+        // FreeService (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 94
-        // Language (urn:iso:std:iso:15118:-20:CommonMessages)
+        // G (http://www.w3.org/2000/09/xmldsig#)
         // event 95
-        // ListOfRootCertificateIDs (urn:iso:std:iso:15118:-20:CommonMessages)
+        // GenChallenge (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 96
-        // Manifest (http://www.w3.org/2000/09/xmldsig#)
+        // GoToPause (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 97
-        // MaximumContractCertificateChains (urn:iso:std:iso:15118:-20:CommonMessages)
+        // HMACOutputLength (http://www.w3.org/2000/09/xmldsig#)
         // event 98
-        // MaximumCost (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Header (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 99
-        // MaximumSupportingPoints (urn:iso:std:iso:15118:-20:CommonMessages)
+        // InletHot (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 100
-        // MeterID (urn:iso:std:iso:15118:-20:CommonTypes)
+        // J (http://www.w3.org/2000/09/xmldsig#)
         // event 101
-        // MeterInfo (urn:iso:std:iso:15118:-20:CommonMessages)
+        // KeyInfo (http://www.w3.org/2000/09/xmldsig#)
         // event 102
-        // MeterSignature (urn:iso:std:iso:15118:-20:CommonTypes)
+        // KeyName (http://www.w3.org/2000/09/xmldsig#)
         // event 103
-        // MeterStatus (urn:iso:std:iso:15118:-20:CommonTypes)
+        // KeyValue (http://www.w3.org/2000/09/xmldsig#)
         // event 104
-        // MeterTimestamp (urn:iso:std:iso:15118:-20:CommonTypes)
+        // Language (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 105
+        // ListOfRootCertificateIDs (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 106
+        // Manifest (http://www.w3.org/2000/09/xmldsig#)
+        // event 107
+        // MaximumContractCertificateChains (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 108
+        // MaximumCost (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 109
+        // MaximumSOC (urn:iso:std:iso:15118:-20:CommonTypes)
+        // event 110
+        // MaximumSupportingPoints (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 111
+        // MeterID (urn:iso:std:iso:15118:-20:CommonTypes)
+        // event 112
+        // MeterInfo (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 113
+        // MeterInfo (urn:iso:std:iso:15118:-20:CommonTypes)
+        // event 114
+        // MeterInfoRequested (urn:iso:std:iso:15118:-20:CommonTypes)
+        // event 115
+        // MeterSignature (urn:iso:std:iso:15118:-20:CommonTypes)
+        // event 116
+        // MeterStatus (urn:iso:std:iso:15118:-20:CommonTypes)
+        // event 117
+        // MeterTimestamp (urn:iso:std:iso:15118:-20:CommonTypes)
+        // event 118
         // MeteringConfirmationReq (urn:iso:std:iso:15118:-20:CommonMessages)
         else if (exiFrag->MeteringConfirmationReq_isUsed == 1)
         {
-            // encode event 106
-            error = exi_basetypes_encoder_nbit_uint(stream, 9, 106);
+            // encode event 119
+            error = exi_basetypes_encoder_nbit_uint(stream, 9, 119);
             if (error == EXI_ERROR__NO_ERROR)
             {
                 error = encode_iso20_MeteringConfirmationReqType(stream, &exiFrag->MeteringConfirmationReq);
             }
         }
         // MeteringConfirmationRes (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 107
-        // MgmtData (http://www.w3.org/2000/09/xmldsig#)
-        // event 108
-        // MinimumCost (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 109
-        // MinimumSOC (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 110
-        // Modulus (http://www.w3.org/2000/09/xmldsig#)
-        // event 111
-        // NotificationMaxDelay (urn:iso:std:iso:15118:-20:CommonTypes)
-        // event 112
-        // NumberOfPriceLevels (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 113
-        // OEMProvisioningCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 114
-        // Object (http://www.w3.org/2000/09/xmldsig#)
-        // event 115
-        // OccupancyCosts (urn:iso:std:iso:15118:-20:CommonTypes)
-        // event 116
-        // OverstayCosts (urn:iso:std:iso:15118:-20:CommonTypes)
-        // event 117
-        // OverstayFee (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 118
-        // OverstayFeePeriod (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 119
-        // OverstayPowerThreshold (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 120
-        // OverstayRule (urn:iso:std:iso:15118:-20:CommonMessages)
+        // MgmtData (http://www.w3.org/2000/09/xmldsig#)
         // event 121
-        // OverstayRuleDescription (urn:iso:std:iso:15118:-20:CommonMessages)
+        // MinimumCost (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 122
-        // OverstayRules (urn:iso:std:iso:15118:-20:CommonMessages)
+        // MinimumSOC (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 123
-        // OverstayTimeThreshold (urn:iso:std:iso:15118:-20:CommonMessages)
+        // MinimumSOC (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 124
-        // P (http://www.w3.org/2000/09/xmldsig#)
+        // Modulus (http://www.w3.org/2000/09/xmldsig#)
         // event 125
-        // PGPData (http://www.w3.org/2000/09/xmldsig#)
+        // NotificationMaxDelay (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 126
-        // PGPKeyID (http://www.w3.org/2000/09/xmldsig#)
+        // NumberOfPriceLevels (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 127
-        // PGPKeyPacket (http://www.w3.org/2000/09/xmldsig#)
+        // OEMProvisioningCertificateChain (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 128
-        // Parameter (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Object (http://www.w3.org/2000/09/xmldsig#)
         // event 129
-        // ParameterSet (urn:iso:std:iso:15118:-20:CommonMessages)
+        // OccupancyCosts (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 130
-        // ParameterSetID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // OverstayCosts (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 131
-        // ParkingFee (urn:iso:std:iso:15118:-20:CommonMessages)
+        // OverstayFee (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 132
-        // ParkingFeePeriod (urn:iso:std:iso:15118:-20:CommonMessages)
+        // OverstayFeePeriod (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 133
-        // ParkingMethod (urn:iso:std:iso:15118:-20:CommonMessages)
+        // OverstayPowerThreshold (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 134
-        // ParkingSpace (urn:iso:std:iso:15118:-20:CommonMessages)
+        // OverstayRule (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 135
-        // PgenCounter (http://www.w3.org/2000/09/xmldsig#)
+        // OverstayRuleDescription (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 136
-        // PnC_AReqAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // OverstayRules (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 137
-        // PnC_ASResAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // OverstayTimeThreshold (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 138
-        // Power (urn:iso:std:iso:15118:-20:CommonMessages)
+        // P (http://www.w3.org/2000/09/xmldsig#)
         // event 139
-        // PowerDeliveryReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PGPData (http://www.w3.org/2000/09/xmldsig#)
         // event 140
-        // PowerDeliveryRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PGPKeyID (http://www.w3.org/2000/09/xmldsig#)
         // event 141
-        // PowerRangeStart (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PGPKeyPacket (http://www.w3.org/2000/09/xmldsig#)
         // event 142
-        // PowerSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Parameter (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 143
-        // PowerScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ParameterSet (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 144
-        // PowerScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ParameterSetID (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 145
-        // PowerTolerance (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ParkingFee (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 146
-        // PowerToleranceAcceptance (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ParkingFeePeriod (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 147
-        // Power_L2 (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ParkingMethod (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 148
-        // Power_L3 (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ParkingSpace (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 149
-        // PriceAlgorithm (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PgenCounter (http://www.w3.org/2000/09/xmldsig#)
         // event 150
-        // PriceLevel (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 151
-        // PriceLevelSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PnC_AReqAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        else if (exiFrag->PnC_AReqAuthorizationMode_isUsed == 1)
+        {
+            // encode event 151
+            error = exi_basetypes_encoder_nbit_uint(stream, 9, 151);
+            if (error == EXI_ERROR__NO_ERROR)
+            {
+                error = encode_iso20_PnC_AReqAuthorizationModeType(stream, &exiFrag->PnC_AReqAuthorizationMode);
+            }
+        }
+        // PnC_ASResAuthorizationMode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 152
-        // PriceLevelScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Power (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 153
-        // PriceLevelScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PowerDeliveryReq (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 154
-        // PriceRule (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PowerDeliveryRes (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 155
-        // PriceRuleStack (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PowerRangeStart (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 156
-        // PriceRuleStacks (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PowerSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 157
-        // PriceScheduleDescription (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PowerScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 158
-        // PriceScheduleID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PowerScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 159
-        // PrioritizedEMAIDs (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PowerTolerance (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 160
-        // ProviderID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PowerToleranceAcceptance (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 161
-        // Q (http://www.w3.org/2000/09/xmldsig#)
+        // Power_L2 (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 162
-        // RSAKeyValue (http://www.w3.org/2000/09/xmldsig#)
+        // Power_L3 (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 163
-        // Receipt (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PresentSOC (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 164
-        // Reference (http://www.w3.org/2000/09/xmldsig#)
+        // PriceAlgorithm (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 165
-        // RemainingContractCertificateChains (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PriceLevel (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 166
-        // RenewableGenerationPercentage (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PriceLevelSchedule (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 167
-        // ResponseCode (urn:iso:std:iso:15118:-20:CommonTypes)
+        // PriceLevelScheduleEntries (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 168
-        // RetrievalMethod (http://www.w3.org/2000/09/xmldsig#)
+        // PriceLevelScheduleEntry (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 169
-        // RootCertificateID (urn:iso:std:iso:15118:-20:CommonTypes)
+        // PriceRule (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 170
-        // SECP521_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PriceRuleStack (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 171
-        // SPKIData (http://www.w3.org/2000/09/xmldsig#)
+        // PriceRuleStacks (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 172
-        // SPKISexp (http://www.w3.org/2000/09/xmldsig#)
+        // PriceScheduleDescription (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 173
-        // ScheduleExchangeReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PriceScheduleID (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 174
-        // ScheduleExchangeRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // PrioritizedEMAIDs (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 175
-        // ScheduleTuple (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ProviderID (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 176
-        // ScheduleTupleID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Q (http://www.w3.org/2000/09/xmldsig#)
         // event 177
-        // Scheduled_EVPPTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // RSAKeyValue (http://www.w3.org/2000/09/xmldsig#)
         // event 178
-        // Scheduled_SEReqControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Receipt (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 179
-        // Scheduled_SEResControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Receipt (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 180
-        // Scheduled_SMDTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Reference (http://www.w3.org/2000/09/xmldsig#)
         // event 181
-        // Seed (http://www.w3.org/2000/09/xmldsig#)
+        // RemainingContractCertificateChains (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 182
-        // SelectedAuthorizationService (urn:iso:std:iso:15118:-20:CommonMessages)
+        // RemainingTimeToMaximumSOC (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 183
-        // SelectedEnergyTransferService (urn:iso:std:iso:15118:-20:CommonMessages)
+        // RemainingTimeToMinimumSOC (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 184
-        // SelectedScheduleTupleID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // RemainingTimeToTargetSOC (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 185
-        // SelectedService (urn:iso:std:iso:15118:-20:CommonMessages)
+        // RenewableGenerationPercentage (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 186
-        // SelectedVASList (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ResponseCode (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 187
-        // Service (urn:iso:std:iso:15118:-20:CommonMessages)
+        // RetrievalMethod (http://www.w3.org/2000/09/xmldsig#)
         // event 188
-        // ServiceDetailReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // RootCertificateID (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 189
-        // ServiceDetailRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // SECP521_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 190
-        // ServiceDiscoveryReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // SPKIData (http://www.w3.org/2000/09/xmldsig#)
         // event 191
-        // ServiceDiscoveryRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // SPKISexp (http://www.w3.org/2000/09/xmldsig#)
         // event 192
-        // ServiceFee (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ScheduleExchangeReq (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 193
-        // ServiceID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ScheduleExchangeRes (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 194
-        // ServiceName (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ScheduleTuple (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 195
-        // ServiceParameterList (urn:iso:std:iso:15118:-20:CommonMessages)
+        // ScheduleTupleID (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 196
-        // ServiceRenegotiationSupported (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Scheduled_EVPPTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 197
-        // ServiceSelectionReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Scheduled_SEReqControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 198
-        // ServiceSelectionRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Scheduled_SEResControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 199
-        // SessionID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Scheduled_SMDTControlMode (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 200
-        // SessionID (urn:iso:std:iso:15118:-20:CommonTypes)
+        // Seed (http://www.w3.org/2000/09/xmldsig#)
         // event 201
-        // SessionSetupReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // SelectedAuthorizationService (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 202
-        // SessionSetupRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // SelectedEnergyTransferService (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 203
-        // SessionStopReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // SelectedScheduleTupleID (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 204
-        // SessionStopRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // SelectedService (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 205
-        // Signature (http://www.w3.org/2000/09/xmldsig#)
+        // SelectedVASList (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 206
-        // SignatureMethod (http://www.w3.org/2000/09/xmldsig#)
+        // Service (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 207
-        // SignatureProperties (http://www.w3.org/2000/09/xmldsig#)
+        // ServiceDetailReq (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 208
-        // SignatureProperty (http://www.w3.org/2000/09/xmldsig#)
+        // ServiceDetailRes (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 209
-        // SignatureValue (http://www.w3.org/2000/09/xmldsig#)
+        // ServiceDiscoveryReq (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 210
+        // ServiceDiscoveryRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 211
+        // ServiceFee (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 212
+        // ServiceID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 213
+        // ServiceName (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 214
+        // ServiceParameterList (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 215
+        // ServiceRenegotiationSupported (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 216
+        // ServiceSelectionReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 217
+        // ServiceSelectionRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 218
+        // SessionID (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 219
+        // SessionID (urn:iso:std:iso:15118:-20:CommonTypes)
+        // event 220
+        // SessionSetupReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 221
+        // SessionSetupRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 222
+        // SessionStopReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 223
+        // SessionStopRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 224
+        // Signature (http://www.w3.org/2000/09/xmldsig#)
+        // event 225
+        // SignatureMethod (http://www.w3.org/2000/09/xmldsig#)
+        // event 226
+        // SignatureProperties (http://www.w3.org/2000/09/xmldsig#)
+        // event 227
+        // SignatureProperty (http://www.w3.org/2000/09/xmldsig#)
+        // event 228
+        // SignatureValue (http://www.w3.org/2000/09/xmldsig#)
+        // event 229
         // SignedInfo (http://www.w3.org/2000/09/xmldsig#)
         else if (exiFrag->SignedInfo_isUsed == 1)
         {
-            // encode event 211
-            error = exi_basetypes_encoder_nbit_uint(stream, 9, 211);
+            // encode event 230
+            error = exi_basetypes_encoder_nbit_uint(stream, 9, 230);
             if (error == EXI_ERROR__NO_ERROR)
             {
                 error = encode_iso20_SignedInfoType(stream, &exiFrag->SignedInfo);
             }
         }
         // SignedInstallationData (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 212
+        else if (exiFrag->SignedInstallationData_isUsed == 1)
+        {
+            // encode event 231
+            error = exi_basetypes_encoder_nbit_uint(stream, 9, 231);
+            if (error == EXI_ERROR__NO_ERROR)
+            {
+                error = encode_iso20_SignedInstallationDataType(stream, &exiFrag->SignedInstallationData);
+            }
+        }
         // SignedMeteringData (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 213
-        // StartTime (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 214
-        // SubCertificates (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 215
-        // SupportedProviders (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 216
-        // SupportedServiceIDs (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 217
-        // TPM_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 218
-        // TargetDistance (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 219
-        // TargetSOC (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 220
-        // TaxCosts (urn:iso:std:iso:15118:-20:CommonTypes)
-        // event 221
-        // TaxIncludedInPrice (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 222
-        // TaxRate (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 223
-        // TaxRule (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 224
-        // TaxRuleID (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 225
-        // TaxRuleID (urn:iso:std:iso:15118:-20:CommonTypes)
-        // event 226
-        // TaxRuleName (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 227
-        // TaxRules (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 228
-        // TimeAnchor (urn:iso:std:iso:15118:-20:CommonMessages)
-        // event 229
-        // TimeAnchor (urn:iso:std:iso:15118:-20:CommonTypes)
-        // event 230
-        // TimeStamp (urn:iso:std:iso:15118:-20:CommonTypes)
-        // event 231
-        // Transform (http://www.w3.org/2000/09/xmldsig#)
         // event 232
-        // Transforms (http://www.w3.org/2000/09/xmldsig#)
+        // StartTime (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 233
-        // VASList (urn:iso:std:iso:15118:-20:CommonMessages)
+        // SubCertificates (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 234
-        // Value (urn:iso:std:iso:15118:-20:CommonTypes)
+        // SupportedProviders (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 235
-        // VehicleCheckInReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // SupportedServiceIDs (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 236
-        // VehicleCheckInRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // TPM_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 237
-        // VehicleCheckOutReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // TargetDistance (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 238
-        // VehicleCheckOutRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // TargetOffsetX (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 239
-        // VehicleFrame (urn:iso:std:iso:15118:-20:CommonMessages)
+        // TargetOffsetY (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 240
-        // VehicleTravel (urn:iso:std:iso:15118:-20:CommonMessages)
+        // TargetSOC (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 241
-        // X448_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
+        // TargetSOC (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 242
-        // X509CRL (http://www.w3.org/2000/09/xmldsig#)
+        // TaxCosts (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 243
-        // X509Certificate (http://www.w3.org/2000/09/xmldsig#)
+        // TaxIncludedInPrice (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 244
-        // X509Data (http://www.w3.org/2000/09/xmldsig#)
+        // TaxRate (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 245
-        // X509IssuerName (http://www.w3.org/2000/09/xmldsig#)
+        // TaxRule (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 246
-        // X509IssuerSerial (http://www.w3.org/2000/09/xmldsig#)
+        // TaxRuleID (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 247
-        // X509SKI (http://www.w3.org/2000/09/xmldsig#)
+        // TaxRuleID (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 248
-        // X509SerialNumber (http://www.w3.org/2000/09/xmldsig#)
+        // TaxRuleName (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 249
-        // X509SubjectName (http://www.w3.org/2000/09/xmldsig#)
+        // TaxRules (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 250
-        // XPath (http://www.w3.org/2000/09/xmldsig#)
+        // TimeAnchor (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 251
-        // Y (http://www.w3.org/2000/09/xmldsig#)
+        // TimeAnchor (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 252
-        // boolValue (urn:iso:std:iso:15118:-20:CommonMessages)
+        // TimeStamp (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 253
-        // byteValue (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Transform (http://www.w3.org/2000/09/xmldsig#)
         // event 254
-        // finiteString (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Transforms (http://www.w3.org/2000/09/xmldsig#)
         // event 255
-        // intValue (urn:iso:std:iso:15118:-20:CommonMessages)
+        // VASList (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 256
-        // rationalNumber (urn:iso:std:iso:15118:-20:CommonMessages)
+        // Value (urn:iso:std:iso:15118:-20:CommonTypes)
         // event 257
-        // shortValue (urn:iso:std:iso:15118:-20:CommonMessages)
+        // VehicleCheckInReq (urn:iso:std:iso:15118:-20:CommonMessages)
         // event 258
+        // VehicleCheckInRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 259
+        // VehicleCheckOutReq (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 260
+        // VehicleCheckOutRes (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 261
+        // VehicleFrame (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 262
+        // VehicleTravel (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 263
+        // X448_EncryptedPrivateKey (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 264
+        // X509CRL (http://www.w3.org/2000/09/xmldsig#)
+        // event 265
+        // X509Certificate (http://www.w3.org/2000/09/xmldsig#)
+        // event 266
+        // X509Data (http://www.w3.org/2000/09/xmldsig#)
+        // event 267
+        // X509IssuerName (http://www.w3.org/2000/09/xmldsig#)
+        // event 268
+        // X509IssuerSerial (http://www.w3.org/2000/09/xmldsig#)
+        // event 269
+        // X509SKI (http://www.w3.org/2000/09/xmldsig#)
+        // event 270
+        // X509SerialNumber (http://www.w3.org/2000/09/xmldsig#)
+        // event 271
+        // X509SubjectName (http://www.w3.org/2000/09/xmldsig#)
+        // event 272
+        // XPath (http://www.w3.org/2000/09/xmldsig#)
+        // event 273
+        // Y (http://www.w3.org/2000/09/xmldsig#)
+        // event 274
+        // boolValue (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 275
+        // byteValue (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 276
+        // finiteString (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 277
+        // intValue (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 278
+        // rationalNumber (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 279
+        // shortValue (urn:iso:std:iso:15118:-20:CommonMessages)
+        // event 280
         else
         {
             error = EXI_ERROR__UNKNOWN_EVENT_FOR_ENCODING;
+        }
+
+        if (error == EXI_ERROR__NO_ERROR)
+        {
+            // End Fragment
+            error = exi_basetypes_encoder_nbit_uint(stream, 9, 282);
         }
     }
 
@@ -20674,6 +20729,12 @@ int encode_iso20_xmldsigFragment(exi_bitstream_t* stream, struct iso20_xmldsigFr
         else
         {
             error = EXI_ERROR__UNKNOWN_EVENT_FOR_ENCODING;
+        }
+
+        if (error == EXI_ERROR__NO_ERROR)
+        {
+            // End Fragment
+            error = exi_basetypes_encoder_nbit_uint(stream, 6, 46);
         }
     }
 

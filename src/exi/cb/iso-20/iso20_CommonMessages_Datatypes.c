@@ -628,11 +628,12 @@ void init_iso20_SignaturePropertiesType(struct iso20_SignaturePropertiesType* Si
 
 // init for fragment
 void init_iso20_exiFragment(struct iso20_exiFragment* exiFrag) {
-    exiFrag->AuthorizationReq_isUsed = 0u;
+    exiFrag->AbsolutePriceSchedule_isUsed = 0u;
     exiFrag->CertificateInstallationReq_isUsed = 0u;
-    exiFrag->CertificateInstallationRes_isUsed = 0u;
     exiFrag->MeteringConfirmationReq_isUsed = 0u;
+    exiFrag->PnC_AReqAuthorizationMode_isUsed = 0u;
     exiFrag->SignedInfo_isUsed = 0u;
+    exiFrag->SignedInstallationData_isUsed = 0u;
 }
 
 // init for xmldsig fragment
