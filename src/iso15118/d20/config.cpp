@@ -4,7 +4,9 @@
 
 namespace iso15118::d20 {
 
-Config::Config() {
+SessionConfig::SessionConfig() {
+    evse_id = "everest se";
+
     cert_install_service = false;
     authorization_services.push_back(message_20::Authorization::EIM);
 

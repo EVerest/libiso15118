@@ -54,7 +54,6 @@ SCENARIO("Service selection state handling") {
     GIVEN("Bad case: selected_energy_transfer service is not correct - FAILED_NoEnergyTransferServiceSelected") {
 
         d20::Session session = d20::Session();
-        d20::Config config = d20::Config();
 
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
         session.offered_services.dc_parameter_list[0] = {
@@ -79,7 +78,6 @@ SCENARIO("Service selection state handling") {
 
     GIVEN("Good case") {
         d20::Session session = d20::Session();
-        d20::Config config = d20::Config();
 
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
         session.offered_services.dc_parameter_list[0] = {
@@ -104,7 +102,6 @@ SCENARIO("Service selection state handling") {
 
     GIVEN("Good case - Check if session variables is set") {
         d20::Session session = d20::Session();
-        d20::Config config = d20::Config();
 
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
         session.offered_services.dc_parameter_list[0] = {
@@ -131,7 +128,6 @@ SCENARIO("Service selection state handling") {
 
     GIVEN("Good case - DC_BPT") {
         d20::Session session = d20::Session();
-        d20::Config config = d20::Config();
 
         session.offered_services.energy_services = {message_20::ServiceCategory::DC_BPT};
         session.offered_services.dc_bpt_parameter_list[0] = {{
@@ -160,7 +156,6 @@ SCENARIO("Service selection state handling") {
 
     GIVEN("Bad case: selected_vas_list false service id - FAILED_ServiceSelectionInvalid") {
         d20::Session session = d20::Session();
-        d20::Config config = d20::Config();
 
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
         session.offered_services.dc_parameter_list[0] = {
@@ -193,7 +188,6 @@ SCENARIO("Service selection state handling") {
 
     GIVEN("Bad case: selected_vas_list false parameter set id - FAILED_ServiceSelectionInvalid") {
         d20::Session session = d20::Session();
-        d20::Config config = d20::Config();
 
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
         session.offered_services.dc_parameter_list[0] = {
@@ -226,7 +220,6 @@ SCENARIO("Service selection state handling") {
 
     GIVEN("Good case - DC & Internet & Parking") {
         d20::Session session = d20::Session();
-        d20::Config config = d20::Config();
 
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
         session.offered_services.dc_parameter_list[0] = {

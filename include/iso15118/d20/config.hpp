@@ -12,7 +12,9 @@
 
 namespace iso15118::d20 {
 
-struct Config {
+struct SessionConfig {
+    std::string evse_id{""};
+
     bool cert_install_service;
     std::vector<message_20::Authorization> authorization_services;
 
@@ -31,7 +33,7 @@ struct Config {
     DC_ModeRes evse_dc_parameter;
     BPT_DC_ModeRes evse_dc_bpt_parameter;
 
-    Config();
+    SessionConfig();
 };
 
 } // namespace iso15118::d20

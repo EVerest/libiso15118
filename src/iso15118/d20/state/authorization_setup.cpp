@@ -14,7 +14,7 @@
 namespace iso15118::d20::state {
 
 message_20::AuthorizationSetupResponse handle_request(const message_20::AuthorizationSetupRequest& req,
-                                                      d20::Session& session, const d20::Config& config) {
+                                                      d20::Session& session, const d20::SessionConfig& config) {
 
     auto res = message_20::AuthorizationSetupResponse(); // default mandatory values [V2G20-736]
 

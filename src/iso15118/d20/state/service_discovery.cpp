@@ -18,7 +18,7 @@ static bool find_service_id(const std::vector<uint16_t>& req_service_ids, const 
 }
 
 message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDiscoveryRequest& req,
-                                                    d20::Session& session, const d20::Config& config) {
+                                                    d20::Session& session, const d20::SessionConfig& config) {
 
     message_20::ServiceDiscoveryResponse res = message_20::ServiceDiscoveryResponse();
 

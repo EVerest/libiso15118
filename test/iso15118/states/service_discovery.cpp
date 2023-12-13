@@ -17,7 +17,7 @@ SCENARIO("Service discovery state handling") {
 
         session = d20::Session();
 
-        const auto res = d20::state::handle_request(req, session, d20::Config());
+        const auto res = d20::state::handle_request(req, session, d20::SessionConfig());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -37,7 +37,7 @@ SCENARIO("Service discovery state handling") {
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        d20::Config config;
+        d20::SessionConfig config;
 
         config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false},
                                                      {message_20::ServiceCategory::DC_BPT, false}};
@@ -66,7 +66,7 @@ SCENARIO("Service discovery state handling") {
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        d20::Config config;
+        d20::SessionConfig config;
 
         config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false},
                                                      {message_20::ServiceCategory::DC_BPT, false}};
@@ -103,7 +103,7 @@ SCENARIO("Service discovery state handling") {
         supported_service_ids.push_back(2);
         supported_service_ids.push_back(65);
 
-        d20::Config config;
+        d20::SessionConfig config;
 
         config.supported_energy_transfer_services = {{message_20::ServiceCategory::DC, false},
                                                      {message_20::ServiceCategory::DC_BPT, false}};

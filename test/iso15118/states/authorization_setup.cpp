@@ -17,7 +17,7 @@ SCENARIO("Authorization setup state handling") {
 
         session = d20::Session();
 
-        const auto res = d20::state::handle_request(req, session, d20::Config());
+        const auto res = d20::state::handle_request(req, session, d20::SessionConfig());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -37,7 +37,7 @@ SCENARIO("Authorization setup state handling") {
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        d20::Config config;
+        d20::SessionConfig config;
         config.cert_install_service = false;
         config.authorization_services = {message_20::Authorization::EIM};
 
@@ -62,7 +62,7 @@ SCENARIO("Authorization setup state handling") {
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        d20::Config config;
+        d20::SessionConfig config;
         config.cert_install_service = false;
         config.authorization_services = {message_20::Authorization::PnC};
 
@@ -90,7 +90,7 @@ SCENARIO("Authorization setup state handling") {
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        d20::Config config;
+        d20::SessionConfig config;
         config.cert_install_service = true;
         config.authorization_services = {message_20::Authorization::PnC, message_20::Authorization::EIM};
 
