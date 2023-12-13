@@ -13,8 +13,9 @@
 
 namespace iso15118::d20::state {
 
-message_20::AuthorizationSetupResponse handle_request(const message_20::AuthorizationSetupRequest& req,
-                                                      d20::Session& session, const d20::SessionConfig& config) {
+message_20::AuthorizationSetupResponse
+handle_request(const message_20::AuthorizationSetupRequest& req, d20::Session& session, bool cert_install_service,
+               const std::vector<message_20::Authorization>& authorization_services) {
 
     auto res = message_20::AuthorizationSetupResponse(); // default mandatory values [V2G20-736]
 
@@ -22,13 +23,13 @@ message_20::AuthorizationSetupResponse handle_request(const message_20::Authoriz
         return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
     }
 
-    res.certificate_installation_service = config.cert_install_service;
+    res.certificate_installation_service = cert_install_service;
 
-    if (config.authorization_services.empty()) {
+    if (authorization_services.empty()) {
         logf("Warning: authorization_services was not set. Setting EIM as auth_mode\n");
         res.authorization_services = {message_20::Authorization::EIM};
     } else {
-        res.authorization_services = config.authorization_services;
+        res.authorization_services = authorization_services;
     }
 
     session.offered_services.auth_services = res.authorization_services;
@@ -64,7 +65,8 @@ FsmSimpleState::HandleEventReturnType AuthorizationSetup::handle_event(Allocator
     const auto variant = ctx.get_request();
 
     if (const auto req = variant->get_if<message_20::AuthorizationSetupRequest>()) {
-        const auto res = handle_request(*req, ctx.session, ctx.config);
+        const auto res =
+            handle_request(*req, ctx.session, ctx.config.cert_install_service, ctx.config.authorization_services);
 
         logf("Timestamp: %d\n", req->header.timestamp);
 

@@ -7,9 +7,6 @@ namespace iso15118::d20 {
 SessionConfig::SessionConfig() {
     evse_id = "everest se";
 
-    cert_install_service = false;
-    authorization_services.push_back(message_20::Authorization::EIM);
-
     supported_energy_transfer_services = {{
                                               message_20::ServiceCategory::DC, // service_id
                                               false                            // free_service
