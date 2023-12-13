@@ -7,14 +7,7 @@ namespace iso15118::d20 {
 SessionConfig::SessionConfig() {
     evse_id = "everest se";
 
-    supported_energy_transfer_services = {{
-                                              message_20::ServiceCategory::DC, // service_id
-                                              false                            // free_service
-                                          },
-                                          {
-                                              message_20::ServiceCategory::DC_BPT, // service_id
-                                              false                                // free_service
-                                          }};
+    supported_energy_transfer_services = {message_20::ServiceCategory::DC, message_20::ServiceCategory::DC_BPT};
 
     dc_parameter_list.push_back({
         message_20::DcConnector::Extended,
