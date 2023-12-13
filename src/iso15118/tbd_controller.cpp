@@ -54,7 +54,16 @@ void TbdController::setup_config() {
 }
 
 // Should be called before every session
-void TbdController::setup_session() {
+void TbdController::setup_session(const std::vector<message_20::Authorization>& auth_services,
+                                  bool cert_install_service) {
+
+    if (auth_services.empty() == false) {
+        session_config.authorization_services = auth_services;
+    } else {
+        session_config.authorization_services = {{message_20::Authorization::EIM}};
+    }
+
+    session_config.cert_install_service = cert_install_service;
 }
 
 void TbdController::handle_sdp_server_input() {

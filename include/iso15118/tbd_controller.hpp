@@ -12,6 +12,8 @@
 #include "session/feedback.hpp"
 #include "session/iso.hpp"
 
+#include "message/common.hpp"
+
 namespace iso15118 {
 
 struct TbdConfig {
@@ -30,7 +32,7 @@ public:
 
     void setup_config();
 
-    void setup_session();
+    void setup_session(const std::vector<message_20::Authorization>& auth_services, bool cert_install_service);
 
 private:
     io::PollManager poll_manager;
