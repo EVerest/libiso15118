@@ -3,21 +3,22 @@
 #pragma once
 
 #include <cstdint>
-#include <vector>
 #include <variant>
+#include <vector>
 
 #include <iso15118/message/common.hpp>
-#include <iso15118/message/service_discovery.hpp>
 #include <iso15118/message/dc_charge_parameter_discovery.hpp>
 
 namespace iso15118::d20 {
 
-struct Config {
-    bool cert_install_service;
-    std::vector<message_20::Authorization> authorization_services;
+struct SessionConfig {
+    std::string evse_id{""};
 
-    std::vector<message_20::ServiceDiscoveryResponse::Service> supported_energy_transfer_services;
-    std::vector<message_20::ServiceDiscoveryResponse::Service> supported_vas_services;
+    bool cert_install_service{false};
+    std::vector<message_20::Authorization> authorization_services{{message_20::Authorization::EIM}};
+
+    std::vector<message_20::ServiceCategory> supported_energy_transfer_services;
+    std::vector<message_20::ServiceCategory> supported_vas_services;
 
     std::vector<message_20::DcParameterList> dc_parameter_list;
     std::vector<message_20::DcBptParameterList> dc_bpt_parameter_list;
@@ -31,7 +32,7 @@ struct Config {
     DC_ModeRes evse_dc_parameter;
     BPT_DC_ModeRes evse_dc_bpt_parameter;
 
-    Config();
+    SessionConfig();
 };
 
 } // namespace iso15118::d20

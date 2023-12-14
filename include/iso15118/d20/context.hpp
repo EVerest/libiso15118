@@ -53,7 +53,7 @@ class Context {
 public:
     // FIXME (aw): bundle arguments
     Context(MessageExchange&, const std::optional<ControlEvent>&, session::feedback::Callbacks, bool&,
-            session::SessionLogger&);
+            session::SessionLogger&, const d20::SessionConfig&);
 
     std::unique_ptr<message_20::Variant> get_request();
 
@@ -83,7 +83,7 @@ public:
 
     Session session;
 
-    Config config;
+    const SessionConfig& config;
 
     bool& session_stopped;
 

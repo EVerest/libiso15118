@@ -12,7 +12,7 @@
 namespace iso15118::d20::state {
 
 message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetailRequest& req, d20::Session& session,
-                                                 const d20::Config& config) {
+                                                 const d20::SessionConfig& config) {
 
     message_20::ServiceDetailResponse res;
 

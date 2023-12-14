@@ -45,7 +45,6 @@ FsmSimpleState::HandleEventReturnType SessionSetup::handle_event(AllocatorType& 
     if (const auto req = variant->get_if<message_20::SessionSetupRequest>()) {
 
         logf("Received session setup with evccid: %s\n", req->evccid.c_str());
-        ctx.config = Config(); // todo(sl): config is initialized here temporarily, needs refactoring
 
         bool new_session{true};
 
@@ -57,7 +56,7 @@ FsmSimpleState::HandleEventReturnType SessionSetup::handle_event(AllocatorType& 
             ctx.session = Session();
         }
 
-        evse_id = "everest se"; // Todo(sl): Use correct evse id from setup control_message
+        evse_id = ctx.config.evse_id;
 
         const auto res = handle_request(*req, ctx.session, evse_id, new_session);
 

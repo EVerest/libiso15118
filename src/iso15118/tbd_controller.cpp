@@ -17,6 +17,7 @@ namespace iso15118 {
 TbdController::TbdController(TbdConfig config_, session::feedback::Callbacks callbacks_) :
     config(std::move(config_)), callbacks(std::move(callbacks_)) {
     poll_manager.register_fd(sdp_server.get_fd(), [this]() { handle_sdp_server_input(); });
+    session_config = d20::SessionConfig();
 }
 
 void TbdController::loop() {
@@ -48,6 +49,23 @@ void TbdController::send_control_event(const d20::ControlEvent& event) {
     sessions.front().push_control_event(event);
 }
 
+// Should be called once
+void TbdController::setup_config() {
+}
+
+// Should be called before every session
+void TbdController::setup_session(const std::vector<message_20::Authorization>& auth_services,
+                                  bool cert_install_service) {
+
+    if (auth_services.empty() == false) {
+        session_config.authorization_services = auth_services;
+    } else {
+        session_config.authorization_services = {{message_20::Authorization::EIM}};
+    }
+
+    session_config.cert_install_service = cert_install_service;
+}
+
 void TbdController::handle_sdp_server_input() {
     auto request = sdp_server.get_peer_request();
 
@@ -77,7 +95,8 @@ void TbdController::handle_sdp_server_input() {
 
     const auto ipv6_endpoint = connection->get_public_endpoint();
 
-    const auto& new_session = sessions.emplace_back(std::move(connection), SessionConfig{}, callbacks);
+    // Todo(sl): Check if session_config is empty
+    const auto& new_session = sessions.emplace_back(std::move(connection), session_config, callbacks);
 
     sdp_server.send_response(request, ipv6_endpoint);
 }

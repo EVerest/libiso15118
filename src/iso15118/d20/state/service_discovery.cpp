@@ -18,7 +18,9 @@ static bool find_service_id(const std::vector<uint16_t>& req_service_ids, const 
 }
 
 message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDiscoveryRequest& req,
-                                                    d20::Session& session, const d20::Config& config) {
+                                                    d20::Session& session,
+                                                    const std::vector<message_20::ServiceCategory>& energy_services,
+                                                    const std::vector<message_20::ServiceCategory>& vas_services) {
 
     message_20::ServiceDiscoveryResponse res = message_20::ServiceDiscoveryResponse();
 
@@ -38,21 +40,23 @@ message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDis
 
     // EV supported service ID's
     if (req.supported_service_ids.has_value() == true) {
-        for (auto& energy_service : config.supported_energy_transfer_services) {
-            if (find_service_id(req.supported_service_ids.value(), static_cast<uint16_t>(energy_service.service_id))) {
-                energy_services_list.push_back(energy_service);
-                session.offered_services.energy_services.push_back(energy_service.service_id);
+        for (auto& energy_service : energy_services) {
+            if (find_service_id(req.supported_service_ids.value(), static_cast<uint16_t>(energy_service))) {
+                energy_services_list.push_back({energy_service, false});
             }
         }
-        for (auto& vas_service : config.supported_vas_services) {
-            if (find_service_id(req.supported_service_ids.value(), static_cast<uint16_t>(vas_service.service_id))) {
-                vas_services_list.push_back(vas_service);
-                session.offered_services.vas_services.push_back(vas_service.service_id);
+        for (auto& vas_service : vas_services) {
+            if (find_service_id(req.supported_service_ids.value(), static_cast<uint16_t>(vas_service))) {
+                vas_services_list.push_back({vas_service, false});
             }
         }
     } else {
-        energy_services_list = config.supported_energy_transfer_services;
-        vas_services_list = config.supported_vas_services;
+        for (auto& energy_service : energy_services) {
+            energy_services_list.push_back({energy_service, false});
+        }
+        for (auto& vas_service : vas_services) {
+            vas_services_list.push_back({vas_service, false});
+        }
     }
 
     for (auto& conf_energy_service : energy_services_list) {
@@ -93,7 +97,8 @@ FsmSimpleState::HandleEventReturnType ServiceDiscovery::handle_event(AllocatorTy
             }
         }
 
-        const auto res = handle_request(*req, ctx.session, ctx.config);
+        const auto res = handle_request(*req, ctx.session, ctx.config.supported_energy_transfer_services,
+                                        ctx.config.supported_vas_services);
 
         ctx.respond(res);
 

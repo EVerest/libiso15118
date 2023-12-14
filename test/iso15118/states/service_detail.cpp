@@ -19,7 +19,7 @@ SCENARIO("Service detail state handling") {
 
         session = d20::Session();
 
-        const auto res = d20::state::handle_request(req, session, d20::Config());
+        const auto res = d20::state::handle_request(req, session, d20::SessionConfig());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -46,7 +46,7 @@ SCENARIO("Service detail state handling") {
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::AC;
 
-        const auto res = d20::state::handle_request(req, session, d20::Config());
+        const auto res = d20::state::handle_request(req, session, d20::SessionConfig());
 
         THEN("ResponseCode: FAILED_ServiceIDInvalid, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_ServiceIDInvalid);
@@ -68,7 +68,7 @@ SCENARIO("Service detail state handling") {
         d20::Session session = d20::Session();
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
 
-        d20::Config config;
+        d20::SessionConfig config;
         config.dc_parameter_list = {{
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
@@ -114,7 +114,7 @@ SCENARIO("Service detail state handling") {
         d20::Session session = d20::Session();
         session.offered_services.energy_services = {message_20::ServiceCategory::DC_BPT};
 
-        d20::Config config;
+        d20::SessionConfig config;
         config.dc_bpt_parameter_list = {{
             {
                 message_20::DcConnector::Extended,
@@ -173,7 +173,7 @@ SCENARIO("Service detail state handling") {
         d20::Session session = d20::Session();
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
 
-        d20::Config config;
+        d20::SessionConfig config;
         config.dc_parameter_list = {{
                                         message_20::DcConnector::Extended,
                                         message_20::ControlMode::Scheduled,
@@ -247,7 +247,7 @@ SCENARIO("Service detail state handling") {
         d20::Session session = d20::Session();
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
 
-        d20::Config config;
+        d20::SessionConfig config;
         config.dc_parameter_list = {{
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
@@ -294,7 +294,7 @@ SCENARIO("Service detail state handling") {
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
         session.offered_services.vas_services = {message_20::ServiceCategory::Internet};
 
-        d20::Config config;
+        d20::SessionConfig config;
         config.internet_parameter_list = {
             {message_20::Protocol::Http, message_20::Port::Port80}};
         config.dc_parameter_list = {{
@@ -335,7 +335,7 @@ SCENARIO("Service detail state handling") {
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
         session.offered_services.vas_services = {message_20::ServiceCategory::ParkingStatus};
 
-        d20::Config config;
+        d20::SessionConfig config;
         config.parking_parameter_list = {
             {message_20::IntendedService::VehicleCheckIn, message_20::ParkingStatus::ManualExternal}};
         config.dc_parameter_list = {{

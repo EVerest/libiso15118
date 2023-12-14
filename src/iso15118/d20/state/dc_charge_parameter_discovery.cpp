@@ -18,7 +18,7 @@ using BPT_DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::BPT_DC_C
 
 message_20::DC_ChargeParameterDiscoveryResponse
 handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const d20::Session& session,
-               const d20::Config& config) {
+               const d20::SessionConfig& config) {
 
     message_20::DC_ChargeParameterDiscoveryResponse res;
 

@@ -7,6 +7,7 @@
 
 #include <iso15118/config.hpp>
 
+#include <iso15118/d20/config.hpp>
 #include <iso15118/d20/context.hpp>
 #include <iso15118/d20/control_event_queue.hpp>
 #include <iso15118/d20/fsm.hpp>
@@ -21,8 +22,6 @@
 
 namespace iso15118 {
 
-struct SessionConfig {};
-
 struct SessionState {
     bool connected{false};
     bool new_data{false};
@@ -31,7 +30,7 @@ struct SessionState {
 
 class Session {
 public:
-    Session(std::unique_ptr<io::IConnection>, const SessionConfig&, const session::feedback::Callbacks&);
+    Session(std::unique_ptr<io::IConnection>, const d20::SessionConfig&, const session::feedback::Callbacks&);
     ~Session();
 
     TimePoint const& poll();
