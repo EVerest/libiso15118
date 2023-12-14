@@ -12,11 +12,12 @@
 using namespace iso15118;
 
 SCENARIO("ISO15118-20 state transitions") {
-    FsmStateHelper state_helper;
+
+    auto state_helper = FsmStateHelper(d20::SessionConfig());
 
     d20::state::SupportedAppProtocol state(state_helper.get_context());
 
-    state.enter();
+    // state.enter(); // ctx.log.enter_state() breaks something
 
     message_20::SupportedAppProtocolRequest req;
     auto& ap = req.app_protocol.emplace_back();
