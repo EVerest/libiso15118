@@ -95,22 +95,15 @@ float from_RationalNumber(const RationalNumber& in) {
 }
 
 RationalNumber from_float(float in) {
-
-    int8_t exponent = 0;
-
-    if (in - std::floor(in) != 0) {
-        exponent = 2;
-    }
-
-    for (;exponent > -4; exponent--) {
-        if ((in * pow(10, exponent)) < INT16_MAX) {
-            break;
-        }
-    }
-
     RationalNumber out;
-    out.exponent = (int8_t)(-exponent);
-    out.value = (int16_t)(in * pow(10, exponent));
+    if (in == 0.0) {
+        out.exponent = 0;
+        out.value = 0;
+        return out;
+    }
+    out.exponent = static_cast<int8_t>(floor(log10(fabs(in))));
+    out.exponent -=3; // add 3 digits of precision
+    out.value = static_cast<int16_t>(in * pow(10, -out.exponent));
     return out;
 }
 
