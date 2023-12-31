@@ -29,7 +29,7 @@ extern "C" {
 
 #include <stdint.h>
 
-#include "exi_basetypes.h"
+#include "common/exi_basetypes.h"
 
 
 

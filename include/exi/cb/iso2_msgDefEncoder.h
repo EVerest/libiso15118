@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 
-#include "exi_bitstream.h"
+#include "common/exi_bitstream.h"
 #include "iso2_msgDefDatatypes.h"
 
 

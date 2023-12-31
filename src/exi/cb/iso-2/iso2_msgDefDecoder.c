@@ -20,11 +20,11 @@
   **/
 #include <stdint.h>
 
-#include "exi_basetypes.h"
-#include "exi_basetypes_decoder.h"
-#include "exi_error_codes.h"
-#include "exi_header.h"
-#include "exi_types_decoder.h"
+#include "common/exi_basetypes.h"
+#include "common/exi_basetypes_decoder.h"
+#include "common/exi_error_codes.h"
+#include "common/exi_header.h"
+#include "common/exi_types_decoder.h"
 #include "iso2_msgDefDatatypes.h"
 #include "iso2_msgDefDecoder.h"
 
