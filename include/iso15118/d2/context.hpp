@@ -7,16 +7,16 @@
 #include <string>
 #include <tuple>
 
-#include <iso15118/message/payload_type.hpp>
-#include <iso15118/message/variant.hpp>
-#include <iso15118/session/feedback.hpp>
-#include <iso15118/session/logger.hpp>
+#include <iso15118/message_d2/payload_type.hpp>
+#include <iso15118/message_d2/variant.hpp>
+#include <iso15118/session_d2/feedback.hpp>
+#include <iso15118/session_d2/logger.hpp>
 
 #include "config.hpp"
 #include "control_event.hpp"
 #include "session.hpp"
 
-namespace iso15118::d20 {
+namespace iso15118::d2 {
 
 // forward declare
 class ControlEventQueue;
@@ -25,21 +25,20 @@ class MessageExchange {
 public:
     MessageExchange(io::StreamOutputView);
 
-    void set_request(std::unique_ptr<message_20::Variant> new_request);
-    std::unique_ptr<message_20::Variant> get_request();
+    void set_request(std::unique_ptr<message_2::Variant> new_request);
+    std::unique_ptr<message_2::Variant> get_request();
 
     template <typename MessageType> void set_response(const MessageType& msg) {
-        response_size = message_20::serialize(msg, response);
+        response_size = message_2::serialize(msg, response);
         response_available = true;
-        payload_type = message_20::PayloadTypeTrait<MessageType>::type;
+        payload_type = message_2::PayloadTypeTrait<MessageType>::type;
     }
 
     std::tuple<bool, size_t, io::v2gtp::PayloadType> check_and_clear_response();
 
-
 private:
     // input
-    std::unique_ptr<message_20::Variant> request{nullptr};
+    std::unique_ptr<message_2::Variant> request{nullptr};
 
     // output
     const io::StreamOutputView response;
@@ -53,10 +52,10 @@ std::unique_ptr<MessageExchange> create_message_exchange(uint8_t* buf, const siz
 class Context {
 public:
     // FIXME (aw): bundle arguments
-    Context(MessageExchange&, const std::optional<ControlEvent>&, session::feedback::Callbacks, bool&,
-            session::SessionLogger&, const d20::SessionConfig&);
+    Context(MessageExchange&, const std::optional<iso15118::d2::ControlEvent>&, session::feedback::Callbacks, bool&,
+            session::SessionLogger&, const d2::SessionConfig&);
 
-    std::unique_ptr<message_20::Variant> get_request();
+    std::unique_ptr<message_2::Variant> get_request();
 
     template <typename MessageType> void respond(const MessageType& msg) {
         message_exchange.set_response(msg);
@@ -88,10 +87,9 @@ public:
 
     bool& session_stopped;
 
- 
 private:
     const std::optional<ControlEvent>& current_control_event;
     MessageExchange& message_exchange;
 };
 
-} // namespace iso15118::d20
+} // namespace iso15118::d2

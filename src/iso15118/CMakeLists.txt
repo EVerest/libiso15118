@@ -72,6 +72,48 @@ target_sources(iso15118
         message/dc_welding_detection.cpp
         message/session_stop.cpp
 
+        d2/fsm.cpp
+        d2/context.cpp
+        d2/context_helper.cpp
+        d2/control_event_queue.cpp
+        d2/session.cpp
+        d2/config.cpp
+
+        d2/state/supported_app_protocol.cpp
+        d2/state/session_setup.cpp
+        d2/state/authorization_setup.cpp
+        d2/state/authorization.cpp
+        d2/state/service_discovery.cpp
+        d2/state/service_detail.cpp
+        d2/state/service_selection.cpp
+        d2/state/dc_charge_parameter_discovery.cpp
+        d2/state/schedule_exchange.cpp
+        d2/state/dc_cable_check.cpp
+        d2/state/dc_pre_charge.cpp
+        d2/state/power_delivery.cpp
+        d2/state/dc_charge_loop.cpp
+        d2/state/dc_welding_detection.cpp
+        d2/state/session_stop.cpp
+
+        message_d2/variant.cpp
+        message_d2/supported_app_protocol.cpp
+        message_d2/session_setup.cpp
+        message_d2/common.cpp
+        message_d2/authorization_setup.cpp
+        message_d2/authorization.cpp
+        message_d2/service_discovery.cpp
+        message_d2/service_detail.cpp
+        message_d2/service_selection.cpp
+        message_d2/dc_charge_parameter_discovery.cpp
+        message_d2/schedule_exchange.cpp
+        message_d2/dc_cable_check.cpp
+        message_d2/dc_pre_charge.cpp
+        message_d2/power_delivery.cpp
+        message_d2/dc_charge_loop.cpp
+        message_d2/dc_welding_detection.cpp
+        message_d2/session_stop.cpp
+
+
         tbd_controller.cpp    
 )
 
