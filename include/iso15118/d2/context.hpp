@@ -52,8 +52,8 @@ std::unique_ptr<MessageExchange> create_message_exchange(uint8_t* buf, const siz
 class Context {
 public:
     // FIXME (aw): bundle arguments
-    Context(MessageExchange&, const std::optional<iso15118::d2::ControlEvent>&, session::feedback::Callbacks, bool&,
-            session::SessionLogger&, const d2::SessionConfig&);
+    Context(MessageExchange&, const std::optional<iso15118::d2::ControlEvent>&, session_2::feedback::Callbacks, bool&,
+            session_2::SessionLogger&, const d2::SessionConfig&);
 
     std::unique_ptr<message_2::Variant> get_request();
 
@@ -77,9 +77,9 @@ public:
         return &std::get<T>(*current_control_event);
     }
 
-    const session::Feedback feedback;
+    const session_2::Feedback feedback;
 
-    session::SessionLogger& log;
+    session_2::SessionLogger& log;
 
     Session session;
 

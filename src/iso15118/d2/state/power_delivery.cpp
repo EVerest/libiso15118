@@ -68,7 +68,7 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
         return sa.HANDLED_INTERNALLY;
     } else if (const auto req = variant->get_if<message_2::PowerDeliveryRequest>()) {
         if (req->charge_progress == message_2::PowerDeliveryRequest::Progress::Start) {
-            ctx.feedback.signal(session::feedback::Signal::SETUP_FINISHED);
+            ctx.feedback.signal(session_2::feedback::Signal::SETUP_FINISHED);
         }
 
         const auto& res = handle_request(*req, ctx.session);

@@ -18,12 +18,12 @@ using Dynamic_BPT_DC_Req = message_2::DC_ChargeLoopRequest::BPT_Dynamic_DC_CLReq
 using Scheduled_DC_Res = message_2::DC_ChargeLoopResponse::Scheduled_DC_CLResControlMode;
 using Scheduled_BPT_DC_Res = message_2::DC_ChargeLoopResponse::BPT_Scheduled_DC_CLResControlMode;
 
-std::tuple<message_2::DC_ChargeLoopResponse, std::optional<session::feedback::DcChargeTarget>>
+std::tuple<message_2::DC_ChargeLoopResponse, std::optional<session_2::feedback::DcChargeTarget>>
 handle_request(const message_2::DC_ChargeLoopRequest& req, const d2::Session& session, const float present_voltage,
                const float present_current) {
 
     message_2::DC_ChargeLoopResponse res;
-    std::optional<session::feedback::DcChargeTarget> charge_target{std::nullopt};
+    std::optional<session_2::feedback::DcChargeTarget> charge_target{std::nullopt};
 
     if (std::holds_alternative<Scheduled_DC_Req>(req.control_mode)) {
 
@@ -106,15 +106,15 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
 
         // Todo(sl): React properly to Start, Stop, Standby and ScheduleRenegotiation
         if (req->charge_progress == message_2::PowerDeliveryRequest::Progress::Stop) {
-            ctx.feedback.signal(session::feedback::Signal::CHARGE_LOOP_FINISHED);
-            ctx.feedback.signal(session::feedback::Signal::DC_OPEN_CONTACTOR);
+            ctx.feedback.signal(session_2::feedback::Signal::CHARGE_LOOP_FINISHED);
+            ctx.feedback.signal(session_2::feedback::Signal::DC_OPEN_CONTACTOR);
             return sa.create_simple<DC_WeldingDetection>(ctx);
         }
 
         return sa.HANDLED_INTERNALLY;
     } else if (const auto req = variant->get_if<message_2::DC_ChargeLoopRequest>()) {
         if (first_entry_in_charge_loop) {
-            ctx.feedback.signal(session::feedback::Signal::CHARGE_LOOP_STARTED);
+            ctx.feedback.signal(session_2::feedback::Signal::CHARGE_LOOP_STARTED);
             first_entry_in_charge_loop = false;
         }
 

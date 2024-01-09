@@ -22,41 +22,43 @@
 
 namespace iso15118 {
 
-struct SessionState {
+
+struct SessionState_2 {
     bool connected{false};
     bool new_data{false};
     bool fsm_needs_call{false};
 };
 
-class Session {
+//RDB Parallel universe for 15118-2
+class Session_2 {
 public:
-    Session(std::unique_ptr<io::IConnection>, const d20::SessionConfig&, const session::feedback::Callbacks&);
-    ~Session();
+    Session_2(std::unique_ptr<io::IConnection>, const d2::SessionConfig&, const session_2::feedback::Callbacks&);
+    ~Session_2();
 
     TimePoint const& poll();
-    void push_control_event(const d20::ControlEvent&);
+    void push_control_event(const d2::ControlEvent&);
 
 private:
     std::unique_ptr<io::IConnection> connection;
-    session::SessionLogger log;
+    session_2::SessionLogger log;
 
-    SessionState state;
+    SessionState_2 state;
     // input buffer
     io::SdpPacket packet;
 
     // output buffer
     uint8_t response_buffer[1028];
 
-    d20::MessageExchange message_exchange{{response_buffer + io::SdpPacket::V2GTP_HEADER_SIZE,
+    d2::MessageExchange message_exchange{{response_buffer + io::SdpPacket::V2GTP_HEADER_SIZE,
                                            sizeof(response_buffer) - io::SdpPacket::V2GTP_HEADER_SIZE}};
 
     // control event buffer
-    d20::ControlEventQueue control_event_queue;
-    std::optional<d20::ControlEvent> active_control_event{std::nullopt};
+    d2::ControlEventQueue control_event_queue;
+    std::optional<d2::ControlEvent> active_control_event{std::nullopt};
 
-    d20::Context ctx;
+    d2::Context ctx;
 
-    d20::Fsm fsm;
+    d2::Fsm fsm;
 
     TimePoint next_session_event;
 

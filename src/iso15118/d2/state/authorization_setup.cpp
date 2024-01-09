@@ -78,7 +78,7 @@ FsmSimpleState::HandleEventReturnType AuthorizationSetup::handle_event(Allocator
         }
 
         // Todo(sl): PnC is currently not supported
-        ctx.feedback.signal(session::feedback::Signal::REQUIRE_AUTH_EIM);
+        ctx.feedback.signal(session_2::feedback::Signal::REQUIRE_AUTH_EIM);
 
         return sa.create_simple<Authorization>(ctx);
     } else if (const auto req = variant->get_if<message_2::SessionStopRequest>()) {

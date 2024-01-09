@@ -11,7 +11,7 @@
 
 namespace iso15118::d2::state {
 
-std::tuple<message_2::DC_PreChargeResponse, session::feedback::DcChargeTarget>
+std::tuple<message_2::DC_PreChargeResponse, session_2::feedback::DcChargeTarget>
 handle_request(const message_2::DC_PreChargeRequest& req, const d2::Session& session, const float present_voltage);
 
 } // namespace iso15118::d2::state

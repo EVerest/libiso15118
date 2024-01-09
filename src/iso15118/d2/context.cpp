@@ -41,7 +41,7 @@ std::tuple<bool, size_t, io::v2gtp::PayloadType> MessageExchange::check_and_clea
 }
 
 Context::Context(MessageExchange& message_exchange_, const std::optional<ControlEvent>& current_control_event_,
-                 session::feedback::Callbacks feedback_callbacks, bool& stopping_, session::SessionLogger& logger,
+                 session_2::feedback::Callbacks feedback_callbacks, bool& stopping_, session_2::SessionLogger& logger,
                  const d2::SessionConfig& config_) :
     current_control_event{current_control_event_},
     feedback(std::move(feedback_callbacks)),

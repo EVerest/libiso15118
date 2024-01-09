@@ -10,11 +10,11 @@
 
 namespace iso15118::d2::state {
 
-std::tuple<message_2::DC_PreChargeResponse, session::feedback::DcChargeTarget>
+std::tuple<message_2::DC_PreChargeResponse, session_2::feedback::DcChargeTarget>
 handle_request(const message_2::DC_PreChargeRequest& req, const d2::Session& session, const float present_voltage) {
 
     message_2::DC_PreChargeResponse res;
-    session::feedback::DcChargeTarget charge_target{};
+    session_2::feedback::DcChargeTarget charge_target{};
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return {response_with_code(res, message_2::ResponseCode::FAILED_UnknownSession), charge_target};
