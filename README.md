@@ -19,7 +19,7 @@ To see current development work, have a look at those places in EVerest:
 - The [repository libSlac](https://github.com/EVerest/libslac) contains
   definitions of SLAC messages that are used for ISO 15118 communication.
 - V2G-related funcationality can be found in
-  [EVerest module EvseV2G])(https://github.com/EVerest/everest-core/tree/main/modules/EvseV2G)
+  [EVerest module EvseV2G](https://github.com/EVerest/everest-core/tree/main/modules/EvseV2G)
 
 This is just a short overview to show you that there is not the one and
 only place for the ISO 15118 implementation. For more information and
