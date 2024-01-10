@@ -24,6 +24,21 @@ static std::unique_ptr<message_2::Variant> make_variant_from_packet(const iso151
         packet.get_payload_type(), io::StreamInputView{packet.get_payload_buffer(), packet.get_payload_length()});
 }
 
+static size_t setup_response_header(uint8_t* buffer, iso15118::io::v2gtp::PayloadType payload_type, size_t size) {
+    buffer[0] = iso15118::io::SDP_PROTOCOL_VERSION;
+    buffer[1] = iso15118::io::SDP_INVERSE_PROTOCOL_VERSION;
+
+    const uint16_t response_payload_type =
+        htobe16(static_cast<std::underlying_type_t<iso15118::io::v2gtp::PayloadType>>(payload_type));
+
+    std::memcpy(buffer + 2, &response_payload_type, sizeof(response_payload_type));
+
+    const uint32_t tmp32 = htobe32(size);
+
+    std::memcpy(buffer + 4, &tmp32, sizeof(tmp32));
+
+    return size + iso15118::io::SdpPacket::V2GTP_HEADER_SIZE;
+}
 
 Session_2::Session_2(std::unique_ptr<io::IConnection> connection_, const d2::SessionConfig& config,
                  const session_2::feedback::Callbacks& callbacks) :

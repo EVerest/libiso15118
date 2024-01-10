@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "config.hpp"
-#include "d20/control_event.hpp"
+#include "d2/control_event.hpp"
 #include "io/poll_manager.hpp"
 #include "io/sdp_server.hpp"
 #include "session_d2/feedback.hpp"
@@ -25,9 +25,9 @@ struct TbdConfig_2 {
     config::TlsNegotiationStrategy tls_negotiation_strategy{config::TlsNegotiationStrategy::ACCEPT_CLIENT_OFFER};
 };
 
-class TbdController_d2 {
+class TbdController_2 {
 public:
-    TbdController_d2(TbdConfig, session_2::feedback::Callbacks);
+    TbdController_2(TbdConfig_2, session_2::feedback::Callbacks);
 
     void loop();
 
@@ -43,13 +43,13 @@ private:
 
     d2::SessionConfig session_config;
 
-    std::list<Session> sessions;
+    std::list<Session_2> sessions;
 
     // callbacks for sdp server
     void handle_sdp_server_input();
 
-    const TbdConfig config;
-    const session::feedback::Callbacks callbacks;
+    const TbdConfig_2 config;
+    const session_2::feedback::Callbacks callbacks;
 };
 
 } // namespace iso15118

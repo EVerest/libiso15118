@@ -6,43 +6,41 @@
 
 #include <iso15118/detail/variant_access_d2.hpp>
 
-#include <exi/cb/iso2_msgDefDatatypes.h>
-#include <exi/cb/iso2_msgDefEncoder.h>
+#include <exi/cb/iso20_CommonMessages_Datatypes.h>
+#include <exi/cb/iso20_CommonMessages_Encoder.h>
 
 namespace iso15118::message_2 {
 
 //
 // conversions
 //
-template <> void convert(const struct iso2_SessionSetupReqType& in, SessionSetupRequest& out) {
-    //convert(in.Header, out.header);// RDB no header in message.
-    //out.evccid = CPP2CB_BYTES(in.EVCCID);  //RDB iso2 uses bytes not chars, not sure how to do this.
+template <> void convert(const struct iso20_SessionSetupReqType& in, SessionSetupRequest& out) {
+    convert(in.Header, out.header);
+    out.evccid = CB2CPP_STRING(in.EVCCID);
 }
 
-
-template <> void convert(const SessionSetupResponse& in, iso2_SessionSetupResType& out) {
-    init_iso2_SessionSetupResType(&out);
+template <> void convert(const SessionSetupResponse& in, iso20_SessionSetupResType& out) {
+    init_iso20_SessionSetupResType(&out);
 
     cb_convert_enum(in.response_code, out.ResponseCode);
 
     CPP2CB_STRING(in.evseid, out.EVSEID);
 
+    convert(in.header, out.Header);
 }
 
-template <> void insert_type(VariantAccess& va, const struct iso2_SessionSetupReqType& in) {
+template <> void insert_type(VariantAccess& va, const struct iso20_SessionSetupReqType& in) {
     va.insert_type<SessionSetupRequest>(in);
 };
 
 template <> int serialize_to_exi(const SessionSetupResponse& in, exi_bitstream_t& out) {
-    iso2_exiDocument doc;
-    init_iso2_exiDocument(&doc);
+    iso20_exiDocument doc;
+    init_iso20_exiDocument(&doc);
+    CB_SET_USED(doc.SessionSetupRes);
 
-    //RDB How do we handle the Header?
-    convert(in.header, doc.V2G_Message.Header);
-    CB_SET_USED(doc.V2G_Message.Body.SessionSetupRes);
+    convert(in, doc.SessionSetupRes);
 
-    convert(in, doc.V2G_Message.Body);
-    return encode_iso2_exiDocument(&out, &doc);
+    return encode_iso20_exiDocument(&out, &doc);
 }
 
 template <> size_t serialize(const SessionSetupResponse& in, const io::StreamOutputView& out) {

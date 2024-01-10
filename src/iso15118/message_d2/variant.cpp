@@ -10,6 +10,7 @@
 
 #include <exi/cb/appHand_Decoder.h>
 #include <exi/cb/iso20_CommonMessages_Decoder.h>
+#include <exi/cb/iso2_msgDefDatatypes.h>
 #include <exi/cb/iso20_DC_Decoder.h>
 
 using PayloadType = iso15118::io::v2gtp::PayloadType;
@@ -39,12 +40,12 @@ static void handle_main(VariantAccess& va) {
     const auto decode_status = decode_iso20_exiDocument(&va.input_stream, &doc);
 
     if (decode_status != 0) {
-        va.error = "decode_iso20_exiDocument failed with " + std::to_string(decode_status);
+        va.error = "decode_iso2_exiDocument failed with " + std::to_string(decode_status);
         return;
     }
 
     if (doc.SessionSetupReq_isUsed) {
-        insert_type(va, doc.SessionSetupReq);
+        //insert_type(va, doc.SessionSetupReq);
     } else if (doc.AuthorizationSetupReq_isUsed) {
         insert_type(va, doc.AuthorizationSetupReq);
     } else if (doc.AuthorizationReq_isUsed) {

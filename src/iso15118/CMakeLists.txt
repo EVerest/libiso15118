@@ -118,7 +118,8 @@ target_sources(iso15118
         message_d2/session_stop.cpp
 
 
-        tbd_controller.cpp    
+        tbd_controller.cpp
+        tbd_controller_d2.cpp    
 )
 
 if (NOT ISO15118_LINK_CUSTOM_MBEDTLS)

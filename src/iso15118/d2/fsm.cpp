@@ -7,4 +7,4 @@ namespace iso15118::d2 {
 Controller::Controller(Context&) {
 }
 
-} // namespace iso15118::d20
+} // namespace iso15118::d2
