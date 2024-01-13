@@ -12,7 +12,7 @@
 #include "session_d2/feedback.hpp"
 #include "session_d2/iso.hpp"
 
-#include "message/common.hpp"
+#include "message_d2/common.hpp"
 
 namespace iso15118 {
 
