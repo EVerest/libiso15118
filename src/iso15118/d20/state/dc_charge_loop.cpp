@@ -20,10 +20,14 @@ using Scheduled_BPT_DC_Res = message_20::DC_ChargeLoopResponse::BPT_Scheduled_DC
 
 std::tuple<message_20::DC_ChargeLoopResponse, std::optional<session::feedback::DcChargeTarget>>
 handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& session, const float present_voltage,
-               const float present_current) {
+               const float present_current, const bool stop) {
 
     message_20::DC_ChargeLoopResponse res;
     std::optional<session::feedback::DcChargeTarget> charge_target{std::nullopt};
+
+    if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
+        return {response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession), charge_target};
+    }
 
     if (std::holds_alternative<Scheduled_DC_Req>(req.control_mode)) {
 
@@ -59,8 +63,8 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
     res.present_voltage = iso15118::message_20::from_float(present_voltage);
     res.present_current = iso15118::message_20::from_float(present_current);
 
-    if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return {response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession), charge_target};
+    if (stop) {
+        res.status = {0, iso15118::message_20::EvseNotification::Terminate};
     }
 
     return {response_with_code(res, message_20::ResponseCode::OK), charge_target};
@@ -73,14 +77,15 @@ void DC_ChargeLoop::enter() {
 FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType& sa, FsmEvent ev) {
 
     if (ev == FsmEvent::CONTROL_MESSAGE) {
-        const auto control_data = ctx.get_control_event<PresentVoltageCurrent>();
-        if (not control_data) {
-            // FIXME (aw): error handling
-            return sa.HANDLED_INTERNALLY;
-        }
 
-        present_voltage = control_data->voltage;
-        present_current = control_data->current;
+        if (const auto control_data = ctx.get_control_event<PresentVoltageCurrent>()) {
+            present_voltage = control_data->voltage;
+            present_current = control_data->current;
+        } else if (const auto control_data = ctx.get_control_event<StopCharging>()) {
+            stop = *control_data;
+        } else {
+            // FIXME (aw): error handling
+        }
 
         return sa.HANDLED_INTERNALLY;
     }
@@ -118,7 +123,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
             first_entry_in_charge_loop = false;
         }
 
-        const auto [res, charge_target] = handle_request(*req, ctx.session, present_voltage, present_current);
+        const auto [res, charge_target] = handle_request(*req, ctx.session, present_voltage, present_current, stop);
 
         if (charge_target) {
             ctx.feedback.dc_charge_target(charge_target.value());

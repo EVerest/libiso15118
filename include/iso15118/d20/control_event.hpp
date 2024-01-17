@@ -36,6 +36,19 @@ private:
     bool authorized;
 };
 
-using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse>;
+class StopCharging {
+public:
+    explicit StopCharging(bool stop_) : stop(stop_) {
+    }
+
+    operator bool() const {
+        return stop;
+    }
+
+private:
+    bool stop;
+};
+
+using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse, StopCharging>;
 
 } // namespace iso15118::d20
