@@ -84,4 +84,9 @@ void PollManager::abort() {
     eventfd_write(event_fd, 1);
 }
 
+// RDB need some way to copy the real (non event) fds from one tbd_controller to another.
+void PollManager::copy_pm(PollManager from_pm) {
+    this->poll_set = create_poll_set(from_pm.registered_fds, event_fd);
+}
+
 } // namespace iso15118::io

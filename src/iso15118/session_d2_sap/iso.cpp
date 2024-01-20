@@ -1,26 +1,26 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <iso15118/session/iso.hpp>
-#include <iso15118/session_d2/iso.hpp>
+#include <iso15118/session_d2_sap/iso.hpp>
 
 #include <cassert>
 #include <cstring>
 
-#include <iso15118/d2/state/session_setup.hpp>
+#include <iso15118/d2_sap/state/supported_app_protocol.hpp>
 
 #include <iso15118/detail/helper.hpp>
 
 namespace iso15118 {
 
-static constexpr auto SESSION_IDLE_TIMEOUT_MS_2 = 5000;
+static constexpr auto SESSION_IDLE_TIMEOUT_MS_2_sap = 5000;
 
-static void log_packet_from_car(const iso15118::io::SdpPacket& packet, session_2::SessionLogger& logger) {
+static void log_packet_from_car(const iso15118::io::SdpPacket& packet, session_2_sap::SessionLogger& logger) {
     logger.exi(static_cast<uint16_t>(packet.get_payload_type()), packet.get_payload_buffer(),
-               packet.get_payload_length(), session_2::logging::ExiMessageDirection::FROM_EV);
+               packet.get_payload_length(), session_2_sap::logging::ExiMessageDirection::FROM_EV);
 }
 
-static std::unique_ptr<message_2::Variant> make_variant_from_packet(const iso15118::io::SdpPacket& packet) {
-    return std::make_unique<message_2::Variant>(
+static std::unique_ptr<message_2_sap::Variant> make_variant_from_packet(const iso15118::io::SdpPacket& packet) {
+    return std::make_unique<message_2_sap::Variant>(
         packet.get_payload_type(), io::StreamInputView{packet.get_payload_buffer(), packet.get_payload_length()});
 }
 
@@ -40,30 +40,29 @@ static size_t setup_response_header(uint8_t* buffer, iso15118::io::v2gtp::Payloa
     return size + iso15118::io::SdpPacket::V2GTP_HEADER_SIZE;
 }
 
-Session_2::Session_2(std::unique_ptr<io::IConnection> connection_, const d2::SessionConfig& config,
-                 const session_2::feedback::Callbacks& callbacks) :
+Session_2_sap::Session_2_sap(std::unique_ptr<io::IConnection> connection_, const d2_sap::SessionConfig& config,
+                 const session_2_sap::feedback::Callbacks& callbacks) :
     connection(std::move(connection_)),
     log(this),
     ctx(message_exchange, active_control_event, callbacks, session_stopped, log, config) {
 
-    next_session_event = offset_time_point_by_ms(get_current_time_point(), SESSION_IDLE_TIMEOUT_MS_2);
+    next_session_event = offset_time_point_by_ms(get_current_time_point(), SESSION_IDLE_TIMEOUT_MS_2_sap);
     connection->set_event_callback([this](io::ConnectionEvent event) { this->handle_connection_event(event); });
-    //RDB start the state machine in SessionSetup
-    fsm.reset<d2::state::SessionSetup>(ctx);
+    fsm.reset<d2_sap::state::SupportedAppProtocol>(ctx);
 }
 
-Session_2::~Session_2() = default;
+Session_2_sap::~Session_2_sap() = default;
 
-void Session_2::push_control_event(const d2::ControlEvent& event) {
+void Session_2_sap::push_control_event(const d2_sap::ControlEvent& event) {
     control_event_queue.push(event);
 }
 
-TimePoint const& Session_2::poll() {
+TimePoint const& Session_2_sap::poll() {
     const auto now = get_current_time_point();
 
     if (not state.connected) {
         // nothing happened so far, just return
-        next_session_event = offset_time_point_by_ms(now, SESSION_IDLE_TIMEOUT_MS_2);
+        next_session_event = offset_time_point_by_ms(now, SESSION_IDLE_TIMEOUT_MS_2_sap);
         return next_session_event;
     }
 
@@ -78,7 +77,7 @@ TimePoint const& Session_2::poll() {
 
     // send all of our queued control events
     while (active_control_event = control_event_queue.pop()) {
-        const auto res = fsm.handle_event(d2::FsmEvent::CONTROL_MESSAGE);
+        const auto res = fsm.handle_event(d2_sap::FsmEvent::CONTROL_MESSAGE);
         // FIXME (aw): check result!
     }
 
@@ -91,7 +90,7 @@ TimePoint const& Session_2::poll() {
 
         packet = {}; // reset the packet
 
-        const auto res = fsm.handle_event(d2::FsmEvent::V2GTP_MESSAGE);
+        const auto res = fsm.handle_event(d2_sap::FsmEvent::V2GTP_MESSAGE);
     }
 
     const auto [got_response, payload_size, payload_type] = message_exchange.check_and_clear_response();
@@ -102,21 +101,21 @@ TimePoint const& Session_2::poll() {
 
         // FIXME (aw): this is hacky ...
         log.exi(static_cast<uint16_t>(payload_type), response_buffer + io::SdpPacket::V2GTP_HEADER_SIZE, payload_size,
-                session_2::logging::ExiMessageDirection::TO_EV);
+                session_2_sap::logging::ExiMessageDirection::TO_EV);
 
         if (session_stopped) {
             connection->close();
             session_stopped = false; // reset
-            ctx.feedback.signal(session_2::feedback::Signal::DLINK_TERMINATE);
+            ctx.feedback.signal(session_2_sap::feedback::Signal::DLINK_TERMINATE);
         }
     }
 
     // FIXME (aw): proper timeout handling!
-    next_session_event = offset_time_point_by_ms(now, SESSION_IDLE_TIMEOUT_MS_2);
+    next_session_event = offset_time_point_by_ms(now, SESSION_IDLE_TIMEOUT_MS_2_sap);
     return next_session_event;
 }
 
-void Session_2::handle_connection_event(io::ConnectionEvent event) {
+void Session_2_sap::handle_connection_event(io::ConnectionEvent event) {
     using Event = io::ConnectionEvent;
     switch (event) {
     case Event::ACCEPTED:
@@ -142,9 +141,9 @@ void Session_2::handle_connection_event(io::ConnectionEvent event) {
     }
 }
 
-//RDB also allow to set the session state to connected manually.
-void Session_2::SetSessionStateConnected(){
-    state.connected=true;
+int Session_2_sap::get_SAP_Version(){
+    return ctx.SAP_Version;
 }
+
 
 } // namespace iso15118

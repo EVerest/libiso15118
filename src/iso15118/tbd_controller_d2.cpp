@@ -14,9 +14,10 @@
 
 namespace iso15118 {
 
+//RDB - no longer needs to handle the sdp server input.
 TbdController_2::TbdController_2(TbdConfig_2 config_, session_2::feedback::Callbacks callbacks_) :
     config(std::move(config_)), callbacks(std::move(callbacks_)) {
-    poll_manager.register_fd(sdp_server.get_fd(), [this]() { handle_sdp_server_input(); });
+    //poll_manager.register_fd(sdp_server.get_fd(), [this]() { handle_sdp_server_input(); });
     session_config = d2::SessionConfig();
 }
 
@@ -99,6 +100,20 @@ void TbdController_2::handle_sdp_server_input() {
     const auto& new_session = sessions.emplace_back(std::move(connection), session_config, callbacks);
 
     sdp_server.send_response(request, ipv6_endpoint);
+}
+
+// RBD allow to pass in the IConnection made by SAP
+void TbdController_2::set_SAP_IConnection(std::unique_ptr<io::IConnection> connection) {
+    const auto& new_session = sessions.emplace_back(std::move(connection), session_config, callbacks);
+    for (auto& session : sessions) {
+        session.SetSessionStateConnected();
+    }
+}
+
+// RDB also allow to copy the poll manager.
+void TbdController_2::set_PollManager(io::PollManager pm) {
+    //RDB we need to keep the event_fd that was created in the constructor of PollManager in this instance
+    poll_manager.copy_pm(pm);
 }
 
 } // namespace iso15118

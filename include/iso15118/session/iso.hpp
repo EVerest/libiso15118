@@ -41,6 +41,10 @@ public:
     TimePoint const& poll();
     void push_control_event(const d20::ControlEvent&);
 
+    //RDB also allow to set the session state to connected manually.
+    void SetSessionStateConnected();
+
+
 private:
     std::unique_ptr<io::IConnection> connection;
     session::SessionLogger log;

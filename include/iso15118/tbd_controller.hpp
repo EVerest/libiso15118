@@ -34,6 +34,13 @@ public:
 
     void setup_session(const std::vector<message_20::Authorization>& auth_services, bool cert_install_service);
 
+    //RBD allow to pass in the IConnection made by SAP
+    void set_SAP_IConnection(std::unique_ptr<io::IConnection>);
+
+    //RDB also allow to copy the poll manager.
+    void set_PollManager(io::PollManager pm);
+
+
 private:
     io::PollManager poll_manager;
     io::SdpServer sdp_server;

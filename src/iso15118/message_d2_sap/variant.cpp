@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
-#include <iso15118/message_d2/variant.hpp>
+#include <iso15118/message_d2_sap/variant.hpp>
 
 #include <cassert>
 #include <string>
 
 #include <iso15118/detail/helper.hpp>
-#include <iso15118/detail/variant_access_d2.hpp>
+#include <iso15118/detail/variant_access_d2_sap.hpp>
 
 #include <exi/cb/appHand_Decoder.h>
 #include <exi/cb/iso20_CommonMessages_Decoder.h>
@@ -15,7 +15,7 @@
 
 using PayloadType = iso15118::io::v2gtp::PayloadType;
 
-namespace iso15118::message_2 {
+namespace iso15118::message_2_sap {
 
 static void handle_sap(VariantAccess& va) {
     appHand_exiDocument doc;
@@ -45,23 +45,23 @@ static void handle_main(VariantAccess& va) {
     }
 
     if (doc.SessionSetupReq_isUsed) {
-        insert_type(va, doc.SessionSetupReq);
+        //insert_type(va, doc.SessionSetupReq);
     } else if (doc.AuthorizationSetupReq_isUsed) {
-        insert_type(va, doc.AuthorizationSetupReq);
+        //insert_type(va, doc.AuthorizationSetupReq);
     } else if (doc.AuthorizationReq_isUsed) {
-        insert_type(va, doc.AuthorizationReq);
+        //insert_type(va, doc.AuthorizationReq);
     } else if (doc.ServiceDiscoveryReq_isUsed) {
-        insert_type(va, doc.ServiceDiscoveryReq);
+        //insert_type(va, doc.ServiceDiscoveryReq);
     } else if (doc.ServiceDetailReq_isUsed) {
-        insert_type(va, doc.ServiceDetailReq);
+        //insert_type(va, doc.ServiceDetailReq);
     } else if (doc.ServiceSelectionReq_isUsed) {
-        insert_type(va, doc.ServiceSelectionReq);
+        //insert_type(va, doc.ServiceSelectionReq);
     } else if (doc.ScheduleExchangeReq_isUsed) {
-        insert_type(va, doc.ScheduleExchangeReq);
+        //insert_type(va, doc.ScheduleExchangeReq);
     } else if (doc.PowerDeliveryReq_isUsed) {
-        insert_type(va, doc.PowerDeliveryReq);
+        //insert_type(va, doc.PowerDeliveryReq);
     } else if (doc.SessionStopReq_isUsed) {
-        insert_type(va, doc.SessionStopReq);
+        //insert_type(va, doc.SessionStopReq);
     } else {
         va.error = "chosen message type unhandled";
     }
@@ -78,15 +78,15 @@ static void handle_dc(VariantAccess& va) {
     }
 
     if (doc.DC_ChargeParameterDiscoveryReq_isUsed) {
-        insert_type(va, doc.DC_ChargeParameterDiscoveryReq);
+        //insert_type(va, doc.DC_ChargeParameterDiscoveryReq);
     } else if (doc.DC_CableCheckReq_isUsed) {
-        insert_type(va, doc.DC_CableCheckReq);
+        //insert_type(va, doc.DC_CableCheckReq);
     } else if (doc.DC_PreChargeReq_isUsed) {
-        insert_type(va, doc.DC_PreChargeReq);
+        //insert_type(va, doc.DC_PreChargeReq);
     } else if (doc.DC_ChargeLoopReq_isUsed) {
-        insert_type(va, doc.DC_ChargeLoopReq);
+        //insert_type(va, doc.DC_ChargeLoopReq);
     } else if (doc.DC_WeldingDetectionReq_isUsed) {
-        insert_type(va, doc.DC_WeldingDetectionReq);
+        //insert_type(va, doc.DC_WeldingDetectionReq);
     } else {
         va.error = "chosen message type unhandled";
     }
@@ -131,4 +131,4 @@ const std::string& Variant::get_error() const {
     return error;
 }
 
-} // namespace iso15118::message_2
+} // namespace iso15118::message_2_sap

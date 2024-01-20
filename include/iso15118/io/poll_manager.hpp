@@ -25,6 +25,9 @@ public:
     void poll(int timeout_ms);
     void abort();
 
+    //RDB need some way to copy the real (non event) fds from one tbd_controller to this one.
+    void copy_pm(PollManager from_pm);
+
 private:
     std::map<int, PollCallback> registered_fds;
 
