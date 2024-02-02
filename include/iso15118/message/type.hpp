@@ -38,6 +38,10 @@ enum class Type {
     DC_WeldingDetectionRes,
     SessionStopReq,
     SessionStopRes,
+    AC_ChargeParameterDiscoveryReq,
+    AC_ChargeParameterDiscoveryRes,
+    AC_ChargeLoopReq,
+    AC_ChargeLoopRes,
 };
 
 template <typename T> struct TypeTrait {
@@ -76,6 +80,8 @@ CREATE_TYPE_TRAIT(PowerDeliveryRequest, PowerDeliveryReq);
 CREATE_TYPE_TRAIT(DC_ChargeLoopRequest, DC_ChargeLoopReq);
 CREATE_TYPE_TRAIT(DC_WeldingDetectionRequest, DC_WeldingDetectionReq);
 CREATE_TYPE_TRAIT(SessionStopRequest, SessionStopReq);
+CREATE_TYPE_TRAIT(AC_ChargeParameterDiscoveryRequest, AC_ChargeParameterDiscoveryReq);
+CREATE_TYPE_TRAIT(AC_ChargeLoopRequest, AC_ChargeLoopReq);
 
 #ifdef CREATE_TYPE_TRAIT_PUSHED
 #define CREATE_TYPE_TRAIT CREATE_TYPE_TRAIT_PUSHED

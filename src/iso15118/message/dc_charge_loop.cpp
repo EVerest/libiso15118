@@ -11,8 +11,7 @@
 
 namespace iso15118::message_20 {
 
-template <>
-void convert(const struct iso20_dc_DisplayParametersType& in, DC_ChargeLoopRequest::DisplayParameters& out) {
+template <> void convert(const struct iso20_dc_DisplayParametersType& in, DisplayParameters& out) {
     CB2CPP_ASSIGN_IF_USED(in.PresentSOC, out.present_soc);
     CB2CPP_ASSIGN_IF_USED(in.MinimumSOC, out.min_soc);
     CB2CPP_ASSIGN_IF_USED(in.TargetSOC, out.target_soc);
@@ -122,19 +121,19 @@ template <> void insert_type(VariantAccess& va, const struct iso20_dc_DC_ChargeL
     va.insert_type<DC_ChargeLoopRequest>(in);
 }
 
-template <> void convert(const DC_ChargeLoopResponse::DetailedCost& in, struct iso20_dc_DetailedCostType& out) {
+template <> void convert(const DetailedCost& in, struct iso20_dc_DetailedCostType& out) {
     init_iso20_dc_DetailedCostType(&out);
     convert(in.amount, out.Amount);
     convert(in.cost_per_unit, out.CostPerUnit);
 }
 
-template <> void convert(const DC_ChargeLoopResponse::DetailedTax& in, struct iso20_dc_DetailedTaxType& out) {
+template <> void convert(const DetailedTax& in, struct iso20_dc_DetailedTaxType& out) {
     init_iso20_dc_DetailedTaxType(&out);
     out.TaxRuleID = in.tax_rule_id;
     convert(in.amount, out.Amount);
 }
 
-template <> void convert(const DC_ChargeLoopResponse::Receipt& in, struct iso20_dc_ReceiptType& out) {
+template <> void convert(const Receipt& in, struct iso20_dc_ReceiptType& out) {
     init_iso20_dc_ReceiptType(&out);
 
     out.TimeAnchor = in.time_anchor;

@@ -6,10 +6,14 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace iso15118::message_20 {
 
 const uint8_t SESSION_ID_LENGTH = 8;
+
+using PercentValue = uint8_t;
+using NumericID = uint32_t; // [1 - 4294967295]
 
 struct Header {
     std::array<uint8_t, SESSION_ID_LENGTH> session_id{};
@@ -242,9 +246,37 @@ struct MeterInfo {
     std::optional<uint64_t> meter_timestamp;
 };
 
-using PercentValue = uint8_t;
+struct DisplayParameters {
+    std::optional<PercentValue> present_soc;
+    std::optional<PercentValue> min_soc;
+    std::optional<PercentValue> target_soc;
+    std::optional<PercentValue> max_soc;
+    std::optional<uint16_t> remaining_time_to_min_soc;
+    std::optional<uint16_t> remaining_time_to_target_soc;
+    std::optional<uint16_t> remaining_time_to_max_soc;
+    std::optional<bool> charging_complete;
+    std::optional<RationalNumber> battery_energy_capacity;
+    std::optional<bool> inlet_hot;
+};
 
-using NumericID = uint32_t; // [1 - 4294967295]
+struct DetailedCost {
+    RationalNumber amount;
+    RationalNumber cost_per_unit;
+};
+
+struct DetailedTax {
+    uint32_t tax_rule_id; // NOTE (aw): only 1 - 4294967295
+    RationalNumber amount;
+};
+
+struct Receipt {
+    uint64_t time_anchor;
+    std::optional<DetailedCost> energy_costs;
+    std::optional<DetailedCost> occupany_costs;
+    std::optional<DetailedCost> additional_service_costs;
+    std::optional<DetailedCost> overstay_costs;
+    std::vector<DetailedTax> tax_costs; // 0 to 10 elements!
+};
 
 template <typename cb_RationalNumberType> void convert(const cb_RationalNumberType& in, RationalNumber& out);
 template <typename cb_RationalNumberType> void convert(const RationalNumber& in, cb_RationalNumberType& out);

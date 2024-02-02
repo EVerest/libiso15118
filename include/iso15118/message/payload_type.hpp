@@ -20,7 +20,7 @@ template <typename T> struct PayloadTypeTrait;
 #define CREATE_TYPE_TRAIT(struct_name, payload_type)                                                                   \
     struct struct_name;                                                                                                \
     template <> struct PayloadTypeTrait<struct_name> {                                                                 \
-        static const io::v2gtp::PayloadType type = io::v2gtp::PayloadType::payload_type;                                  \
+        static const io::v2gtp::PayloadType type = io::v2gtp::PayloadType::payload_type;                               \
     }
 
 CREATE_TYPE_TRAIT(SupportedAppProtocolResponse, SAP);
@@ -38,6 +38,8 @@ CREATE_TYPE_TRAIT(PowerDeliveryResponse, Part20Main);
 CREATE_TYPE_TRAIT(DC_ChargeLoopResponse, Part20DC);
 CREATE_TYPE_TRAIT(DC_WeldingDetectionResponse, Part20DC);
 CREATE_TYPE_TRAIT(SessionStopResponse, Part20Main);
+CREATE_TYPE_TRAIT(AC_ChargeParameterDiscoveryResponse, Part20AC);
+CREATE_TYPE_TRAIT(AC_ChargeLoopResponse, Part20AC);
 
 #ifdef CREATE_TYPE_TRAIT_PUSHED
 #define CREATE_TYPE_TRAIT CREATE_TYPE_TRAIT_PUSHED
