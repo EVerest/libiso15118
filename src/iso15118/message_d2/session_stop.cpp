@@ -6,42 +6,48 @@
 
 #include <iso15118/detail/variant_access_d2.hpp>
 
-#include <exi/cb/iso20_CommonMessages_Encoder.h>
+#include <exi/cb/iso2_msgDefDatatypes.h>
+#include <exi/cb/iso2_msgDefEncoder.h>
 
 namespace iso15118::message_2 {
 
-template <> void convert(const struct iso20_SessionStopReqType& in, SessionStopRequest& out) {
-    convert(in.Header, out.header);
+template <> void convert(const struct iso2_SessionStopReqType& in, SessionStopRequest& out) {
+    //convert(in.Header, out.header);
 
     cb_convert_enum(in.ChargingSession, out.charging_session);
-    if (in.EVTerminationCode_isUsed) {
-        out.ev_termination_code = CB2CPP_STRING(in.EVTerminationCode);
-    }
-    if (in.EVTerminationExplanation_isUsed) {
-        out.ev_termination_explanation = CB2CPP_STRING(in.EVTerminationExplanation);
-    }
+    // if (in.EVTerminationCode_isUsed) {
+    //     out.ev_termination_code = CB2CPP_STRING(in.EVTerminationCode);
+    // }
+    // if (in.EVTerminationExplanation_isUsed) {
+    //     out.ev_termination_explanation = CB2CPP_STRING(in.EVTerminationExplanation);
+    // }
 }
 
-template <> void insert_type(VariantAccess& va, const struct iso20_SessionStopReqType& in) {
+template <> void insert_type(VariantAccess& va, const struct iso2_SessionStopReqType& in) {
     va.insert_type<SessionStopRequest>(in);
 }
 
-template <> void convert(const SessionStopResponse& in, struct iso20_SessionStopResType& out) {
-    init_iso20_SessionStopResType(&out);
-    convert(in.header, out.Header);
+template <> void convert(const SessionStopResponse& in, struct iso2_SessionStopResType& out) {
+    init_iso2_SessionStopResType(&out);
+    //convert(in.header, out.Header);
     cb_convert_enum(in.response_code, out.ResponseCode);
 }
 
 template <> int serialize_to_exi(const SessionStopResponse& in, exi_bitstream_t& out) {
-    iso20_exiDocument doc;
-    init_iso20_exiDocument(&doc);
+    iso2_exiDocument doc;
+    init_iso2_exiDocument(&doc);
 
-    CB_SET_USED(doc.SessionStopRes);
+    //RDB this is new in ISO2
+    init_iso2_BodyType(&doc.V2G_Message.Body);
 
-    convert(in, doc.SessionStopRes);
+    //RDB Convert the header since it is separate in ISO2.
+    convert(in.header, doc.V2G_Message.Header);
 
-    return encode_iso20_exiDocument(&out, &doc);
-}
+    CB_SET_USED(doc.V2G_Message.Body.SessionStopRes);
+
+    convert(in, doc.V2G_Message.Body.SessionStopRes);
+
+    return encode_iso2_exiDocument(&out, &doc);}
 
 template <> size_t serialize(const SessionStopResponse& in, const io::StreamOutputView& out) {
     return serialize_helper(in, out);

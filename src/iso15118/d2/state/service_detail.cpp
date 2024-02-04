@@ -2,9 +2,12 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <iso15118/d2/state/service_detail.hpp>
 #include <iso15118/d2/state/service_selection.hpp>
+#include <iso15118/d2/state/authorization.hpp>
+
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/d2/state/service_detail.hpp>
+#include <iso15118/detail/d2/state/service_selection.hpp>
 #include <iso15118/detail/d2/state/session_stop.hpp>
 
 #include <iso15118/detail/helper.hpp>
@@ -122,6 +125,26 @@ FsmSimpleState::HandleEventReturnType ServiceDetail::handle_event(AllocatorType&
         }
 
         return sa.create_simple<ServiceSelection>(ctx);
+    } else if (const auto req = variant->get_if<message_2::ServiceSelectionRequest>()){
+        //RDB add this case since in ISO2 apparently this can happen, going directly to PaymentServiceSelection with no service detail req.
+        const auto res = handle_request(*req, ctx.session);
+
+        // RDB ISO2 allows parameter lists to be optional so ignore this. It turns out that we need to simulate this
+        //  by adding in a hard coded DC parameter list so that DC charge parameter discovery works.
+        //  RDB TODO this is a hack.
+        for (auto& parameter_set : ctx.config.dc_parameter_list) {
+            ctx.session.offered_services.dc_parameter_list[0] = parameter_set;
+        }
+
+        ctx.respond(res);
+
+        if (res.response_code >= message_2::ResponseCode::FAILED) {
+            ctx.session_stopped = true;
+            return sa.PASS_ON;
+        }
+
+        return sa.create_simple<Authorization>(ctx);
+
     } else if (const auto req = variant->get_if<message_2::SessionStopRequest>()) {
         const auto res = handle_request(*req, ctx.session);
 

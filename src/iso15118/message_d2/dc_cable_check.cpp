@@ -6,35 +6,50 @@
 
 #include <iso15118/detail/variant_access_d2.hpp>
 
-#include <exi/cb/iso20_DC_Decoder.h>
-#include <exi/cb/iso20_DC_Encoder.h>
+#include <exi/cb/iso2_msgDefDatatypes.h>
+#include <exi/cb/iso2_msgDefEncoder.h>
 
 namespace iso15118::message_2 {
 
-template <> void convert(const struct iso20_dc_DC_CableCheckReqType& in, DC_CableCheckRequest& out) {
-    convert(in.Header, out.header);
+template <> void convert(const struct iso2_CableCheckReqType& in, DC_CableCheckRequest& out) {
+    //convert(in.Header, out.header);
 }
 
-template <> void insert_type(VariantAccess& va, const struct iso20_dc_DC_CableCheckReqType& in) {
+template <> void insert_type(VariantAccess& va, const struct iso2_CableCheckReqType& in) {
     va.insert_type<DC_CableCheckRequest>(in);
 }
 
-template <> void convert(const DC_CableCheckResponse& in, struct iso20_dc_DC_CableCheckResType& out) {
-    init_iso20_dc_DC_CableCheckResType(&out);
-    convert(in.header, out.Header);
+template <> void convert(const DC_CableCheckResponse& in, struct iso2_CableCheckResType& out) {
+    init_iso2_CableCheckResType(&out);
+    //convert(in.header, out.Header);
     cb_convert_enum(in.response_code, out.ResponseCode);
     cb_convert_enum(in.processing, out.EVSEProcessing);
+
+    //RDB Also send send the DC_EVStatus
+    out.DC_EVSEStatus.NotificationMaxDelay=0;
+    out.DC_EVSEStatus.EVSENotification=iso2_EVSENotificationType_None;
+    out.DC_EVSEStatus.EVSEStatusCode=iso2_DC_EVSEStatusCodeType_EVSE_Ready;
+    //RDB TODO - isolation status needs to reflect the IMD state.
+    out.DC_EVSEStatus.EVSEIsolationStatus=iso2_isolationLevelType_Valid;
+    out.DC_EVSEStatus.EVSEIsolationStatus_isUsed=true;
+
 }
 
 template <> int serialize_to_exi(const DC_CableCheckResponse& in, exi_bitstream_t& out) {
-    iso20_dc_exiDocument doc;
-    init_iso20_dc_exiDocument(&doc);
+    iso2_exiDocument doc;
+    init_iso2_exiDocument(&doc);
 
-    CB_SET_USED(doc.DC_CableCheckRes);
+    //RDB this is new in ISO2
+    init_iso2_BodyType(&doc.V2G_Message.Body);
 
-    convert(in, doc.DC_CableCheckRes);
+    //RDB Convert the header since it is separate in ISO2.
+    convert(in.header, doc.V2G_Message.Header);
 
-    return encode_iso20_dc_exiDocument(&out, &doc);
+    CB_SET_USED(doc.V2G_Message.Body.CableCheckRes);
+
+    convert(in, doc.V2G_Message.Body.CableCheckRes);
+
+    return encode_iso2_exiDocument(&out, &doc);
 }
 
 template <> size_t serialize(const DC_CableCheckResponse& in, const io::StreamOutputView& out) {

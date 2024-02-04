@@ -2,7 +2,7 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <algorithm>
 
-#include <iso15118/d2/state/authorization_setup.hpp>
+#include <iso15118/d2/state/service_discovery.hpp>
 #include <iso15118/d2/state/session_setup.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
@@ -62,7 +62,7 @@ FsmSimpleState::HandleEventReturnType SessionSetup::handle_event(AllocatorType& 
 
         ctx.respond(res);
 
-        return sa.create_simple<AuthorizationSetup>(ctx);
+        return sa.create_simple<ServiceDiscovery>(ctx);
 
         // Todo(sl): Going straight to ChargeParameterDiscovery?
 

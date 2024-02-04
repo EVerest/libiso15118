@@ -6,38 +6,54 @@
 
 #include <iso15118/detail/variant_access_d2.hpp>
 
-#include <exi/cb/iso20_DC_Decoder.h>
-#include <exi/cb/iso20_DC_Encoder.h>
+#include <exi/cb/iso2_msgDefDatatypes.h>
+#include <exi/cb/iso2_msgDefEncoder.h>
 
 namespace iso15118::message_2 {
 
-template <> void convert(const struct iso20_dc_DC_WeldingDetectionReqType& in, DC_WeldingDetectionRequest& out) {
-    convert(in.Header, out.header);
+template <> void convert(const struct iso2_WeldingDetectionReqType& in, DC_WeldingDetectionRequest& out) {
+    //convert(in.Header, out.header);
 
-    cb_convert_enum(in.EVProcessing, out.processing);
+    //cb_convert_enum(in.EVProcessing, out.processing);
 }
 
-template <> void insert_type(VariantAccess& va, const struct iso20_dc_DC_WeldingDetectionReqType& in) {
+template <> void insert_type(VariantAccess& va, const struct iso2_WeldingDetectionReqType& in) {
     va.insert_type<DC_WeldingDetectionRequest>(in);
 }
 
-template <> void convert(const DC_WeldingDetectionResponse& in, struct iso20_dc_DC_WeldingDetectionResType& out) {
-    init_iso20_dc_DC_WeldingDetectionResType(&out);
-    convert(in.header, out.Header);
+template <> void convert(const DC_WeldingDetectionResponse& in, struct iso2_WeldingDetectionResType& out) {
+    init_iso2_WeldingDetectionResType(&out);
+    //convert(in.header, out.Header);
+    
     cb_convert_enum(in.response_code, out.ResponseCode);
 
     convert(in.present_voltage, out.EVSEPresentVoltage);
+    out.EVSEPresentVoltage.Unit=iso2_unitSymbolType_V;
+
+    //RDB Also send send the DC_EVStatus
+    out.DC_EVSEStatus.NotificationMaxDelay=0;
+    out.DC_EVSEStatus.EVSENotification=iso2_EVSENotificationType_None;
+    out.DC_EVSEStatus.EVSEStatusCode=iso2_DC_EVSEStatusCodeType_EVSE_Ready;
+    //RDB TODO - isolation status needs to reflect the IMD state.
+    out.DC_EVSEStatus.EVSEIsolationStatus=iso2_isolationLevelType_Valid;
+    out.DC_EVSEStatus.EVSEIsolationStatus_isUsed=true;
 }
 
 template <> int serialize_to_exi(const DC_WeldingDetectionResponse& in, exi_bitstream_t& out) {
-    iso20_dc_exiDocument doc;
-    init_iso20_dc_exiDocument(&doc);
+    iso2_exiDocument doc;
+    init_iso2_exiDocument(&doc);
 
-    CB_SET_USED(doc.DC_WeldingDetectionRes);
+    //RDB this is new in ISO2
+    init_iso2_BodyType(&doc.V2G_Message.Body);
 
-    convert(in, doc.DC_WeldingDetectionRes);
+    //RDB Convert the header since it is separate in ISO2.
+    convert(in.header, doc.V2G_Message.Header);
 
-    return encode_iso20_dc_exiDocument(&out, &doc);
+    CB_SET_USED(doc.V2G_Message.Body.WeldingDetectionRes);
+
+    convert(in, doc.V2G_Message.Body.WeldingDetectionRes);
+
+    return encode_iso2_exiDocument(&out, &doc);
 }
 
 template <> size_t serialize(const DC_WeldingDetectionResponse& in, const io::StreamOutputView& out) {

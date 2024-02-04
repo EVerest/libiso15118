@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
-#include <iso15118/d2/state/dc_charge_parameter_discovery.hpp>
+#include <iso15118/d2/state/authorization.hpp>
 #include <iso15118/d2/state/service_selection.hpp>
+#include <iso15118/d2/config.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/d2/state/service_detail.hpp>
@@ -31,7 +32,8 @@ message_2::ServiceSelectionResponse handle_request(const message_2::ServiceSelec
     }
 
     if (!energy_service_found) {
-        return response_with_code(res, message_2::ResponseCode::FAILED_NoEnergyTransferServiceSelected);
+        //RDB change response code to equivalent
+        return response_with_code(res, message_2::ResponseCode::FAILED_NoChargeServiceSelected);
     }
 
     if (req.selected_vas_list.has_value()) {
@@ -51,13 +53,23 @@ message_2::ServiceSelectionResponse handle_request(const message_2::ServiceSelec
         }
     }
 
-    if (not session.find_parameter_set_id(req.selected_energy_transfer_service.service_id,
-                                          req.selected_energy_transfer_service.parameter_set_id)) {
-        return response_with_code(res, message_2::ResponseCode::FAILED_ServiceSelectionInvalid);
-    }
+    //RDB ISO2 allows parameter lists to be optional so ignore this. It turns out that we need to simulate this
+    // by adding in a hard coded DC parameter list so that DC charge parameter discovery works.
+    //RDB TODO allow parameter lists
+    // if (not session.find_parameter_set_id(req.selected_energy_transfer_service.service_id,
+    //                                       req.selected_energy_transfer_service.parameter_set_id)) {
+    //     return response_with_code(res, message_2::ResponseCode::FAILED_ServiceSelectionInvalid);
+    // }
 
-    session.selected_service_parameters(req.selected_energy_transfer_service.service_id,
-                                        req.selected_energy_transfer_service.parameter_set_id);
+    // RDB TODO Hack to get around the parameter list issue.
+    session.offered_services.energy_services = {message_2::ServiceCategory::DC};
+    session.offered_services.dc_parameter_list[0] = {
+        message_2::DcConnector::Extended,
+        message_2::ControlMode::Scheduled,
+        message_2::MobilityNeedsMode::ProvidedByEvcc,
+        message_2::Pricing::NoPricing,
+    };
+    session.selected_service_parameters(req.selected_energy_transfer_service.service_id, 0);
 
     if (req.selected_vas_list.has_value()) {
         auto& selected_vas_list = req.selected_vas_list.value();
@@ -85,6 +97,7 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
 
     const auto variant = ctx.get_request();
 
+
     if (const auto req = variant->get_if<message_2::ServiceDetailRequest>()) {
         logf("Requested info about ServiceID: %d\n", req->service);
 
@@ -108,7 +121,9 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
             return sa.PASS_ON;
         }
 
-        return sa.create_simple<DC_ChargeParameterDiscovery>(ctx);
+        //RDB ISO2 goes to Authorization next
+        return sa.create_simple<Authorization>(ctx);
+
     } else if (const auto req = variant->get_if<message_2::SessionStopRequest>()) {
         const auto res = handle_request(*req, ctx.session);
 

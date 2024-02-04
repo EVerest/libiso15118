@@ -7,6 +7,7 @@
 #include <iso15118/detail/cb_exi.hpp>
 #include <iso15118/message_d2/variant.hpp>
 
+#include <exi/cb/iso2_msgDefDatatypes.h>
 #include <exi/cb/iso20_CommonMessages_Datatypes.h>
 #include <exi/cb/iso20_DC_Datatypes.h>
 
@@ -24,11 +25,18 @@ template void convert(const struct iso20_MessageHeaderType& in, Header& out);
 template void convert(const struct iso20_dc_MessageHeaderType& in, Header& out);
 
 template <typename cb_HeaderType> void convert_header(const Header& in, cb_HeaderType& out) {
-    out.TimeStamp = in.timestamp;
+    //RDB No TimeStamp in ISO2
+    //out.TimeStamp = in.timestamp;
     std::copy(in.session_id.begin(), in.session_id.end(), out.SessionID.bytes);
 
     // FIXME (aw): this should be fixed 8
     out.SessionID.bytesLen = 8;
+}
+
+//RDB fix this so it works for ISO2
+template <> void convert(const Header& in, iso2_MessageHeaderType& out) {
+    init_iso2_MessageHeaderType(&out);
+    convert_header(in, out);
 }
 
 template <> void convert(const Header& in, iso20_MessageHeaderType& out) {
@@ -60,6 +68,100 @@ template void convert(const RationalNumber& in, struct iso20_RationalNumberType&
 template <> void convert(const EvseStatus& in, struct iso20_dc_EVSEStatusType& out) {
     out.NotificationMaxDelay = in.notification_max_delay;
     cb_convert_enum(in.notification, out.EVSENotification);
+}
+
+
+/*!
+ * \brief init_physical_value This funcion inits a physicalValue struct.
+ * \param physicalValue is the struct of the physical value.
+ * \param unit is the unit of the physical value.
+ */
+void init_physical_value(struct iso2_PhysicalValueType* const physicalValue, iso2_unitSymbolType unit);
+
+
+//RDB Copied from v2gctx.hpp
+/*!
+ * \brief populate_physical_value This function fills all elements of a \c iso1PhysicalValueType struct regarding the
+ * parameter value and unit.
+ * \param pv is pointer to the physical value struct
+ * \param value is the physical value
+ * \param unit is the unit of the physical value
+ * \return Returns \c true if the convertion was succesfull, otherwise \c false.
+ */
+bool populate_physical_value(struct iso2_PhysicalValueType* pv, long long int value, iso2_unitSymbolType unit);
+
+/*!
+ * \brief populate_physical_value_float This function fills all elements of a \c iso1PhysicalValueType struct from a
+ * json object.
+ * \param pv is pointer to the physical value struct
+ * \param value is the physical value
+ * \param decimal_places is to determine the precision
+ * \param unit is the unit of the physical value
+ */
+void populate_physical_value_float(struct iso2_PhysicalValueType* pv, float value, uint8_t decimal_places,
+                                   iso2_unitSymbolType unit);
+
+void init_physical_value(struct iso2_PhysicalValueType* const physicalValue, iso2_unitSymbolType unit) {
+    physicalValue->Multiplier = 0;
+    physicalValue->Unit = unit;
+    physicalValue->Value = 0;
+}
+
+// Only for AC
+bool populate_physical_value(struct iso2_PhysicalValueType* pv, long long int value, iso2_unitSymbolType unit) {
+    struct iso2_PhysicalValueType physic_tmp = {pv->Multiplier, pv->Unit, pv->Value}; // To restore
+    pv->Unit = unit;
+    pv->Multiplier = 0; // with integers, we don't need negative multipliers for precision, so start at 0
+
+    // if the value is too large to be represented in 16 signed bits, increase the multiplier
+    while ((value > INT16_MAX) || (value < INT16_MIN)) {
+        pv->Multiplier++;
+        value /= 10;
+    }
+
+    // if ((pv->Multiplier < PHY_VALUE_MULT_MIN) || (pv->Multiplier > PHY_VALUE_MULT_MAX)) {
+    //     memcpy(pv, &physic_tmp, sizeof(struct iso1PhysicalValueType));
+    //     dlog(DLOG_LEVEL_WARNING, "Physical value out of scope. Ignore value");
+    //     return false;
+    // }
+
+    pv->Value = value;
+
+    return true;
+}
+
+void populate_physical_value_float(struct iso2_PhysicalValueType* pv, float value, uint8_t decimal_places,
+                                   iso2_unitSymbolType unit) {
+    if (false == populate_physical_value(pv, (long long int)value, unit)) {
+        return;
+    }
+
+    if (pv->Multiplier == 0) {
+        for (uint8_t idx = 0; idx < decimal_places; idx++) {
+            if (((long int)(value * 10) < INT16_MAX) && ((long int)(value * 10) > INT16_MIN)) {
+                pv->Multiplier--;
+                value *= 10;
+            }
+        }
+    }
+
+    // if (pv->Multiplier != -decimal_places) {
+    //     dlog(DLOG_LEVEL_WARNING,
+    //          "Possible precision loss while converting to physical value type, requested %i, actual %i (value %f)",
+    //          decimal_places, -pv->Multiplier, value);
+    // }
+
+    pv->Value = value;
+}
+
+// RDB Add conversions to and from RationalNumber to and from iso2_PhysicalValueType
+// Not sure what to do about the Unit part or the decimal part
+template <> void convert(const iso2_PhysicalValueType& in, RationalNumber& out) {
+    out = from_float(in.Value * (pow(10, in.Multiplier)));
+}
+// RDB TODO Decimal point set to 6? Units set to hours just for a placekeeper
+template <> void convert(const RationalNumber& in, iso2_PhysicalValueType& out) {
+    populate_physical_value_float(&out, in.value * pow(10, in.exponent), 6, iso2_unitSymbolType_h);
 }
 
 template <typename cb_MeterInfoType> void convert_meterinfo(const MeterInfo& in, cb_MeterInfoType& out) {

@@ -1,0 +1,61 @@
+{
+    "V2G_Message": {
+        "Header": {
+            "SessionID": "DC82E5825548E426"
+        },
+        "Body": {
+            "ChargeParameterDiscoveryRes": {
+                "ResponseCode": "OK",
+                "EVSEProcessing": "Finished",
+                "DC_EVSEChargeParameter": {
+                    "DC_EVSEStatus": {
+                        "NotificationMaxDelay": 0,
+                        "EVSENotification": "None",
+                        "EVSEIsolationStatus": "Invalid",
+                        "EVSEStatusCode": "EVSE_Ready"
+                    },
+                    "EVSEMaximumCurrentLimit": {
+                        "Multiplier": -2,
+                        "Unit": "A",
+                        "Value": 20000
+                    },
+                    "EVSEMaximumPowerLimit": {
+                        "Multiplier": 0,
+                        "Unit": "W",
+                        "Value": 22080
+                    },
+                    "EVSEMaximumVoltageLimit": {
+                        "Multiplier": -1,
+                        "Unit": "V",
+                        "Value": 9000
+                    },
+                    "EVSEMinimumCurrentLimit": {
+                        "Multiplier": -1,
+                        "Unit": "A",
+                        "Value": 10
+                    },
+                    "EVSEMinimumVoltageLimit": {
+                        "Multiplier": -1,
+                        "Unit": "V",
+                        "Value": 2000
+                    },
+                    "EVSECurrentRegulationTolerance": {
+                        "Multiplier": -1,
+                        "Unit": "A",
+                        "Value": 20
+                    },
+                    "EVSEPeakCurrentRipple": {
+                        "Multiplier": -1,
+                        "Unit": "A",
+                        "Value": 20
+                    },
+                    "EVSEEnergyToBeDelivered": {
+                        "Multiplier": 0,
+                        "Unit": "Wh",
+                        "Value": 10000
+                    }
+                }
+            }
+        }
+    }
+}

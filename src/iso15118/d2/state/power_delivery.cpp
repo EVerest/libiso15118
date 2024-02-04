@@ -20,10 +20,11 @@ message_2::PowerDeliveryResponse handle_request(const message_2::PowerDeliveryRe
         return response_with_code(res, message_2::ResponseCode::FAILED_UnknownSession);
     }
 
-    // Todo(sl): Add standby feature and define as everest module config
-    if (req.charge_progress == message_2::PowerDeliveryRequest::Progress::Standby) {
-        return response_with_code(res, message_2::ResponseCode::WARNING_StandbyNotAllowed);
-    }
+    //RBL Not part of ISO2?
+    // // Todo(sl): Add standby feature and define as everest module config
+    // if (req.charge_progress == message_2::PowerDeliveryRequest::Progress::Standby) {
+    //     return response_with_code(res, message_2::ResponseCode::WARNING_StandbyNotAllowed);
+    // }
 
     return response_with_code(res, message_2::ResponseCode::OK);
 }

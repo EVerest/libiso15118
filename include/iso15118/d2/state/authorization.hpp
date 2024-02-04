@@ -16,6 +16,7 @@ struct Authorization : public FsmSimpleState {
 
 private:
     message_2::AuthStatus authorization_status{message_2::AuthStatus::Pending};
+    bool DoneOnce = false;
 };
 
 } // namespace iso15118::d2::state

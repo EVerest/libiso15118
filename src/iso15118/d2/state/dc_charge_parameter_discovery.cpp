@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <iso15118/d2/state/dc_charge_parameter_discovery.hpp>
-#include <iso15118/d2/state/schedule_exchange.hpp>
+#include <iso15118/d2/state/dc_cable_check.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/d2/state/dc_charge_parameter_discovery.hpp>
@@ -88,7 +88,9 @@ FsmSimpleState::HandleEventReturnType DC_ChargeParameterDiscovery::handle_event(
             return sa.PASS_ON;
         }
 
-        return sa.create_simple<ScheduleExchange>(ctx);
+        //RDB Go on to CableCheck next
+        return sa.create_simple<DC_CableCheck>(ctx);
+
     } else if (const auto req = variant->get_if<message_2::SessionStopRequest>()) {
         const auto res = handle_request(*req, ctx.session);
 

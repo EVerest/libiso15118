@@ -15,22 +15,25 @@ static auto handle_request(const message_2_sap::SupportedAppProtocolRequest& req
 
     //RDB Decide here which app protocol to use. Send it back in res.SAP_Version
     for (const auto& protocol : req.app_protocol) {
-        if (protocol.protocol_namespace.compare("urn:iso:std:iso:15118:-20:DC") == 0) {
+        if (false){//protocol.protocol_namespace.compare("urn:iso:std:iso:15118:-20:DC") == 0) {
+            res.schema_id = protocol.schema_id;
+            res.SAP_Version = 20;
+            return response_with_code(
+                res, message_2_sap::SupportedAppProtocolResponse::ResponseCode::OK_SuccessfulNegotiation);
+        } 
+        else if (protocol.protocol_namespace.compare("urn:iso:15118:2:2013:MsgDef") == 0) {
             res.schema_id = protocol.schema_id;
             res.SAP_Version = 2;
             return response_with_code(
                 res, message_2_sap::SupportedAppProtocolResponse::ResponseCode::OK_SuccessfulNegotiation);
-        } 
-        // else if (protocol.protocol_namespace.compare("urn:iso:15118:2:2013:MsgDef") == 0) {
-        //     res.schema_id = protocol.schema_id;
-        //     res.SAP_Version = 2;
-        //     return response_with_code(
-        //         res, message_2_sap::SupportedAppProtocolResponse::ResponseCode::OK_SuccessfulNegotiation);
-        // }
+        }
     }
 
     return response_with_code(res, message_2_sap::SupportedAppProtocolResponse::ResponseCode::Failed_NoNegotiation);
 }
+
+
+
 
 void SupportedAppProtocol::enter() {
     ctx.log.enter_state("SupportedAppProtocol");

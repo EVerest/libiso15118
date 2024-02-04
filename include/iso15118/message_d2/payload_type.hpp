@@ -24,20 +24,21 @@ template <typename T> struct PayloadTypeTrait;
     }
 
 CREATE_TYPE_TRAIT(SupportedAppProtocolResponse, SAP);
-CREATE_TYPE_TRAIT(SessionSetupResponse, Part20Main);
+//RDB ISO2 only uses 0x8001
+CREATE_TYPE_TRAIT(SessionSetupResponse, SAP);
 CREATE_TYPE_TRAIT(AuthorizationSetupResponse, Part20Main);
-CREATE_TYPE_TRAIT(AuthorizationResponse, Part20Main);
-CREATE_TYPE_TRAIT(ServiceDiscoveryResponse, Part20Main);
+CREATE_TYPE_TRAIT(AuthorizationResponse, SAP);
+CREATE_TYPE_TRAIT(ServiceDiscoveryResponse, SAP);
 CREATE_TYPE_TRAIT(ServiceDetailResponse, Part20Main);
-CREATE_TYPE_TRAIT(ServiceSelectionResponse, Part20Main);
-CREATE_TYPE_TRAIT(DC_ChargeParameterDiscoveryResponse, Part20DC);
+CREATE_TYPE_TRAIT(ServiceSelectionResponse, SAP);
+CREATE_TYPE_TRAIT(DC_ChargeParameterDiscoveryResponse, SAP);
 CREATE_TYPE_TRAIT(ScheduleExchangeResponse, Part20Main);
-CREATE_TYPE_TRAIT(DC_CableCheckResponse, Part20DC);
-CREATE_TYPE_TRAIT(DC_PreChargeResponse, Part20DC);
-CREATE_TYPE_TRAIT(PowerDeliveryResponse, Part20Main);
-CREATE_TYPE_TRAIT(DC_ChargeLoopResponse, Part20DC);
-CREATE_TYPE_TRAIT(DC_WeldingDetectionResponse, Part20DC);
-CREATE_TYPE_TRAIT(SessionStopResponse, Part20Main);
+CREATE_TYPE_TRAIT(DC_CableCheckResponse, SAP);
+CREATE_TYPE_TRAIT(DC_PreChargeResponse, SAP);
+CREATE_TYPE_TRAIT(PowerDeliveryResponse, SAP);
+CREATE_TYPE_TRAIT(DC_ChargeLoopResponse, SAP);
+CREATE_TYPE_TRAIT(DC_WeldingDetectionResponse, SAP);
+CREATE_TYPE_TRAIT(SessionStopResponse, SAP);
 
 #ifdef CREATE_TYPE_TRAIT_PUSHED
 #define CREATE_TYPE_TRAIT CREATE_TYPE_TRAIT_PUSHED

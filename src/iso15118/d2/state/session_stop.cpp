@@ -23,10 +23,11 @@ message_2::SessionStopResponse handle_request(const message_2::SessionStopReques
         return response_with_code(res, message_2::ResponseCode::FAILED_UnknownSession);
     }
 
-    if (req.charging_session == message_2::ChargingSession::ServiceRenegotiation &&
-        session.service_renegotiation_supported == false) {
-        return response_with_code(res, message_2::ResponseCode::FAILED_NoServiceRenegotiationSupported);
-    }
+    //RBL Not part of ISO2?
+    // if (req.charging_session == message_2::ChargingSession::ServiceRenegotiation &&
+    //     session.service_renegotiation_supported == false) {
+    //     return response_with_code(res, message_2::ResponseCode::FAILED_NoServiceRenegotiationSupported);
+    // }
 
     // Todo(sl): Check req.charging_session
 

@@ -6,80 +6,61 @@
 
 #include <iso15118/detail/variant_access_d2.hpp>
 
-#include <exi/cb/iso20_CommonMessages_Encoder.h>
+#include <exi/cb/iso2_msgDefDatatypes.h>
+#include <exi/cb/iso2_msgDefEncoder.h>
 
 namespace iso15118::message_2 {
 
-template <>
-void convert(const struct iso20_Scheduled_EVPPTControlModeType& in,
-             PowerDeliveryRequest::Scheduled_EVPPTControlMode& out) {
-}
 
-template <> void convert(const struct iso20_PowerScheduleEntryType& in, PowerDeliveryRequest::PowerScheduleEntry& out) {
-    out.duration = in.Duration;
-    convert(in.Power, out.power);
-    CB2CPP_CONVERT_IF_USED(in.Power_L2, out.power_l2);
-    CB2CPP_CONVERT_IF_USED(in.Power_L3, out.power_l3);
-}
+template <> void convert(const struct iso2_PowerDeliveryReqType& in, PowerDeliveryRequest& out) {
+    //convert(in.Header, out.header);
 
-template <> void convert(const struct iso20_EVPowerProfileType& in, PowerDeliveryRequest::PowerProfile& out) {
-    out.time_anchor = in.TimeAnchor;
-
-    if (in.Dynamic_EVPPTControlMode_isUsed) {
-        out.control_mode.emplace<PowerDeliveryRequest::Dynamic_EVPPTControlMode>();
-        // NOTE (aw): nothing more to do here because Dynamic_EVPPTControlMode is empty
-    } else if (in.Scheduled_EVPPTControlMode_isUsed) {
-        auto& cm = out.control_mode.emplace<PowerDeliveryRequest::Scheduled_EVPPTControlMode>();
-        convert(in.Scheduled_EVPPTControlMode, cm);
-    } else {
-        throw std::runtime_error("PowerProfile control mode not defined");
-    }
-
-    auto& entries_in = in.EVPowerProfileEntries.EVPowerProfileEntry;
-    out.entries.reserve(entries_in.arrayLen);
-    for (auto i = 0; i < entries_in.arrayLen; ++i) {
-        auto& entry_out = out.entries.emplace_back();
-        const auto& entry_in = entries_in.array[i];
-        convert(entry_in, entry_out);
-    }
-}
-
-void convert(const iso20_channelSelectionType in, PowerDeliveryRequest::ChannelSelection& out) {
-    cb_convert_enum(in, out);
-}
-
-template <> void convert(const struct iso20_PowerDeliveryReqType& in, PowerDeliveryRequest& out) {
-    convert(in.Header, out.header);
-
-    cb_convert_enum(in.EVProcessing, out.processing);
+    //cb_convert_enum(in. EVProcessing, out.processing);
     cb_convert_enum(in.ChargeProgress, out.charge_progress);
 
-    CB2CPP_CONVERT_IF_USED(in.EVPowerProfile, out.power_profile);
-    CB2CPP_CONVERT_IF_USED(in.BPT_ChannelSelection, out.channel_selection);
+    //RDB TODO handle the rest of the incoming parameters, esp the SessionID
+
 }
 
-template <> void convert(const PowerDeliveryResponse& in, iso20_PowerDeliveryResType& out) {
-    init_iso20_PowerDeliveryResType(&out);
+template <> void convert(const PowerDeliveryResponse& in, iso2_PowerDeliveryResType& out) {
+    init_iso2_PowerDeliveryResType(&out);
 
-    convert(in.header, out.Header);
+    //convert(in.header, out.Header);
     cb_convert_enum(in.response_code, out.ResponseCode);
+    
+    //CPP2CB_CONVERT_IF_USED(in.status, out.EVSEStatus);
+    
+    //RDB Also send send the DC_EVStatus
+    out.DC_EVSEStatus_isUsed=true;
+    out.DC_EVSEStatus.NotificationMaxDelay=0;
+    out.DC_EVSEStatus.EVSENotification=iso2_EVSENotificationType_None;
+    out.DC_EVSEStatus.EVSEStatusCode=iso2_DC_EVSEStatusCodeType_EVSE_Ready;
+    //RDB TODO - isolation status needs to reflect the IMD state.
+    out.DC_EVSEStatus.EVSEIsolationStatus=iso2_isolationLevelType_Valid;
+    out.DC_EVSEStatus.EVSEIsolationStatus_isUsed=true;
 
-    CPP2CB_CONVERT_IF_USED(in.status, out.EVSEStatus);
 }
 
-template <> void insert_type(VariantAccess& va, const struct iso20_PowerDeliveryReqType& in) {
+template <> void insert_type(VariantAccess& va, const struct iso2_PowerDeliveryReqType& in) {
     va.insert_type<PowerDeliveryRequest>(in);
 };
 
 template <> int serialize_to_exi(const PowerDeliveryResponse& in, exi_bitstream_t& out) {
-    iso20_exiDocument doc;
-    init_iso20_exiDocument(&doc);
+    iso2_exiDocument doc;
+    init_iso2_exiDocument(&doc);
 
-    CB_SET_USED(doc.PowerDeliveryRes);
+    //RDB this is new in ISO2
+    init_iso2_BodyType(&doc.V2G_Message.Body);
 
-    convert(in, doc.PowerDeliveryRes);
+    //RDB Convert the header since it is separate in ISO2.
+    convert(in.header, doc.V2G_Message.Header);
 
-    return encode_iso20_exiDocument(&out, &doc);
+
+    CB_SET_USED(doc.V2G_Message.Body.PowerDeliveryRes);
+
+    convert(in, doc.V2G_Message.Body.PowerDeliveryRes);
+
+    return encode_iso2_exiDocument(&out, &doc);
 }
 
 template <> size_t serialize(const PowerDeliveryResponse& in, const io::StreamOutputView& out) {
