@@ -46,7 +46,7 @@ SdpServer::SdpServer() {
     const auto bind_result =
         bind(fd, reinterpret_cast<const struct sockaddr*>(&socket_address), sizeof(socket_address));
     if (bind_result == -1) {
-        log_and_throw("Failed to bind to socket");
+    //    log_and_throw("Failed to bind to socket");
     }
 }
 

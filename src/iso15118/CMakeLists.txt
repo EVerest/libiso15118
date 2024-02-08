@@ -30,6 +30,15 @@ target_sources(iso15118
         session/feedback.cpp
         session/iso.cpp
         session/logger.cpp
+
+        session_d2/feedback.cpp
+        session_d2/iso.cpp
+        session_d2/logger.cpp
+
+        session_d2_sap/feedback.cpp
+        session_d2_sap/iso.cpp
+        session_d2_sap/logger.cpp
+
         
         d20/fsm.cpp
         d20/context.cpp
@@ -74,7 +83,62 @@ target_sources(iso15118
         message/ac_charge_parameter_discovery.cpp
         message/ac_charge_loop.cpp
 
-        tbd_controller.cpp    
+        d2/fsm.cpp
+        d2/context.cpp
+        d2/context_helper.cpp
+        d2/control_event_queue.cpp
+        d2/session.cpp
+        d2/config.cpp
+
+        d2_sap/fsm.cpp
+        d2_sap/context.cpp
+        d2_sap/context_helper.cpp
+        d2_sap/control_event_queue.cpp
+        d2_sap/session.cpp
+        d2_sap/config.cpp
+
+        d2/state/supported_app_protocol.cpp
+        d2/state/session_setup.cpp
+        d2/state/authorization_setup.cpp
+        d2/state/authorization.cpp
+        d2/state/service_discovery.cpp
+        d2/state/service_detail.cpp
+        d2/state/service_selection.cpp
+        d2/state/dc_charge_parameter_discovery.cpp
+        d2/state/schedule_exchange.cpp
+        d2/state/dc_cable_check.cpp
+        d2/state/dc_pre_charge.cpp
+        d2/state/power_delivery.cpp
+        d2/state/dc_charge_loop.cpp
+        d2/state/dc_welding_detection.cpp
+        d2/state/session_stop.cpp
+
+        d2_sap/state/supported_app_protocol.cpp
+
+        message_d2/variant.cpp
+        message_d2/supported_app_protocol.cpp
+        message_d2/session_setup.cpp
+        message_d2/common.cpp
+        message_d2/authorization_setup.cpp
+        message_d2/authorization.cpp
+        message_d2/service_discovery.cpp
+        message_d2/service_detail.cpp
+        message_d2/service_selection.cpp
+        message_d2/dc_charge_parameter_discovery.cpp
+        message_d2/schedule_exchange.cpp
+        message_d2/dc_cable_check.cpp
+        message_d2/dc_pre_charge.cpp
+        message_d2/power_delivery.cpp
+        message_d2/dc_charge_loop.cpp
+        message_d2/dc_welding_detection.cpp
+        message_d2/session_stop.cpp
+
+        message_d2_sap/variant.cpp
+        message_d2_sap/supported_app_protocol.cpp
+
+        tbd_controller.cpp
+        tbd_controller_d2.cpp    
+        tbd_controller_d2_sap.cpp
 )
 
 if (NOT ISO15118_LINK_CUSTOM_MBEDTLS)

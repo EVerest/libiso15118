@@ -36,6 +36,7 @@ public:
 
     std::tuple<bool, size_t, io::v2gtp::PayloadType> check_and_clear_response();
 
+
 private:
     // input
     std::unique_ptr<message_20::Variant> request{nullptr};
@@ -87,6 +88,7 @@ public:
 
     bool& session_stopped;
 
+ 
 private:
     const std::optional<ControlEvent>& current_control_event;
     MessageExchange& message_exchange;
