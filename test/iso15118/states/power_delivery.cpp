@@ -8,7 +8,7 @@ using namespace iso15118;
 
 SCENARIO("Power delivery state handling") {
     GIVEN("Bad case - Unknown session") {
-        d20::Session session = d20::Session();
+        const auto session = states::Session();
 
         message_20::PowerDeliveryRequest req;
         req.header.session_id = session.get_id();
@@ -17,7 +17,7 @@ SCENARIO("Power delivery state handling") {
         req.processing = message_20::Processing::Ongoing;
         req.charge_progress = message_20::PowerDeliveryRequest::Progress::Start;
 
-        const auto res = d20::state::handle_request(req, d20::Session());
+        const auto res = d20::state::handle_request(req, states::Session());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -25,7 +25,7 @@ SCENARIO("Power delivery state handling") {
         }
     }
     GIVEN("Not so bad case - WARNING_StandbyNotAllowed") {
-        d20::Session session = d20::Session();
+        const auto session = states::Session();
 
         message_20::PowerDeliveryRequest req;
         req.header.session_id = session.get_id();

@@ -9,14 +9,14 @@ using namespace iso15118;
 SCENARIO("DC cable check state handling") {
     GIVEN("Bad case - Unknown session") {
 
-        d20::Session session = d20::Session();
+        const auto session = states::Session();
 
         message_20::DC_CableCheckRequest req;
 
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        const auto res = d20::state::handle_request(req, d20::Session(), false);
+        const auto res = d20::state::handle_request(req, states::Session(), false);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -25,7 +25,7 @@ SCENARIO("DC cable check state handling") {
     }
 
     GIVEN("Good case - ongoing ") {
-        d20::Session session = d20::Session();
+        const auto session = states::Session();
 
         message_20::DC_CableCheckRequest req;
         req.header.session_id = session.get_id();
@@ -40,7 +40,7 @@ SCENARIO("DC cable check state handling") {
     }
 
     GIVEN("Good case - finished ") {
-        d20::Session session = d20::Session();
+        const auto session = states::Session();
 
         message_20::DC_CableCheckRequest req;
         req.header.session_id = session.get_id();

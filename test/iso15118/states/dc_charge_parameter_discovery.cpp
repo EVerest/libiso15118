@@ -15,7 +15,7 @@ using BPT_DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::BPT_DC_C
 SCENARIO("DC charge parameter discovery state handling") {
     GIVEN("Bad Case - Unknown session") {
 
-        d20::Session session = d20::Session();
+        const auto session = states::Session();
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -29,7 +29,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto res = d20::state::handle_request(req, d20::Session(), d20::SessionConfig());
+        const auto res = d20::state::handle_request(req, states::Session(), states::SessionConfig());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -54,12 +54,12 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Bad Case: e.g. dc transfer mod instead of dc_bpt transfer mod - FAILED_WrongChargeParameter") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        const auto service_parameters = states::SelectedServiceParameters(
             message_20::ServiceCategory::DC_BPT, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing,
             message_20::BptChannel::Unified, message_20::GeneratorMode::GridFollowing);
 
-        d20::Session session = d20::Session(service_parameters);
+        const auto session = states::Session(service_parameters);
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -73,7 +73,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, d20::SessionConfig());
+        const auto res = d20::state::handle_request(req, session, states::SessionConfig());
 
         THEN("ResponseCode: FAILED_WrongChargeParameter, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_WrongChargeParameter);
@@ -98,11 +98,11 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Bad Case: e.g. DC_BPT transfer mod instead of dc transfer mod - FAILED_WrongChargeParameter") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        const auto service_parameters = states::SelectedServiceParameters(
             message_20::ServiceCategory::DC, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing);
 
-        d20::Session session = d20::Session(service_parameters);
+        const auto session = states::Session(service_parameters);
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -120,7 +120,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, d20::SessionConfig());
+        const auto res = d20::state::handle_request(req, session, states::SessionConfig());
 
         THEN("ResponseCode: FAILED_WrongChargeParameter, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_WrongChargeParameter);
@@ -145,12 +145,12 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Good Case: DC") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        const auto service_parameters = states::SelectedServiceParameters(
             message_20::ServiceCategory::DC, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing);
 
-        d20::Session session = d20::Session(service_parameters);
-        d20::SessionConfig config = d20::SessionConfig();
+        const auto session = states::Session(service_parameters);
+        auto config = states::SessionConfig();
         DC_ModeRes evse_dc_parameter = {
             {22, 3},  // max_charge_power
             {0, 0},   // min_charge_power
@@ -202,13 +202,13 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Good Case: DC_BPT") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        const auto service_parameters = states::SelectedServiceParameters(
             message_20::ServiceCategory::DC_BPT, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing,
             message_20::BptChannel::Unified, message_20::GeneratorMode::GridFollowing);
 
-        d20::Session session = d20::Session(service_parameters);
-        d20::SessionConfig config = d20::SessionConfig();
+        const auto session = states::Session(service_parameters);
+        auto config = states::SessionConfig();
 
         BPT_DC_ModeRes evse_dc_bpt_parameter = {
             {

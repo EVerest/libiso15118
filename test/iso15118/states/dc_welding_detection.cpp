@@ -10,7 +10,7 @@ SCENARIO("DC Welding Detection state handling") {
 
     GIVEN("Bad case - Unknown session") {
 
-        auto session = d20::Session();
+        const auto session = states::Session();
 
         message_20::DC_WeldingDetectionRequest req;
         req.header.session_id = session.get_id();
@@ -19,7 +19,7 @@ SCENARIO("DC Welding Detection state handling") {
 
         const float present_voltage = 0.1;
 
-        const auto res = d20::state::handle_request(req, d20::Session(), present_voltage);
+        const auto res = d20::state::handle_request(req, states::Session(), present_voltage);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -30,7 +30,7 @@ SCENARIO("DC Welding Detection state handling") {
 
     GIVEN("Good Case") {
         
-        auto session = d20::Session();
+        const auto session = states::Session();
 
         message_20::DC_WeldingDetectionRequest req;
         req.header.session_id = session.get_id();
@@ -43,8 +43,8 @@ SCENARIO("DC Welding Detection state handling") {
 
         THEN("ResponseCode: OK, present_voltage should be 200V") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
-            REQUIRE(res.present_voltage.value == 200);
-            REQUIRE(res.present_voltage.exponent == 0);
+            REQUIRE(res.present_voltage.value == 2000);
+            REQUIRE(res.present_voltage.exponent == -1);
         }
     }
 

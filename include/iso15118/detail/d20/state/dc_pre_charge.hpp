@@ -4,14 +4,14 @@
 
 #include <tuple>
 
-#include <iso15118/d20/session.hpp>
-#include <iso15118/message/dc_pre_charge.hpp>
+#include <iso15118/message_d20/dc_pre_charge.hpp>
+#include <iso15118/states/session.hpp>
 
 #include <iso15118/session/feedback.hpp>
 
 namespace iso15118::d20::state {
 
 std::tuple<message_20::DC_PreChargeResponse, session::feedback::DcChargeTarget>
-handle_request(const message_20::DC_PreChargeRequest& req, const d20::Session& session, const float present_voltage);
+handle_request(const message_20::DC_PreChargeRequest& req, const states::Session& session, const float present_voltage);
 
 } // namespace iso15118::d20::state

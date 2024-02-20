@@ -1,13 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <iso15118/message/authorization.hpp>
-#include <iso15118/message/authorization_setup.hpp>
-#include <iso15118/message/schedule_exchange.hpp>
-#include <iso15118/message/service_detail.hpp>
-#include <iso15118/message/service_discovery.hpp>
-#include <iso15118/message/service_selection.hpp>
-#include <iso15118/message/session_setup.hpp>
-#include <iso15118/message/variant.hpp>
+#include <iso15118/message_d20/authorization.hpp>
+#include <iso15118/message_d20/authorization_setup.hpp>
+#include <iso15118/message_d20/schedule_exchange.hpp>
+#include <iso15118/message_d20/service_detail.hpp>
+#include <iso15118/message_d20/service_discovery.hpp>
+#include <iso15118/message_d20/service_selection.hpp>
+#include <iso15118/message_d20/session_setup.hpp>
+#include <iso15118/message_d20/variant.hpp>
 
 #include <string>
 
@@ -315,7 +315,7 @@ SCENARIO("ISO15118-20 Ser/Des") {
         message_20::ScheduleExchangeResponse res;
         res.header.session_id = {0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23};
         res.response_code = message_20::ResponseCode::OK;
-        
+
         uint8_t serialization_buffer[1024];
         io::StreamOutputView out({serialization_buffer, sizeof(serialization_buffer)});
 

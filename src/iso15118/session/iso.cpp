@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstring>
 
-#include <iso15118/d20/state/supported_app_protocol.hpp>
+#include <iso15118/states/d20/supported_app_protocol.hpp>
 
 #include <iso15118/detail/helper.hpp>
 
@@ -29,9 +29,9 @@ static void log_packet_from_car(const iso15118::io::SdpPacket& packet, session::
                packet.get_payload_length(), session::logging::ExiMessageDirection::FROM_EV);
 }
 
-static std::unique_ptr<message_20::Variant> make_variant_from_packet(const iso15118::io::SdpPacket& packet) {
-    return std::make_unique<message_20::Variant>(
-        packet.get_payload_type(), io::StreamInputView{packet.get_payload_buffer(), packet.get_payload_length()});
+template <typename T> std::unique_ptr<T> make_variant_from_packet(const iso15118::io::SdpPacket& packet) {
+    return std::make_unique<T>(packet.get_payload_type(),
+                               io::StreamInputView{packet.get_payload_buffer(), packet.get_payload_length()});
 }
 
 void raise_invalid_packet_state(const io::SdpPacket& sdp_packet) {
@@ -113,11 +113,11 @@ static size_t setup_response_header(uint8_t* buffer, iso15118::io::v2gtp::Payloa
     return size + iso15118::io::SdpPacket::V2GTP_HEADER_SIZE;
 }
 
-Session::Session(std::unique_ptr<io::IConnection> connection_, const d20::SessionConfig& config,
+Session::Session(std::unique_ptr<io::IConnection> connection_, const states::SessionConfig& config,
                  const session::feedback::Callbacks& callbacks) :
     connection(std::move(connection_)),
     log(this),
-    ctx(message_exchange, active_control_event, callbacks, session_stopped, log, config) {
+    ctx(message_exchange, active_control_event, callbacks, session_stopped, log, config, active_protocol) {
 
     next_session_event = offset_time_point_by_ms(get_current_time_point(), SESSION_IDLE_TIMEOUT_MS);
     connection->set_event_callback([this](io::ConnectionEvent event) { this->handle_connection_event(event); });
@@ -126,7 +126,7 @@ Session::Session(std::unique_ptr<io::IConnection> connection_, const d20::Sessio
 
 Session::~Session() = default;
 
-void Session::push_control_event(const d20::ControlEvent& event) {
+void Session::push_control_event(const states::ControlEvent& event) {
     control_event_queue.push(event);
 }
 
@@ -150,7 +150,7 @@ TimePoint const& Session::poll() {
 
     // send all of our queued control events
     while (active_control_event = control_event_queue.pop()) {
-        const auto res = fsm.handle_event(d20::FsmEvent::CONTROL_MESSAGE);
+        const auto res = fsm.handle_event(states::FsmEvent::CONTROL_MESSAGE);
         // FIXME (aw): check result!
     }
 
@@ -159,11 +159,17 @@ TimePoint const& Session::poll() {
         // FIXME (aw): this event loop only acts on new packets, seems to be enough for now ...
         log_packet_from_car(packet, log);
 
-        message_exchange.set_request(make_variant_from_packet(packet));
+        if (active_protocol == states::SessionProtocol::DIN70121) {
+            // message_exchange.set_request(make_variant_from_packet<din::Variant>(packet));
+        } else if (active_protocol == states::SessionProtocol::ISO15118_2) {
+            message_exchange.set_request(make_variant_from_packet<message_2::Variant>(packet));
+        } else {
+            message_exchange.set_request(make_variant_from_packet<message_20::Variant>(packet));
+        }
 
         packet = {}; // reset the packet
 
-        const auto res = fsm.handle_event(d20::FsmEvent::V2GTP_MESSAGE);
+        const auto res = fsm.handle_event(states::FsmEvent::V2GTP_MESSAGE);
     }
 
     const auto [got_response, payload_size, payload_type] = message_exchange.check_and_clear_response();

@@ -6,13 +6,13 @@
 #include <memory>
 
 #include "config.hpp"
-#include "d20/control_event.hpp"
 #include "io/poll_manager.hpp"
 #include "io/sdp_server.hpp"
 #include "session/feedback.hpp"
 #include "session/iso.hpp"
+#include "states/control_event.hpp"
 
-#include "message/common.hpp"
+#include "message_d20/common.hpp"
 
 namespace iso15118 {
 
@@ -28,7 +28,7 @@ public:
 
     void loop();
 
-    void send_control_event(const d20::ControlEvent&);
+    void send_control_event(const states::ControlEvent&);
 
     void setup_config();
 
@@ -38,7 +38,7 @@ private:
     io::PollManager poll_manager;
     io::SdpServer sdp_server;
 
-    d20::SessionConfig session_config;
+    states::SessionConfig session_config;
 
     std::list<Session> sessions;
 

@@ -7,10 +7,10 @@
 
 #include <iso15118/config.hpp>
 
-#include <iso15118/d20/config.hpp>
-#include <iso15118/d20/context.hpp>
-#include <iso15118/d20/control_event_queue.hpp>
-#include <iso15118/d20/fsm.hpp>
+#include <iso15118/states/config.hpp>
+#include <iso15118/states/context.hpp>
+#include <iso15118/states/control_event_queue.hpp>
+#include <iso15118/states/fsm.hpp>
 
 #include <iso15118/io/connection_abstract.hpp>
 #include <iso15118/io/poll_manager.hpp>
@@ -30,11 +30,11 @@ struct SessionState {
 
 class Session {
 public:
-    Session(std::unique_ptr<io::IConnection>, const d20::SessionConfig&, const session::feedback::Callbacks&);
+    Session(std::unique_ptr<io::IConnection>, const states::SessionConfig&, const session::feedback::Callbacks&);
     ~Session();
 
     TimePoint const& poll();
-    void push_control_event(const d20::ControlEvent&);
+    void push_control_event(const states::ControlEvent&);
 
 private:
     std::unique_ptr<io::IConnection> connection;
@@ -47,20 +47,22 @@ private:
     // output buffer
     uint8_t response_buffer[1028];
 
-    d20::MessageExchange message_exchange{{response_buffer + io::SdpPacket::V2GTP_HEADER_SIZE,
-                                           sizeof(response_buffer) - io::SdpPacket::V2GTP_HEADER_SIZE}};
+    states::MessageExchange message_exchange{{response_buffer + io::SdpPacket::V2GTP_HEADER_SIZE,
+                                              sizeof(response_buffer) - io::SdpPacket::V2GTP_HEADER_SIZE}};
 
     // control event buffer
-    d20::ControlEventQueue control_event_queue;
-    std::optional<d20::ControlEvent> active_control_event{std::nullopt};
+    states::ControlEventQueue control_event_queue;
+    std::optional<states::ControlEvent> active_control_event{std::nullopt};
 
-    d20::Context ctx;
+    states::Context ctx;
 
-    d20::Fsm fsm;
+    states::Fsm fsm;
 
     TimePoint next_session_event;
 
     bool session_stopped{false};
+
+    states::SessionProtocol active_protocol{states::SessionProtocol::ISO15118_20};
 
     void handle_connection_event(io::ConnectionEvent event);
 };

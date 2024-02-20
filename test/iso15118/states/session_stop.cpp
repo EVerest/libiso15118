@@ -10,14 +10,14 @@ SCENARIO("Session Stop state handling") {
 
     GIVEN("Bad case - Unknown session") {
 
-        auto session = d20::Session();
+        const auto session = states::Session();
 
         message_20::SessionStopRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.charging_session = message_20::ChargingSession::Terminate;
 
-        const auto res = d20::state::handle_request(req, d20::Session());
+        const auto res = d20::state::handle_request(req, states::Session());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -26,7 +26,7 @@ SCENARIO("Session Stop state handling") {
 
     GIVEN("Good Case") {
 
-        auto session = d20::Session();
+        const auto session = states::Session();
 
         message_20::SessionStopRequest req;
         req.header.session_id = session.get_id();
@@ -41,7 +41,7 @@ SCENARIO("Session Stop state handling") {
     }
 
     GIVEN("Bad case - FAILED_NoServiceRenegotiationSupported") {
-        auto session = d20::Session();
+        auto session = states::Session();
 
         session.service_renegotiation_supported = false;
 

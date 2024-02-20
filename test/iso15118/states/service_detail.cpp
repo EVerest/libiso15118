@@ -10,16 +10,16 @@ SCENARIO("Service detail state handling") {
 
     GIVEN("Bad Case - Unknown session") {
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
 
         message_20::ServiceDetailRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::DC;
 
-        session = d20::Session();
+        session = states::Session();
 
-        const auto res = d20::state::handle_request(req, session, d20::SessionConfig());
+        const auto res = d20::state::handle_request(req, session, states::SessionConfig());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -38,7 +38,7 @@ SCENARIO("Service detail state handling") {
 
     GIVEN("Bad Case - FAILED_ServiceIDInvalid") {
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
         session.offered_services.energy_services = {message_20::ServiceCategory::DC_BPT};
 
         message_20::ServiceDetailRequest req;
@@ -46,7 +46,7 @@ SCENARIO("Service detail state handling") {
         req.header.timestamp = 1691411798;
         req.service = message_20::ServiceCategory::AC;
 
-        const auto res = d20::state::handle_request(req, session, d20::SessionConfig());
+        const auto res = d20::state::handle_request(req, session, states::SessionConfig());
 
         THEN("ResponseCode: FAILED_ServiceIDInvalid, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_ServiceIDInvalid);
@@ -65,10 +65,10 @@ SCENARIO("Service detail state handling") {
 
     GIVEN("Good Case - DC Service") {
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
 
-        d20::SessionConfig config;
+        states::SessionConfig config;
         config.dc_parameter_list = {{
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
@@ -111,10 +111,10 @@ SCENARIO("Service detail state handling") {
     }
 
     GIVEN("Good Case - DC_BPT Service") {
-        d20::Session session = d20::Session();
+        auto session = states::Session();
         session.offered_services.energy_services = {message_20::ServiceCategory::DC_BPT};
 
-        d20::SessionConfig config;
+        states::SessionConfig config;
         config.dc_bpt_parameter_list = {{
             {
                 message_20::DcConnector::Extended,
@@ -170,10 +170,10 @@ SCENARIO("Service detail state handling") {
 
     GIVEN("Good Case - 2x DC Services") {
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
 
-        d20::SessionConfig config;
+        states::SessionConfig config;
         config.dc_parameter_list = {{
                                         message_20::DcConnector::Extended,
                                         message_20::ControlMode::Scheduled,
@@ -244,10 +244,10 @@ SCENARIO("Service detail state handling") {
 
     GIVEN("Bad Case - DC Service: Scheduled Mode: 1, MobilityNeedsMode: 2 change to 1") {
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
 
-        d20::SessionConfig config;
+        states::SessionConfig config;
         config.dc_parameter_list = {{
             message_20::DcConnector::Extended,
             message_20::ControlMode::Scheduled,
@@ -290,11 +290,11 @@ SCENARIO("Service detail state handling") {
     }
 
     GIVEN("Good case - Internet service") {
-        d20::Session session = d20::Session();
+        auto session = states::Session();
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
         session.offered_services.vas_services = {message_20::ServiceCategory::Internet};
 
-        d20::SessionConfig config;
+        states::SessionConfig config;
         config.internet_parameter_list = {
             {message_20::Protocol::Http, message_20::Port::Port80}};
         config.dc_parameter_list = {{
@@ -331,11 +331,11 @@ SCENARIO("Service detail state handling") {
     }
 
     GIVEN("Good case - Parking status service") {
-        d20::Session session = d20::Session();
+        auto session = states::Session();
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
         session.offered_services.vas_services = {message_20::ServiceCategory::ParkingStatus};
 
-        d20::SessionConfig config;
+        states::SessionConfig config;
         config.parking_parameter_list = {
             {message_20::IntendedService::VehicleCheckIn, message_20::ParkingStatus::ManualExternal}};
         config.dc_parameter_list = {{

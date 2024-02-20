@@ -31,48 +31,54 @@ target_sources(iso15118
         session/iso.cpp
         session/logger.cpp
         
-        d20/fsm.cpp
-        d20/context.cpp
-        d20/context_helper.cpp
-        d20/control_event_queue.cpp
-        d20/session.cpp
-        d20/config.cpp
+        states/fsm.cpp
+        states/context.cpp
+        states/context_helper.cpp
+        states/control_event_queue.cpp
+        states/session.cpp
+        states/config.cpp
 
-        d20/state/supported_app_protocol.cpp
-        d20/state/session_setup.cpp
-        d20/state/authorization_setup.cpp
-        d20/state/authorization.cpp
-        d20/state/service_discovery.cpp
-        d20/state/service_detail.cpp
-        d20/state/service_selection.cpp
-        d20/state/dc_charge_parameter_discovery.cpp
-        d20/state/schedule_exchange.cpp
-        d20/state/dc_cable_check.cpp
-        d20/state/dc_pre_charge.cpp
-        d20/state/power_delivery.cpp
-        d20/state/dc_charge_loop.cpp
-        d20/state/dc_welding_detection.cpp
-        d20/state/session_stop.cpp
+        states/d20/supported_app_protocol.cpp
+        states/d20/session_setup.cpp
+        states/d20/authorization_setup.cpp
+        states/d20/authorization.cpp
+        states/d20/service_discovery.cpp
+        states/d20/service_detail.cpp
+        states/d20/service_selection.cpp
+        states/d20/dc_charge_parameter_discovery.cpp
+        states/d20/schedule_exchange.cpp
+        states/d20/dc_cable_check.cpp
+        states/d20/dc_pre_charge.cpp
+        states/d20/power_delivery.cpp
+        states/d20/dc_charge_loop.cpp
+        states/d20/dc_welding_detection.cpp
+        states/d20/session_stop.cpp
 
-        message/variant.cpp
-        message/supported_app_protocol.cpp
-        message/session_setup.cpp
-        message/common.cpp
-        message/authorization_setup.cpp
-        message/authorization.cpp
-        message/service_discovery.cpp
-        message/service_detail.cpp
-        message/service_selection.cpp
-        message/dc_charge_parameter_discovery.cpp
-        message/schedule_exchange.cpp
-        message/dc_cable_check.cpp
-        message/dc_pre_charge.cpp
-        message/power_delivery.cpp
-        message/dc_charge_loop.cpp
-        message/dc_welding_detection.cpp
-        message/session_stop.cpp
-        message/ac_charge_parameter_discovery.cpp
-        message/ac_charge_loop.cpp
+        states/d2/session_setup.cpp
+
+        message_d2/variant.cpp
+        message_d2/session_setup.cpp
+        message_d2/common.cpp
+
+        message_d20/variant.cpp
+        message_d20/supported_app_protocol.cpp
+        message_d20/session_setup.cpp
+        message_d20/common.cpp
+        message_d20/authorization_setup.cpp
+        message_d20/authorization.cpp
+        message_d20/service_discovery.cpp
+        message_d20/service_detail.cpp
+        message_d20/service_selection.cpp
+        message_d20/dc_charge_parameter_discovery.cpp
+        message_d20/schedule_exchange.cpp
+        message_d20/dc_cable_check.cpp
+        message_d20/dc_pre_charge.cpp
+        message_d20/power_delivery.cpp
+        message_d20/dc_charge_loop.cpp
+        message_d20/dc_welding_detection.cpp
+        message_d20/session_stop.cpp
+        message_d20/ac_charge_parameter_discovery.cpp
+        message_d20/ac_charge_loop.cpp
 
         tbd_controller.cpp    
 )

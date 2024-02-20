@@ -2,9 +2,9 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include <iso15118/d20/context.hpp>
-#include <iso15118/d20/session.hpp>
-#include <iso15118/message/common.hpp>
+#include <iso15118/message_d20/common.hpp>
+#include <iso15118/states/context.hpp>
+#include <iso15118/states/session.hpp>
 
 namespace iso15118::d20 {
 
@@ -15,10 +15,11 @@ template <typename Response, typename ResponseCode> Response& response_with_code
     return res;
 }
 
-bool validate_and_setup_header(message_20::Header&, const Session&, const decltype(message_20::Header::session_id)&);
+bool validate_and_setup_header(message_20::Header&, const states::Session&,
+                               const decltype(message_20::Header::session_id)&);
 
-void setup_header(message_20::Header&, const Session&);
+void setup_header(message_20::Header&, const states::Session&);
 
-void send_sequence_error(const message_20::Type, d20::Context&);
+void send_sequence_error(const message_20::Type, states::Context&);
 
 } // namespace iso15118::d20

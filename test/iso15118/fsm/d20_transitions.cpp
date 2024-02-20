@@ -4,16 +4,16 @@
 
 #include "helper.hpp"
 
-#include <iso15118/d20/state/session_setup.hpp>
-#include <iso15118/d20/state/supported_app_protocol.hpp>
+#include <iso15118/states/d20/session_setup.hpp>
+#include <iso15118/states/d20/supported_app_protocol.hpp>
 
-#include <iso15118/message/supported_app_protocol.hpp>
+#include <iso15118/message_d20/supported_app_protocol.hpp>
 
 using namespace iso15118;
 
 SCENARIO("ISO15118-20 state transitions") {
 
-    auto state_helper = FsmStateHelper(d20::SessionConfig());
+    auto state_helper = FsmStateHelper(states::SessionConfig());
 
     d20::state::SupportedAppProtocol state(state_helper.get_context());
 
