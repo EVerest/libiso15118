@@ -9,14 +9,14 @@ using namespace iso15118;
 SCENARIO("Authorization setup state handling") {
 
     GIVEN("Bad Case - Unknown session") {
-        auto session = d20::Session();
+        auto session = states::Session();
 
         message_20::AuthorizationSetupRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        session = d20::Session();
-        d20::SessionConfig config;
+        session = states::Session();
+        states::SessionConfig config;
 
         const auto res =
             d20::state::handle_request(req, session, config.cert_install_service, config.authorization_services);
@@ -33,13 +33,13 @@ SCENARIO("Authorization setup state handling") {
 
     GIVEN("Good Case - EIM only , cert_install_service not provided") {
 
-        auto session = d20::Session();
+        auto session = states::Session();
 
         message_20::AuthorizationSetupRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        d20::SessionConfig config;
+        states::SessionConfig config;
         config.cert_install_service = false;
         config.authorization_services = {message_20::Authorization::EIM};
 
@@ -59,13 +59,13 @@ SCENARIO("Authorization setup state handling") {
 
     GIVEN("Good Case - PnC only, cert_install_service not provided") {
 
-        auto session = d20::Session();
+        auto session = states::Session();
 
         message_20::AuthorizationSetupRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        d20::SessionConfig config;
+        states::SessionConfig config;
         config.cert_install_service = false;
         config.authorization_services = {message_20::Authorization::PnC};
 
@@ -88,13 +88,13 @@ SCENARIO("Authorization setup state handling") {
 
     GIVEN("Good Case - EIM + PnC, cert_install_service provided") {
 
-        auto session = d20::Session();
+        auto session = states::Session();
 
         message_20::AuthorizationSetupRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        d20::SessionConfig config;
+        states::SessionConfig config;
         config.cert_install_service = true;
         config.authorization_services = {message_20::Authorization::PnC, message_20::Authorization::EIM};
 

@@ -17,7 +17,7 @@ namespace iso15118 {
 TbdController::TbdController(TbdConfig config_, session::feedback::Callbacks callbacks_) :
     config(std::move(config_)), callbacks(std::move(callbacks_)) {
     poll_manager.register_fd(sdp_server.get_fd(), [this]() { handle_sdp_server_input(); });
-    session_config = d20::SessionConfig();
+    session_config = states::SessionConfig();
 }
 
 void TbdController::loop() {
@@ -38,7 +38,7 @@ void TbdController::loop() {
     }
 }
 
-void TbdController::send_control_event(const d20::ControlEvent& event) {
+void TbdController::send_control_event(const states::ControlEvent& event) {
     if (sessions.size() > 1) {
         logf("Inconsistent state, sessions.size() > 1 -- dropping control event");
         return;

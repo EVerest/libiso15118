@@ -10,7 +10,7 @@ using AuthStatus = message_20::AuthStatus;
 SCENARIO("Authorization state handling") {
 
     GIVEN("Bad Case - Unknown session") {
-        d20::Session session = d20::Session();
+        const auto session = states::Session();
 
         message_20::AuthorizationRequest req;
         req.header.session_id = session.get_id();
@@ -19,7 +19,7 @@ SCENARIO("Authorization state handling") {
         req.selected_authorization_service = message_20::Authorization::EIM;
         req.eim_as_req_authorization_mode.emplace();
 
-        const auto res = d20::state::handle_request(req, d20::Session(), AuthStatus::Pending);
+        const auto res = d20::state::handle_request(req, states::Session(), AuthStatus::Pending);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -29,7 +29,7 @@ SCENARIO("Authorization state handling") {
 
     GIVEN("Warning - Authorization selection is invalid") {
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
         session.offered_services.auth_services = {message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;
@@ -51,7 +51,7 @@ SCENARIO("Authorization state handling") {
 
     GIVEN("Warning - EIM Authorization Failure") { // [V2G20-2219]
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
         session.offered_services.auth_services = {message_20::Authorization::EIM, message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;
@@ -71,7 +71,7 @@ SCENARIO("Authorization state handling") {
 
     GIVEN("Good case - EIM waiting for authorization") {
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
         session.offered_services.auth_services = {message_20::Authorization::EIM, message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;
@@ -91,7 +91,7 @@ SCENARIO("Authorization state handling") {
 
     GIVEN("Good case - EIM authorized") {
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
         session.offered_services.auth_services = {message_20::Authorization::EIM, message_20::Authorization::PnC};
 
         message_20::AuthorizationRequest req;

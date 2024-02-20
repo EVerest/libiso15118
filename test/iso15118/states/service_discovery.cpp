@@ -9,13 +9,13 @@ using namespace iso15118;
 SCENARIO("Service discovery state handling") {
 
     GIVEN("Bad Case - Unknown session") {
-        auto session = d20::Session();
+        auto session = states::Session();
 
         message_20::ServiceDiscoveryRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        session = d20::Session();
+        session = states::Session();
 
         std::vector<message_20::ServiceCategory> energy_services = {message_20::ServiceCategory::DC};
 
@@ -33,7 +33,7 @@ SCENARIO("Service discovery state handling") {
 
     GIVEN("Good Case - Setting services") {
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
 
         message_20::ServiceDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -60,7 +60,7 @@ SCENARIO("Service discovery state handling") {
 
     GIVEN("Good Case - Setting services + vas list") {
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
 
         message_20::ServiceDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -91,7 +91,7 @@ SCENARIO("Service discovery state handling") {
 
     GIVEN("Good Case - Filter supported_service_providers") {
 
-        d20::Session session = d20::Session();
+        auto session = states::Session();
 
         message_20::ServiceDiscoveryRequest req;
         req.header.session_id = session.get_id();

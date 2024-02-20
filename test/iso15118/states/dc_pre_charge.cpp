@@ -10,7 +10,7 @@ SCENARIO("DC Pre charge state handling") {
 
     GIVEN("Bad case - Unknown session") {
 
-        auto session = d20::Session();
+        const auto session = states::Session();
 
         message_20::DC_PreChargeRequest req;
 
@@ -22,7 +22,7 @@ SCENARIO("DC Pre charge state handling") {
 
         const float present_voltage = 0.1;
 
-        const auto [res, charge_target] = d20::state::handle_request(req, d20::Session(), present_voltage);
+        const auto [res, charge_target] = d20::state::handle_request(req, states::Session(), present_voltage);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -32,7 +32,7 @@ SCENARIO("DC Pre charge state handling") {
     }
 
     GIVEN("Good Case") {
-        auto session = d20::Session();
+        const auto session = states::Session();
 
         message_20::DC_PreChargeRequest req;
 

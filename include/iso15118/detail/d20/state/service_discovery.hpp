@@ -4,15 +4,15 @@
 
 #include <vector>
 
-#include <iso15118/d20/config.hpp>
-#include <iso15118/d20/session.hpp>
-#include <iso15118/message/common.hpp>
-#include <iso15118/message/service_discovery.hpp>
+#include <iso15118/message_d20/common.hpp>
+#include <iso15118/message_d20/service_discovery.hpp>
+#include <iso15118/states/config.hpp>
+#include <iso15118/states/session.hpp>
 
 namespace iso15118::d20::state {
 
 message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDiscoveryRequest& req,
-                                                    d20::Session& session,
+                                                    states::Session& session,
                                                     const std::vector<message_20::ServiceCategory>& energy_services,
                                                     const std::vector<message_20::ServiceCategory>& vas_services);
 

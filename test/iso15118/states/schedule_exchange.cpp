@@ -15,7 +15,7 @@ SCENARIO("Schedule Exchange state handling") {
 
     GIVEN("Bad case - Unknown session") {
 
-        d20::Session session = d20::Session();
+        const auto session = states::Session();
 
         message_20::ScheduleExchangeRequest req;
         req.header.session_id = session.get_id();
@@ -25,7 +25,7 @@ SCENARIO("Schedule Exchange state handling") {
 
         message_20::RationalNumber max_power = {0, 0};
 
-        const auto res = d20::state::handle_request(req, d20::Session(), max_power);
+        const auto res = d20::state::handle_request(req, states::Session(), max_power);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -39,11 +39,11 @@ SCENARIO("Schedule Exchange state handling") {
     }
 
     GIVEN("Bad case - False control mode") {
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        const auto service_parameters = states::SelectedServiceParameters(
             message_20::ServiceCategory::DC, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing);
 
-        auto session = d20::Session(service_parameters);
+        const auto session = states::Session(service_parameters);
 
         message_20::ScheduleExchangeRequest req;
         req.header.session_id = session.get_id();
@@ -67,11 +67,11 @@ SCENARIO("Schedule Exchange state handling") {
     }
 
     GIVEN("Good case - Scheduled Mode") {
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        const auto service_parameters = states::SelectedServiceParameters(
             message_20::ServiceCategory::DC, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
             message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing);
 
-        auto session = d20::Session(service_parameters);
+        const auto session = states::Session(service_parameters);
 
         message_20::ScheduleExchangeRequest req;
         req.header.session_id = session.get_id();
