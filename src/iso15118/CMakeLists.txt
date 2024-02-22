@@ -52,6 +52,19 @@ target_sources(iso15118
         message_d2/variant.cpp
         message_d2/session_setup.cpp
         message_d2/common.cpp
+        message_d2/authorization_setup.cpp
+        message_d2/authorization.cpp
+        message_d2/service_discovery.cpp
+        message_d2/service_detail.cpp
+        message_d2/service_selection.cpp
+        message_d2/dc_charge_parameter_discovery.cpp
+        message_d2/schedule_exchange.cpp
+        message_d2/dc_cable_check.cpp
+        message_d2/dc_pre_charge.cpp
+        message_d2/power_delivery.cpp
+        message_d2/dc_charge_loop.cpp
+        message_d2/dc_welding_detection.cpp
+        message_d2/session_stop.cpp
 
         message_d20/variant.cpp
         message_d20/supported_app_protocol.cpp
