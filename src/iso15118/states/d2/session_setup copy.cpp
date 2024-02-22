@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2024 Pionix GmbH and Contributors to EVerest
+// Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <algorithm>
 
 #include <iso15118/d2/state/service_discovery.hpp>
