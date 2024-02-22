@@ -37,6 +37,7 @@ if (ISO15118_INSTALL)
             cb_v2gtp
             cb_exi_codec
             cb_iso20
+            cb_iso2
             iso15118
         EXPORT iso15118-targets
     )

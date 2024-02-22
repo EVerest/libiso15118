@@ -69,3 +69,27 @@ target_include_directories(cb_v2gtp
 )
 
 target_compile_features(cb_v2gtp PRIVATE c_std_99)
+
+add_library(cb_iso2)
+add_library(iso15118::exi_2 ALIAS cb_iso2)
+
+target_sources(cb_iso2
+    PRIVATE
+        iso-2/iso2_msgDefDatatypes.c
+        iso-2/iso2_msgDefDecoder.c
+        iso-2/iso2_msgDefEncoder.c
+)
+
+target_include_directories(cb_iso2
+    INTERFACE
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/include/exi/cb
+)
+
+target_link_libraries(cb_iso2
+    PRIVATE
+        cb_exi_codec
+)
+
+target_compile_features(cb_iso2 PRIVATE c_std_99)

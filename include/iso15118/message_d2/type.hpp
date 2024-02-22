@@ -10,6 +10,32 @@ enum class Type {
     None,
     SessionSetupReq,
     SessionSetupRes,
+    AuthorizationSetupReq,
+    AuthorizationSetupRes,
+    AuthorizationReq,
+    AuthorizationRes,
+    ServiceDiscoveryReq,
+    ServiceDiscoveryRes,
+    ServiceDetailReq,
+    ServiceDetailRes,
+    ServiceSelectionReq,
+    ServiceSelectionRes,
+    DC_ChargeParameterDiscoveryReq,
+    DC_ChargeParameterDiscoveryRes,
+    ScheduleExchangeReq,
+    ScheduleExchangeRes,
+    DC_CableCheckReq,
+    DC_CableCheckRes,
+    DC_PreChargeReq,
+    DC_PreChargeRes,
+    PowerDeliveryReq,
+    PowerDeliveryRes,
+    DC_ChargeLoopReq,
+    DC_ChargeLoopRes,
+    DC_WeldingDetectionReq,
+    DC_WeldingDetectionRes,
+    SessionStopReq,
+    SessionStopRes,
 };
 
 template <typename T> struct TypeTrait {
@@ -34,6 +60,19 @@ template <typename MessageType> size_t serialize(const MessageType&, const io::S
     }
 
 CREATE_TYPE_TRAIT(SessionSetupRequest, SessionSetupReq);
+CREATE_TYPE_TRAIT(AuthorizationSetupRequest, AuthorizationSetupReq);
+CREATE_TYPE_TRAIT(AuthorizationRequest, AuthorizationReq);
+CREATE_TYPE_TRAIT(ServiceDiscoveryRequest, ServiceDiscoveryReq);
+CREATE_TYPE_TRAIT(ServiceDetailRequest, ServiceDetailReq);
+CREATE_TYPE_TRAIT(ServiceSelectionRequest, ServiceSelectionReq);
+CREATE_TYPE_TRAIT(DC_ChargeParameterDiscoveryRequest, DC_ChargeParameterDiscoveryReq);
+CREATE_TYPE_TRAIT(ScheduleExchangeRequest, ScheduleExchangeReq);
+CREATE_TYPE_TRAIT(DC_CableCheckRequest, DC_CableCheckReq);
+CREATE_TYPE_TRAIT(DC_PreChargeRequest, DC_PreChargeReq);
+CREATE_TYPE_TRAIT(PowerDeliveryRequest, PowerDeliveryReq);
+CREATE_TYPE_TRAIT(DC_ChargeLoopRequest, DC_ChargeLoopReq);
+CREATE_TYPE_TRAIT(DC_WeldingDetectionRequest, DC_WeldingDetectionReq);
+CREATE_TYPE_TRAIT(SessionStopRequest, SessionStopReq);
 
 #ifdef CREATE_TYPE_TRAIT_PUSHED
 #define CREATE_TYPE_TRAIT CREATE_TYPE_TRAIT_PUSHED
