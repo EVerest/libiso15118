@@ -68,7 +68,7 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Bad Case: e.g. dc transfer mod instead of dc_bpt transfer mod - FAILED_WrongChargeParameter") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::DcBptDcSelectedServiceParameters service_parameters = d20::DcBptDcSelectedServiceParameters(
             dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
             dt::GeneratorMode::GridFollowing);
@@ -112,7 +112,7 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Bad Case: e.g. DC_BPT transfer mod instead of dc transfer mod - FAILED_WrongChargeParameter") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::SelectedServiceParameters service_parameters = d20::DcSelectedServiceParameters(
             dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
@@ -159,7 +159,7 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Good Case: DC") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::DcSelectedServiceParameters service_parameters = d20::DcSelectedServiceParameters(
             dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
@@ -211,7 +211,7 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Good Case: DC_BPT") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::DcBptDcSelectedServiceParameters service_parameters = d20::DcBptDcSelectedServiceParameters(
             dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
             dt::GeneratorMode::GridFollowing);

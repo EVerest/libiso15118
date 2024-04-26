@@ -41,7 +41,7 @@ SCENARIO("Schedule Exchange state handling") {
     }
 
     GIVEN("Bad case - False control mode") {
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::DcSelectedServiceParameters service_parameters = d20::DcSelectedServiceParameters(
             dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
@@ -69,7 +69,7 @@ SCENARIO("Schedule Exchange state handling") {
     }
 
     GIVEN("Good case - Scheduled Mode") {
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::DcSelectedServiceParameters service_parameters = d20::DcSelectedServiceParameters(
             dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 

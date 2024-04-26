@@ -82,17 +82,37 @@ bool Session::find_parameter_set_id(const dt::ServiceCategory service, int16_t i
 void Session::selected_service_parameters(const dt::ServiceCategory service, const uint16_t id) {
 
     switch (service) {
+    case dt::ServiceCategory::AC:
+        if (this->offered_services.ac_parameter_list.find(id) != this->offered_services.ac_parameter_list.end()) {
+            const auto& parameters = this->offered_services.ac_parameter_list.at(id);
+            this->selected_services = AcSelectedServiceParameters(
+                message_20::datatypes::ServiceCategory::AC, parameters.control_mode, parameters.connector,
+                parameters.evse_nominal_voltage, parameters.mobility_needs_mode, parameters.pricing);
+        } else {
+            // Todo(sl): Should be not the case -> Raise Error?
+        }
+        break;
+
+    case dt::ServiceCategory::AC_BPT:
+        if (this->offered_services.ac_bpt_parameter_list.find(id) !=
+            this->offered_services.ac_bpt_parameter_list.end()) {
+            const auto& parameters = this->offered_services.ac_bpt_parameter_list.at(id);
+            this->selected_services = AcBptSelectedServiceParameters(
+                message_20::datatypes::ServiceCategory::AC_BPT, parameters.control_mode, parameters.connector,
+                parameters.evse_nominal_voltage, parameters.mobility_needs_mode, parameters.pricing,
+                parameters.bpt_channel, parameters.generator_mode, parameters.grid_code_detection_methode);
+        } else {
+            // Todo(sl): Should be not the case -> Raise Error?
+        }
+        break;
+
     case dt::ServiceCategory::DC:
 
         if (this->offered_services.dc_parameter_list.find(id) != this->offered_services.dc_parameter_list.end()) {
-            auto& parameters = this->offered_services.dc_parameter_list.at(id);
+            const auto& parameters = this->offered_services.dc_parameter_list.at(id);
             this->selected_services =
-                SelectedServiceParameters(dt::ServiceCategory::DC, parameters.connector, parameters.control_mode,
-                                          parameters.mobility_needs_mode, parameters.pricing);
-
-            logf_info("Selected DC service parameters: control mode: %s, mobility needs mode: %s",
-                      dt::from_control_mode(parameters.control_mode).c_str(),
-                      dt::from_mobility_needs_mode(parameters.mobility_needs_mode).c_str());
+                DcSelectedServiceParameters(dt::ServiceCategory::DC, parameters.control_mode,
+                                            parameters.connector, parameters.mobility_needs_mode, parameters.pricing);
         } else {
             // Todo(sl): Should be not the case -> Raise Error?
         }
@@ -101,9 +121,9 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
     case dt::ServiceCategory::DC_BPT:
         if (this->offered_services.dc_bpt_parameter_list.find(id) !=
             this->offered_services.dc_bpt_parameter_list.end()) {
-            auto& parameters = this->offered_services.dc_bpt_parameter_list.at(id);
-            this->selected_services = SelectedServiceParameters(
-                dt::ServiceCategory::DC_BPT, parameters.connector, parameters.control_mode,
+            const auto& parameters = this->offered_services.dc_bpt_parameter_list.at(id);
+            this->selected_services = DcBptDcSelectedServiceParameters(
+                dt::ServiceCategory::DC_BPT, parameters.control_mode, parameters.connector,
                 parameters.mobility_needs_mode, parameters.pricing, parameters.bpt_channel, parameters.generator_mode);
 
             logf_info("Selected DC_BPT service parameters: control mode: %s, mobility needs mode: %s",
