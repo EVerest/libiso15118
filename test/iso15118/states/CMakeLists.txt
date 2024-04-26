@@ -50,6 +50,16 @@ target_link_libraries(test_service_selection
 
 catch_discover_tests(test_service_selection)
 
+add_executable(test_ac_charge_parameter_discovery ac_charge_parameter_discovery.cpp)
+
+target_link_libraries(test_ac_charge_parameter_discovery
+    PRIVATE
+        iso15118
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(test_ac_charge_parameter_discovery)
+
 add_executable(test_dc_charge_parameter_discovery dc_charge_parameter_discovery.cpp)
 
 target_link_libraries(test_dc_charge_parameter_discovery
