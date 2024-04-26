@@ -25,6 +25,13 @@ handle_request(const message_20::SupportedAppProtocolRequest& req) {
                         res, message_20::SupportedAppProtocolResponse::ResponseCode::OK_SuccessfulNegotiation),
                     protocol};
         }
+
+        if (protocol.protocol_namespace.compare("urn:iso:std:iso:15118:-20:AC") == 0) {
+            res.schema_id = protocol.schema_id;
+            return {response_with_code(
+                        res, message_20::SupportedAppProtocolResponse::ResponseCode::OK_SuccessfulNegotiation),
+                    protocol};
+        }
     }
 
     return {response_with_code(res, message_20::SupportedAppProtocolResponse::ResponseCode::Failed_NoNegotiation),

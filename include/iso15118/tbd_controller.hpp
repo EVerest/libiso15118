@@ -39,6 +39,7 @@ public:
                                        bool cert_install_service);
     void update_dc_limits(const d20::DcTransferLimits&);
     void update_energy_modes(const std::vector<message_20::datatypes::ServiceCategory>&);
+    void update_ac_limits(const d20::AcTransferLimits&);
 
 private:
     io::PollManager poll_manager;
