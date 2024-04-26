@@ -36,6 +36,8 @@ struct SessionConfig {
     std::vector<message_20::datatypes::ServiceCategory> supported_energy_transfer_services;
     std::vector<message_20::datatypes::ServiceCategory> supported_vas_services;
 
+    std::vector<message_20::datatypes::AcParameterList> ac_parameter_list;
+    std::vector<message_20::datatypes::AcBptParameterList> ac_bpt_parameter_list;
     std::vector<message_20::datatypes::DcParameterList> dc_parameter_list;
     std::vector<message_20::datatypes::DcBptParameterList> dc_bpt_parameter_list;
 
