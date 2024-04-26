@@ -54,8 +54,8 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Bad Case: e.g. dc transfer mod instead of dc_bpt transfer mod - FAILED_WrongChargeParameter") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
-            message_20::ServiceCategory::DC_BPT, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
+        const auto service_parameters = d20::DcBptDcSelectedServiceParameters(
+            message_20::ServiceCategory::DC_BPT, message_20::ControlMode::Scheduled, message_20::DcConnector::Extended,
             message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing,
             message_20::BptChannel::Unified, message_20::GeneratorMode::GridFollowing);
 
@@ -98,8 +98,8 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Bad Case: e.g. DC_BPT transfer mod instead of dc transfer mod - FAILED_WrongChargeParameter") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
-            message_20::ServiceCategory::DC, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
+        const auto service_parameters = d20::DcSelectedServiceParameters(
+            message_20::ServiceCategory::DC, message_20::ControlMode::Scheduled, message_20::DcConnector::Extended,
             message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing);
 
         d20::Session session = d20::Session(service_parameters);
@@ -145,8 +145,8 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Good Case: DC") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
-            message_20::ServiceCategory::DC, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
+        const auto service_parameters = d20::DcSelectedServiceParameters(
+            message_20::ServiceCategory::DC, message_20::ControlMode::Scheduled, message_20::DcConnector::Extended,
             message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing);
 
         d20::Session session = d20::Session(service_parameters);
@@ -202,8 +202,8 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Good Case: DC_BPT") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
-            message_20::ServiceCategory::DC_BPT, message_20::DcConnector::Extended, message_20::ControlMode::Scheduled,
+        const auto service_parameters = d20::DcBptDcSelectedServiceParameters(
+            message_20::ServiceCategory::DC_BPT, message_20::ControlMode::Scheduled, message_20::DcConnector::Extended,
             message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing,
             message_20::BptChannel::Unified, message_20::GeneratorMode::GridFollowing);
 

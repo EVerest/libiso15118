@@ -18,6 +18,8 @@ struct OfferedServices {
     std::vector<message_20::ServiceCategory> energy_services;
     std::vector<message_20::ServiceCategory> vas_services;
 
+    std::map<uint8_t, message_20::AcParameterList> ac_parameter_list;
+    std::map<uint8_t, message_20::AcBptParameterList> ac_bpt_parameter_list;
     std::map<uint8_t, message_20::DcParameterList> dc_parameter_list;
     std::map<uint8_t, message_20::DcBptParameterList> dc_bpt_parameter_list;
     std::map<uint8_t, message_20::InternetParameterList> internet_parameter_list;
@@ -25,43 +27,87 @@ struct OfferedServices {
 };
 
 struct SelectedServiceParameters {
-
     message_20::ServiceCategory selected_energy_service;
-
-    std::variant<message_20::AcConnector, message_20::DcConnector> selected_connector;
     message_20::ControlMode selected_control_mode;
+};
+
+struct AcSelectedServiceParameters : SelectedServiceParameters {
+    message_20::AcConnector selected_conntector;
+    uint32_t evse_nominal_voltage;
     message_20::MobilityNeedsMode selected_mobility_needs_mode;
     message_20::Pricing selected_pricing;
 
+    AcSelectedServiceParameters() = default;
+    AcSelectedServiceParameters(message_20::ServiceCategory energy_service_, message_20::ControlMode control_mode_,
+                                message_20::AcConnector connector_, uint32_t voltage_,
+                                message_20::MobilityNeedsMode mobility_, message_20::Pricing pricing_) :
+        selected_conntector(connector_),
+        evse_nominal_voltage(voltage_),
+        selected_mobility_needs_mode(mobility_),
+        selected_pricing(pricing_) {
+        selected_energy_service = energy_service_;
+        selected_control_mode = control_mode_;
+    };
+};
+
+struct AcBptSelectedServiceParameters : AcSelectedServiceParameters {
+    message_20::BptChannel selected_bpt_channel;
+    message_20::GeneratorMode selected_generator_mode;
+    message_20::GridCodeIslandingDetectionMethode selected_grid_code_methode;
+
+    AcBptSelectedServiceParameters(message_20::ServiceCategory energy_service_, message_20::ControlMode control_mode_,
+                                   message_20::AcConnector connector_, uint32_t voltage_,
+                                   message_20::MobilityNeedsMode mobility_, message_20::Pricing pricing_,
+                                   message_20::BptChannel channel_, message_20::GeneratorMode generator_mode_,
+                                   message_20::GridCodeIslandingDetectionMethode grid_detect_method_) :
+        selected_bpt_channel(channel_),
+        selected_generator_mode(generator_mode_),
+        selected_grid_code_methode(grid_detect_method_) {
+        selected_energy_service = energy_service_;
+        selected_control_mode = control_mode_;
+        selected_conntector = connector_;
+        evse_nominal_voltage = voltage_;
+        selected_mobility_needs_mode = mobility_;
+        selected_pricing = pricing_;
+    };
+};
+
+struct DcSelectedServiceParameters : SelectedServiceParameters {
+    message_20::DcConnector selected_connector;
+    message_20::MobilityNeedsMode selected_mobility_needs_mode;
+    message_20::Pricing selected_pricing;
+
+    DcSelectedServiceParameters() = default;
+    DcSelectedServiceParameters(message_20::ServiceCategory energy_service_, message_20::ControlMode control_mode_,
+                                message_20::DcConnector connector_, message_20::MobilityNeedsMode mobility_,
+                                message_20::Pricing pricing_) :
+        selected_mobility_needs_mode(mobility_), selected_pricing(pricing_), selected_connector(connector_) {
+        selected_energy_service = energy_service_;
+        selected_control_mode = control_mode_;
+    };
+};
+
+struct DcBptDcSelectedServiceParameters : DcSelectedServiceParameters {
     message_20::BptChannel selected_bpt_channel;
     message_20::GeneratorMode selected_generator_mode;
 
-    SelectedServiceParameters(){}; // TODO(sl): What to do here?
-    // Constructor for DC
-    SelectedServiceParameters(message_20::ServiceCategory energy_service_, message_20::DcConnector dc_connector_,
-                              message_20::ControlMode control_mode_, message_20::MobilityNeedsMode mobility_,
-                              message_20::Pricing pricing_) :
-        selected_energy_service(energy_service_),
-        selected_control_mode(control_mode_),
-        selected_mobility_needs_mode(mobility_),
-        selected_pricing(pricing_) {
-        selected_connector.emplace<message_20::DcConnector>(dc_connector_);
-    };
-
-    // Constructor for DC_BPT
-    SelectedServiceParameters(message_20::ServiceCategory energy_service_, message_20::DcConnector dc_connector_,
-                              message_20::ControlMode control_mode_, message_20::MobilityNeedsMode mobility_,
-                              message_20::Pricing pricing_, message_20::BptChannel channel_,
-                              message_20::GeneratorMode generator_) :
-        selected_energy_service(energy_service_),
-        selected_control_mode(control_mode_),
-        selected_mobility_needs_mode(mobility_),
-        selected_pricing(pricing_),
-        selected_bpt_channel(channel_),
-        selected_generator_mode(generator_) {
-        selected_connector.emplace<message_20::DcConnector>(dc_connector_);
+    DcBptDcSelectedServiceParameters(message_20::ServiceCategory energy_service_, message_20::ControlMode control_mode_,
+                                     message_20::DcConnector dc_connector_, message_20::MobilityNeedsMode mobility_,
+                                     message_20::Pricing pricing_, message_20::BptChannel channel_,
+                                     message_20::GeneratorMode generator_) :
+        selected_bpt_channel(channel_), selected_generator_mode(generator_) {
+        selected_energy_service = energy_service_;
+        selected_control_mode = control_mode_;
+        selected_connector = dc_connector_;
+        selected_mobility_needs_mode = mobility_;
+        selected_pricing = pricing_;
     };
 };
+
+// Todo(sl): missing services
+// WPT -> ControlMode, Pricing
+// DC_ACDP -> ControlMode, MobilityNeedsMode
+// DC_ACDP_BPT -> ControlMode, MobilityNeedsMode, BPTChannel
 
 struct SelectedVasParameter {
     std::vector<message_20::ServiceCategory> vas_services;

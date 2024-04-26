@@ -78,13 +78,37 @@ bool Session::find_parameter_set_id(const message_20::ServiceCategory service, i
 void Session::selected_service_parameters(const message_20::ServiceCategory service, const uint16_t id) {
 
     switch (service) {
+    case message_20::ServiceCategory::AC:
+        if (this->offered_services.ac_parameter_list.find(id) != this->offered_services.ac_parameter_list.end()) {
+            const auto& parameters = this->offered_services.ac_parameter_list.at(id);
+            this->selected_services = AcSelectedServiceParameters(
+                message_20::ServiceCategory::AC, parameters.control_mode, parameters.connector,
+                parameters.evse_nominal_voltage, parameters.mobility_needs_mode, parameters.pricing);
+        } else {
+            // Todo(sl): Should be not the case -> Raise Error?
+        }
+        break;
+
+    case message_20::ServiceCategory::AC_BPT:
+        if (this->offered_services.ac_bpt_parameter_list.find(id) !=
+            this->offered_services.ac_bpt_parameter_list.end()) {
+            const auto& parameters = this->offered_services.ac_bpt_parameter_list.at(id);
+            this->selected_services = AcBptSelectedServiceParameters(
+                message_20::ServiceCategory::AC_BPT, parameters.control_mode, parameters.connector,
+                parameters.evse_nominal_voltage, parameters.mobility_needs_mode, parameters.pricing,
+                parameters.bpt_channel, parameters.generator_mode, parameters.grid_code_detection_methode);
+        } else {
+            // Todo(sl): Should be not the case -> Raise Error?
+        }
+        break;
+
     case message_20::ServiceCategory::DC:
 
         if (this->offered_services.dc_parameter_list.find(id) != this->offered_services.dc_parameter_list.end()) {
-            auto& parameters = this->offered_services.dc_parameter_list.at(id);
+            const auto& parameters = this->offered_services.dc_parameter_list.at(id);
             this->selected_services =
-                SelectedServiceParameters(message_20::ServiceCategory::DC, parameters.connector,
-                                          parameters.control_mode, parameters.mobility_needs_mode, parameters.pricing);
+                DcSelectedServiceParameters(message_20::ServiceCategory::DC, parameters.control_mode,
+                                            parameters.connector, parameters.mobility_needs_mode, parameters.pricing);
         } else {
             // Todo(sl): Should be not the case -> Raise Error?
         }
@@ -93,9 +117,9 @@ void Session::selected_service_parameters(const message_20::ServiceCategory serv
     case message_20::ServiceCategory::DC_BPT:
         if (this->offered_services.dc_bpt_parameter_list.find(id) !=
             this->offered_services.dc_bpt_parameter_list.end()) {
-            auto& parameters = this->offered_services.dc_bpt_parameter_list.at(id);
-            this->selected_services = SelectedServiceParameters(
-                message_20::ServiceCategory::DC_BPT, parameters.connector, parameters.control_mode,
+            const auto& parameters = this->offered_services.dc_bpt_parameter_list.at(id);
+            this->selected_services = DcBptDcSelectedServiceParameters(
+                message_20::ServiceCategory::DC_BPT, parameters.control_mode, parameters.connector,
                 parameters.mobility_needs_mode, parameters.pricing, parameters.bpt_channel, parameters.generator_mode);
         } else {
             // Todo(sl): Should be not the case -> Raise Error?
@@ -107,7 +131,7 @@ void Session::selected_service_parameters(const message_20::ServiceCategory serv
         if (this->offered_services.internet_parameter_list.find(id) !=
             this->offered_services.internet_parameter_list.end()) {
             this->selected_vas_services.vas_services.push_back(message_20::ServiceCategory::Internet);
-            auto& parameters = this->offered_services.internet_parameter_list.at(id);
+            const auto& parameters = this->offered_services.internet_parameter_list.at(id);
             this->selected_vas_services.internet_port = parameters.port;
             this->selected_vas_services.internet_protocol = parameters.protocol;
         }
@@ -118,7 +142,7 @@ void Session::selected_service_parameters(const message_20::ServiceCategory serv
         if (this->offered_services.parking_parameter_list.find(id) !=
             this->offered_services.parking_parameter_list.end()) {
             this->selected_vas_services.vas_services.push_back(message_20::ServiceCategory::ParkingStatus);
-            auto& parameters = this->offered_services.parking_parameter_list.at(id);
+            const auto& parameters = this->offered_services.parking_parameter_list.at(id);
             this->selected_vas_services.parking_intended_service = parameters.intended_service;
             this->selected_vas_services.parking_status = parameters.parking_status;
         }
