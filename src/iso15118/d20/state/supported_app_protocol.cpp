@@ -15,6 +15,7 @@
 namespace iso15118::d20::state {
 
 constexpr auto ISO20_DC_NAMESPACE = "urn:iso:std:iso:15118:-20:DC";
+constexpr auto ISO20_AC_NAMESPACE = "urn:iso:std:iso:15118:-20:AC";
 
 using ResponseCode = message_20::SupportedAppProtocolResponse::ResponseCode;
 
@@ -27,8 +28,9 @@ message_20::SupportedAppProtocolResponse handle_request(const message_20::Suppor
     for (const auto& protocol : req.app_protocol) {
         if (protocol.protocol_namespace.compare(ISO20_DC_NAMESPACE) == 0) {
             ev_supported_protocols[protocol.priority] = protocol.schema_id;
-        }
-        if (protocol.protocol_namespace.compare(custom_protocol_namespace.value_or("")) == 0) {
+        } else if (protocol.protocol_namespace.compare(ISO20_AC_NAMESPACE) == 0) {
+            ev_supported_protocols[protocol.priority] = protocol.schema_id;
+        } else if (protocol.protocol_namespace.compare(custom_protocol_namespace.value_or("")) == 0) {
             ev_supported_protocols[protocol.priority] = protocol.schema_id;
         }
     }
