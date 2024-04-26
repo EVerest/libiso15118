@@ -24,6 +24,47 @@ auto get_mobility_needs_mode(const ControlMobilityNeedsModes& mode) {
     return mode.mobility_mode;
 }
 
+auto get_default_ac_parameter_list(const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
+    using namespace dt;
+
+    std::vector<AcParameterList> param_list;
+
+    for (const auto& mode : control_mobility_modes) {
+        param_list.push_back({
+            AcConnector::SinglePhase,
+            mode.control_mode,
+            get_mobility_needs_mode(mode),
+            // evse_nominal_voltage
+            16,
+            Pricing::NoPricing,
+        });
+    }
+
+    return param_list;
+}
+
+auto get_default_ac_bpt_parameter_list(const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
+    using namespace dt;
+
+    std::vector<AcBptParameterList> param_list;
+
+    for (const auto& mode : control_mobility_modes) {
+        param_list.push_back({{
+                                  AcConnector::SinglePhase,
+                                  mode.control_mode,
+                                  get_mobility_needs_mode(mode),
+                                  // evse_nominal_voltage
+                                  16,
+                                  Pricing::NoPricing,
+                              },
+                              BptChannel::Unified,
+                              GeneratorMode::GridFollowing,
+                              GridCodeIslandingDetectionMethode::Passive});
+    }
+
+    return param_list;
+}
+
 auto get_default_dc_parameter_list(const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
     using namespace dt;
 
@@ -87,6 +128,9 @@ SessionConfig::SessionConfig(EvseSetupConfig config) :
         logf_warning("No control modes were provided, set to scheduled mode");
         supported_control_mobility_modes = {{dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
     }
+
+    ac_parameter_list = get_default_ac_parameter_list(supported_control_mobility_modes);
+    ac_bpt_parameter_list = get_default_ac_bpt_parameter_list(supported_control_mobility_modes);
 
     dc_parameter_list = get_default_dc_parameter_list(supported_control_mobility_modes);
     dc_bpt_parameter_list = get_default_dc_bpt_parameter_list(supported_control_mobility_modes);

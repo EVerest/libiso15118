@@ -14,6 +14,9 @@ using BPT_DC_ModeReq = message_20::datatypes::BPT_DC_CPDReqEnergyTransferMode;
 using DC_ModeRes = message_20::datatypes::DC_CPDResEnergyTransferMode;
 using BPT_DC_ModeRes = message_20::datatypes::BPT_DC_CPDResEnergyTransferMode;
 
+using DcServiceParameters = d20::DcSelectedServiceParameters;
+using DcBptServiceParameters = d20::DcBptDcSelectedServiceParameters;
+
 SCENARIO("DC charge parameter discovery state handling") {
 
     const auto evse_id = std::string("everest se");
@@ -21,11 +24,12 @@ SCENARIO("DC charge parameter discovery state handling") {
     const auto cert_install{false};
     const std::vector<dt::Authorization> auth_services = {dt::Authorization::EIM};
     const d20::DcTransferLimits dc_limits;
+    const d20::AcTransferLimits ac_limits;
     const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
         {dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
 
-    const d20::EvseSetupConfig evse_setup{evse_id,   supported_energy_services, auth_services, cert_install,
-                                          dc_limits, control_mobility_modes};
+    const d20::EvseSetupConfig evse_setup{evse_id,   supported_energy_services, auth_services, cert_install, dc_limits,
+                                          ac_limits, control_mobility_modes};
 
     GIVEN("Bad Case - Unknown session") {
 
@@ -68,7 +72,7 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Bad Case: e.g. dc transfer mod instead of dc_bpt transfer mod - FAILED_WrongChargeParameter") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::DcBptDcSelectedServiceParameters service_parameters = d20::DcBptDcSelectedServiceParameters(
             dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
             dt::GeneratorMode::GridFollowing);
@@ -112,7 +116,7 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Bad Case: e.g. DC_BPT transfer mod instead of dc transfer mod - FAILED_WrongChargeParameter") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::SelectedServiceParameters service_parameters = d20::DcSelectedServiceParameters(
             dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
@@ -159,7 +163,7 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Good Case: DC") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::DcSelectedServiceParameters service_parameters = d20::DcSelectedServiceParameters(
             dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
@@ -211,7 +215,7 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Good Case: DC_BPT") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::DcBptDcSelectedServiceParameters service_parameters = d20::DcBptDcSelectedServiceParameters(
             dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
             dt::GeneratorMode::GridFollowing);
@@ -275,10 +279,10 @@ SCENARIO("DC charge parameter discovery state handling") {
     }
 
     GIVEN("Bad Case: Provided DC charge limits but the ev wants bpt charge parameter - FAILED") {
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
-            dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
-            dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
-            dt::GeneratorMode::GridFollowing);
+        DcBptServiceParameters service_parameters =
+            DcBptServiceParameters(dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
+                                   dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing,
+                                   dt::BptChannel::Unified, dt::GeneratorMode::GridFollowing);
 
         d20::Session session = d20::Session(service_parameters);
 

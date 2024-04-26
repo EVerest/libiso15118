@@ -37,6 +37,7 @@ public:
     void update_authorization_services(const std::vector<message_20::datatypes::Authorization>& services,
                                        bool cert_install_service);
     void update_dc_limits(const d20::DcTransferLimits&);
+    void update_ac_limits(const d20::AcTransferLimits&);
 
 private:
     io::PollManager poll_manager;

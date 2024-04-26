@@ -96,7 +96,7 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
     }
 
-    const auto selected_services = session.get_selected_services();
+    const auto& selected_services = session.get_selected_services();
     const auto selected_control_mode = selected_services.selected_control_mode;
     const auto selected_energy_service = selected_services.selected_energy_service;
     const auto selected_mobility_needs_mode = selected_services.selected_mobility_needs_mode;

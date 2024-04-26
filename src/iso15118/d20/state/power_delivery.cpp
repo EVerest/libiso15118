@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
+#include <iso15118/d20/state/ac_charge_loop.hpp>
 #include <iso15118/d20/state/dc_charge_loop.hpp>
 #include <iso15118/d20/state/power_delivery.hpp>
 #include <iso15118/d20/state/session_stop.hpp>
@@ -83,7 +84,23 @@ Result PowerDelivery::feed(Event ev) {
             return {};
         }
 
-        return m_ctx.create_state<DC_ChargeLoop>();
+        const auto selected_energy_service = m_ctx.session.get_selected_services().selected_energy_service;
+
+        if (selected_energy_service == dt::ServiceCategory::AC ||
+            selected_energy_service == dt::ServiceCategory::AC_BPT) {
+            // Close the AC contactor so that charging can start
+            m_ctx.feedback.signal(session::feedback::Signal::AC_CLOSE_CONTACTOR);
+            return m_ctx.create_state<AC_ChargeLoop>();
+        } else if (selected_energy_service == dt::ServiceCategory::DC ||
+                   selected_energy_service == dt::ServiceCategory::DC_BPT) {
+            return m_ctx.create_state<DC_ChargeLoop>();
+        } else {
+            m_ctx.log("expected selected_energy_service AC, AC_BPT, DC, DC_BPT! But code type id: %d",
+                      static_cast<int>(selected_energy_service));
+
+            m_ctx.session_stopped = true;
+            return {};
+        }
     } else {
         m_ctx.log("Expected DC_PreChargeReq or PowerDeliveryReq! But code type id: %d", variant->get_type());
 

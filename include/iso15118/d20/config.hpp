@@ -22,6 +22,7 @@ struct EvseSetupConfig {
     std::vector<message_20::datatypes::Authorization> authorization_services;
     bool enable_certificate_install_service;
     d20::DcTransferLimits dc_limits;
+    d20::AcTransferLimits ac_limits;
     std::vector<ControlMobilityNeedsModes> control_mobility_modes;
 };
 
@@ -37,6 +38,8 @@ struct SessionConfig {
     std::vector<message_20::datatypes::ServiceCategory> supported_energy_transfer_services;
     std::vector<message_20::datatypes::ServiceCategory> supported_vas_services;
 
+    std::vector<message_20::datatypes::AcParameterList> ac_parameter_list;
+    std::vector<message_20::datatypes::AcBptParameterList> ac_bpt_parameter_list;
     std::vector<message_20::datatypes::DcParameterList> dc_parameter_list;
     std::vector<message_20::datatypes::DcBptParameterList> dc_bpt_parameter_list;
 
@@ -44,6 +47,7 @@ struct SessionConfig {
     std::vector<message_20::datatypes::ParkingParameterList> parking_parameter_list;
 
     DcTransferLimits dc_limits;
+    AcTransferLimits ac_limits;
 
     std::vector<ControlMobilityNeedsModes> supported_control_mobility_modes;
 };

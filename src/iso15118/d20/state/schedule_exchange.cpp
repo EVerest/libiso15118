@@ -3,6 +3,7 @@
 #include <ctime>
 
 #include <iso15118/d20/state/dc_cable_check.hpp>
+#include <iso15118/d20/state/power_delivery.hpp>
 #include <iso15118/d20/state/schedule_exchange.hpp>
 
 #include <iso15118/detail/d20/context_helper.hpp>
@@ -67,7 +68,7 @@ message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleEx
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
     }
 
-    const auto selected_services = session.get_selected_services();
+    const auto& selected_services = session.get_selected_services();
     const auto selected_control_mode = selected_services.selected_control_mode;
     const auto selected_mobility_needs_mode = selected_services.selected_mobility_needs_mode;
 
@@ -136,15 +137,23 @@ Result ScheduleExchange::feed(Event ev) {
             max_charge_power = m_ctx.session_config.dc_limits.charge_limits.power.max;
         }
 
-        // We will pass the raw data to the listener, the
-        // listener will construct the full required type
         std::optional<dt::AcConnector> ac_connector{};
-        if (std::holds_alternative<dt::AcConnector>(selected_services.selected_connector)) {
-            ac_connector = std::get<dt::AcConnector>(selected_services.selected_connector);
+        const auto& vararg = m_ctx.session.get_var_selected_services();
+        if (auto* ptr = std::get_if<AcSelectedServiceParameters>(&vararg)) {
+            ac_connector = ptr->selected_conntector;
+        } else if (auto* ptr = std::get_if<AcBptSelectedServiceParameters>(&vararg)) {
+            ac_connector = ptr->selected_conntector;
         }
 
-        // TODO(ioan): prepare for AC transfer limits
-        const session::feedback::EvseTransferLimits& evse_limits = m_ctx.session_config.dc_limits;
+        session::feedback::EvseTransferLimits evse_limits;
+        if (selected_energy_service == dt::ServiceCategory::AC ||
+            selected_energy_service == dt::ServiceCategory::AC_BPT) {
+            evse_limits = m_ctx.session_config.ac_limits;
+        } else if (selected_energy_service == dt::ServiceCategory::DC ||
+                   selected_energy_service == dt::ServiceCategory::DC_BPT) {
+            evse_limits = m_ctx.session_config.dc_limits;
+        }
+
         const session::feedback::EvTransferLimits& ev_limits = m_ctx.session_ev_info.ev_transfer_limits;
 
         const auto& control_mode = req->control_mode;
@@ -167,7 +176,20 @@ Result ScheduleExchange::feed(Event ev) {
             return {};
         }
 
-        return m_ctx.create_state<DC_CableCheck>();
+        if (selected_energy_service == dt::ServiceCategory::AC ||
+            selected_energy_service == dt::ServiceCategory::AC_BPT) {
+            // For AC move directly to power delivery
+            return m_ctx.create_state<PowerDelivery>();
+        } else if (selected_energy_service == dt::ServiceCategory::DC ||
+                   selected_energy_service == dt::ServiceCategory::DC_BPT) {
+            return m_ctx.create_state<DC_CableCheck>();
+        } else {
+            m_ctx.log("expected selected_energy_service AC, AC_BPT, DC, DC_BPT! But code type id: %d",
+                      static_cast<int>(selected_energy_service));
+
+            m_ctx.session_stopped = true;
+            return {};
+        }
     } else if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {
         const auto res = handle_request(*req, m_ctx.session);
 

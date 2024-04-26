@@ -8,6 +8,8 @@ using namespace iso15118;
 
 namespace dt = message_20::datatypes;
 
+using TestServiceParameters = d20::DcSelectedServiceParameters;
+
 SCENARIO("Schedule Exchange state handling") {
 
     using Scheduled_ModeReq = message_20::datatypes::Scheduled_SEReqControlMode;
@@ -41,7 +43,7 @@ SCENARIO("Schedule Exchange state handling") {
     }
 
     GIVEN("Bad case - False control mode") {
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::DcSelectedServiceParameters service_parameters = d20::DcSelectedServiceParameters(
             dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
@@ -69,7 +71,7 @@ SCENARIO("Schedule Exchange state handling") {
     }
 
     GIVEN("Good case - Scheduled Mode") {
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+        d20::DcSelectedServiceParameters service_parameters = d20::DcSelectedServiceParameters(
             dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
@@ -102,9 +104,9 @@ SCENARIO("Schedule Exchange state handling") {
     }
 
     GIVEN("Good case - Dynamic Mode") {
-        d20::SelectedServiceParameters service_parameters =
-            d20::SelectedServiceParameters(dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
-                                           dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
+        TestServiceParameters service_parameters =
+            TestServiceParameters(dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
+                                  dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
         auto session = d20::Session(service_parameters);
 

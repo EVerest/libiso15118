@@ -55,6 +55,6 @@ private:
 };
 
 using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse, StopCharging,
-                                  DcTransferLimits, UpdateDynamicModeParameters>;
+                                  DcTransferLimits, AcTransferLimits, UpdateDynamicModeParameters>;
 
 } // namespace iso15118::d20

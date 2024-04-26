@@ -20,15 +20,22 @@ Session::Session() {
     }
 }
 
-Session::Session(SelectedServiceParameters service_parameters_) : selected_services(service_parameters_) {
-    std::random_device rd;
-    std::mt19937 generator(rd());
-    std::uniform_int_distribution<uint8_t> distribution(0x00, 0xff);
-
-    for (auto& item : id) {
-        item = distribution(generator);
-    }
+Session::Session(const AcSelectedServiceParameters& service_parameters_) : Session() {
+    selected_services.emplace<AcSelectedServiceParameters>(service_parameters_);
 }
+
+Session::Session(const AcBptSelectedServiceParameters& service_parameters_) : Session() {
+    selected_services.emplace<AcBptSelectedServiceParameters>(service_parameters_);
+}
+
+Session::Session(const DcSelectedServiceParameters& service_parameters_) : Session() {
+    selected_services.emplace<DcSelectedServiceParameters>(service_parameters_);
+}
+
+Session::Session(const DcBptSelectedServiceParameters& service_parameters_) : Session() {
+    selected_services.emplace<DcBptSelectedServiceParameters>(service_parameters_);
+}
+
 Session::Session(OfferedServices services_) : offered_services(services_) {
     std::random_device rd;
     std::mt19937 generator(rd());
@@ -44,6 +51,21 @@ Session::~Session() = default;
 bool Session::find_parameter_set_id(const dt::ServiceCategory service, int16_t id) {
 
     switch (service) {
+    case dt::ServiceCategory::AC:
+
+        if (this->offered_services.ac_parameter_list.find(id) != this->offered_services.ac_parameter_list.end()) {
+            return true;
+        }
+        break;
+
+    case dt::ServiceCategory::AC_BPT:
+
+        if (this->offered_services.ac_bpt_parameter_list.find(id) !=
+            this->offered_services.ac_bpt_parameter_list.end()) {
+            return true;
+        }
+        break;
+
     case dt::ServiceCategory::DC:
 
         if (this->offered_services.dc_parameter_list.find(id) != this->offered_services.dc_parameter_list.end()) {
@@ -72,7 +94,7 @@ bool Session::find_parameter_set_id(const dt::ServiceCategory service, int16_t i
         }
 
     default:
-        // Todo(sl): logf AC, WPT, ACDP is not supported
+        // Todo(sl): logf WPT, ACDP is not supported
         break;
     }
 
@@ -82,17 +104,37 @@ bool Session::find_parameter_set_id(const dt::ServiceCategory service, int16_t i
 void Session::selected_service_parameters(const dt::ServiceCategory service, const uint16_t id) {
 
     switch (service) {
+    case dt::ServiceCategory::AC:
+        if (this->offered_services.ac_parameter_list.find(id) != this->offered_services.ac_parameter_list.end()) {
+            const auto& parameters = this->offered_services.ac_parameter_list.at(id);
+            this->selected_services.emplace<AcSelectedServiceParameters>(
+                message_20::datatypes::ServiceCategory::AC, parameters.control_mode, parameters.connector,
+                parameters.evse_nominal_voltage, parameters.mobility_needs_mode, parameters.pricing);
+        } else {
+            // Todo(sl): Should be not the case -> Raise Error?
+        }
+        break;
+
+    case dt::ServiceCategory::AC_BPT:
+        if (this->offered_services.ac_bpt_parameter_list.find(id) !=
+            this->offered_services.ac_bpt_parameter_list.end()) {
+            const auto& parameters = this->offered_services.ac_bpt_parameter_list.at(id);
+            this->selected_services.emplace<AcBptSelectedServiceParameters>(
+                message_20::datatypes::ServiceCategory::AC_BPT, parameters.control_mode, parameters.connector,
+                parameters.evse_nominal_voltage, parameters.mobility_needs_mode, parameters.pricing,
+                parameters.bpt_channel, parameters.generator_mode, parameters.grid_code_detection_methode);
+        } else {
+            // Todo(sl): Should be not the case -> Raise Error?
+        }
+        break;
+
     case dt::ServiceCategory::DC:
 
         if (this->offered_services.dc_parameter_list.find(id) != this->offered_services.dc_parameter_list.end()) {
-            auto& parameters = this->offered_services.dc_parameter_list.at(id);
-            this->selected_services =
-                SelectedServiceParameters(dt::ServiceCategory::DC, parameters.connector, parameters.control_mode,
-                                          parameters.mobility_needs_mode, parameters.pricing);
-
-            logf_info("Selected DC service parameters: control mode: %s, mobility needs mode: %s",
-                      dt::from_control_mode(parameters.control_mode).c_str(),
-                      dt::from_mobility_needs_mode(parameters.mobility_needs_mode).c_str());
+            const auto& parameters = this->offered_services.dc_parameter_list.at(id);
+            this->selected_services.emplace<DcSelectedServiceParameters>(
+                dt::ServiceCategory::DC, parameters.connector, parameters.control_mode, parameters.mobility_needs_mode,
+                parameters.pricing);
         } else {
             // Todo(sl): Should be not the case -> Raise Error?
         }
@@ -101,8 +143,8 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
     case dt::ServiceCategory::DC_BPT:
         if (this->offered_services.dc_bpt_parameter_list.find(id) !=
             this->offered_services.dc_bpt_parameter_list.end()) {
-            auto& parameters = this->offered_services.dc_bpt_parameter_list.at(id);
-            this->selected_services = SelectedServiceParameters(
+            const auto& parameters = this->offered_services.dc_bpt_parameter_list.at(id);
+            this->selected_services.emplace<DcBptSelectedServiceParameters>(
                 dt::ServiceCategory::DC_BPT, parameters.connector, parameters.control_mode,
                 parameters.mobility_needs_mode, parameters.pricing, parameters.bpt_channel, parameters.generator_mode);
 
@@ -119,7 +161,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
         if (this->offered_services.internet_parameter_list.find(id) !=
             this->offered_services.internet_parameter_list.end()) {
             this->selected_vas_services.vas_services.push_back(dt::ServiceCategory::Internet);
-            auto& parameters = this->offered_services.internet_parameter_list.at(id);
+            const auto& parameters = this->offered_services.internet_parameter_list.at(id);
             this->selected_vas_services.internet_port = parameters.port;
             this->selected_vas_services.internet_protocol = parameters.protocol;
         }
@@ -130,7 +172,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
         if (this->offered_services.parking_parameter_list.find(id) !=
             this->offered_services.parking_parameter_list.end()) {
             this->selected_vas_services.vas_services.push_back(dt::ServiceCategory::ParkingStatus);
-            auto& parameters = this->offered_services.parking_parameter_list.at(id);
+            const auto& parameters = this->offered_services.parking_parameter_list.at(id);
             this->selected_vas_services.parking_intended_service = parameters.intended_service;
             this->selected_vas_services.parking_status = parameters.parking_status;
         }
