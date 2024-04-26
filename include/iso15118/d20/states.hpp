@@ -12,6 +12,7 @@ enum class Event {
     RESET,
     V2GTP_MESSAGE,
     CONTROL_MESSAGE,
+    TIMEOUT,
 
     // internal events
     FAILED,
@@ -25,6 +26,8 @@ enum class StateID {
     ServiceDetail,
     ServiceDiscovery,
     ServiceSelection,
+    AC_ChargeParameterDiscovery,
+    AC_ChargeLoop,
     DC_ChargeParameterDiscovery,
     DC_PreCharge,
     DC_ChargeLoop,
