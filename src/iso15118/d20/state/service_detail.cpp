@@ -47,6 +47,21 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
     uint8_t id = 0;
 
     switch (req.service) {
+
+    case dt::ServiceCategory::AC:
+        res.service = dt::ServiceCategory::AC;
+        for (auto& parameter_set : config.ac_parameter_list) {
+            session.offered_services.ac_parameter_list[id] = parameter_set;
+            res.service_parameter_list.push_back(dt::ParameterSet(id++, parameter_set));
+        }
+        break;
+    case dt::ServiceCategory::AC_BPT:
+        res.service = dt::ServiceCategory::AC_BPT;
+        for (auto& parameter_set : config.ac_bpt_parameter_list) {
+            session.offered_services.ac_bpt_parameter_list[id] = parameter_set;
+            res.service_parameter_list.push_back(dt::ParameterSet(id++, parameter_set));
+        }
+        break;
     case dt::ServiceCategory::DC:
         res.service = dt::ServiceCategory::DC;
         for (auto& parameter_set : config.dc_parameter_list) {
@@ -90,7 +105,6 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
             res.service_parameter_list.push_back(dt::ParameterSet(id++, parameter_set));
         }
         break;
-
     default:
         // Todo(sl): fill not supported
         break;
