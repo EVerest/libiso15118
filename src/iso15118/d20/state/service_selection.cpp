@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
+#include <iso15118/d20/state/ac_charge_parameter_discovery.hpp>
 #include <iso15118/d20/state/dc_charge_parameter_discovery.hpp>
 #include <iso15118/d20/state/service_selection.hpp>
 
@@ -110,7 +111,17 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
             return sa.PASS_ON;
         }
 
-        return sa.create_simple<DC_ChargeParameterDiscovery>(ctx);
+        const auto selected_energy_service = ctx.session.get_selected_energy_service();
+
+        if (selected_energy_service == message_20::ServiceCategory::AC ||
+            selected_energy_service == message_20::ServiceCategory::AC_BPT) {
+            return sa.create_simple<AC_ChargeParameterDiscovery>(ctx);
+        } else if (selected_energy_service == message_20::ServiceCategory::DC ||
+                   selected_energy_service == message_20::ServiceCategory::DC_BPT) {
+            return sa.create_simple<DC_ChargeParameterDiscovery>(ctx);
+        }
+        return sa.PASS_ON;
+
     } else if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {
         const auto res = handle_request(*req, ctx.session);
 

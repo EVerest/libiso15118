@@ -257,6 +257,61 @@ SCENARIO("Service selection state handling") {
         }
     }
 
+    GIVEN("Good case - AC") {
+        d20::Session session = d20::Session();
+
+        session.offered_services.energy_services = {message_20::ServiceCategory::AC};
+        session.offered_services.ac_parameter_list[0] = {
+            message_20::AcConnector::ThreePhase,
+            message_20::ControlMode::Scheduled,
+            message_20::MobilityNeedsMode::ProvidedByEvcc,
+            230,
+            message_20::Pricing::NoPricing,
+        };
+
+        message_20::ServiceSelectionRequest req;
+        req.header.session_id = session.get_id();
+        req.header.timestamp = 1691411798;
+        req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::AC;
+        req.selected_energy_transfer_service.parameter_set_id = 0;
+
+        const auto res = d20::state::handle_request(req, session);
+
+        THEN("ResponseCode: OK") {
+            REQUIRE(res.response_code == message_20::ResponseCode::OK);
+        }
+    }
+
+    GIVEN("Good case - AC_BPT") {
+        d20::Session session = d20::Session();
+
+        session.offered_services.energy_services = {message_20::ServiceCategory::AC_BPT};
+        session.offered_services.ac_bpt_parameter_list[0] = {{
+                                                                 message_20::AcConnector::ThreePhase,
+                                                                 message_20::ControlMode::Scheduled,
+                                                                 message_20::MobilityNeedsMode::ProvidedByEvcc,
+                                                                 230,
+                                                                 message_20::Pricing::NoPricing,
+                                                             },
+                                                             message_20::BptChannel::Unified,
+                                                             message_20::GeneratorMode::GridFollowing,
+                                                             message_20::GridCodeIslandingDetectionMethode::Passive};
+
+        message_20::ServiceSelectionRequest req;
+        req.header.session_id = session.get_id();
+        req.header.timestamp = 1691411798;
+        req.selected_energy_transfer_service.service_id = message_20::ServiceCategory::AC_BPT;
+        req.selected_energy_transfer_service.parameter_set_id = 0;
+
+        const auto res = d20::state::handle_request(req, session);
+
+        THEN("ResponseCode: OK") {
+            REQUIRE(res.response_code == message_20::ResponseCode::OK);
+            REQUIRE(session.get_selected_energy_service() == message_20::ServiceCategory::AC_BPT);
+            REQUIRE(session.get_selected_control_mode() == message_20::ControlMode::Scheduled);
+        }
+    }
+
     // GIVEN("Bad case - FAILED_NoServiceRenegotiationSupported") {} // todo(sl): pause/resume not supported yet
 
     // GIVEN("Bad Case - sequence error") {} // todo(sl): not here
