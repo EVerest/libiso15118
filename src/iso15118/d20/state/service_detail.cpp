@@ -45,21 +45,35 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
     uint8_t id = 0;
 
     switch (req.service) {
+
+    case message_20::ServiceCategory::AC:
+        res.service = message_20::ServiceCategory::AC;
+        for (auto& parameter_set : config.ac_parameter_list) {
+            session.offered_services.ac_parameter_list[id] = parameter_set;
+            res.service_parameter_list.push_back(message_20::ParameterSet(id++, parameter_set));
+        }
+        break;
+    case message_20::ServiceCategory::AC_BPT:
+        res.service = message_20::ServiceCategory::AC_BPT;
+        for (auto& parameter_set : config.ac_bpt_parameter_list) {
+            session.offered_services.ac_bpt_parameter_list[id] = parameter_set;
+            res.service_parameter_list.push_back(message_20::ParameterSet(id++, parameter_set));
+        }
+        break;
     case message_20::ServiceCategory::DC:
         res.service = message_20::ServiceCategory::DC;
         for (auto& parameter_set : config.dc_parameter_list) {
             session.offered_services.dc_parameter_list[id] = parameter_set;
-            res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id++, parameter_set));
+            res.service_parameter_list.push_back(message_20::ParameterSet(id++, parameter_set));
         }
         break;
     case message_20::ServiceCategory::DC_BPT:
         res.service = message_20::ServiceCategory::DC_BPT;
         for (auto& parameter_set : config.dc_bpt_parameter_list) {
             session.offered_services.dc_bpt_parameter_list[id] = parameter_set;
-            res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id++, parameter_set));
+            res.service_parameter_list.push_back(message_20::ParameterSet(id++, parameter_set));
         }
         break;
-
     case message_20::ServiceCategory::Internet:
         res.service = message_20::ServiceCategory::Internet;
 
@@ -75,20 +89,18 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
                 id = 4;
             }
             session.offered_services.internet_parameter_list[id] = parameter_set;
-            res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id, parameter_set));
+            res.service_parameter_list.push_back(message_20::ParameterSet(id, parameter_set));
         }
 
         break;
-
     case message_20::ServiceCategory::ParkingStatus:
         res.service = message_20::ServiceCategory::ParkingStatus;
 
         for (auto& parameter_set : config.parking_parameter_list) {
             session.offered_services.parking_parameter_list[id] = parameter_set;
-            res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id++, parameter_set));
+            res.service_parameter_list.push_back(message_20::ParameterSet(id++, parameter_set));
         }
         break;
-
     default:
         // Todo(sl): fill not supported
         break;

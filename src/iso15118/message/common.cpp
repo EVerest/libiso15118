@@ -139,4 +139,73 @@ std::string from_Protocol(const Protocol& in) {
     return "";
 }
 
+ParameterSet::ParameterSet(uint16_t _id) : id(_id) {
+    parameters.push_back({"", false});
+}
+
+ParameterSet::ParameterSet(uint16_t _id, const AcParameterList& list) : id(_id) {
+    parameters.push_back({"Connector", static_cast<int32_t>(list.connector)});
+    parameters.push_back({"ControlMode", static_cast<int32_t>(list.control_mode)});
+    parameters.push_back({"EVSENominalVoltage", static_cast<int32_t>(list.evse_nominal_voltage)});
+    if (list.control_mode == message_20::ControlMode::Scheduled) {
+        parameters.push_back(
+            {"MobilityNeedsMode", static_cast<int32_t>(message_20::MobilityNeedsMode::ProvidedByEvcc)});
+    } else {
+        parameters.push_back({"MobilityNeedsMode", static_cast<int32_t>(list.mobility_needs_mode)});
+    }
+    parameters.push_back({"Pricing", static_cast<int32_t>(list.pricing)});
+}
+
+ParameterSet::ParameterSet(uint16_t _id, const AcBptParameterList& list) : id(_id) {
+    parameters.push_back({"Connector", static_cast<int32_t>(list.connector)});
+    parameters.push_back({"ControlMode", static_cast<int32_t>(list.control_mode)});
+    parameters.push_back({"EVSENominalVoltage", static_cast<int32_t>(list.evse_nominal_voltage)});
+    if (list.control_mode == message_20::ControlMode::Scheduled) {
+        parameters.push_back(
+            {"MobilityNeedsMode", static_cast<int32_t>(message_20::MobilityNeedsMode::ProvidedByEvcc)});
+    } else {
+        parameters.push_back({"MobilityNeedsMode", static_cast<int32_t>(list.mobility_needs_mode)});
+    }
+    parameters.push_back({"Pricing", static_cast<int32_t>(list.pricing)});
+    parameters.push_back({"BPTChannel", static_cast<int32_t>(list.bpt_channel)});
+    parameters.push_back({"GeneratorMode", static_cast<int32_t>(list.generator_mode)});
+    parameters.push_back({"DetectionMethodGridCodeIslanding", static_cast<int32_t>(list.grid_code_detection_methode)});
+}
+
+ParameterSet::ParameterSet(uint16_t _id, const DcParameterList& list) : id(_id) {
+    parameters.push_back({"Connector", static_cast<int32_t>(list.connector)});
+    parameters.push_back({"ControlMode", static_cast<int32_t>(list.control_mode)});
+    if (list.control_mode == message_20::ControlMode::Scheduled) {
+        parameters.push_back(
+            {"MobilityNeedsMode", static_cast<int32_t>(message_20::MobilityNeedsMode::ProvidedByEvcc)});
+    } else {
+        parameters.push_back({"MobilityNeedsMode", static_cast<int32_t>(list.mobility_needs_mode)});
+    }
+    parameters.push_back({"Pricing", static_cast<int32_t>(list.pricing)});
+}
+
+ParameterSet::ParameterSet(uint16_t _id, const DcBptParameterList& list) : id(_id) {
+    parameters.push_back({"Connector", static_cast<int32_t>(list.connector)});
+    parameters.push_back({"ControlMode", static_cast<int32_t>(list.control_mode)});
+    if (list.control_mode == message_20::ControlMode::Scheduled) {
+        parameters.push_back(
+            {"MobilityNeedsMode", static_cast<int32_t>(message_20::MobilityNeedsMode::ProvidedByEvcc)});
+    } else {
+        parameters.push_back({"MobilityNeedsMode", static_cast<int32_t>(list.mobility_needs_mode)});
+    }
+    parameters.push_back({"Pricing", static_cast<int32_t>(list.pricing)});
+    parameters.push_back({"BPTChannel", static_cast<int32_t>(list.bpt_channel)});
+    parameters.push_back({"GeneratorMode", static_cast<int32_t>(list.generator_mode)});
+}
+
+ParameterSet::ParameterSet(uint16_t _id, const InternetParameterList& list) : id(_id) {
+    parameters.push_back({"Protocol", message_20::from_Protocol(list.protocol)});
+    parameters.push_back({"Port", static_cast<int32_t>(list.port)});
+}
+
+ParameterSet::ParameterSet(uint16_t _id, const ParkingParameterList& list) : id(_id) {
+    parameters.push_back({"IntendedService", static_cast<int32_t>(list.intended_service)});
+    parameters.push_back({"ParkingStatusType", static_cast<int32_t>(list.parking_status)});
+}
+
 } // namespace iso15118::message_20
