@@ -44,6 +44,21 @@ Session::~Session() = default;
 bool Session::find_parameter_set_id(const dt::ServiceCategory service, int16_t id) {
 
     switch (service) {
+    case dt::ServiceCategory::AC:
+
+        if (this->offered_services.ac_parameter_list.find(id) != this->offered_services.ac_parameter_list.end()) {
+            return true;
+        }
+        break;
+
+    case dt::ServiceCategory::AC_BPT:
+
+        if (this->offered_services.ac_bpt_parameter_list.find(id) !=
+            this->offered_services.ac_bpt_parameter_list.end()) {
+            return true;
+        }
+        break;
+
     case dt::ServiceCategory::DC:
 
         if (this->offered_services.dc_parameter_list.find(id) != this->offered_services.dc_parameter_list.end()) {
@@ -72,7 +87,7 @@ bool Session::find_parameter_set_id(const dt::ServiceCategory service, int16_t i
         }
 
     default:
-        // Todo(sl): logf AC, WPT, ACDP is not supported
+        // Todo(sl): logf WPT, ACDP is not supported
         break;
     }
 
