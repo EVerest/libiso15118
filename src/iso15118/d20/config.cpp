@@ -8,6 +8,7 @@ SessionConfig::SessionConfig() {
     evse_id = "everest se";
 
     supported_energy_transfer_services = {message_20::ServiceCategory::DC, message_20::ServiceCategory::DC_BPT};
+// supported_energy_transfer_services = {message_20::ServiceCategory::AC, message_20::ServiceCategory::AC_BPT};
 
     ac_parameter_list.push_back({
         message_20::AcConnector::SinglePhase,
