@@ -2,8 +2,8 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <algorithm>
 
-#include <iso15118/d2/state/service_detail.hpp>
-#include <iso15118/d2/state/service_discovery.hpp>
+#include <iso15118/states/d2/service_detail.hpp>
+#include <iso15118/states/d2/service_discovery.hpp>
 
 #include <iso15118/detail/helper.hpp>
 
@@ -17,10 +17,9 @@ static bool find_service_id(const std::vector<uint16_t>& req_service_ids, const 
     return std::find(req_service_ids.begin(), req_service_ids.end(), service) != req_service_ids.end();
 }
 
-message_2::ServiceDiscoveryResponse handle_request(const message_2::ServiceDiscoveryRequest& req,
-                                                    d2::Session& session,
-                                                    const std::vector<message_2::ServiceCategory>& energy_services,
-                                                    const std::vector<message_2::ServiceCategory>& vas_services) {
+message_2::ServiceDiscoveryResponse handle_request(const message_2::ServiceDiscoveryRequest& req, d2::Session& session,
+                                                   const std::vector<message_2::ServiceCategory>& energy_services,
+                                                   const std::vector<message_2::ServiceCategory>& vas_services) {
 
     message_2::ServiceDiscoveryResponse res = message_2::ServiceDiscoveryResponse();
 

@@ -2,8 +2,8 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <ctime>
 
-#include <iso15118/d2/state/dc_cable_check.hpp>
-#include <iso15118/d2/state/schedule_exchange.hpp>
+#include <iso15118/states/d2/dc_cable_check.hpp>
+#include <iso15118/states/d2/schedule_exchange.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/d2/state/schedule_exchange.hpp>
@@ -13,8 +13,8 @@
 namespace iso15118::d2::state {
 
 message_2::ScheduleExchangeResponse handle_request(const message_2::ScheduleExchangeRequest& req,
-                                                    const d2::Session& session,
-                                                    const message_2::RationalNumber& max_power) {
+                                                   const d2::Session& session,
+                                                   const message_2::RationalNumber& max_power) {
 
     message_2::ScheduleExchangeResponse res;
 
@@ -48,8 +48,7 @@ message_2::ScheduleExchangeResponse handle_request(const message_2::ScheduleExch
         control_mode.schedule_tuple.push_back(schedule);
 
     } else if (session.get_selected_control_mode() == message_2::ControlMode::Dynamic &&
-               std::holds_alternative<message_2::ScheduleExchangeRequest::Dynamic_SEReqControlMode>(
-                   req.control_mode)) {
+               std::holds_alternative<message_2::ScheduleExchangeRequest::Dynamic_SEReqControlMode>(req.control_mode)) {
 
         auto& control_mode = res.control_mode.emplace<message_2::ScheduleExchangeResponse::Dynamic_SEResControlMode>();
 

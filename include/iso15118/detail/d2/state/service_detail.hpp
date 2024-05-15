@@ -9,6 +9,6 @@
 namespace iso15118::d2::state {
 
 message_2::ServiceDetailResponse handle_request(const message_2::ServiceDetailRequest& req, d2::Session& session,
-                                                 const d2::SessionConfig& config);
+                                                const d2::SessionConfig& config);
 
 } // namespace iso15118::d2::state

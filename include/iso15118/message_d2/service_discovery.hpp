@@ -9,7 +9,7 @@
 
 namespace iso15118::message_2 {
 
-//RDB Added from v2G.hpp of everest EVSEv2g
+// RDB Added from v2G.hpp of everest EVSEv2g
 #define ServiceScope_CHARACTER_SIZE 65
 typedef enum {
     serviceCategoryType_EVCharging = 0,
@@ -26,7 +26,6 @@ enum v2g_service {
     V2G_SERVICE_ID_USECASEINFORMATION = 4,
 };
 
-
 typedef enum {
     paymentOptionType_Contract = 0,
     paymentOptionType_ExternalPayment = 1
@@ -34,7 +33,7 @@ typedef enum {
 
 struct ServiceDiscoveryRequest {
     Header header;
-    //RDB ISO2 just ServiceScope and ServiceCategory instead of SupportedServiceIDs for filtering the response
+    // RDB ISO2 just ServiceScope and ServiceCategory instead of SupportedServiceIDs for filtering the response
     std::optional<std::vector<uint16_t>> supported_service_ids;
 };
 
@@ -44,7 +43,7 @@ struct ServiceDiscoveryResponse {
         bool free_service;
     };
 
-//RDB Add Payment Options for ISO2
+    // RDB Add Payment Options for ISO2
     struct PaymentOption {
         paymentOptionType payment_option;
     };
@@ -58,7 +57,7 @@ struct ServiceDiscoveryResponse {
     }};
     std::optional<std::vector<Service>> vas_list;
 
-    //RDB Add the ISO2 payment option list
+    // RDB Add the ISO2 payment option list
     std::optional<std::vector<PaymentOption>> payment_option_list;
 };
 

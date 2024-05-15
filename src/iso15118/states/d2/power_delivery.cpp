@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
-#include <iso15118/d2/state/dc_charge_loop.hpp>
-#include <iso15118/d2/state/power_delivery.hpp>
-#include <iso15118/d2/state/session_stop.hpp>
+#include <iso15118/states/d2/dc_charge_loop.hpp>
+#include <iso15118/states/d2/power_delivery.hpp>
+#include <iso15118/states/d2/session_stop.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/d2/state/dc_pre_charge.hpp>
@@ -12,7 +12,7 @@
 namespace iso15118::d2::state {
 
 message_2::PowerDeliveryResponse handle_request(const message_2::PowerDeliveryRequest& req,
-                                                 const d2::Session& session) {
+                                                const d2::Session& session) {
 
     message_2::PowerDeliveryResponse res;
 
@@ -20,11 +20,11 @@ message_2::PowerDeliveryResponse handle_request(const message_2::PowerDeliveryRe
         return response_with_code(res, message_2::ResponseCode::FAILED_UnknownSession);
     }
 
-    //RBL Not part of ISO2?
-    // // Todo(sl): Add standby feature and define as everest module config
-    // if (req.charge_progress == message_2::PowerDeliveryRequest::Progress::Standby) {
-    //     return response_with_code(res, message_2::ResponseCode::WARNING_StandbyNotAllowed);
-    // }
+    // RBL Not part of ISO2?
+    //  // Todo(sl): Add standby feature and define as everest module config
+    //  if (req.charge_progress == message_2::PowerDeliveryRequest::Progress::Standby) {
+    //      return response_with_code(res, message_2::ResponseCode::WARNING_StandbyNotAllowed);
+    //  }
 
     return response_with_code(res, message_2::ResponseCode::OK);
 }

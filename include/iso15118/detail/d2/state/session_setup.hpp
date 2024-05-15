@@ -8,5 +8,5 @@
 namespace iso15118::d2::state {
 
 message_2::SessionSetupResponse handle_request(const message_2::SessionSetupRequest& req, const d2::Session& session,
-                                                const std::string evse_id, bool new_session);
+                                               const std::string evse_id, bool new_session);
 } // namespace iso15118::d2::state

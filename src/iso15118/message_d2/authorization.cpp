@@ -4,19 +4,19 @@
 
 #include <type_traits>
 
-#include <iso15118/detail/variant_access_d2.hpp>
+#include <iso15118/detail/variant_access.hpp>
 
-#include <exi/cb/iso2_msgDefDatatypes.h>
-#include <exi/cb/iso2_msgDefEncoder.h>
+#include <cbv2g/iso_2/iso2_msgDefDecoder.h>
+#include <cbv2g/iso_2/iso2_msgDefEncoder.h>
 
 namespace iso15118::message_2 {
 
 template <> void convert(const struct iso2_AuthorizationReqType& in, AuthorizationRequest& out) {
     // RDB header is different in iso2
-    //convert(in.Header, out.header);
+    // convert(in.Header, out.header);
 
-    //RDB ISO2 Id and Genchallenge are optional
-    //RDB TODO allow id and genchallenge
+    // RDB ISO2 Id and Genchallenge are optional
+    // RDB TODO allow id and genchallenge
 
     // out.selected_authorization_service = static_cast<Authorization>(in.SelectedAuthorizationService);
     // if (in.EIM_AReqAuthorizationMode_isUsed) {
@@ -40,8 +40,8 @@ template <> void convert(const AuthorizationResponse& in, iso2_AuthorizationResT
     out.ResponseCode = static_cast<iso2_responseCodeType>(in.response_code);
     out.EVSEProcessing = static_cast<iso2_EVSEProcessingType>(in.evse_processing);
 
-    //RDB - ISO2 separates the header and the body, so we don't convert the header here, do it in the serialize_to_exi instead.
-    //convert(in.header, out.Header);
+    // RDB - ISO2 separates the header and the body, so we don't convert the header here, do it in the serialize_to_exi
+    // instead. convert(in.header, out.Header);
 }
 
 template <> void insert_type(VariantAccess& va, const struct iso2_AuthorizationReqType& in) {
@@ -52,10 +52,10 @@ template <> int serialize_to_exi(const AuthorizationResponse& in, exi_bitstream_
     iso2_exiDocument doc;
     init_iso2_exiDocument(&doc);
 
-    //RDB this is new in ISO2
+    // RDB this is new in ISO2
     init_iso2_BodyType(&doc.V2G_Message.Body);
 
-    //RDB Convert the header since it is separate in ISO2.
+    // RDB Convert the header since it is separate in ISO2.
     convert(in.header, doc.V2G_Message.Header);
 
     CB_SET_USED(doc.V2G_Message.Body.AuthorizationRes);

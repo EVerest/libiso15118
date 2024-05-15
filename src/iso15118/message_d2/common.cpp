@@ -7,7 +7,7 @@
 #include <iso15118/detail/cb_exi.hpp>
 #include <iso15118/message_d2/variant.hpp>
 
-#include <exi/cb/iso2_msgDefDatatypes.h>
+#include <cbv2g/iso_2/iso2_msgDefDatatypes.h>
 
 namespace iso15118::message_2 {
 

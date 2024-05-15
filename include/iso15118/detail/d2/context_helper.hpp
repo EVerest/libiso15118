@@ -22,4 +22,4 @@ void setup_header(message_20::Header&, const states::Session&);
 
 void send_sequence_error(const message_20::Type, states::Context&);
 
-} // namespace iso15118::d20
+} // namespace iso15118::d2

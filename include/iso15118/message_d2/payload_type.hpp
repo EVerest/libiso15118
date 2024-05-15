@@ -20,11 +20,11 @@ template <typename T> struct PayloadTypeTrait;
 #define CREATE_TYPE_TRAIT(struct_name, payload_type)                                                                   \
     struct struct_name;                                                                                                \
     template <> struct PayloadTypeTrait<struct_name> {                                                                 \
-        static const io::v2gtp::PayloadType type = io::v2gtp::PayloadType::payload_type;                                  \
+        static const io::v2gtp::PayloadType type = io::v2gtp::PayloadType::payload_type;                               \
     }
 
 CREATE_TYPE_TRAIT(SupportedAppProtocolResponse, SAP);
-//RDB ISO2 only uses 0x8001
+// RDB ISO2 only uses 0x8001
 CREATE_TYPE_TRAIT(SessionSetupResponse, SAP);
 CREATE_TYPE_TRAIT(AuthorizationSetupResponse, Part20Main);
 CREATE_TYPE_TRAIT(AuthorizationResponse, SAP);

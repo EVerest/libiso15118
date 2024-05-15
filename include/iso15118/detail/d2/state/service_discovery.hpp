@@ -11,9 +11,8 @@
 
 namespace iso15118::d2::state {
 
-message_2::ServiceDiscoveryResponse handle_request(const message_2::ServiceDiscoveryRequest& req,
-                                                    d2::Session& session,
-                                                    const std::vector<message_2::ServiceCategory>& energy_services,
-                                                    const std::vector<message_2::ServiceCategory>& vas_services);
+message_2::ServiceDiscoveryResponse handle_request(const message_2::ServiceDiscoveryRequest& req, d2::Session& session,
+                                                   const std::vector<message_2::ServiceCategory>& energy_services,
+                                                   const std::vector<message_2::ServiceCategory>& vas_services);
 
 } // namespace iso15118::d2::state

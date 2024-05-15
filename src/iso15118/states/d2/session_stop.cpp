@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
-#include <iso15118/d2/state/session_stop.hpp>
+#include <iso15118/states/d2/session_stop.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/d2/state/session_stop.hpp>
@@ -23,11 +23,11 @@ message_2::SessionStopResponse handle_request(const message_2::SessionStopReques
         return response_with_code(res, message_2::ResponseCode::FAILED_UnknownSession);
     }
 
-    //RBL Not part of ISO2?
-    // if (req.charging_session == message_2::ChargingSession::ServiceRenegotiation &&
-    //     session.service_renegotiation_supported == false) {
-    //     return response_with_code(res, message_2::ResponseCode::FAILED_NoServiceRenegotiationSupported);
-    // }
+    // RBL Not part of ISO2?
+    //  if (req.charging_session == message_2::ChargingSession::ServiceRenegotiation &&
+    //      session.service_renegotiation_supported == false) {
+    //      return response_with_code(res, message_2::ResponseCode::FAILED_NoServiceRenegotiationSupported);
+    //  }
 
     // Todo(sl): Check req.charging_session
 

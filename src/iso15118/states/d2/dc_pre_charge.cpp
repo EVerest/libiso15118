@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
-#include <iso15118/d2/state/dc_pre_charge.hpp>
-#include <iso15118/d2/state/power_delivery.hpp>
+#include <iso15118/states/d2/dc_pre_charge.hpp>
+#include <iso15118/states/d2/power_delivery.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/d2/state/dc_pre_charge.hpp>

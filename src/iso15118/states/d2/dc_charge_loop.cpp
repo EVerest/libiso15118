@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
-#include <iso15118/d2/state/dc_charge_loop.hpp>
-#include <iso15118/d2/state/dc_welding_detection.hpp>
+#include <iso15118/states/d2/dc_charge_loop.hpp>
+#include <iso15118/states/d2/dc_welding_detection.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/d2/state/dc_charge_loop.hpp>

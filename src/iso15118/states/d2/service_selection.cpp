@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
-#include <iso15118/d2/state/authorization.hpp>
-#include <iso15118/d2/state/service_selection.hpp>
 #include <iso15118/d2/config.hpp>
+#include <iso15118/states/d2/authorization.hpp>
+#include <iso15118/states/d2/service_selection.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/d2/state/service_detail.hpp>
@@ -13,7 +13,7 @@
 namespace iso15118::d2::state {
 
 message_2::ServiceSelectionResponse handle_request(const message_2::ServiceSelectionRequest& req,
-                                                    d2::Session& session) {
+                                                   d2::Session& session) {
 
     message_2::ServiceSelectionResponse res;
 
@@ -32,7 +32,7 @@ message_2::ServiceSelectionResponse handle_request(const message_2::ServiceSelec
     }
 
     if (!energy_service_found) {
-        //RDB change response code to equivalent
+        // RDB change response code to equivalent
         return response_with_code(res, message_2::ResponseCode::FAILED_NoChargeServiceSelected);
     }
 
@@ -53,13 +53,13 @@ message_2::ServiceSelectionResponse handle_request(const message_2::ServiceSelec
         }
     }
 
-    //RDB ISO2 allows parameter lists to be optional so ignore this. It turns out that we need to simulate this
-    // by adding in a hard coded DC parameter list so that DC charge parameter discovery works.
-    //RDB TODO allow parameter lists
-    // if (not session.find_parameter_set_id(req.selected_energy_transfer_service.service_id,
-    //                                       req.selected_energy_transfer_service.parameter_set_id)) {
-    //     return response_with_code(res, message_2::ResponseCode::FAILED_ServiceSelectionInvalid);
-    // }
+    // RDB ISO2 allows parameter lists to be optional so ignore this. It turns out that we need to simulate this
+    //  by adding in a hard coded DC parameter list so that DC charge parameter discovery works.
+    // RDB TODO allow parameter lists
+    //  if (not session.find_parameter_set_id(req.selected_energy_transfer_service.service_id,
+    //                                        req.selected_energy_transfer_service.parameter_set_id)) {
+    //      return response_with_code(res, message_2::ResponseCode::FAILED_ServiceSelectionInvalid);
+    //  }
 
     // RDB TODO Hack to get around the parameter list issue.
     session.offered_services.energy_services = {message_2::ServiceCategory::DC};
@@ -97,7 +97,6 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
 
     const auto variant = ctx.get_request();
 
-
     if (const auto req = variant->get_if<message_2::ServiceDetailRequest>()) {
         logf("Requested info about ServiceID: %d\n", req->service);
 
@@ -121,7 +120,7 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
             return sa.PASS_ON;
         }
 
-        //RDB ISO2 goes to Authorization next
+        // RDB ISO2 goes to Authorization next
         return sa.create_simple<Authorization>(ctx);
 
     } else if (const auto req = variant->get_if<message_2::SessionStopRequest>()) {

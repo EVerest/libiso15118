@@ -2,8 +2,8 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <algorithm>
 
-#include <iso15118/d2/state/authorization.hpp>
-#include <iso15118/d2/state/dc_charge_parameter_discovery.hpp>
+#include <iso15118/states/d2/authorization.hpp>
+#include <iso15118/states/d2/dc_charge_parameter_discovery.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/d2/state/authorization.hpp>
@@ -20,9 +20,8 @@ static bool find_auth_service_in_offered_services(const message_2::Authorization
            offered_auth_services.end();
 }
 
-message_2::AuthorizationResponse handle_request(const message_2::AuthorizationRequest& req,
-                                                 const d2::Session& session,
-                                                 const message_2::AuthStatus& authorization_status) {
+message_2::AuthorizationResponse handle_request(const message_2::AuthorizationRequest& req, const d2::Session& session,
+                                                const message_2::AuthStatus& authorization_status) {
 
     message_2::AuthorizationResponse res = message_2::AuthorizationResponse();
 
@@ -30,12 +29,13 @@ message_2::AuthorizationResponse handle_request(const message_2::AuthorizationRe
         return response_with_code(res, message_2::ResponseCode::FAILED_UnknownSession);
     }
 
-//RBL Not part of ISO2?
-    // // [V2G20-2209] Check if authorization service was offered in authorization_setup res
-    // if (not find_auth_service_in_offered_services(req.selected_authorization_service, session)) {
-    //     return response_with_code(
-    //         res, message_2::ResponseCode::WARNING_AuthorizationSelectionInvalid); // [V2G20-2226] Handling if warning
-    // }
+    // RBL Not part of ISO2?
+    //  // [V2G20-2209] Check if authorization service was offered in authorization_setup res
+    //  if (not find_auth_service_in_offered_services(req.selected_authorization_service, session)) {
+    //      return response_with_code(
+    //          res, message_2::ResponseCode::WARNING_AuthorizationSelectionInvalid); // [V2G20-2226] Handling if
+    //          warning
+    //  }
 
     message_2::ResponseCode response_code;
 
@@ -46,11 +46,11 @@ message_2::AuthorizationResponse handle_request(const message_2::AuthorizationRe
             res.evse_processing = message_2::Processing::Finished;
             response_code = message_2::ResponseCode::OK;
             break;
-        //RBL Not part of ISO2?    
-        // case AuthStatus::Rejected: // Failure [V2G20-2230]
-        //     res.evse_processing = message_2::Processing::Finished;
-        //     response_code = message_2::ResponseCode::WARNING_EIMAuthorizationFailure;
-        //     break;
+        // RBL Not part of ISO2?
+        //  case AuthStatus::Rejected: // Failure [V2G20-2230]
+        //      res.evse_processing = message_2::Processing::Finished;
+        //      response_code = message_2::ResponseCode::WARNING_EIMAuthorizationFailure;
+        //      break;
         case AuthStatus::Pending:
         default:
             res.evse_processing = message_2::Processing::Ongoing;
@@ -102,13 +102,12 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
     if (const auto req = variant->get_if<message_2::AuthorizationRequest>()) {
         const auto res = handle_request(*req, ctx.session, authorization_status);
 
-        if(DoneOnce==false){
-            //RDB iso auth is quite different than ISO20, no authorization_setup to ask for authorization, so do it once here.
-            //RDB TODO - figure out the correct way to set up autorization in ISO2
+        if (DoneOnce == false) {
+            // RDB iso auth is quite different than ISO20, no authorization_setup to ask for authorization, so do it
+            // once here. RDB TODO - figure out the correct way to set up autorization in ISO2
             ctx.feedback.signal(session_2::feedback::Signal::REQUIRE_AUTH_EIM);
-            DoneOnce=true;
+            DoneOnce = true;
         }
-
 
         ctx.respond(res);
 

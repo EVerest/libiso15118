@@ -7,7 +7,6 @@
 
 namespace iso15118::d2::state {
 
-message_2::PowerDeliveryResponse handle_request(const message_2::PowerDeliveryRequest& req,
-                                                 const d2::Session& session);
+message_2::PowerDeliveryResponse handle_request(const message_2::PowerDeliveryRequest& req, const d2::Session& session);
 
 } // namespace iso15118::d2::state

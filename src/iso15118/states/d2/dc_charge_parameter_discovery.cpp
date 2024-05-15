@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
-#include <iso15118/d2/state/dc_charge_parameter_discovery.hpp>
-#include <iso15118/d2/state/dc_cable_check.hpp>
+#include <iso15118/states/d2/dc_cable_check.hpp>
+#include <iso15118/states/d2/dc_charge_parameter_discovery.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/d2/state/dc_charge_parameter_discovery.hpp>
@@ -16,9 +16,9 @@ using BPT_DC_ModeReq = message_2::DC_ChargeParameterDiscoveryRequest::BPT_DC_CPD
 using DC_ModeRes = message_2::DC_ChargeParameterDiscoveryResponse::DC_CPDResEnergyTransferMode;
 using BPT_DC_ModeRes = message_2::DC_ChargeParameterDiscoveryResponse::BPT_DC_CPDResEnergyTransferMode;
 
-message_2::DC_ChargeParameterDiscoveryResponse
-handle_request(const message_2::DC_ChargeParameterDiscoveryRequest& req, const d2::Session& session,
-               const d2::SessionConfig& config) {
+message_2::DC_ChargeParameterDiscoveryResponse handle_request(const message_2::DC_ChargeParameterDiscoveryRequest& req,
+                                                              const d2::Session& session,
+                                                              const d2::SessionConfig& config) {
 
     message_2::DC_ChargeParameterDiscoveryResponse res;
 
@@ -88,7 +88,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeParameterDiscovery::handle_event(
             return sa.PASS_ON;
         }
 
-        //RDB Go on to CableCheck next
+        // RDB Go on to CableCheck next
         return sa.create_simple<DC_CableCheck>(ctx);
 
     } else if (const auto req = variant->get_if<message_2::SessionStopRequest>()) {

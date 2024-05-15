@@ -7,8 +7,7 @@
 
 namespace iso15118::d2::state {
 
-message_2::AuthorizationResponse handle_request(const message_2::AuthorizationRequest& req,
-                                                 const d2::Session& session,
-                                                 const message_2::AuthStatus& authorization_status);
+message_2::AuthorizationResponse handle_request(const message_2::AuthorizationRequest& req, const d2::Session& session,
+                                                const message_2::AuthStatus& authorization_status);
 
 } // namespace iso15118::d2::state

@@ -2,8 +2,8 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <random>
 
-#include <iso15118/d2/state/authorization.hpp>
-#include <iso15118/d2/state/authorization_setup.hpp>
+#include <iso15118/states/d2/authorization.hpp>
+#include <iso15118/states/d2/authorization_setup.hpp>
 
 #include <iso15118/detail/d2/context_helper.hpp>
 #include <iso15118/detail/helper.hpp>

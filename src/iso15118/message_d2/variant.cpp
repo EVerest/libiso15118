@@ -8,8 +8,8 @@
 #include <iso15118/detail/helper.hpp>
 #include <iso15118/detail/variant_access.hpp>
 
-#include <exi/cb/iso2_msgDefDatatypes.h>
-#include <exi/cb/iso2_msgDefDecoder.h>
+#include <cbv2g/iso_2/iso2_msgDefDatatypes.h>
+#include <cbv2g/iso_2/iso2_msgDefDecoder.h>
 
 using PayloadType = iso15118::io::v2gtp::PayloadType;
 

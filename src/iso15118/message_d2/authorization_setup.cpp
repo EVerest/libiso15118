@@ -4,9 +4,9 @@
 
 #include <type_traits>
 
-#include <iso15118/detail/variant_access_d2.hpp>
+#include <iso15118/detail/variant_access.hpp>
 
-#include <exi/cb/iso20_CommonMessages_Encoder.h>
+#include <cbv2g/iso_20/iso20_CommonMessages_Encoder.h>
 
 namespace iso15118::message_2 {
 
