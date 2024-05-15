@@ -294,7 +294,7 @@ SCENARIO("Service detail state handling") {
         session.offered_services.energy_services = {message_20::ServiceCategory::DC};
         session.offered_services.vas_services = {message_20::ServiceCategory::Internet};
 
-        d20::SessionConfig config;
+        states::SessionConfig config;
         config.internet_parameter_list = {{message_20::Protocol::Http, message_20::Port::Port80}};
         config.dc_parameter_list = {{
             message_20::DcConnector::Extended,

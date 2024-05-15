@@ -30,7 +30,7 @@ SCENARIO("DC Welding Detection state handling") {
 
     GIVEN("Good Case") {
 
-        auto session = d20::Session();
+        auto session = states::Session();
 
         message_20::DC_WeldingDetectionRequest req;
         req.header.session_id = session.get_id();

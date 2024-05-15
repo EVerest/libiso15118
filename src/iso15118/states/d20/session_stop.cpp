@@ -8,7 +8,8 @@
 
 namespace iso15118::d20::state {
 
-message_20::SessionStopResponse handle_request(const message_20::SessionStopRequest& req, const states::Session& session) {
+message_20::SessionStopResponse handle_request(const message_20::SessionStopRequest& req,
+                                               const states::Session& session) {
 
     if (req.ev_termination_code.has_value()) {
         logf("EV termination code: %s\n", req.ev_termination_code.value().c_str());

@@ -15,8 +15,9 @@ static bool session_is_zero(const iso15118::message_20::Header& header) {
 
 namespace iso15118::d20::state {
 
-message_20::SessionSetupResponse handle_request(const message_20::SessionSetupRequest& req, const states::Session& session,
-                                                const std::string& evse_id, bool new_session) {
+message_20::SessionSetupResponse handle_request(const message_20::SessionSetupRequest& req,
+                                                const states::Session& session, const std::string& evse_id,
+                                                bool new_session) {
 
     message_20::SessionSetupResponse res;
     setup_header(res.header, session);

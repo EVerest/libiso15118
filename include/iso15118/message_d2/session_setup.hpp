@@ -2,8 +2,8 @@
 // Copyright 2024 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include <string>
 #include <optional>
+#include <string>
 
 #include "common.hpp"
 

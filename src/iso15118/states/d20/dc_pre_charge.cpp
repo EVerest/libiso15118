@@ -11,7 +11,8 @@
 namespace iso15118::d20::state {
 
 std::tuple<message_20::DC_PreChargeResponse, session::feedback::DcChargeTarget>
-handle_request(const message_20::DC_PreChargeRequest& req, const states::Session& session, const float present_voltage) {
+handle_request(const message_20::DC_PreChargeRequest& req, const states::Session& session,
+               const float present_voltage) {
 
     message_20::DC_PreChargeResponse res;
     session::feedback::DcChargeTarget charge_target{};

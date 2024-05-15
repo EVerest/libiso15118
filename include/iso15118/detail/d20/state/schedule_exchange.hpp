@@ -2,8 +2,8 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include <iso15118/states/session.hpp>
 #include <iso15118/message_d20/schedule_exchange.hpp>
+#include <iso15118/states/session.hpp>
 
 namespace iso15118::d20::state {
 

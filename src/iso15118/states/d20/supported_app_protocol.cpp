@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
-#include <iso15118/states/d20/supported_app_protocol.hpp>
-#include <iso15118/states/d20/session_setup.hpp>
 #include <iso15118/states/d2/session_setup.hpp>
+#include <iso15118/states/d20/session_setup.hpp>
+#include <iso15118/states/d20/supported_app_protocol.hpp>
 
 #include <iso15118/message_d20/supported_app_protocol.hpp>
 
@@ -28,7 +28,8 @@ void SupportedAppProtocol::enter() {
     ctx.log.enter_state("SupportedAppProtocol");
 }
 
-states::FsmSimpleState::HandleEventReturnType SupportedAppProtocol::handle_event(AllocatorType& sa, states::FsmEvent ev) {
+states::FsmSimpleState::HandleEventReturnType SupportedAppProtocol::handle_event(AllocatorType& sa,
+                                                                                 states::FsmEvent ev) {
     if (ev == states::FsmEvent::V2GTP_MESSAGE) {
         auto variant = ctx.get_request<message_20::Variant>();
         if (variant->get_type() != message_20::Type::SupportedAppProtocolReq) {

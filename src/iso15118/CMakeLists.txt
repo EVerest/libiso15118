@@ -96,6 +96,7 @@ target_link_libraries(iso15118
         fsm::fsm
         cbv2g::tp
         cbv2g::iso20
+        cbv2g::iso2
     PRIVATE
         Threads::Threads
 

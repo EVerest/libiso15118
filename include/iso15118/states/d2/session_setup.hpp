@@ -20,5 +20,4 @@ private:
     std::string evse_id;
 };
 
-
 } // namespace iso15118::d2::state
