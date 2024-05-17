@@ -48,7 +48,7 @@ struct VariantAccess {
     iso15118::message_2::Variant::CustomDeleter& custom_deleter;
     std::string& error;
 
-    template <typename MessageType, typename CbExiMessageType> void insert_type(const CbExiMessageType& in) {
+    template <typename MessageType, typename CbExiMessage> void insert_type(const CbExiMessage& in) {
         assert(data == nullptr);
 
         data = new MessageType;
@@ -59,6 +59,7 @@ struct VariantAccess {
     };
 };
 
-template <typename CbExiMessageType> void insert_type(VariantAccess& va, const CbExiMessageType&);
+template <typename CbExiMessageHeader, typename CbExiMessageType>
+void insert_type(VariantAccess& va, const CbExiMessageHeader&, const CbExiMessageType&);
 
 } // namespace iso15118::message_2

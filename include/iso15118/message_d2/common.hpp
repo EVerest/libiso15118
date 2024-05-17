@@ -28,8 +28,6 @@ struct Header {
     // std::optional<> signature; // Todo(sl)
 };
 
-template <typename cb_HeaderType> void convert(const cb_HeaderType& in, Header& out);
-
 enum class ResponseCode {
     OK,
     OK_NewSessionEstablished,

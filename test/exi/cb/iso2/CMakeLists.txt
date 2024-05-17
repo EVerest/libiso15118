@@ -1,0 +1,10 @@
+add_executable(test_iso15118_2 iso_2.cpp)
+
+target_link_libraries(test_iso15118_2
+    PRIVATE
+        iso15118
+        Catch2::Catch2WithMain
+)
+
+include(Catch)
+catch_discover_tests(test_iso15118_2)

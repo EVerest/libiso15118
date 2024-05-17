@@ -26,60 +26,64 @@ static void handle_v2g(VariantAccess& va) {
         return;
     }
 
-    // RDB adapt to ISO2 structure of the document.
     if (doc.V2G_Message.Body.SessionSetupReq_isUsed) {
-        insert_type(va, doc.V2G_Message.Body.SessionSetupReq);
-        // RDB bring over the header into the full struct.
-        va.insert_header(doc.V2G_Message.Header);
-        // } else if (doc.V2G_Message.Body.AuthorizationSetupReq_isUsed) {
-        //     insert_type(va, doc.V2G_Message.Body.AuthorizationSetupReq);
-    } else if (doc.V2G_Message.Body.AuthorizationReq_isUsed) {
-        insert_type(va, doc.V2G_Message.Body.AuthorizationReq);
-        // RDB bring over the header into the full struct.
-        va.insert_header(doc.V2G_Message.Header);
-    } else if (doc.V2G_Message.Body.ServiceDiscoveryReq_isUsed) {
-        insert_type(va, doc.V2G_Message.Body.ServiceDiscoveryReq);
-        // RDB bring over the header into the full struct.
-        va.insert_header(doc.V2G_Message.Header);
-        // } else if (doc.V2G_Message.Body.ServiceDetailReq_isUsed) {
-        //     insert_type(va, doc.V2G_Message.Body.ServiceDetailReq);
-    } else if (doc.V2G_Message.Body.PaymentServiceSelectionReq_isUsed) {
-        insert_type(va, doc.V2G_Message.Body.PaymentServiceSelectionReq);
-        // RDB bring over the header into the full struct.
-        va.insert_header(doc.V2G_Message.Header);
-    } else if (doc.V2G_Message.Body.ChargeParameterDiscoveryReq_isUsed) {
-        insert_type(va, doc.V2G_Message.Body.ChargeParameterDiscoveryReq);
-        // RDB bring over the header into the full struct.
-        va.insert_header(doc.V2G_Message.Header);
-    } else if (doc.V2G_Message.Body.CableCheckReq_isUsed) {
-        insert_type(va, doc.V2G_Message.Body.CableCheckReq);
-        // RDB bring over the header into the full struct.
-        va.insert_header(doc.V2G_Message.Header);
-    } else if (doc.V2G_Message.Body.PreChargeReq_isUsed) {
-        insert_type(va, doc.V2G_Message.Body.PreChargeReq);
-        // RDB bring over the header into the full struct.
-        va.insert_header(doc.V2G_Message.Header);
-        // } else if (doc.V2G_Message.Body.ScheduleExchangeReq_isUsed) {
-        //     insert_type(va, doc.V2G_Message.Body.ScheduleExchangeReq);
-    } else if (doc.V2G_Message.Body.PowerDeliveryReq_isUsed) {
-        insert_type(va, doc.V2G_Message.Body.PowerDeliveryReq);
-        // RDB bring over the header into the full struct.
-        va.insert_header(doc.V2G_Message.Header);
-    } else if (doc.V2G_Message.Body.CurrentDemandReq_isUsed) {
-        insert_type(va, doc.V2G_Message.Body.CurrentDemandReq);
-        // RDB bring over the header into the full struct.
-        va.insert_header(doc.V2G_Message.Header);
-    } else if (doc.V2G_Message.Body.WeldingDetectionReq_isUsed) {
-        insert_type(va, doc.V2G_Message.Body.WeldingDetectionReq);
-        // RDB bring over the header into the full struct.
-        va.insert_header(doc.V2G_Message.Header);
-    } else if (doc.V2G_Message.Body.SessionStopReq_isUsed) {
-        insert_type(va, doc.V2G_Message.Body.SessionStopReq);
-        // RDB bring over the header into the full struct.
-        va.insert_header(doc.V2G_Message.Header);
+        insert_type(va, doc.V2G_Message.Header, doc.V2G_Message.Body.SessionSetupReq);
     } else {
         va.error = "chosen message type unhandled";
     }
+
+    // RDB adapt to ISO2 structure of the document.
+    // if (doc.V2G_Message.Body.SessionSetupReq_isUsed) {
+    //     insert_type(va, doc.V2G_Message.Body.SessionSetupReq);
+    //     // RDB bring over the header into the full struct.
+    //     va.insert_header(doc.V2G_Message.Header);
+    //     // } else if (doc.V2G_Message.Body.AuthorizationSetupReq_isUsed) {
+    //     //     insert_type(va, doc.V2G_Message.Body.AuthorizationSetupReq);
+    // } else if (doc.V2G_Message.Body.AuthorizationReq_isUsed) {
+    //     insert_type(va, doc.V2G_Message.Body.AuthorizationReq);
+    //     // RDB bring over the header into the full struct.
+    //     va.insert_header(doc.V2G_Message.Header);
+    // } else if (doc.V2G_Message.Body.ServiceDiscoveryReq_isUsed) {
+    //     insert_type(va, doc.V2G_Message.Body.ServiceDiscoveryReq);
+    //     // RDB bring over the header into the full struct.
+    //     va.insert_header(doc.V2G_Message.Header);
+    //     // } else if (doc.V2G_Message.Body.ServiceDetailReq_isUsed) {
+    //     //     insert_type(va, doc.V2G_Message.Body.ServiceDetailReq);
+    // } else if (doc.V2G_Message.Body.PaymentServiceSelectionReq_isUsed) {
+    //     insert_type(va, doc.V2G_Message.Body.PaymentServiceSelectionReq);
+    //     // RDB bring over the header into the full struct.
+    //     va.insert_header(doc.V2G_Message.Header);
+    // } else if (doc.V2G_Message.Body.ChargeParameterDiscoveryReq_isUsed) {
+    //     insert_type(va, doc.V2G_Message.Body.ChargeParameterDiscoveryReq);
+    //     // RDB bring over the header into the full struct.
+    //     va.insert_header(doc.V2G_Message.Header);
+    // } else if (doc.V2G_Message.Body.CableCheckReq_isUsed) {
+    //     insert_type(va, doc.V2G_Message.Body.CableCheckReq);
+    //     // RDB bring over the header into the full struct.
+    //     va.insert_header(doc.V2G_Message.Header);
+    // } else if (doc.V2G_Message.Body.PreChargeReq_isUsed) {
+    //     insert_type(va, doc.V2G_Message.Body.PreChargeReq);
+    //     // RDB bring over the header into the full struct.
+    //     va.insert_header(doc.V2G_Message.Header);
+    //     // } else if (doc.V2G_Message.Body.ScheduleExchangeReq_isUsed) {
+    //     //     insert_type(va, doc.V2G_Message.Body.ScheduleExchangeReq);
+    // } else if (doc.V2G_Message.Body.PowerDeliveryReq_isUsed) {
+    //     insert_type(va, doc.V2G_Message.Body.PowerDeliveryReq);
+    //     // RDB bring over the header into the full struct.
+    //     va.insert_header(doc.V2G_Message.Header);
+    // } else if (doc.V2G_Message.Body.CurrentDemandReq_isUsed) {
+    //     insert_type(va, doc.V2G_Message.Body.CurrentDemandReq);
+    //     // RDB bring over the header into the full struct.
+    //     va.insert_header(doc.V2G_Message.Header);
+    // } else if (doc.V2G_Message.Body.WeldingDetectionReq_isUsed) {
+    //     insert_type(va, doc.V2G_Message.Body.WeldingDetectionReq);
+    //     // RDB bring over the header into the full struct.
+    //     va.insert_header(doc.V2G_Message.Header);
+    // } else if (doc.V2G_Message.Body.SessionStopReq_isUsed) {
+    //     insert_type(va, doc.V2G_Message.Body.SessionStopReq);
+    //     // RDB bring over the header into the full struct.
+    //     va.insert_header(doc.V2G_Message.Header);
+    // }
 }
 
 Variant::Variant(io::v2gtp::PayloadType payload_type, const io::StreamInputView& buffer_view) {

@@ -47,37 +47,37 @@ target_sources(iso15118
         states/d20/dc_welding_detection.cpp
         states/d20/session_stop.cpp
 
-        states/d2/session_setup.cpp
-        states/d2/authorization_setup.cpp
-        states/d2/authorization.cpp
-        states/d2/service_discovery.cpp
-        states/d2/service_detail.cpp
-        states/d2/service_selection.cpp
-        states/d2/dc_charge_parameter_discovery.cpp
-        states/d2/schedule_exchange.cpp
-        states/d2/dc_cable_check.cpp
-        states/d2/dc_pre_charge.cpp
-        states/d2/power_delivery.cpp
-        states/d2/dc_charge_loop.cpp
-        states/d2/dc_welding_detection.cpp
-        states/d2/session_stop.cpp
+        # states/d2/session_setup.cpp
+        # states/d2/authorization_setup.cpp
+        # states/d2/authorization.cpp
+        # states/d2/service_discovery.cpp
+        # states/d2/service_detail.cpp
+        # states/d2/service_selection.cpp
+        # states/d2/dc_charge_parameter_discovery.cpp
+        # states/d2/schedule_exchange.cpp
+        # states/d2/dc_cable_check.cpp
+        # states/d2/dc_pre_charge.cpp
+        # states/d2/power_delivery.cpp
+        # states/d2/dc_charge_loop.cpp
+        # states/d2/dc_welding_detection.cpp
+        # states/d2/session_stop.cpp
 
         message_d2/variant.cpp
         message_d2/session_setup.cpp
         message_d2/common.cpp
-        message_d2/authorization_setup.cpp
-        message_d2/authorization.cpp
-        message_d2/service_discovery.cpp
-        message_d2/service_detail.cpp
-        message_d2/service_selection.cpp
-        message_d2/dc_charge_parameter_discovery.cpp
-        message_d2/schedule_exchange.cpp
-        message_d2/dc_cable_check.cpp
-        message_d2/dc_pre_charge.cpp
-        message_d2/power_delivery.cpp
-        message_d2/dc_charge_loop.cpp
-        message_d2/dc_welding_detection.cpp
-        message_d2/session_stop.cpp
+        # message_d2/authorization_setup.cpp
+        # message_d2/authorization.cpp
+        # message_d2/service_discovery.cpp
+        # message_d2/service_detail.cpp
+        # message_d2/service_selection.cpp
+        # message_d2/dc_charge_parameter_discovery.cpp
+        # message_d2/schedule_exchange.cpp
+        # message_d2/dc_cable_check.cpp
+        # message_d2/dc_pre_charge.cpp
+        # message_d2/power_delivery.cpp
+        # message_d2/dc_charge_loop.cpp
+        # message_d2/dc_welding_detection.cpp
+        # message_d2/session_stop.cpp
 
         message_d20/variant.cpp
         message_d20/supported_app_protocol.cpp
