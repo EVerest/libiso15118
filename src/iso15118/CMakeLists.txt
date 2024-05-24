@@ -90,6 +90,7 @@ target_link_libraries(iso15118
         fsm::fsm
         cb_v2gtp
         cb_iso20
+	cb_exi_codec
     PRIVATE
         Threads::Threads
 
