@@ -29,6 +29,7 @@ if (NOT DISABLE_EDM)
 else()
     find_package(fsm REQUIRED)
     find_package(cb_v2g REQUIRED)
+    set(ISO15118_INSTALL ON)
 endif()
 
 add_subdirectory(3rd_party)
