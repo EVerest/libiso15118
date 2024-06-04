@@ -42,6 +42,9 @@ FsmSimpleState::HandleEventReturnType SessionSetup::handle_event(AllocatorType& 
 
     const auto variant = ctx.get_request();
 
+    const auto v2g_message_type = convert_request_type(variant->get_type());
+    ctx.feedback.v2g_message(v2g_message_type);
+
     if (const auto req = variant->get_if<message_20::SessionSetupRequest>()) {
 
         logf("Received session setup with evccid: %s\n", req->evccid.c_str());
@@ -61,6 +64,7 @@ FsmSimpleState::HandleEventReturnType SessionSetup::handle_event(AllocatorType& 
         const auto res = handle_request(*req, ctx.session, evse_id, new_session);
 
         ctx.respond(res);
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::SessionSetupRes);
 
         return sa.create_simple<AuthorizationSetup>(ctx);
 

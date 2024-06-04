@@ -36,9 +36,13 @@ FsmSimpleState::HandleEventReturnType SupportedAppProtocol::handle_event(Allocat
             return sa.PASS_ON;
         }
 
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::SupportedAppProtocolReq);
+
         const auto res = handle_request(variant->get<message_20::SupportedAppProtocolRequest>());
 
         ctx.respond(res);
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::SupportedAppProtocolRes);
+        
         return sa.create_simple<SessionSetup>(ctx);
     }
 

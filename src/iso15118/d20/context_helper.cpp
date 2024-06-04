@@ -95,4 +95,48 @@ void send_sequence_error(const message_20::Type req_type, d20::Context& ctx) {
     }
 }
 
+session::feedback::V2gMessageId convert_request_type(const message_20::Type type) {
+
+    using V2gMessageId = session::feedback::V2gMessageId;
+
+    switch (type) {
+    case message_20::Type::SupportedAppProtocolReq:
+        return V2gMessageId::SupportedAppProtocolReq;
+    case message_20::Type::SessionSetupReq:
+        return V2gMessageId::SessionSetupReq;
+    case message_20::Type::AuthorizationSetupReq:
+        return V2gMessageId::AuthorizationSetupReq;
+    case message_20::Type::AuthorizationReq:
+        return V2gMessageId::AuthorizationReq;
+    case message_20::Type::ServiceDiscoveryReq:
+        return V2gMessageId::ServiceDiscoveryReq;
+    case message_20::Type::ServiceDetailReq:
+        return V2gMessageId::ServiceDetailReq;
+    case message_20::Type::ServiceSelectionReq:
+        return V2gMessageId::ServiceSelectionReq;
+    case message_20::Type::DC_ChargeParameterDiscoveryReq:
+        return V2gMessageId::DcChargeParameterDiscoveryReq;
+    case message_20::Type::ScheduleExchangeReq:
+        return V2gMessageId::ScheduleExchangeReq;
+    case message_20::Type::DC_CableCheckReq:
+        return V2gMessageId::DcCableCheckReq;
+    case message_20::Type::DC_PreChargeReq:
+        return V2gMessageId::DcPreChargeReq;
+    case message_20::Type::PowerDeliveryReq:
+        return V2gMessageId::PowerDeliveryReq;
+    case message_20::Type::DC_ChargeLoopReq:
+        return V2gMessageId::DcChargeLoopReq;
+    case message_20::Type::DC_WeldingDetectionReq:
+        return V2gMessageId::DcWeldingDetectionReq;
+    case message_20::Type::SessionStopReq:
+        return V2gMessageId::SessionStopReq;
+    case message_20::Type::AC_ChargeParameterDiscoveryReq:
+        return V2gMessageId::AcChargeParameterDiscoveryReq;
+    case message_20::Type::AC_ChargeLoopReq:
+        return V2gMessageId::AcChargeLoopReq;
+    }
+
+    return V2gMessageId::UnknownMessage;
+}
+
 } // namespace iso15118::d20

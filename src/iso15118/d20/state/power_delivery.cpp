@@ -52,6 +52,9 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
 
     const auto variant = ctx.get_request();
 
+    const auto v2g_message_type = convert_request_type(variant->get_type());
+    ctx.feedback.v2g_message(v2g_message_type);
+
     if (const auto req = variant->get_if<message_20::DC_PreChargeRequest>()) {
         const auto [res, charge_target] = handle_request(*req, ctx.session, present_voltage);
 
@@ -59,6 +62,8 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
         ctx.feedback.dc_charge_target(charge_target);
 
         ctx.respond(res);
+
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::DcPreChargeRes);
 
         if (res.response_code >= message_20::ResponseCode::FAILED) {
             ctx.session_stopped = true;
@@ -74,6 +79,8 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
         const auto& res = handle_request(*req, ctx.session);
 
         ctx.respond(res);
+
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::PowerDeliveryRes);
 
         if (res.response_code >= message_20::ResponseCode::FAILED) {
             ctx.session_stopped = true;

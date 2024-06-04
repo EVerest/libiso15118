@@ -89,6 +89,9 @@ FsmSimpleState::HandleEventReturnType ServiceDiscovery::handle_event(AllocatorTy
 
     const auto variant = ctx.get_request();
 
+    const auto v2g_message_type = convert_request_type(variant->get_type());
+    ctx.feedback.v2g_message(v2g_message_type);
+
     if (const auto req = variant->get_if<message_20::ServiceDiscoveryRequest>()) {
         if (req->supported_service_ids) {
             logf("Possible ids\n");
@@ -101,6 +104,7 @@ FsmSimpleState::HandleEventReturnType ServiceDiscovery::handle_event(AllocatorTy
                                         ctx.config.supported_vas_services);
 
         ctx.respond(res);
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::ServiceDiscoveryRes);
 
         if (res.response_code >= message_20::ResponseCode::FAILED) {
             ctx.session_stopped = true;
@@ -113,6 +117,8 @@ FsmSimpleState::HandleEventReturnType ServiceDiscovery::handle_event(AllocatorTy
 
         ctx.respond(res);
         ctx.session_stopped = true;
+
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::SessionStopRes);
 
         return sa.PASS_ON;
     } else {

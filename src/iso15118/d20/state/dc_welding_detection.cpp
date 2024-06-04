@@ -46,10 +46,15 @@ FsmSimpleState::HandleEventReturnType DC_WeldingDetection::handle_event(Allocato
 
     const auto variant = ctx.get_request();
 
+    const auto v2g_message_type = convert_request_type(variant->get_type());
+    ctx.feedback.v2g_message(v2g_message_type);
+
     if (const auto req = variant->get_if<message_20::DC_WeldingDetectionRequest>()) {
         const auto res = handle_request(*req, ctx.session, present_voltage);
 
         ctx.respond(res);
+
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::DcWeldingDetectionRes);
 
         if (res.response_code >= message_20::ResponseCode::FAILED) {
             ctx.session_stopped = true;
