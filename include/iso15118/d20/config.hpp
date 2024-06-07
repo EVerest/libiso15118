@@ -3,6 +3,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <variant>
 #include <vector>
 
@@ -31,6 +32,20 @@ struct SessionConfig {
 
     DC_ModeRes evse_dc_parameter;
     BPT_DC_ModeRes evse_dc_bpt_parameter;
+
+    // DC & DC_BPT RationalNumber values
+    message_20::RationalNumber max_charge_power;
+    message_20::RationalNumber min_charge_power;
+    message_20::RationalNumber max_charge_current;
+    message_20::RationalNumber min_charge_current;
+    message_20::RationalNumber max_voltage;
+    message_20::RationalNumber min_voltage;
+    std::optional<message_20::RationalNumber> power_ramp_limit;
+
+    std::optional<message_20::RationalNumber> max_discharge_power;
+    std::optional<message_20::RationalNumber> min_discharge_power;
+    std::optional<message_20::RationalNumber> max_discharge_current;
+    std::optional<message_20::RationalNumber> min_discharge_current;
 
     SessionConfig();
 };

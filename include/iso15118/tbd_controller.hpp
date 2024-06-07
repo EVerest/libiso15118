@@ -4,6 +4,7 @@
 
 #include <list>
 #include <memory>
+#include <optional>
 
 #include "config.hpp"
 #include "d20/control_event.hpp"
@@ -32,7 +33,11 @@ public:
 
     void setup_config(const std::string&, const std::vector<message_20::ServiceCategory>&);
 
-    void setup_session(const std::vector<message_20::Authorization>& auth_services, bool cert_install_service);
+    void setup_session(const std::vector<message_20::Authorization>&, bool);
+
+    void update_dc_max_values(float, float, float, std::optional<float>, std::optional<float>);
+
+    void update_dc_min_values(float, float, float, std::optional<float>, std::optional<float>);
 
 private:
     io::PollManager poll_manager;

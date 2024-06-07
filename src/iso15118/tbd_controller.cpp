@@ -80,6 +80,38 @@ void TbdController::setup_session(const std::vector<message_20::Authorization>& 
     session_config.cert_install_service = cert_install_service;
 }
 
+// Should be called at least once. Values can be updated during session
+void TbdController::update_dc_max_values(float max_charge_power, float max_charge_current, float max_voltage,
+                                         std::optional<float> max_discharge_power,
+                                         std::optional<float> max_discharge_current) {
+    session_config.max_charge_power = message_20::from_float(max_charge_power);
+    session_config.max_charge_current = message_20::from_float(max_charge_current);
+    session_config.max_voltage = message_20::from_float(max_voltage);
+
+    if (max_discharge_power.has_value()) {
+        session_config.max_discharge_power = message_20::from_float(max_discharge_power.value());
+    }
+    if (max_discharge_current.has_value()) {
+        session_config.max_discharge_current = message_20::from_float(max_discharge_current.value());
+    }
+}
+
+// Should be called at least once. Values can be updated during session
+void TbdController::update_dc_min_values(float min_charge_power, float min_charge_current, float min_voltage,
+                                         std::optional<float> min_discharge_power,
+                                         std::optional<float> min_discharge_current) {
+    session_config.min_charge_power = message_20::from_float(min_charge_power);
+    session_config.min_charge_current = message_20::from_float(min_charge_current);
+    session_config.min_voltage = message_20::from_float(min_voltage);
+
+    if (min_discharge_power.has_value()) {
+        session_config.min_discharge_power = message_20::from_float(min_discharge_power.value());
+    }
+    if (min_discharge_current.has_value()) {
+        session_config.min_discharge_current = message_20::from_float(min_discharge_current.value());
+    }
+}
+
 void TbdController::handle_sdp_server_input() {
     auto request = sdp_server.get_peer_request();
 
