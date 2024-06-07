@@ -56,7 +56,15 @@ void TbdController::send_control_event(const d20::ControlEvent& event) {
 }
 
 // Should be called once
-void TbdController::setup_config() {
+void TbdController::setup_config(const std::string& evse_id,
+                                 const std::vector<message_20::ServiceCategory>& supported_energy_transfer_services) {
+    session_config.evse_id = evse_id;
+
+    if (supported_energy_transfer_services.empty() == false) {
+        session_config.supported_energy_transfer_services = supported_energy_transfer_services;
+    } else {
+        std::runtime_error("Supported energy services are empty!");
+    }
 }
 
 // Should be called before every session

@@ -30,7 +30,7 @@ public:
 
     void send_control_event(const d20::ControlEvent&);
 
-    void setup_config();
+    void setup_config(const std::string&, const std::vector<message_20::ServiceCategory>&);
 
     void setup_session(const std::vector<message_20::Authorization>& auth_services, bool cert_install_service);
 
