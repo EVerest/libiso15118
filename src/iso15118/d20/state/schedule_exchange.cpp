@@ -83,10 +83,9 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
 
         const auto selected_energy_service = ctx.session.get_selected_energy_service();
 
-        if (selected_energy_service == message_20::ServiceCategory::DC) {
-            max_charge_power = ctx.config.evse_dc_parameter.max_charge_power;
-        } else if (selected_energy_service == message_20::ServiceCategory::DC_BPT) {
-            max_charge_power = ctx.config.evse_dc_bpt_parameter.max_charge_power;
+        if (selected_energy_service == message_20::ServiceCategory::DC ||
+            selected_energy_service == message_20::ServiceCategory::DC_BPT) {
+            max_charge_power = ctx.config.max_charge_power;
         }
 
         const auto res = handle_request(*req, ctx.session, max_charge_power);

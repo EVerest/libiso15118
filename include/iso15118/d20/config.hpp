@@ -27,11 +27,6 @@ struct SessionConfig {
     std::vector<message_20::InternetParameterList> internet_parameter_list;
     std::vector<message_20::ParkingParameterList> parking_parameter_list;
 
-    using DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::DC_CPDResEnergyTransferMode;
-    using BPT_DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::BPT_DC_CPDResEnergyTransferMode;
-
-    DC_ModeRes evse_dc_parameter;
-    BPT_DC_ModeRes evse_dc_bpt_parameter;
 
     // DC & DC_BPT RationalNumber values
     message_20::RationalNumber max_charge_power;

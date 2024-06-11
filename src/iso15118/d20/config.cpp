@@ -21,30 +21,6 @@ SessionConfig::SessionConfig() {
                               },
                               message_20::BptChannel::Unified,
                               message_20::GeneratorMode::GridFollowing}};
-
-    evse_dc_parameter = {
-        {22, 3},  // max_charge_power
-        {0, 0},   // min_charge_power
-        {25, 0},  // max_charge_current
-        {0, 0},   // min_charge_current
-        {900, 0}, // max_voltage
-        {0, 0},   // min_voltage
-    };
-
-    evse_dc_bpt_parameter = {
-        {
-            {22, 3},  // max_charge_power
-            {0, 0},   // min_charge_power
-            {25, 0},  // max_charge_current
-            {0, 0},   // min_charge_current
-            {900, 0}, // max_voltage
-            {0, 0},   // min_voltage
-        },
-        {11, 3}, // max_discharge_power
-        {0, 0},  // min_discharge_power
-        {25, 0}, // max_discharge_current
-        {0, 0},  // min_discharge_current
-    };
 }
 
 } // namespace iso15118::d20

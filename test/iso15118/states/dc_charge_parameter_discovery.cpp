@@ -29,7 +29,9 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto res = d20::state::handle_request(req, d20::Session(), d20::SessionConfig());
+        const d20::state::TransferMode transfer_mode = {};
+
+        const auto res = d20::state::handle_request(req, d20::Session(), transfer_mode);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -73,7 +75,9 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, d20::SessionConfig());
+        const d20::state::TransferMode transfer_mode = {};
+
+        const auto res = d20::state::handle_request(req, session, transfer_mode);
 
         THEN("ResponseCode: FAILED_WrongChargeParameter, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_WrongChargeParameter);
@@ -120,7 +124,9 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, d20::SessionConfig());
+        const d20::state::TransferMode transfer_mode = {};
+
+        const auto res = d20::state::handle_request(req, session, transfer_mode);
 
         THEN("ResponseCode: FAILED_WrongChargeParameter, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_WrongChargeParameter);
@@ -151,17 +157,6 @@ SCENARIO("DC charge parameter discovery state handling") {
 
         d20::Session session = d20::Session(service_parameters);
         d20::SessionConfig config = d20::SessionConfig();
-        DC_ModeRes evse_dc_parameter = {
-            {22, 3},  // max_charge_power
-            {0, 0},   // min_charge_power
-            {25, 0},  // max_charge_current
-            {0, 0},   // min_charge_current
-            {900, 0}, // max_voltage
-            {0, 0},   // min_voltage
-        };
-        message_20::RationalNumber power_ramp_limit = {20, 0};
-        evse_dc_parameter.power_ramp_limit.emplace<>(power_ramp_limit);
-        config.evse_dc_parameter = evse_dc_parameter;
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -175,7 +170,17 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, config);
+        auto transfer_mode = d20::state::TransferMode();
+
+        transfer_mode.max_charge_power = {22, 3};
+        transfer_mode.min_charge_power = {0, 0};
+        transfer_mode.max_charge_current = {25, 0};
+        transfer_mode.min_charge_current = {0, 0};
+        transfer_mode.max_voltage = {900, 0};
+        transfer_mode.min_voltage = {0, 0};
+        transfer_mode.power_ramp_limit = {20, 0};
+
+        const auto res = d20::state::handle_request(req, session, transfer_mode);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -210,22 +215,6 @@ SCENARIO("DC charge parameter discovery state handling") {
         d20::Session session = d20::Session(service_parameters);
         d20::SessionConfig config = d20::SessionConfig();
 
-        BPT_DC_ModeRes evse_dc_bpt_parameter = {
-            {
-                {22, 3},  // max_charge_power
-                {0, 0},   // min_charge_power
-                {25, 0},  // max_charge_current
-                {0, 0},   // min_charge_current
-                {900, 0}, // max_voltage
-                {0, 0},   // min_voltage
-            },
-            {11, 3}, // max_discharge_power
-            {0, 0},  // min_discharge_power
-            {25, 0}, // max_discharge_current
-            {0, 0},  // min_discharge_current
-        };
-        config.evse_dc_bpt_parameter = evse_dc_bpt_parameter;
-
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
@@ -242,7 +231,21 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, config);
+        auto transfer_mode = d20::state::TransferMode();
+
+        transfer_mode.max_charge_power = {22, 3};
+        transfer_mode.min_charge_power = {0, 0};
+        transfer_mode.max_charge_current = {25, 0};
+        transfer_mode.min_charge_current = {0, 0};
+        transfer_mode.max_voltage = {900, 0};
+        transfer_mode.min_voltage = {0, 0};
+
+        transfer_mode.max_discharge_power = {11, 3};
+        transfer_mode.min_discharge_power = {0, 0};
+        transfer_mode.max_discharge_current = {25, 0};
+        transfer_mode.min_discharge_current = {0, 0};
+
+        const auto res = d20::state::handle_request(req, session, transfer_mode);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
