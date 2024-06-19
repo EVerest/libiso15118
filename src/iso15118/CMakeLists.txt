@@ -12,7 +12,7 @@ target_sources(iso15118
         misc/helper.cpp
         misc/cb_exi.cpp
 
-        io/connection_ssl.cpp
+        io/connection_tls.cpp
         io/connection_plain.cpp
         io/logging.cpp
         io/poll_manager.cpp
