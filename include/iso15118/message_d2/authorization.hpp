@@ -7,46 +7,22 @@
 #include <vector>
 
 #include "common.hpp"
+#include "iso15118/message_d2/data_types/fault_and_response_code_types.hpp"
+#include "iso15118/message_d2/data_types/general_types.hpp"
+#include "iso15118/message_d2/data_types/security_types.hpp"
 
 namespace iso15118::message_2 {
 
-enum class AuthStatus {
-    Accepted = 0,
-    Pending = 1,
-    Rejected = 2,
+struct AuthorizationReq {
+    V2GMessageHeader header;
+    std::optional<iso15118::message_d2::data_types::gen_challenge_type> gen_challenge;
+    std::string id;
 };
 
-struct AuthorizationRequest {
-
-    // Todo(sl): Refactor in common
-    struct ContractCertificateChain {
-        struct Certificate {
-            std::vector<uint8_t> certificate;
-        };
-        Certificate certificate;
-        std::vector<Certificate> sub_certificates;
-    };
-
-    struct EIM_ASReqAuthorizationMode {};
-    struct PnC_ASReqAuthorizationMode {
-        std::string id;
-        std::vector<uint8_t> gen_challenge;
-        ContractCertificateChain contract_certificate_chain;
-    };
-
-    Header header;
-    Authorization selected_authorization_service;
-    std::optional<EIM_ASReqAuthorizationMode> eim_as_req_authorization_mode;
-    std::optional<PnC_ASReqAuthorizationMode> pnc_as_req_authorization_mode;
-};
-
-struct AuthorizationResponse {
-
-    AuthorizationResponse() : evse_processing(Processing::Finished){};
-
-    Header header;
-    ResponseCode response_code;
-    Processing evse_processing;
+struct AuthorizationRes {
+    V2GMessageHeader header;
+    iso15118::message_d2::data_types::response_code_type response_code;
+    iso15118::message_d2::data_types::evse_processing_type evse_processing;
 };
 
 } // namespace iso15118::message_2

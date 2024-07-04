@@ -3,7 +3,6 @@
 #include <iso15118/message_d2/session_setup.hpp>
 
 #include <string>
-#include <type_traits>
 
 #include <iso15118/detail/variant_access.hpp>
 

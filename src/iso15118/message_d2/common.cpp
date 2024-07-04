@@ -19,7 +19,7 @@ template <> void convert(const iso2_NotificationType& in, Notification& out) {
     }
 }
 
-template <> void convert(const iso2_MessageHeaderType& in, Header& out) {
+template <> void convert(const iso2_MessageHeaderType& in, V2GMessageHeader& out) {
 
     std::copy(in.SessionID.bytes, in.SessionID.bytes + in.SessionID.bytesLen, out.session_id.begin());
 
@@ -38,7 +38,7 @@ template <> void convert(const Notification& in, iso2_NotificationType& out) {
     }
 }
 
-template <> void convert(const Header& in, iso2_MessageHeaderType& out) {
+template <> void convert(const V2GMessageHeader& in, iso2_MessageHeaderType& out) {
     init_iso2_MessageHeaderType(&out);
 
     std::copy(in.session_id.begin(), in.session_id.end(), out.SessionID.bytes);

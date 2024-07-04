@@ -22,7 +22,7 @@ struct Notification {
     std::optional<std::string> fault_message;
 };
 
-struct Header {
+struct V2GMessageHeader {
     std::array<uint8_t, SESSION_ID_LENGTH> session_id{};
     std::optional<Notification> notification;
     // std::optional<> signature; // Todo(sl)

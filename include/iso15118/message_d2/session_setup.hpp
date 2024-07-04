@@ -2,23 +2,22 @@
 // Copyright 2024 Pionix GmbH and Contributors to EVerest
 #pragma once
 
+#include "iso15118/message_d2/data_types/identification_number_types.hpp"
+#include <array>
 #include <optional>
 #include <string>
-#include <array>
 
 #include "common.hpp"
 
 namespace iso15118::message_2 {
 
-constexpr auto EVCC_ID_LENGTH = 6;
-
 struct SessionSetupRequest {
-    Header header;
-    std::array<uint8_t, EVCC_ID_LENGTH> evccid{};
+    V2GMessageHeader header;
+    iso15118::message_d2::data_types::evcc_id_type evccid;
 };
 
 struct SessionSetupResponse {
-    Header header;
+    V2GMessageHeader header;
     ResponseCode response_code;
     std::string evseid;
     std::optional<int64_t> timestamp;

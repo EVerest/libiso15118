@@ -1,65 +1,81 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2023 Pionix GmbH and Contributors to EVerest
+// Copyright 2024 Pionix GmbH and Contributors to EVerest
 #include <iso15118/message_d2/power_delivery.hpp>
-
-#include <type_traits>
 
 #include <iso15118/detail/variant_access.hpp>
 
-#include <cbv2g/iso_2/iso2_msgDefDatatypes.h>
 #include <cbv2g/iso_2/iso2_msgDefEncoder.h>
 
 namespace iso15118::message_2 {
 
-template <> void convert(const struct iso2_PowerDeliveryReqType& in, PowerDeliveryRequest& out) {
-    // convert(in.Header, out.header);
-
-    // cb_convert_enum(in. EVProcessing, out.processing);
-    cb_convert_enum(in.ChargeProgress, out.charge_progress);
-
-    // RDB TODO handle the rest of the incoming parameters, esp the SessionID
-}
-
-template <> void convert(const PowerDeliveryResponse& in, iso2_PowerDeliveryResType& out) {
-    init_iso2_PowerDeliveryResType(&out);
-
-    // convert(in.header, out.Header);
-    cb_convert_enum(in.response_code, out.ResponseCode);
-
-    // CPP2CB_CONVERT_IF_USED(in.status, out.EVSEStatus);
-
-    // RDB Also send send the DC_EVStatus
-    out.DC_EVSEStatus_isUsed = true;
-    out.DC_EVSEStatus.NotificationMaxDelay = 0;
-    out.DC_EVSEStatus.EVSENotification = iso2_EVSENotificationType_None;
-    out.DC_EVSEStatus.EVSEStatusCode = iso2_DC_EVSEStatusCodeType_EVSE_Ready;
-    // RDB TODO - isolation status needs to reflect the IMD state.
-    out.DC_EVSEStatus.EVSEIsolationStatus = iso2_isolationLevelType_Valid;
-    out.DC_EVSEStatus.EVSEIsolationStatus_isUsed = true;
-}
-
-template <> void insert_type(VariantAccess& va, const struct iso2_PowerDeliveryReqType& in) {
-    va.insert_type<PowerDeliveryRequest>(in);
+struct V2gMessageRequest {
+    iso2_MessageHeaderType header;
+    iso2_PowerDeliveryReqType body;
 };
 
-template <> int serialize_to_exi(const PowerDeliveryResponse& in, exi_bitstream_t& out) {
+const auto convertChargingProfile = [](const iso2_ChargingProfileType& in) {
+    if (in.ProfileEntry.arrayLen > 0) {
+        iso15118::message_d2::data_types::charging_profile_type chargingProfile;
+        for (uint16_t i = 0; i < in.ProfileEntry.arrayLen; ++i) {
+            iso15118::message_d2::data_types::profile_entry_type entry;
+            entry.charging_profile_entry_start =
+                static_cast<uint64_t>(in.ProfileEntry.array[i].ChargingProfileEntryStart);
+            convert(in.ProfileEntry.array[i].ChargingProfileEntryMaxPower, entry.charging_profile_entry_max_power);
+            if (in.ProfileEntry.array[i].ChargingProfileEntryMaxNumberOfPhasesInUse_isUsed) {
+                entry.charging_profile_entry_max_number_of_phases_in_use =
+                    static_cast<message_d2::data_types::max_num_phases_type>(
+                        in.ProfileEntry.array[i].ChargingProfileEntryMaxNumberOfPhasesInUse);
+            }
+            chargingProfile.profile_entry.push_back(entry);
+        }
+        return chargingProfile;
+    } else {
+        return iso15118::message_d2::data_types::charging_profile_type{};
+    }
+};
+
+template <> void convert(const V2gMessageRequest& in, PowerDeliveryReq& out) {
+    convert(in.header, out.header);
+    out.charge_progress = static_cast<iso15118::message_d2::data_types::charge_progress_type>(in.body.ChargeProgress);
+    out.sa_schedule_tuple_id = in.body.SAScheduleTupleID;
+    if (in.body.ChargingProfile_isUsed) {
+        out.charging_profile = convertChargingProfile(in.body.ChargingProfile);
+    }
+    if (in.body.EVPowerDeliveryParameter_isUsed) {
+        // TODO (tm): not sure what should happen here
+        //        out.ev_power_delivery_parameter = in.body.EVPowerDeliveryParameter._unused;
+    }
+}
+
+template <> void convert(const PowerDeliveryRes& in, iso2_PowerDeliveryResType& out) {
+    init_iso2_PowerDeliveryResType(&out);
+
+    cb_convert_enum(in.response_code, out.ResponseCode);
+    convert(in.evse_status, out.EVSEStatus);
+}
+
+template <>
+void insert_type(VariantAccess& va, const struct iso2_MessageHeaderType& header,
+                 const struct iso2_PowerDeliveryReqType& in) {
+
+    const auto v2g_message = V2gMessageRequest{header, in};
+    va.insert_type<PowerDeliveryReq>(v2g_message);
+}
+
+template <> int serialize_to_exi(const PowerDeliveryRes& in, exi_bitstream_t& out) {
+
     iso2_exiDocument doc;
     init_iso2_exiDocument(&doc);
 
-    // RDB this is new in ISO2
-    init_iso2_BodyType(&doc.V2G_Message.Body);
-
-    // RDB Convert the header since it is separate in ISO2.
     convert(in.header, doc.V2G_Message.Header);
 
     CB_SET_USED(doc.V2G_Message.Body.PowerDeliveryRes);
-
     convert(in, doc.V2G_Message.Body.PowerDeliveryRes);
 
     return encode_iso2_exiDocument(&out, &doc);
 }
 
-template <> size_t serialize(const PowerDeliveryResponse& in, const io::StreamOutputView& out) {
+template <> size_t serialize(const PowerDeliveryRes& in, const io::StreamOutputView& out) {
     return serialize_helper(in, out);
 }
 

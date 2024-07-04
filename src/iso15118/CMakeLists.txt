@@ -3,12 +3,12 @@ find_package(Threads REQUIRED)
 add_library(iso15118)
 add_library(iso15118::iso15118 ALIAS iso15118)
 target_include_directories(iso15118
-    PUBLIC
+        PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 
 target_sources(iso15118
-    PRIVATE
+        PRIVATE
         misc/helper.cpp
         misc/cb_exi.cpp
 
@@ -23,7 +23,7 @@ target_sources(iso15118
         session/feedback.cpp
         session/iso.cpp
         session/logger.cpp
-        
+
         states/fsm.cpp
         states/context.cpp
         states/context_helper.cpp
@@ -66,18 +66,25 @@ target_sources(iso15118
         message_d2/session_setup.cpp
         message_d2/common.cpp
         # message_d2/authorization_setup.cpp
-        # message_d2/authorization.cpp
-        # message_d2/service_discovery.cpp
-        # message_d2/service_detail.cpp
-        # message_d2/service_selection.cpp
+        message_d2/authorization.cpp
+        message_d2/service_discovery.cpp
+        message_d2/service_detail.cpp
+        message_d2/service_selection.cpp
+        message_d2/payment_details.cpp
+        message_d2/certificate_update.cpp
+        message_d2/certificate_installation.cpp
+        message_d2/charging_status.cpp
+        message_d2/charge_parameter_discovery.cpp
         # message_d2/dc_charge_parameter_discovery.cpp
         # message_d2/schedule_exchange.cpp
-        # message_d2/dc_cable_check.cpp
-        # message_d2/dc_pre_charge.cpp
-        # message_d2/power_delivery.cpp
+        message_d2/dc_cable_check.cpp
+        message_d2/dc_current_demand.cpp
+        message_d2/dc_pre_charge.cpp
+        message_d2/power_delivery.cpp
+        message_d2/metering_receipt.cpp
         # message_d2/dc_charge_loop.cpp
-        # message_d2/dc_welding_detection.cpp
-        # message_d2/session_stop.cpp
+        message_d2/dc_welding_detection.cpp
+        message_d2/session_stop.cpp
 
         message_d20/variant.cpp
         message_d20/supported_app_protocol.cpp
@@ -99,31 +106,31 @@ target_sources(iso15118
         message_d20/ac_charge_parameter_discovery.cpp
         message_d20/ac_charge_loop.cpp
 
-        tbd_controller.cpp    
+        tbd_controller.cpp
 )
 
 if (NOT ISO15118_LINK_CUSTOM_MBEDTLS)
     set(MBEDTLS_LINK_DEPENDENCIES
-        mbedtls
-        mbedx509
-        mbedcrypto
+            mbedtls
+            mbedx509
+            mbedcrypto
     )
 else ()
     set(MBEDTLS_LINK_DEPENDENCIES
-        mbedtls_custom
-        mbedx509_custom
-        mbedcrypto_custom
+            mbedtls_custom
+            mbedx509_custom
+            mbedcrypto_custom
     )
 endif ()
 
 target_link_libraries(iso15118
-    PUBLIC
+        PUBLIC
         # FIXME (aw): would be nice if we could make this private!
         fsm::fsm
         cbv2g::tp
         cbv2g::iso20
         cbv2g::iso2
-    PRIVATE
+        PRIVATE
         Threads::Threads
 
         ${MBEDTLS_LINK_DEPENDENCIES}

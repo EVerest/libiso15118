@@ -1,69 +1,27 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2023 Pionix GmbH and Contributors to EVerest
+// Copyright 2024 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include <optional>
-#include <variant>
-#include <vector>
-
 #include "common.hpp"
+#include "iso15118/message_d2/data_types/complex_types/charging_profile_type.hpp"
+#include "iso15118/message_d2/data_types/complex_types/ev_power_delivery_related_types.hpp"
+#include "iso15118/message_d2/data_types/tariffs_and_payment_types.hpp"
+#include "iso15118/message_d2/data_types/fault_and_response_code_types.hpp"
 
 namespace iso15118::message_2 {
 
-struct PowerDeliveryRequest {
-    enum class Progress {
-        Start,
-        Stop,
-        Standby,
-        ScheduleRenegotiation,
-    };
-
-    struct PowerScheduleEntry {
-        uint32_t duration;
-        RationalNumber power;
-        std::optional<RationalNumber> power_l2;
-        std::optional<RationalNumber> power_l3;
-    };
-
-    struct Dynamic_EVPPTControlMode {
-        // intentionally left blank
-    };
-
-    enum class PowerToleranceAcceptance : uint8_t {
-        NotConfirmed,
-        Confirmed,
-    };
-
-    struct Scheduled_EVPPTControlMode {
-        NumericID selected_schedule;
-        PowerToleranceAcceptance power_tolerance_acceptance;
-    };
-
-    struct PowerProfile {
-        uint64_t time_anchor;
-        std::variant<Dynamic_EVPPTControlMode, Scheduled_EVPPTControlMode> control_mode;
-        std::vector<PowerScheduleEntry> entries; // maximum 2048
-    };
-
-    enum class ChannelSelection : uint8_t {
-        Charge,
-        Discharge,
-    };
-
-    Header header;
-
-    Processing processing;
-    Progress charge_progress;
-
-    std::optional<PowerProfile> power_profile;
-    std::optional<ChannelSelection> channel_selection;
+struct PowerDeliveryReq {
+    V2GMessageHeader header;
+    iso15118::message_d2::data_types::charge_progress_type charge_progress;
+    iso15118::message_d2::data_types::sa_id_type sa_schedule_tuple_id;
+    std::optional<iso15118::message_d2::data_types::charging_profile_type> charging_profile;
+    std::optional<iso15118::message_d2::data_types::ev_power_delivery_parameter_type> ev_power_delivery_parameter;
 };
 
-struct PowerDeliveryResponse {
-    Header header;
-    ResponseCode response_code;
-
-    std::optional<EvseStatus> status;
+struct PowerDeliveryRes {
+    V2GMessageHeader header;
+    iso15118::message_d2::data_types::response_code_type response_code;
+    iso15118::message_d2::data_types::evse_status_type evse_status;
 };
 
 } // namespace iso15118::message_2

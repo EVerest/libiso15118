@@ -2,40 +2,25 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include <string>
-#include <variant>
-#include <vector>
+#include <optional>
 
 #include "common.hpp"
+#include "iso15118/message_d2/data_types/complex_types/service_related_types.hpp"
+#include "iso15118/message_d2/data_types/fault_and_response_code_types.hpp"
+#include "iso15118/message_d2/data_types/identification_number_types.hpp"
 
 namespace iso15118::message_2 {
 
-struct ServiceDetailRequest {
-    Header header;
-    ServiceCategory service;
+struct ServiceDetailReq {
+    V2GMessageHeader header;
+    iso15118::message_d2::data_types::service_id_type service_id;
 };
 
-struct ServiceDetailResponse {
-    struct Parameter {
-        std::string name;
-        std::variant<bool, int8_t, int16_t, int32_t, std::string, RationalNumber> value;
-    };
-
-    struct ParameterSet {
-        uint16_t id;
-        std::vector<Parameter> parameter;
-
-        ParameterSet();
-        ParameterSet(uint16_t _id, const DcParameterList& list);
-        ParameterSet(uint16_t _id, const DcBptParameterList& list);
-        ParameterSet(uint16_t _id, const InternetParameterList& list);
-        ParameterSet(uint16_t _id, const ParkingParameterList& list);
-    };
-
-    Header header;
-    ResponseCode response_code;
-    ServiceCategory service = ServiceCategory::DC;
-    std::vector<ParameterSet> service_parameter_list = {ParameterSet()};
+struct ServiceDetailRes {
+    V2GMessageHeader header;
+    iso15118::message_d2::data_types::response_code_type response_code;
+    iso15118::message_d2::data_types::service_id_type service_id;
+    std::optional<iso15118::message_d2::data_types::service_parameter_list_type> service_parameter_list;
 };
 
 } // namespace iso15118::message_2
