@@ -15,28 +15,28 @@ struct V2gMessageRequest {
 
 const auto convertChargingProfile = [](const iso2_ChargingProfileType& in) {
     if (in.ProfileEntry.arrayLen > 0) {
-        iso15118::message_d2::data_types::charging_profile_type chargingProfile;
+        data_types::ChargingProfile chargingProfile;
         for (uint16_t i = 0; i < in.ProfileEntry.arrayLen; ++i) {
-            iso15118::message_d2::data_types::profile_entry_type entry;
+            data_types::ProfileEntry entry;
             entry.charging_profile_entry_start =
                 static_cast<uint64_t>(in.ProfileEntry.array[i].ChargingProfileEntryStart);
             convert(in.ProfileEntry.array[i].ChargingProfileEntryMaxPower, entry.charging_profile_entry_max_power);
             if (in.ProfileEntry.array[i].ChargingProfileEntryMaxNumberOfPhasesInUse_isUsed) {
                 entry.charging_profile_entry_max_number_of_phases_in_use =
-                    static_cast<message_d2::data_types::max_num_phases_type>(
+                    static_cast<data_types::max_num_phases_type>(
                         in.ProfileEntry.array[i].ChargingProfileEntryMaxNumberOfPhasesInUse);
             }
             chargingProfile.profile_entry.push_back(entry);
         }
         return chargingProfile;
     } else {
-        return iso15118::message_d2::data_types::charging_profile_type{};
+        return data_types::ChargingProfile{};
     }
 };
 
 template <> void convert(const V2gMessageRequest& in, PowerDeliveryReq& out) {
     convert(in.header, out.header);
-    out.charge_progress = static_cast<iso15118::message_d2::data_types::charge_progress_type>(in.body.ChargeProgress);
+    out.charge_progress = static_cast<data_types::ChargeProgress>(in.body.ChargeProgress);
     out.sa_schedule_tuple_id = in.body.SAScheduleTupleID;
     if (in.body.ChargingProfile_isUsed) {
         out.charging_profile = convertChargingProfile(in.body.ChargingProfile);

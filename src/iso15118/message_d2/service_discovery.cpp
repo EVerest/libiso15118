@@ -22,7 +22,7 @@ template <> void convert(const V2gMessageRequest& in, ServiceDiscoveryReq& out) 
     }
     if (in.body.ServiceCategory_isUsed) {
         out.service_category =
-            static_cast<iso15118::message_d2::data_types::service_category_type>(in.body.ServiceCategory);
+            static_cast<data_types::ServiceCategory>(in.body.ServiceCategory);
     }
 }
 

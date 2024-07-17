@@ -21,7 +21,7 @@ template <> void convert(const V2gMessageRequest& in, ChargeParameterDiscoveryRe
         out.max_entries_sa_schedule_tuple = in.body.MaxEntriesSAScheduleTuple;
     }
     out.requested_energy_transfer_mode =
-        static_cast<iso15118::message_d2::data_types::energy_transfer_mode_type>(in.body.RequestedEnergyTransferMode);
+        static_cast<data_types::EnergyTransferMode>(in.body.RequestedEnergyTransferMode);
     convert(in.body.EVChargeParameter, out.ev_charge_parameter);
 }
 

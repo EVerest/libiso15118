@@ -3,19 +3,18 @@
 #pragma once
 
 #include "common.hpp"
-#include "iso15118/message_d2/data_types/fault_and_response_code_types.hpp"
-#include "iso15118/message_d2/data_types/general_types.hpp"
+#include "iso15118/message_d2/msg_data_types.hpp"
 
 namespace iso15118::message_2 {
 
 struct SessionStopReq {
     V2GMessageHeader header;
-    iso15118::message_d2::data_types::charging_session_type charging_session;
+    data_types::ChargingSession charging_session;
 };
 
 struct SessionStopRes {
     V2GMessageHeader header;
-    iso15118::message_d2::data_types::response_code_type response_code;
+    data_types::ResponseCode response_code;
 };
 
 } // namespace iso15118::message_2

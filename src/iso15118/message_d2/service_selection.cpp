@@ -20,7 +20,7 @@ struct V2gMessageRequest {
 template <> void convert(const V2gMessageRequest& in, PaymentServiceSelectionReq& out) {
     convert(in.header, out.header);
     out.selected_payment_option =
-        static_cast<iso15118::message_d2::data_types::payment_option_type>(in.body.SelectedPaymentOption);
+        static_cast<data_types::PaymentOption>(in.body.SelectedPaymentOption);
     convert(in.body.SelectedServiceList, out.selected_service_list);
 }
 
