@@ -82,6 +82,7 @@ public:
     Session();
     Session(SelectedServiceParameters);
     Session(OfferedServices);
+    ~Session() = default;
 
     std::array<uint8_t, ID_LENGTH> get_id() const {
         return id;
@@ -100,8 +101,6 @@ public:
     }
 
     // TODO(sl): Define get_selected_*() if necessary
-
-    ~Session();
 
     OfferedServices offered_services;
 

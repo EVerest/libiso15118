@@ -31,10 +31,14 @@ struct SessionState {
 class Session {
 public:
     Session(std::unique_ptr<io::IConnection>, const d20::SessionConfig&, const session::feedback::Callbacks&);
-    ~Session();
+    ~Session() = default;
 
     TimePoint const& poll();
     void push_control_event(const d20::ControlEvent&);
+
+    bool is_session_finished() {
+        return session_finished;
+    }
 
 private:
     std::unique_ptr<io::IConnection> connection;
@@ -60,7 +64,7 @@ private:
 
     TimePoint next_session_event;
 
-    bool session_stopped{false};
+    bool session_finished{false};
 
     void handle_connection_event(io::ConnectionEvent event);
 };

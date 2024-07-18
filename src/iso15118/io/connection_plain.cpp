@@ -21,6 +21,7 @@ static constexpr auto DEFAULT_SOCKET_BACKLOG = 4;
 ConnectionPlain::ConnectionPlain(PollManager& poll_manager_, const std::string& interface_name) :
     poll_manager(poll_manager_) {
     sockaddr_in6 address;
+    int enable{1};
     if (not get_first_sockaddr_in6_for_interface(interface_name, address)) {
         const auto msg = "Failed to get ipv6 socket address for interface " + interface_name;
         log_and_throw(msg.c_str());
@@ -37,6 +38,16 @@ ConnectionPlain::ConnectionPlain(PollManager& poll_manager_, const std::string& 
 
     // before bind, set the port
     address.sin6_port = htobe16(end_point.port);
+
+    const auto set_reuseaddr = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
+    if (set_reuseaddr == -1) {
+        log_and_throw("setsockopt(SO_REUSEADDR) failed");
+    }
+
+    const auto set_reuseport= setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(enable));
+    if (set_reuseport == -1) {
+        log_and_throw("setsockopt(SO_REUSEPORT) failed");
+    }
 
     const auto bind_result = bind(fd, reinterpret_cast<const struct sockaddr*>(&address), sizeof(address));
     if (bind_result == -1) {

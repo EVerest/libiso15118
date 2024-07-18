@@ -28,6 +28,7 @@ TbdController::TbdController(TbdConfig config_, session::feedback::Callbacks cal
 
 void TbdController::loop() {
     static constexpr auto POLL_MANAGER_TIMEOUT_MS = 50;
+    bool session_finished = false;
 
     auto next_event = get_current_time_point();
 
@@ -37,22 +38,25 @@ void TbdController::loop() {
 
         next_event = offset_time_point_by_ms(get_current_time_point(), POLL_MANAGER_TIMEOUT_MS);
 
-        for (auto& session : sessions) {
-            const auto next_session_event = session.poll();
+        if (session_active == true and session.get() != nullptr) {
+            const auto next_session_event = session.get()->poll();
             next_event = std::min(next_event, next_session_event);
+            session_finished = session.get()->is_session_finished();
+        }
+
+        // Reset session
+        if (session_finished) {
+            session_active = false;
+            session_finished = false;
+            session.reset();
         }
     }
 }
 
 void TbdController::send_control_event(const d20::ControlEvent& event) {
-    if (sessions.size() > 1) {
-        logf("Inconsistent state, sessions.size() > 1 -- dropping control event");
-        return;
-    } else if (sessions.size() == 0) {
-        return;
+    if (session_active == true and session.get() != nullptr) {
+        session.get()->push_control_event(event);
     }
-
-    sessions.front().push_control_event(event);
 }
 
 // Should be called once
@@ -142,7 +146,8 @@ void TbdController::handle_sdp_server_input() {
     const auto ipv6_endpoint = connection->get_public_endpoint();
 
     // Todo(sl): Check if session_config is empty
-    const auto& new_session = sessions.emplace_back(std::move(connection), session_config, callbacks);
+    session = std::make_unique<Session>(std::move(connection), session_config, callbacks);
+    session_active = true;
 
     sdp_server.send_response(request, ipv6_endpoint);
 }

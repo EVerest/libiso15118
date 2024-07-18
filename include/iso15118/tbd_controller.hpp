@@ -5,6 +5,7 @@
 #include <list>
 #include <memory>
 #include <optional>
+#include <atomic>
 
 #include "config.hpp"
 #include "d20/control_event.hpp"
@@ -45,7 +46,8 @@ private:
 
     d20::SessionConfig session_config;
 
-    std::list<Session> sessions;
+    std::unique_ptr<Session> session;
+    std::atomic_bool session_active{false};
 
     // callbacks for sdp server
     void handle_sdp_server_input();

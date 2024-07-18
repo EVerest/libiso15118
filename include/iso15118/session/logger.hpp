@@ -42,6 +42,7 @@ void set_session_log_callback(const Callback&);
 class SessionLogger {
 public:
     SessionLogger(void*);
+    ~SessionLogger() = default;
     void enter_state(const std::string& new_state);
     void event(const std::string& info) const;
     void exi(uint16_t payload_type, uint8_t const* data, size_t len, logging::ExiMessageDirection direction) const;

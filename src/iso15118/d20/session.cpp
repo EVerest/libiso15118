@@ -35,8 +35,6 @@ Session::Session(OfferedServices services_) : offered_services(services_) {
     }
 }
 
-Session::~Session() = default;
-
 bool Session::find_parameter_set_id(const message_20::ServiceCategory service, int16_t id) {
 
     switch (service) {
