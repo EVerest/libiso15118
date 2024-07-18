@@ -22,13 +22,22 @@ namespace iso15118 {
 
 TbdController::TbdController(TbdConfig config_, session::feedback::Callbacks callbacks_) :
     config(std::move(config_)), callbacks(std::move(callbacks_)) {
-    poll_manager.register_fd(sdp_server.get_fd(), [this]() { handle_sdp_server_input(); });
+    if (config.enable_sdp_server) {
+        sdp_server.init();
+        poll_manager.register_fd(sdp_server.get_fd(), [this]() { handle_sdp_server_input(); });
+    }
     session_config = d20::SessionConfig();
 }
 
 void TbdController::loop() {
     static constexpr auto POLL_MANAGER_TIMEOUT_MS = 50;
     bool session_finished = false;
+
+    if (not config.enable_sdp_server) {
+        auto connection = std::make_unique<io::ConnectionPlain>(poll_manager, config.interface_name);
+        session = std::make_unique<Session>(std::move(connection), session_config, callbacks);
+        session_active = true;
+    }
 
     auto next_event = get_current_time_point();
 
@@ -46,9 +55,16 @@ void TbdController::loop() {
 
         // Reset session
         if (session_finished) {
-            session_active = false;
             session_finished = false;
-            session.reset();
+
+            if (config.enable_sdp_server) {
+                session_active = false;
+                session.reset();
+            } else {
+                auto connection = std::make_unique<io::ConnectionPlain>(poll_manager, config.interface_name);
+                session = std::make_unique<Session>(std::move(connection), session_config, callbacks);
+                session_active = true; // Not necessary
+            }
         }
     }
 }

@@ -30,7 +30,15 @@ static void log_peer_hostname(const struct sockaddr_in6& address) {
 
 namespace io {
 
-SdpServer::SdpServer() {
+SdpServer::~SdpServer() {
+    // FIXME (aw): rather use some RAII class for this!
+    logf("Shutting down SDP server!");
+    if (fd != -1) {
+        close(fd);
+    }
+}
+
+void SdpServer::init() {
     fd = socket(AF_INET6, SOCK_DGRAM, 0);
 
     if (fd == -1) {
@@ -48,14 +56,6 @@ SdpServer::SdpServer() {
         bind(fd, reinterpret_cast<const struct sockaddr*>(&socket_address), sizeof(socket_address));
     if (bind_result == -1) {
         log_and_throw("Failed to bind to socket");
-    }
-}
-
-SdpServer::~SdpServer() {
-    // FIXME (aw): rather use some RAII class for this!
-    logf("Shutting down SDP server!");
-    if (fd != -1) {
-        close(fd);
     }
 }
 
