@@ -56,14 +56,12 @@ void TbdController::loop() {
         // Reset session
         if (session_finished) {
             session_finished = false;
-
-            if (config.enable_sdp_server) {
-                session_active = false;
-                session.reset();
-            } else {
+            session_active = false;
+            if (not config.enable_sdp_server) {
+                // Create a connection and start a new session directly
                 auto connection = std::make_unique<io::ConnectionPlain>(poll_manager, config.interface_name);
                 session = std::make_unique<Session>(std::move(connection), session_config, callbacks);
-                session_active = true; // Not necessary
+                session_active = true;
             }
         }
     }

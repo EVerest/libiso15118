@@ -377,6 +377,8 @@ void ConnectionSSL::close() {
 
     poll_manager.unregister_fd(accept_fd);
 
+    ssl.reset();
+
     logf(LogLevel::Info, "TLS connection closed gracefully");
 
     call_if_available(event_callback, ConnectionEvent::CLOSED);
