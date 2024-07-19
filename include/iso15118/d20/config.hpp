@@ -27,7 +27,6 @@ struct SessionConfig {
     std::vector<message_20::InternetParameterList> internet_parameter_list;
     std::vector<message_20::ParkingParameterList> parking_parameter_list;
 
-
     // DC & DC_BPT RationalNumber values
     message_20::RationalNumber max_charge_power;
     message_20::RationalNumber min_charge_power;

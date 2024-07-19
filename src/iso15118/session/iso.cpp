@@ -23,7 +23,8 @@ static void log_sdp_packet(const iso15118::io::SdpPacket& sdp) {
                  sdp.get_payload_buffer()[i]);
     }
 
-    iso15118::logf(LogLevel::Info, "[SDP Packet in]: Header: %04hx, Payload: %s", sdp.get_payload_type(), payload_string_buffer.get());
+    iso15118::logf(LogLevel::Info, "[SDP Packet in]: Header: %04hx, Payload: %s", sdp.get_payload_type(),
+                   payload_string_buffer.get());
 }
 
 static void log_packet_from_car(const iso15118::io::SdpPacket& packet, session::SessionLogger& logger) {
@@ -120,9 +121,7 @@ static size_t setup_response_header(uint8_t* buffer, iso15118::io::v2gtp::Payloa
 
 Session::Session(std::unique_ptr<io::IConnection> connection_, const d20::SessionConfig& config,
                  const session::feedback::Callbacks& callbacks) :
-    connection(std::move(connection_)),
-    log(this),
-    ctx(message_exchange, active_control_event, callbacks, log, config) {
+    connection(std::move(connection_)), log(this), ctx(message_exchange, active_control_event, callbacks, log, config) {
 
     next_session_event = offset_time_point_by_ms(get_current_time_point(), SESSION_IDLE_TIMEOUT_MS);
     connection->set_event_callback([this](io::ConnectionEvent event) { this->handle_connection_event(event); });

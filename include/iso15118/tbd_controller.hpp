@@ -2,10 +2,10 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #pragma once
 
+#include <atomic>
 #include <list>
 #include <memory>
 #include <optional>
-#include <atomic>
 
 #include "config.hpp"
 #include "d20/control_event.hpp"

@@ -42,7 +42,7 @@ FsmSimpleState::HandleEventReturnType SupportedAppProtocol::handle_event(Allocat
 
         ctx.respond(res);
         ctx.feedback.v2g_message(session::feedback::V2gMessageId::SupportedAppProtocolRes);
-        
+
         return sa.create_simple<SessionSetup>(ctx);
     }
 

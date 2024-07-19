@@ -44,7 +44,7 @@ ConnectionPlain::ConnectionPlain(PollManager& poll_manager_, const std::string& 
         log_and_throw("setsockopt(SO_REUSEADDR) failed");
     }
 
-    const auto set_reuseport= setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(enable));
+    const auto set_reuseport = setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(enable));
     if (set_reuseport == -1) {
         log_and_throw("setsockopt(SO_REUSEPORT) failed");
     }

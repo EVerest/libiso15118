@@ -18,7 +18,7 @@ using namespace iso15118;
 class FsmStateHelper {
 public:
     FsmStateHelper(const d20::SessionConfig& config) :
-        log(this), ctx(msg_exch, active_control_event, callbacks, log, config) {};
+        log(this), ctx(msg_exch, active_control_event, callbacks, log, config){};
 
     d20::Context& get_context();
 
