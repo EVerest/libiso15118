@@ -52,6 +52,9 @@ FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType&
 
     const auto variant = ctx.get_request();
 
+    const auto v2g_message_type = convert_request_type(variant->get_type());
+    ctx.feedback.v2g_message(v2g_message_type);
+
     if (const auto req = variant->get_if<message_20::DC_CableCheckRequest>()) {
         if (not cable_check_initiated) {
             ctx.feedback.signal(session::feedback::Signal::START_CABLE_CHECK);
@@ -61,6 +64,8 @@ FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType&
         const auto res = handle_request(*req, ctx.session, cable_check_done);
 
         ctx.respond(res);
+
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::DcCableCheckRes);
 
         if (res.response_code >= message_20::ResponseCode::FAILED) {
             ctx.session_stopped = true;
@@ -77,6 +82,8 @@ FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType&
 
         ctx.respond(res);
         ctx.session_stopped = true;
+
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::SessionStopRes);
 
         return sa.PASS_ON;
     } else {

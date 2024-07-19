@@ -26,7 +26,7 @@ handle_request(const message_20::AuthorizationSetupRequest& req, d20::Session& s
     res.certificate_installation_service = cert_install_service;
 
     if (authorization_services.empty()) {
-        logf("Warning: authorization_services was not set. Setting EIM as auth_mode\n");
+        logf(LogLevel::Warning, "authorization_services was not set. Setting EIM as auth_mode\n");
         res.authorization_services = {message_20::Authorization::EIM};
     } else {
         res.authorization_services = authorization_services;
@@ -64,13 +64,18 @@ FsmSimpleState::HandleEventReturnType AuthorizationSetup::handle_event(Allocator
 
     const auto variant = ctx.get_request();
 
+    const auto v2g_message_type = convert_request_type(variant->get_type());
+    ctx.feedback.v2g_message(v2g_message_type);
+
     if (const auto req = variant->get_if<message_20::AuthorizationSetupRequest>()) {
         const auto res =
             handle_request(*req, ctx.session, ctx.config.cert_install_service, ctx.config.authorization_services);
 
-        logf("Timestamp: %d\n", req->header.timestamp);
+        logf(LogLevel::Info, "Timestamp: %d\n", req->header.timestamp);
 
         ctx.respond(res);
+
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::AuthorizationSetupRes);
 
         if (res.response_code >= message_20::ResponseCode::FAILED) {
             ctx.session_stopped = true;
@@ -86,6 +91,8 @@ FsmSimpleState::HandleEventReturnType AuthorizationSetup::handle_event(Allocator
 
         ctx.respond(res);
         ctx.session_stopped = true;
+
+        ctx.feedback.v2g_message(session::feedback::V2gMessageId::SessionStopRes);
 
         return sa.PASS_ON;
     } else {

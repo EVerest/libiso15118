@@ -5,6 +5,7 @@
 #include <iso15118/d20/context.hpp>
 #include <iso15118/d20/session.hpp>
 #include <iso15118/message/common.hpp>
+#include <iso15118/session/feedback.hpp>
 
 namespace iso15118::d20 {
 
@@ -20,5 +21,7 @@ bool validate_and_setup_header(message_20::Header&, const Session&, const declty
 void setup_header(message_20::Header&, const Session&);
 
 void send_sequence_error(const message_20::Type, d20::Context&);
+
+session::feedback::V2gMessageId convert_request_type(const message_20::Type);
 
 } // namespace iso15118::d20

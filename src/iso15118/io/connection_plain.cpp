@@ -21,6 +21,7 @@ static constexpr auto DEFAULT_SOCKET_BACKLOG = 4;
 ConnectionPlain::ConnectionPlain(PollManager& poll_manager_, const std::string& interface_name) :
     poll_manager(poll_manager_) {
     sockaddr_in6 address;
+    int enable{1};
     if (not get_first_sockaddr_in6_for_interface(interface_name, address)) {
         const auto msg = "Failed to get ipv6 socket address for interface " + interface_name;
         log_and_throw(msg.c_str());
@@ -37,6 +38,16 @@ ConnectionPlain::ConnectionPlain(PollManager& poll_manager_, const std::string& 
 
     // before bind, set the port
     address.sin6_port = htobe16(end_point.port);
+
+    const auto set_reuseaddr = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
+    if (set_reuseaddr == -1) {
+        log_and_throw("setsockopt(SO_REUSEADDR) failed");
+    }
+
+    const auto set_reuseport = setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(enable));
+    if (set_reuseport == -1) {
+        log_and_throw("setsockopt(SO_REUSEPORT) failed");
+    }
 
     const auto bind_result = bind(fd, reinterpret_cast<const struct sockaddr*>(&address), sizeof(address));
     if (bind_result == -1) {
@@ -87,7 +98,7 @@ ReadResult ConnectionPlain::read(uint8_t* buf, size_t len) {
     // should be an error
     if (errno != EAGAIN) {
         // in case the error is not due to blocking, log it
-        logf("ConnectionPlain::read failed with error code: %d", errno);
+        logf(LogLevel::Error, "ConnectionPlain::read failed with error code: %d", errno);
     }
 
     return {did_block, 0};
@@ -105,7 +116,7 @@ void ConnectionPlain::handle_connect() {
 
     const auto address_name = sockaddr_in6_to_name(address);
 
-    logf("Incoming connection from [%s]:%" PRIu16, address_name.get(), ntohs(address.sin6_port));
+    logf(LogLevel::Info, "Incoming connection from [%s]:%" PRIu16, address_name.get(), ntohs(address.sin6_port));
 
     poll_manager.unregister_fd(fd);
     ::close(fd);
@@ -128,7 +139,7 @@ void ConnectionPlain::handle_data() {
 void ConnectionPlain::close() {
 
     /* tear down TCP connection gracefully */
-    logf("Closing TCP connection\n");
+    logf(LogLevel::Info, "Closing TCP connection\n");
 
     // Wait for 5 seconds [V2G20-1643]
     std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -150,7 +161,7 @@ void ConnectionPlain::close() {
         log_and_throw("close() failed");
     }
 
-    logf("TCP connection closed gracefully");
+    logf(LogLevel::Info, "TCP connection closed gracefully");
 
     connection_open = false;
     call_if_available(event_callback, ConnectionEvent::CLOSED);

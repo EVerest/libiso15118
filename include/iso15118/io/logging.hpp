@@ -5,7 +5,18 @@
 #include <functional>
 #include <string>
 
-namespace iso15118::io {
-void set_logging_callback(const std::function<void(std::string)>&);
+namespace iso15118 {
+enum class LogLevel {
+    Error,
+    Warning,
+    Info,
+    Debug,
+    Trace,
+};
 
-} // namespace iso15118::io
+namespace io {
+void set_logging_callback(const std::function<void(LogLevel, std::string)>&);
+
+} // namespace io
+
+} // namespace iso15118

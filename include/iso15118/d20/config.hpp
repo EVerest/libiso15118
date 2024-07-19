@@ -3,6 +3,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <variant>
 #include <vector>
 
@@ -26,11 +27,19 @@ struct SessionConfig {
     std::vector<message_20::InternetParameterList> internet_parameter_list;
     std::vector<message_20::ParkingParameterList> parking_parameter_list;
 
-    using DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::DC_CPDResEnergyTransferMode;
-    using BPT_DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::BPT_DC_CPDResEnergyTransferMode;
+    // DC & DC_BPT RationalNumber values
+    message_20::RationalNumber max_charge_power;
+    message_20::RationalNumber min_charge_power;
+    message_20::RationalNumber max_charge_current;
+    message_20::RationalNumber min_charge_current;
+    message_20::RationalNumber max_voltage;
+    message_20::RationalNumber min_voltage;
+    std::optional<message_20::RationalNumber> power_ramp_limit;
 
-    DC_ModeRes evse_dc_parameter;
-    BPT_DC_ModeRes evse_dc_bpt_parameter;
+    std::optional<message_20::RationalNumber> max_discharge_power;
+    std::optional<message_20::RationalNumber> min_discharge_power;
+    std::optional<message_20::RationalNumber> max_discharge_current;
+    std::optional<message_20::RationalNumber> min_discharge_current;
 
     SessionConfig();
 };

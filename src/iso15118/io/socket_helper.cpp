@@ -39,12 +39,12 @@ bool get_first_sockaddr_in6_for_interface(const std::string& interface_name, soc
 
         // NOTE (aw): because we did the check for AF_INET6, we can assume that ifa_addr is indeed an sockaddr_in6
         const auto current_addr = reinterpret_cast<const sockaddr_in6*>(current_if->ifa_addr);
-        if (not IN6_IS_ADDR_LINKLOCAL(&(current_addr->sin6_addr))) {
+        if (interface_name != "lo" and not IN6_IS_ADDR_LINKLOCAL(&(current_addr->sin6_addr))) {
             continue;
         }
 
         if (interface_name == "auto") {
-            logf("Found an ipv6 link local address for interface: %s\n", current_if->ifa_name);
+            logf(LogLevel::Info, "Found an ipv6 link local address for interface: %s\n", current_if->ifa_name);
         }
 
         memcpy(&address, current_addr, sizeof(address));
