@@ -6,8 +6,8 @@
 #include <optional>
 #include <string>
 
-#include "common.hpp"
 #include "iso15118/message_d2/msg_data_types.hpp"
+#include "message_header.hpp"
 
 namespace iso15118::message_2 {
 
@@ -18,7 +18,7 @@ struct SessionSetupRequest {
 
 struct SessionSetupResponse {
     V2GMessageHeader header;
-    ResponseCode response_code;
+    data_types::ResponseCode response_code;
     std::string evseid;
     std::optional<int64_t> timestamp;
 };

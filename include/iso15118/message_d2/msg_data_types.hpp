@@ -2,20 +2,20 @@
 // Copyright Pionix GmbH and Contributors to EVerest
 
 #pragma once
+#include <array>
 #include <cbv2g/iso_2/iso2_msgDefEncoder.h>
 #include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <optional>
 
-namespace data_types {
+namespace iso15118::message_2::data_types {
 
 // Simple types
 
 // general types
 using percent_value_type = uint8_t; // range 0-100
-
-using fault_msg_type = std::string; // max length 64
 
 enum class EvseProcessing {
     Finished,
@@ -29,40 +29,7 @@ enum class EvseNotification {
     ReNegotiation
 };
 
-enum class ChargeProgress {
-    Start,
-    Stop,
-    Renegotiate
-};
-
-enum class ChargingSession {
-    Terminate,
-    Pause
-};
-
-using service_name_type = std::string; // max length 32
-
-enum class ServiceCategory {
-    EVCharging,
-    Internet,
-    ContractCertificate,
-    OtherCustom
-};
-
-using service_scope_type = std::string; // max length 64
-
 using max_num_phases_type = uint8_t; // range 1-3
-
-enum class ValueType {
-    Bool,
-    Byte,
-    Short,
-    Int,
-    PhysicalValue,
-    String
-};
-
-using meter_status_type = int16_t;
 
 // energy transfer types
 enum class EnergyTransferMode {
@@ -75,8 +42,7 @@ enum class EnergyTransferMode {
 };
 
 // tariffs and payment types
-using sa_id_type = uint8_t;                  // unsignedByte, range 1-255
-using tariff_description_type = std::string; // max length 32
+using sa_id_type = uint8_t; // unsignedByte, range 1-255
 
 enum class CostKind {
     relative_price_percentage,
@@ -288,7 +254,7 @@ struct DcEvPowerDeliveryParameter : public EvPowerDeliveryParameter {
 
 // evse ev charge paramter related types
 struct EvChargeParameter {
-    std::optional<uint64_t> departure_time;        // minOccurs="0"
+    std::optional<uint64_t> departure_time; // minOccurs="0"
     virtual ~EvChargeParameter() = default; // To ensure polymorphic behavior
 };
 
@@ -306,8 +272,8 @@ struct DcEvChargeParameter : public EvChargeParameter {
     PhysicalValue ev_maximum_voltage_limit;
     std::optional<PhysicalValue> ev_energy_capacity; // minOccurs="0"
     std::optional<PhysicalValue> ev_energy_request;  // minOccurs="0"
-    std::optional<percent_value_type> full_soc;            // minOccurs="0"
-    std::optional<percent_value_type> bulk_soc;            // minOccurs="0"
+    std::optional<percent_value_type> full_soc;      // minOccurs="0"
+    std::optional<percent_value_type> bulk_soc;      // minOccurs="0"
 };
 
 struct EvseChargeParameter {
@@ -335,7 +301,7 @@ struct DcEvseChargeParameter : public EvseChargeParameter {
 // header related types
 struct Notification {
     FaultCode fault_code;
-    std::optional<fault_msg_type> fault_msg;
+    std::optional<std::string> fault_msg;
 };
 
 // metering related types
@@ -343,7 +309,7 @@ struct MeterInfo {
     meter_id_type meter_id;
     std::optional<uint64_t> meter_reading;
     std::optional<sig_meter_reading_type> sig_meter_reading;
-    std::optional<meter_status_type> meter_status;
+    std::optional<int16_t> meter_status;
     std::optional<int64_t> t_meter;
 };
 
@@ -366,19 +332,14 @@ struct DiffieHellmanPublickey {
     id_type id;
 };
 
-struct EmaidExtended {
-    emaid_type value;
-    id_type id;
+struct SubCertificates {
+    std::vector<certificate_type> certificate; // maxOccurs="4"
 };
 
 struct CertificateChain {
     certificate_type certificate;
-    std::vector<certificate_type> sub_certificates; // minOccurs="0"
+    std::optional<SubCertificates> sub_certificates; // minOccurs="0"
     id_type id;
-};
-
-struct SubCertificates {
-    std::vector<certificate_type> certificate; // maxOccurs="4"
 };
 
 struct ListOfRootCertificateIds {
@@ -386,6 +347,13 @@ struct ListOfRootCertificateIds {
 };
 
 // service related types
+enum class ServiceCategory {
+    EVCharging,
+    Internet,
+    ContractCertificate,
+    OtherCustom
+};
+
 struct Service {
     service_id_type service_id;
     std::string service_name; // minOccurs="0"
@@ -395,45 +363,7 @@ struct Service {
 };
 
 struct ServiceList {
-    std::vector<Service> service; // maxOccurs="8"
-};
-
-struct SelectedService {
-    service_id_type service_id;
-    short parameter_set_id; // minOccurs="0"
-};
-
-struct SelectedServiceList {
-    std::vector<SelectedService> selected_service; // maxOccurs="16"
-};
-
-struct Parameter {
-    std::string name;
-    union {
-        bool bool_value;
-        uint8_t byte_value;
-        short short_value;
-        int int_value;
-        PhysicalValue physical_value;
-        std::string string_value;
-    };
-};
-
-struct ParameterSet {
-    short parameter_set_id;
-    std::vector<Parameter> parameter; // maxOccurs="16"
-};
-
-struct ServiceParameterList {
-    std::vector<ParameterSet> parameter_set; // maxOccurs="255"
-};
-
-struct SupportedEnergyTransferMode {
-    std::vector<EnergyTransferMode> energy_transfer_mode; // maxOccurs="6"
-};
-
-struct ChargeService : public Service {
-    SupportedEnergyTransferMode supported_energy_transfer_mode;
+    std::vector<data_types::Service> service; // maxOccurs="8"
 };
 
 // tariff related types
@@ -457,7 +387,7 @@ struct ConsumptionCost {
 };
 
 struct SalesTariffEntry : public Entry {
-    std::optional<uint8_t> e_price_level;                // minOccurs="0"
+    std::optional<uint8_t> e_price_level;          // minOccurs="0"
     std::vector<ConsumptionCost> consumption_cost; // minOccurs="0", maxOccurs="3"
 };
 
@@ -471,9 +401,9 @@ struct PmaxSchedule {
 
 struct SalesTariff {
     sa_id_type sales_tariff_id;
-    std::optional<tariff_description_type> sales_tariff_description; // minOccurs="0"
-    std::optional<uint8_t> num_e_price_levels;                       // minOccurs="0"
-    std::vector<SalesTariffEntry> sales_tariff_entry;         // maxOccurs="1024"
+    std::optional<std::string> sales_tariff_description; // minOccurs="0"
+    std::optional<uint8_t> num_e_price_levels;           // minOccurs="0"
+    std::vector<SalesTariffEntry> sales_tariff_entry;    // maxOccurs="1024"
     id_type id;
 };
 
@@ -495,4 +425,4 @@ struct RelativeTimeInterval : public Interval {
     uint64_t start;
     std::optional<uint64_t> duration; // minOccurs="0"
 };
-} // namespace data_types
+} // namespace iso15118::message_2::data_types

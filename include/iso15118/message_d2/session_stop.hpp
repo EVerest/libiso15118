@@ -2,14 +2,19 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include "common.hpp"
 #include "iso15118/message_d2/msg_data_types.hpp"
+#include "message_header.hpp"
 
 namespace iso15118::message_2 {
 
+enum class ChargingSession {
+    Terminate,
+    Pause
+};
+
 struct SessionStopReq {
     V2GMessageHeader header;
-    data_types::ChargingSession charging_session;
+    ChargingSession charging_session;
 };
 
 struct SessionStopRes {

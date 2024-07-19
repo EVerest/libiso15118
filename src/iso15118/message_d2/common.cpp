@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2024 Pionix GmbH and Contributors to EVerest
-#include <iso15118/message_d2/common.hpp>
+#include <iso15118/message_d2/message_header.hpp>
 
 #include <cmath>
 
@@ -11,11 +11,11 @@
 
 namespace iso15118::message_2 {
 
-template <> void convert(const iso2_NotificationType& in, Notification& out) {
+template <> void convert(const iso2_NotificationType& in, data_types::Notification& out) {
     cb_convert_enum(in.FaultCode, out.fault_code);
 
     if (in.FaultMsg_isUsed) {
-        out.fault_message = CB2CPP_STRING(in.FaultMsg);
+        out.fault_msg = CB2CPP_STRING(in.FaultMsg);
     }
 }
 
@@ -28,12 +28,12 @@ template <> void convert(const iso2_MessageHeaderType& in, V2GMessageHeader& out
     // Todo(sl): missing signature
 }
 
-template <> void convert(const Notification& in, iso2_NotificationType& out) {
+template <> void convert(const data_types::Notification& in, iso2_NotificationType& out) {
 
     cb_convert_enum(in.fault_code, out.FaultCode);
 
-    if (in.fault_message) {
-        CPP2CB_STRING(in.fault_message.value(), out.FaultMsg);
+    if (in.fault_msg) {
+        CPP2CB_STRING(in.fault_msg.value(), out.FaultMsg);
         CB_SET_USED(out.FaultMsg);
     }
 }

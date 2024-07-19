@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "common.hpp"
 #include "iso15118/message_d2/msg_data_types.hpp"
+#include "message_header.hpp"
 
 namespace iso15118::message_2 {
 

@@ -6,7 +6,7 @@
 
 #include <iso15118/d2/config.hpp>
 #include <iso15118/d2/session.hpp>
-#include <iso15118/message_d2/common.hpp>
+#include <iso15118/message_d2/message_header.hpp>
 #include <iso15118/message_d2/service_discovery.hpp>
 
 namespace iso15118::d2::state {

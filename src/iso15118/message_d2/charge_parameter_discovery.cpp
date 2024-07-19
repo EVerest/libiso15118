@@ -2,7 +2,7 @@
 // Copyright 2024 Pionix GmbH and Contributors to EVerest
 
 #include <iso15118/message_d2/charge_parameter_discovery.hpp>
-#include <iso15118/message_d2/common.hpp>
+#include <iso15118/message_d2/message_header.hpp>
 
 #include <iso15118/detail/variant_access.hpp>
 

@@ -8,7 +8,7 @@
 #include <variant>
 #include <vector>
 
-#include "common.hpp"
+#include "message_header.hpp"
 
 namespace iso15118::message_2 {
 
