@@ -94,9 +94,9 @@ FsmSimpleState::HandleEventReturnType ServiceDiscovery::handle_event(AllocatorTy
 
     if (const auto req = variant->get_if<message_20::ServiceDiscoveryRequest>()) {
         if (req->supported_service_ids) {
-            logf("Possible ids\n");
+            logf(LogLevel::Info, "Possible ids\n");
             for (auto id : req->supported_service_ids.value()) {
-                logf("  %d\n", id);
+                logf(LogLevel::Info, "  %d\n", id);
             }
         }
 

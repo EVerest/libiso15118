@@ -9,11 +9,20 @@
 
 namespace iso15118 {
 
-void logf(const char* fmt, ...);
+// FIXME(SL): Double declaration here and io/logging.hpp
+enum class LogLevel {
+    Error,
+    Warning,
+    Info,
+    Debug,
+    Trace,
+};
 
-void vlogf(const char* fmt, va_list ap);
+void logf(const LogLevel&, const char* fmt, ...);
 
-void log(const std::string&);
+void vlogf(const LogLevel&, const char* fmt, va_list ap);
+
+void log(const LogLevel&, const std::string&);
 
 void log_and_throw(const char* msg);
 

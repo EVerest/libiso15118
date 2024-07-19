@@ -91,7 +91,7 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
     ctx.feedback.v2g_message(v2g_message_type);
 
     if (const auto req = variant->get_if<message_20::ServiceDetailRequest>()) {
-        logf("Requested info about ServiceID: %d\n", req->service);
+        logf(LogLevel::Info, "Requested info about ServiceID: %d\n", req->service);
 
         const auto res = handle_request(*req, ctx.session, ctx.config);
 

@@ -79,16 +79,16 @@ FsmSimpleState::HandleEventReturnType DC_ChargeParameterDiscovery::handle_event(
 
             const auto& max_discharge_current = std::get<1>(req->transfer_mode).max_discharge_current;
 
-            logf("Max discharge current %de%d\n", max_discharge_current.value, max_discharge_current.exponent);
+            logf(LogLevel::Info, "Max discharge current %de%d\n", max_discharge_current.value, max_discharge_current.exponent);
 
             // Check if config discharge options are set
             if (not ctx.config.max_discharge_power.has_value() || not ctx.config.min_discharge_power.has_value() ||
                 not ctx.config.max_discharge_current.has_value() || not ctx.config.min_discharge_current.has_value()) {
-                logf("Some session config discharge options are not set. Set them to zero watts and amps!");
+                logf(LogLevel::Warning, "Some session config discharge options are not set. Set them to zero watts and amps!");
             }
         }
 
-        logf("Max charge current %de%d\n", max_current.value, max_current.exponent);
+        logf(LogLevel::Info, "Max charge current %de%d\n", max_current.value, max_current.exponent);
 
         const TransferMode transfer_mode = {ctx.config.max_charge_power,
                                             ctx.config.min_charge_power,
