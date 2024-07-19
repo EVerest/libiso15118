@@ -7,14 +7,17 @@
 
 namespace iso15118::message_2 {
 
+namespace data_types {
 enum class ChargingSession {
     Terminate,
     Pause
 };
 
+} // namespace data_types
+
 struct SessionStopReq {
     V2GMessageHeader header;
-    ChargingSession charging_session;
+    data_types::ChargingSession charging_session;
 };
 
 struct SessionStopRes {

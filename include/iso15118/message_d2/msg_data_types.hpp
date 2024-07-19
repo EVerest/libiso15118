@@ -5,10 +5,10 @@
 #include <array>
 #include <cbv2g/iso_2/iso2_msgDefEncoder.h>
 #include <cstdint>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <optional>
 
 namespace iso15118::message_2::data_types {
 
@@ -16,6 +16,8 @@ namespace iso15118::message_2::data_types {
 
 // general types
 using percent_value_type = uint8_t; // range 0-100
+
+using fault_msg_type = std::string; // max length 64
 
 enum class EvseProcessing {
     Finished,
@@ -29,7 +31,13 @@ enum class EvseNotification {
     ReNegotiation
 };
 
+using service_name_type = std::string; // max length 32
+
+using service_scope_type = std::string; // max length 64
+
 using max_num_phases_type = uint8_t; // range 1-3
+
+using meter_status_type = int16_t;
 
 // energy transfer types
 enum class EnergyTransferMode {
@@ -42,7 +50,8 @@ enum class EnergyTransferMode {
 };
 
 // tariffs and payment types
-using sa_id_type = uint8_t; // unsignedByte, range 1-255
+using sa_id_type = uint8_t;                  // unsignedByte, range 1-255
+using tariff_description_type = std::string; // max length 32
 
 enum class CostKind {
     relative_price_percentage,
@@ -301,7 +310,7 @@ struct DcEvseChargeParameter : public EvseChargeParameter {
 // header related types
 struct Notification {
     FaultCode fault_code;
-    std::optional<std::string> fault_msg;
+    std::optional<fault_msg_type> fault_msg;
 };
 
 // metering related types
@@ -309,7 +318,7 @@ struct MeterInfo {
     meter_id_type meter_id;
     std::optional<uint64_t> meter_reading;
     std::optional<sig_meter_reading_type> sig_meter_reading;
-    std::optional<int16_t> meter_status;
+    std::optional<meter_status_type> meter_status;
     std::optional<int64_t> t_meter;
 };
 
@@ -401,9 +410,9 @@ struct PmaxSchedule {
 
 struct SalesTariff {
     sa_id_type sales_tariff_id;
-    std::optional<std::string> sales_tariff_description; // minOccurs="0"
-    std::optional<uint8_t> num_e_price_levels;           // minOccurs="0"
-    std::vector<SalesTariffEntry> sales_tariff_entry;    // maxOccurs="1024"
+    std::optional<tariff_description_type> sales_tariff_description; // minOccurs="0"
+    std::optional<uint8_t> num_e_price_levels;                       // minOccurs="0"
+    std::vector<SalesTariffEntry> sales_tariff_entry;                // maxOccurs="1024"
     id_type id;
 };
 

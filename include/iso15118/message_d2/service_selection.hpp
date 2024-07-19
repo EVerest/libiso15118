@@ -5,6 +5,8 @@
 
 namespace iso15118::message_2 {
 
+namespace data_types {
+
 struct SelectedService {
     data_types::service_id_type service_id;
     short parameter_set_id; // minOccurs="0"
@@ -14,11 +16,12 @@ struct SelectedServiceList {
     std::vector<SelectedService> selected_service; // maxOccurs="16"
 };
 
+} // namespace data_types
 
 struct PaymentServiceSelectionReq {
     V2GMessageHeader header;
     data_types::PaymentOption selected_payment_option;
-    SelectedServiceList selected_service_list;
+    data_types::SelectedServiceList selected_service_list;
 };
 
 struct PaymentServiceSelectionRes {

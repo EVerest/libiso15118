@@ -15,7 +15,7 @@ struct V2gMessageRequest {
 
 template <> void convert(const V2gMessageRequest& in, SessionStopReq& out) {
     convert(in.header, out.header);
-    out.charging_session = static_cast<ChargingSession>(in.body.ChargingSession);
+    out.charging_session = static_cast<data_types::ChargingSession>(in.body.ChargingSession);
 }
 
 template <> void convert(const SessionStopRes& in, iso2_SessionStopResType& out) {

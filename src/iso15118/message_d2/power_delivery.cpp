@@ -36,7 +36,7 @@ const auto convertChargingProfile = [](const iso2_ChargingProfileType& in) {
 
 template <> void convert(const V2gMessageRequest& in, PowerDeliveryReq& out) {
     convert(in.header, out.header);
-    out.charge_progress = static_cast<ChargeProgress>(in.body.ChargeProgress);
+    out.charge_progress = static_cast<data_types::ChargeProgress>(in.body.ChargeProgress);
     out.sa_schedule_tuple_id = in.body.SAScheduleTupleID;
     if (in.body.ChargingProfile_isUsed) {
         out.charging_profile = convertChargingProfile(in.body.ChargingProfile);

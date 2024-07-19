@@ -9,6 +9,7 @@
 
 namespace iso15118::message_2 {
 
+namespace data_types {
 
 struct Parameter {
     std::string name;
@@ -30,6 +31,9 @@ struct ParameterSet {
 struct ServiceParameterList {
     std::vector<ParameterSet> parameter_set; // maxOccurs="255"
 };
+
+} // namespace data_types
+
 struct ServiceDetailReq {
     V2GMessageHeader header;
     data_types::service_id_type service_id;
@@ -39,7 +43,7 @@ struct ServiceDetailRes {
     V2GMessageHeader header;
     data_types::ResponseCode response_code;
     data_types::service_id_type service_id;
-    std::optional<ServiceParameterList> service_parameter_list;
+    std::optional<data_types::ServiceParameterList> service_parameter_list;
 };
 
 } // namespace iso15118::message_2

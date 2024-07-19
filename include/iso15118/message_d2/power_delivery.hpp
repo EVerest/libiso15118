@@ -7,15 +7,19 @@
 
 namespace iso15118::message_2 {
 
+namespace data_types {
+
 enum class ChargeProgress {
     Start,
     Stop,
     Renegotiate
 };
 
+} // namespace data_types
+
 struct PowerDeliveryReq {
     V2GMessageHeader header;
-    ChargeProgress charge_progress;
+    data_types::ChargeProgress charge_progress;
     data_types::sa_id_type sa_schedule_tuple_id;
     std::optional<data_types::ChargingProfile> charging_profile;
     std::optional<data_types::EvPowerDeliveryParameter> ev_power_delivery_parameter;

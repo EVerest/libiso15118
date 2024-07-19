@@ -9,6 +9,8 @@
 
 namespace iso15118::message_2 {
 
+namespace data_types {
+
 struct SupportedEnergyTransferMode {
     std::vector<data_types::EnergyTransferMode> energy_transfer_mode; // maxOccurs="6"
 };
@@ -16,9 +18,12 @@ struct SupportedEnergyTransferMode {
 struct ChargeService : public data_types::Service {
     SupportedEnergyTransferMode supported_energy_transfer_mode;
 };
+
+} // namespace data_types
+
 struct ServiceDiscoveryReq {
     V2GMessageHeader header;
-    std::optional<std::string> service_scope;
+    std::optional<data_types::service_scope_type> service_scope;
     std::optional<data_types::ServiceCategory> service_category;
 };
 
@@ -26,7 +31,7 @@ struct ServiceDiscoveryRes {
     V2GMessageHeader header;
     data_types::ResponseCode response_code;
     data_types::PaymentOptionList payment_option_list;
-    ChargeService charge_service;
+    data_types::ChargeService charge_service;
     std::optional<data_types::ServiceList> service_list;
 };
 
