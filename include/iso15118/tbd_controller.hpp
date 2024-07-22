@@ -11,9 +11,9 @@
 #include <iso15118/d20/config.hpp>
 #include <iso15118/d20/control_event.hpp>
 #include <iso15118/d20/limits.hpp>
+#include <iso15118/message/msg_data_types.hpp>
 #include <iso15118/io/poll_manager.hpp>
 #include <iso15118/io/sdp_server.hpp>
-#include <iso15118/message/common.hpp>
 #include <iso15118/session/feedback.hpp>
 #include <iso15118/session/iso.hpp>
 

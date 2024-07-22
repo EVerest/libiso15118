@@ -2,7 +2,7 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include "common.hpp"
+#include "msg_data_types.hpp"
 
 namespace iso15118::message_20 {
 

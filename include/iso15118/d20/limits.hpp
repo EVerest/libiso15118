@@ -4,7 +4,7 @@
 
 #include <optional>
 
-#include <iso15118/message/common.hpp>
+#include <iso15118/message/msg_data_types.hpp>
 
 namespace iso15118::d20 {
 
