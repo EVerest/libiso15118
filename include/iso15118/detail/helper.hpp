@@ -18,8 +18,10 @@ enum class LogLevel {
     Trace,
 };
 
+void logf(const char* fmt, ...);
 void logf(const LogLevel&, const char* fmt, ...);
 
+void vlogf(const char* fmt, va_list ap);
 void vlogf(const LogLevel&, const char* fmt, va_list ap);
 
 void log(const LogLevel&, const std::string&);

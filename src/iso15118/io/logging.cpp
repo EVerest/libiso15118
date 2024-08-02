@@ -15,6 +15,15 @@ void log(const LogLevel& level, const std::string& msg) {
     logging_callback(level, msg);
 }
 
+void vlogf(const char* fmt, va_list ap) {
+    static constexpr auto MAX_FMT_LOG_BUFSIZE = 1024;
+    char msg_buf[MAX_FMT_LOG_BUFSIZE];
+
+    vsnprintf(msg_buf, MAX_FMT_LOG_BUFSIZE, fmt, ap);
+
+    log(LogLevel::Info, msg_buf);
+}
+
 void vlogf(const LogLevel& level, const char* fmt, va_list ap) {
     static constexpr auto MAX_FMT_LOG_BUFSIZE = 1024;
     char msg_buf[MAX_FMT_LOG_BUFSIZE];
@@ -22,6 +31,15 @@ void vlogf(const LogLevel& level, const char* fmt, va_list ap) {
     vsnprintf(msg_buf, MAX_FMT_LOG_BUFSIZE, fmt, ap);
 
     log(level, msg_buf);
+}
+
+void logf(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+
+    vlogf(fmt, args);
+
+    va_end(args);
 }
 
 void logf(const LogLevel& level, const char* fmt, ...) {
