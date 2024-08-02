@@ -74,7 +74,8 @@ FsmSimpleState::HandleEventReturnType DC_ChargeParameterDiscovery::handle_event(
 
             const auto& max_discharge_current = std::get<1>(req->transfer_mode).max_discharge_current;
 
-            logf(LogLevel::Info, "Max discharge current %de%d\n", max_discharge_current.value, max_discharge_current.exponent);
+            logf(LogLevel::Info, "Max discharge current %de%d\n", max_discharge_current.value,
+                 max_discharge_current.exponent);
         }
 
         logf(LogLevel::Info, "Max charge current %de%d\n", max_current.value, max_current.exponent);

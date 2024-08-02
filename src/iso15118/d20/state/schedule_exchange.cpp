@@ -54,7 +54,7 @@ message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleEx
         auto& control_mode = res.control_mode.emplace<message_20::ScheduleExchangeResponse::Dynamic_SEResControlMode>();
 
     } else {
-        logf(LogLevel::Error,"The control mode of the req message does not match the previously agreed contol mode.");
+        logf(LogLevel::Error, "The control mode of the req message does not match the previously agreed contol mode.");
         return response_with_code(res, message_20::ResponseCode::FAILED);
     }
 

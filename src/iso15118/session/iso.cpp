@@ -23,7 +23,8 @@ static void log_sdp_packet(const iso15118::io::SdpPacket& sdp) {
                  sdp.get_payload_buffer()[i]);
     }
 
-    iso15118::logf(LogLevel::Info, "[SDP Packet in]: Header: %04hx, Payload: %s", sdp.get_payload_type(), payload_string_buffer.get());
+    iso15118::logf(LogLevel::Info, "[SDP Packet in]: Header: %04hx, Payload: %s", sdp.get_payload_type(),
+                   payload_string_buffer.get());
 }
 
 static void log_packet_from_car(const iso15118::io::SdpPacket& packet, session::SessionLogger& logger) {
