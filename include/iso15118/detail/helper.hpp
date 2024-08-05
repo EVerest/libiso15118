@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2023 Pionix GmbH and Contributors to EVerest
+// Copyright 2024 Pionix GmbH and Contributors to EVerest
 #pragma once
+
+#include <iso15118/io/log_levels.hpp>
 
 #include <cstdarg>
 #include <cstdint>
@@ -8,15 +10,6 @@
 #include <string>
 
 namespace iso15118 {
-
-// FIXME(SL): Double declaration here and io/logging.hpp
-enum class LogLevel {
-    Error,
-    Warning,
-    Info,
-    Debug,
-    Trace,
-};
 
 void logf(const char* fmt, ...);
 void logf(const LogLevel&, const char* fmt, ...);

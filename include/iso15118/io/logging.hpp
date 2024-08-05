@@ -5,14 +5,9 @@
 #include <functional>
 #include <string>
 
+#include "log_levels.hpp"
+
 namespace iso15118 {
-enum class LogLevel {
-    Error,
-    Warning,
-    Info,
-    Debug,
-    Trace,
-};
 
 namespace io {
 void set_logging_callback(const std::function<void(LogLevel, std::string)>&);
