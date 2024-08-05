@@ -4,6 +4,8 @@
 
 #include <stdexcept>
 
+#include <iso15118/detail/helper.hpp>
+
 namespace iso15118::d20 {
 
 std::unique_ptr<MessageExchange> create_message_exchange(uint8_t* buf, const size_t len) {
@@ -31,13 +33,22 @@ std::unique_ptr<message_20::Variant> MessageExchange::get_request() {
     return std::move(request);
 }
 
-std::tuple<bool, size_t, io::v2gtp::PayloadType> MessageExchange::check_and_clear_response() {
-    auto retval = std::make_tuple(response_available, response_size, payload_type);
+std::tuple<bool, size_t, io::v2gtp::PayloadType, message_20::Type> MessageExchange::check_and_clear_response() {
+    auto retval = std::make_tuple(response_available, response_size, payload_type, response_type);
 
     response_available = false;
     response_size = 0;
+    response_type = message_20::Type::None;
 
     return retval;
+}
+
+message_20::Type MessageExchange::get_request_type() const {
+    if (not request) {
+        logf("Warning: Tried to access V2G message, but there is none");
+        return message_20::Type::None;
+    }
+    return request->get_type();
 }
 
 Context::Context(MessageExchange& message_exchange_, const std::optional<ControlEvent>& current_control_event_,
@@ -53,6 +64,10 @@ Context::Context(MessageExchange& message_exchange_, const std::optional<Control
 
 std::unique_ptr<message_20::Variant> Context::get_request() {
     return message_exchange.get_request();
+}
+
+message_20::Type Context::get_request_type() const {
+    return message_exchange.get_request_type();
 }
 
 } // namespace iso15118::d20
