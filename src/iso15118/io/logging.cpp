@@ -52,6 +52,22 @@ void logf(const LogLevel& level, const char* fmt, ...) {
     va_end(args);
 }
 
+void logf_error(const char* fmt, ...) {
+    logf(LogLevel::Error, fmt);
+}
+void logf_warning(const char* fmt, ...) {
+    logf(LogLevel::Warning, fmt);
+}
+void logf_info(const char* fmt, ...) {
+    logf(LogLevel::Info, fmt);
+}
+void logf_debug(const char* fmt, ...) {
+    logf(LogLevel::Debug, fmt);
+}
+void logf_trace(const char* fmt, ...) {
+    logf(LogLevel::Trace, fmt);
+}
+
 namespace io {
 void set_logging_callback(const std::function<void(LogLevel, std::string)>& callback) {
     logging_callback = callback;

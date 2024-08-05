@@ -21,6 +21,12 @@ enum class LogLevel {
 void logf(const char* fmt, ...);
 void logf(const LogLevel&, const char* fmt, ...);
 
+void logf_error(const char* fmt, ...);
+void logf_warning(const char* fmt, ...);
+void logf_info(const char* fmt, ...);
+void logf_debug(const char* fmt, ...);
+void logf_trace(const char* fmt, ...);
+
 void vlogf(const char* fmt, va_list ap);
 void vlogf(const LogLevel&, const char* fmt, va_list ap);
 
