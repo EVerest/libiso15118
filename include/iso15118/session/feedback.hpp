@@ -37,7 +37,7 @@ struct Callbacks {
     std::function<void(Signal)> signal;
     std::function<void(const DcChargeTarget&)> dc_charge_target;
     std::function<void(const DcMaximumLimits&)> dc_max_limits;
-    std::function<void(const message_20::Type&)> v2g_mesage;
+    std::function<void(const message_20::Type&)> v2g_message;
 };
 
 } // namespace feedback
