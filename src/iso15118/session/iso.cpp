@@ -168,7 +168,7 @@ TimePoint const& Session::poll() {
 
         packet = {}; // reset the packet
 
-        const auto request_msg_type = ctx.get_request_type();
+        const auto request_msg_type = ctx.peek_request_type();
         ctx.feedback.v2g_message(request_msg_type);
 
         const auto res = fsm.handle_event(d20::FsmEvent::V2GTP_MESSAGE);

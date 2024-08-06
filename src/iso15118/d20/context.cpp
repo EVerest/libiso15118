@@ -25,7 +25,7 @@ void MessageExchange::set_request(std::unique_ptr<message_20::Variant> new_reque
     request = std::move(new_request);
 }
 
-std::unique_ptr<message_20::Variant> MessageExchange::get_request() {
+std::unique_ptr<message_20::Variant> MessageExchange::pull_request() {
     if (not request) {
         throw std::runtime_error("Tried to access V2G message, but there is none");
     }
@@ -43,7 +43,7 @@ std::tuple<bool, size_t, io::v2gtp::PayloadType, message_20::Type> MessageExchan
     return retval;
 }
 
-message_20::Type MessageExchange::get_request_type() const {
+message_20::Type MessageExchange::peek_request_type() const {
     if (not request) {
         logf("Warning: Tried to access V2G message, but there is none");
         return message_20::Type::None;
@@ -62,12 +62,12 @@ Context::Context(MessageExchange& message_exchange_, const std::optional<Control
     config(config_) {
 }
 
-std::unique_ptr<message_20::Variant> Context::get_request() {
-    return message_exchange.get_request();
+std::unique_ptr<message_20::Variant> Context::pull_request() {
+    return message_exchange.pull_request();
 }
 
-message_20::Type Context::get_request_type() const {
-    return message_exchange.get_request_type();
+message_20::Type Context::peek_request_type() const {
+    return message_exchange.peek_request_type();
 }
 
 } // namespace iso15118::d20
