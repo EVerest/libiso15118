@@ -47,6 +47,8 @@ static sockaddr_in6 key_log_address;
 struct SSLContext {
     std::unique_ptr<SSL_CTX> ssl_ctx;
     std::unique_ptr<SSL> ssl;
+    int fd{-1};
+    int accept_fd{-1};
 };
 
 static std::tuple<int, sockaddr_in6> create_udp_socket(const char* interface_name, uint16_t port) {
@@ -135,26 +137,26 @@ ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& inte
     // Openssl stuff missing!
     init_ssl(ssl_config);
 
-    fd = socket(AF_INET6, SOCK_STREAM, 0);
-    if (fd == -1) {
+    ssl->fd = socket(AF_INET6, SOCK_STREAM, 0);
+    if (ssl->fd == -1) {
         log_and_throw("Failed to create an ipv6 socket");
     }
 
     // before bind, set the port
     address.sin6_port = htobe16(end_point.port);
 
-    const auto bind_result = bind(fd, reinterpret_cast<const struct sockaddr*>(&address), sizeof(address));
+    const auto bind_result = bind(ssl->fd, reinterpret_cast<const struct sockaddr*>(&address), sizeof(address));
     if (bind_result == -1) {
         const auto error = "Failed to bind ipv6 socket to interface " + interface_name_;
         log_and_throw(error.c_str());
     }
 
-    const auto listen_result = listen(fd, DEFAULT_SOCKET_BACKLOG);
+    const auto listen_result = listen(ssl->fd, DEFAULT_SOCKET_BACKLOG);
     if (listen_result == -1) {
         log_and_throw("Listen on socket failed");
     }
 
-    poll_manager.register_fd(fd, [this]() { this->handle_connect(); });
+    poll_manager.register_fd(ssl->fd, [this]() { this->handle_connect(); });
 }
 
 ConnectionSSL::~ConnectionSSL() = default;
@@ -278,9 +280,9 @@ ReadResult ConnectionSSL::read(uint8_t* buf, size_t len) {
 void ConnectionSSL::handle_connect() {
 
     auto* peer = BIO_ADDR_new();
-    accept_fd = BIO_accept_ex(fd, peer, BIO_SOCK_NONBLOCK);
+    ssl->accept_fd = BIO_accept_ex(ssl->fd, peer, BIO_SOCK_NONBLOCK);
 
-    if (accept_fd < 0) {
+    if (ssl->accept_fd < 0) {
         log_and_raise_openssl_error("Failed to BIO_accept_ex");
     }
 
@@ -294,19 +296,19 @@ void ConnectionSSL::handle_connect() {
         std::tie(key_log_fd, key_log_address) = create_udp_socket(interface_name.c_str(), port);
     }
 
-    poll_manager.unregister_fd(fd);
-    ::close(fd);
+    poll_manager.unregister_fd(ssl->fd);
+    ::close(ssl->fd);
 
     call_if_available(event_callback, ConnectionEvent::ACCEPTED);
 
     ssl->ssl = std::unique_ptr<SSL>(SSL_new(ssl->ssl_ctx.get()));
-    const auto socket_bio = BIO_new_socket(accept_fd, BIO_CLOSE);
+    const auto socket_bio = BIO_new_socket(ssl->accept_fd, BIO_CLOSE);
 
     SSL_set_bio(ssl->ssl.get(), socket_bio, socket_bio);
     SSL_set_accept_state(ssl->ssl.get());
     SSL_set_app_data(ssl->ssl.get(), this);
 
-    poll_manager.register_fd(accept_fd, [this]() { this->handle_data(); });
+    poll_manager.register_fd(ssl->accept_fd, [this]() { this->handle_data(); });
 
     OPENSSL_free(ip);
     OPENSSL_free(service);
@@ -363,7 +365,8 @@ void ConnectionSSL::close() {
 
     // TODO(sl): Test if correct
 
-    poll_manager.unregister_fd(accept_fd);
+    ::close(ssl->accept_fd);
+    poll_manager.unregister_fd(ssl->accept_fd);
 
     logf_info("TLS connection closed gracefully");
 

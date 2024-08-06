@@ -34,9 +34,6 @@ private:
 
     Ipv6EndPoint end_point;
 
-    int fd{-1};
-    int accept_fd{-1};
-
     bool connection_open{false};
 
     ConnectionEventCallback event_callback{nullptr};
