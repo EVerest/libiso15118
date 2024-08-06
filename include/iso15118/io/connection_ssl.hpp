@@ -39,7 +39,7 @@ private:
     bool handshake_complete{false};
 
     std::string interface_name;
-    bool enable_ssl_logging{false};
+    bool enable_key_logging{false};
 
     void handle_connect();
     void handle_data();

@@ -96,7 +96,7 @@ static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
     // TODO(sl): How switch verify mode to none if tls 1.2 is used?
     SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, nullptr);
 
-    if (ssl_config.enable_ssl_logging) {
+    if (ssl_config.enable_tls_key_logging) {
 
         SSL_CTX_set_keylog_callback(ctx, [](const SSL* ssl, const char* line) {
             logf_info("TLS handshake keys: %s\n", line);
@@ -182,7 +182,7 @@ ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& inte
                              const config::SSLConfig& ssl_config) :
     poll_manager(poll_manager_),
     interface_name(interface_name_),
-    enable_ssl_logging(ssl_config.enable_ssl_logging),
+    enable_key_logging(ssl_config.enable_tls_key_logging),
     ssl(std::make_unique<SSLContext>()) {
     
     // Openssl stuff missing!
@@ -293,7 +293,7 @@ void ConnectionSSL::handle_connect() {
 
     logf_info("Incoming connection from [%s]:%s", ip, service);
 
-    if (enable_ssl_logging) {
+    if (enable_key_logging) {
         const auto port = std::stoul(service);
         std::tie(key_log_fd, key_log_address) = create_udp_socket(interface_name.c_str(), port);
     }
@@ -338,7 +338,7 @@ void ConnectionSSL::handle_data() {
             logf_info("Handshake complete!\n");
 
             handshake_complete = true;
-            if (enable_ssl_logging) {
+            if (enable_key_logging) {
                 ::close(key_log_fd);
                 key_log_fd = -1;
                 key_log_address = {};
