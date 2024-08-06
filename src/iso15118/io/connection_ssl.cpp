@@ -5,11 +5,8 @@
 #include <cassert>
 #include <cstring>
 #include <filesystem>
-#include <tuple>
 #include <unistd.h>
 
-#include <arpa/inet.h>
-#include <net/if.h>
 #include <sys/socket.h>
 
 #include <openssl/bio.h>
@@ -18,6 +15,7 @@
 
 #include <iso15118/detail/helper.hpp>
 #include <iso15118/detail/io/socket_helper.hpp>
+#include <iso15118/io/sdp_server.hpp>
 
 namespace std {
 template <> class default_delete<SSL> {
@@ -38,10 +36,7 @@ namespace iso15118::io {
 
 static constexpr auto DEFAULT_SOCKET_BACKLOG = 4;
 
-static constexpr auto LINK_LOCAL_MULTICAST = "ff02::1";
-
-static auto key_log_fd{-1};
-static sockaddr_in6 key_log_address;
+static io::TlsKeyLoggingServer key_logging_server; // FIXME(sl): Check out SSL_set_ex_data & SSL_get_ex_data
 
 struct SSLContext {
     std::unique_ptr<SSL_CTX> ssl_ctx;
@@ -101,16 +96,12 @@ static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
         SSL_CTX_set_keylog_callback(ctx, [](const SSL* ssl, const char* line) {
             logf_info("TLS handshake keys: %s\n", line);
 
-            if (key_log_fd == -1) {
+            if (key_logging_server.get_fd() == -1) {
                 logf_warning("Error - key_log_fd is not available");
                 return;
             }
-
-            const auto udp_send_result =
-                sendto(key_log_fd, line, strlen(line), 0, reinterpret_cast<const sockaddr*>(&key_log_address),
-                       sizeof(key_log_address));
-
-            if (udp_send_result != strlen(line)) {
+            const auto result = key_logging_server.send(line);
+            if (result != strlen(line)) {
                 const auto error_msg = adding_err_msg("UDP send() failed");
                 logf_error(error_msg.c_str());
             }
@@ -120,71 +111,13 @@ static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
     return ctx;
 }
 
-static std::tuple<int, sockaddr_in6> create_udp_socket(const char* interface_name, uint16_t port) {
-    int udp_socket = socket(AF_INET6, SOCK_DGRAM, 0);
-    if (udp_socket < 0) {
-        const auto error_msg = adding_err_msg("Could not create socket");
-        logf_error(error_msg.c_str());
-        return {udp_socket, {}};
-    }
-
-    // source setup
-
-    // find port between 49152-65535
-    auto could_bind = false;
-    auto source_port = 49152;
-    for (; source_port < 65535; source_port++) {
-        sockaddr_in6 source_address = {AF_INET6, htons(source_port)};
-        if (bind(udp_socket, reinterpret_cast<sockaddr*>(&source_address), sizeof(sockaddr_in6)) == 0) {
-            could_bind = true;
-            break;
-        }
-    }
-
-    if (!could_bind) {
-        const auto error_msg = adding_err_msg("Could not bind");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-
-    logf_info("UDP socket bound to source port: %u", source_port);
-
-    const auto index = if_nametoindex(interface_name);
-    auto mreq = ipv6_mreq{};
-    mreq.ipv6mr_interface = index;
-    if (inet_pton(AF_INET6, LINK_LOCAL_MULTICAST, &mreq.ipv6mr_multiaddr) <= 0) {
-        const auto error_msg = adding_err_msg("Failed to setup multicast address");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-    if (setsockopt(udp_socket, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0) {
-        const auto error_msg = adding_err_msg("Could not add multicast group membership");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-
-    if (setsockopt(udp_socket, IPPROTO_IPV6, IPV6_MULTICAST_IF, &index, sizeof(index)) < 0) {
-        const auto error_msg = adding_err_msg("Could not set interface name:" + std::string(interface_name));
-        logf_error(error_msg.c_str());
-    }
-
-    sockaddr_in6 dest_address = {AF_INET6, htons(port)};
-    if (inet_pton(AF_INET6, LINK_LOCAL_MULTICAST, &dest_address.sin6_addr) <= 0) {
-        const auto error_msg = adding_err_msg("Failed to setup server address, reset key_log_fd");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-
-    return {udp_socket, dest_address};
-}
-
 ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& interface_name_,
                              const config::SSLConfig& ssl_config) :
     poll_manager(poll_manager_),
     interface_name(interface_name_),
     enable_key_logging(ssl_config.enable_tls_key_logging),
     ssl(std::make_unique<SSLContext>()) {
-    
+
     // Openssl stuff missing!
     const auto ssl_ctx = init_ssl(ssl_config);
     ssl->ssl_ctx = std::unique_ptr<SSL_CTX>(ssl_ctx);
@@ -295,7 +228,7 @@ void ConnectionSSL::handle_connect() {
 
     if (enable_key_logging) {
         const auto port = std::stoul(service);
-        std::tie(key_log_fd, key_log_address) = create_udp_socket(interface_name.c_str(), port);
+        key_logging_server = io::TlsKeyLoggingServer(interface_name, port);
     }
 
     poll_manager.unregister_fd(ssl->fd);
@@ -339,9 +272,7 @@ void ConnectionSSL::handle_data() {
 
             handshake_complete = true;
             if (enable_key_logging) {
-                ::close(key_log_fd);
-                key_log_fd = -1;
-                key_log_address = {};
+                key_logging_server.~TlsKeyLoggingServer(); // FIXME(sl): Not good........
             }
 
             call_if_available(event_callback, ConnectionEvent::OPEN);
