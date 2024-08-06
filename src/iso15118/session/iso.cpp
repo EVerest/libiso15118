@@ -4,6 +4,8 @@
 
 #include <cassert>
 #include <cstring>
+#include <thread>
+#include <chrono>
 
 #include <endian.h>
 
@@ -188,6 +190,8 @@ TimePoint const& Session::poll() {
         ctx.feedback.v2g_message(response_type);
 
         if (session_stopped) {
+            // Wait for 5 seconds [V2G20-1643]
+            std::this_thread::sleep_for(std::chrono::seconds(5));
             connection->close();
             session_stopped = false; // reset
             ctx.feedback.signal(session::feedback::Signal::DLINK_TERMINATE);

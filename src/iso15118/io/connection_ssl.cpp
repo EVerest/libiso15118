@@ -5,7 +5,6 @@
 #include <cassert>
 #include <cstring>
 #include <filesystem>
-#include <thread>
 #include <tuple>
 #include <unistd.h>
 
@@ -350,9 +349,6 @@ void ConnectionSSL::handle_data() {
 void ConnectionSSL::close() {
     /* tear down TLS connection gracefully */
     logf_info("Closing TLS connection\n");
-
-    // Wait for 5 seconds [V2G20-1643]
-    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     const auto ssl_close_result = SSL_shutdown(ssl->ssl.get()); // TODO(sl): Correct shutdown handling
 

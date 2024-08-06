@@ -5,7 +5,6 @@
 #include <cassert>
 #include <cstring>
 #include <filesystem>
-#include <thread>
 
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/debug.h"
@@ -262,9 +261,6 @@ void ConnectionSSL::close() {
 
     /* tear down TLS connection gracefully */
     logf_info("Closing TLS connection\n");
-
-    // Wait for 5 seconds [V2G20-1643]
-    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     poll_manager.unregister_fd(ssl->connection_net_ctx.fd);
 
