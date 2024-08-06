@@ -7,11 +7,7 @@
 
 #include "log_levels.hpp"
 
-namespace iso15118 {
+namespace iso15118::io {
+void set_logging_callback(const std::function<void(std::string)>&);
 
-namespace io {
-void set_logging_callback(const std::function<void(LogLevel, std::string)>&);
-
-} // namespace io
-
-} // namespace iso15118
+} // namespace iso15118::io
