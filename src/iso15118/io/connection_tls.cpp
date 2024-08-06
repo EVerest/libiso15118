@@ -87,7 +87,7 @@ static void load_certificates(SSLContext& ssl, const config::SSLConfig& ssl_conf
     }
 }
 
-ConnectionTLS::ConnectionTLS(PollManager& poll_manager_, const std::string& interface_name,
+ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& interface_name,
                              const config::SSLConfig& ssl_config) :
     poll_manager(poll_manager_), ssl(std::make_unique<SSLContext>()) {
 
@@ -168,17 +168,17 @@ ConnectionTLS::ConnectionTLS(PollManager& poll_manager_, const std::string& inte
     poll_manager.register_fd(ssl->accepting_net_ctx.fd, [this]() { this->handle_connect(); });
 }
 
-ConnectionTLS::~ConnectionTLS() = default;
+ConnectionSSL::~ConnectionSSL() = default;
 
-void ConnectionTLS::set_event_callback(const ConnectionEventCallback& callback) {
+void ConnectionSSL::set_event_callback(const ConnectionEventCallback& callback) {
     this->event_callback = callback;
 }
 
-Ipv6EndPoint ConnectionTLS::get_public_endpoint() const {
+Ipv6EndPoint ConnectionSSL::get_public_endpoint() const {
     return end_point;
 }
 
-void ConnectionTLS::write(const uint8_t* buf, size_t len) {
+void ConnectionSSL::write(const uint8_t* buf, size_t len) {
     assert(handshake_complete);
 
     const auto ssl_write_result = mbedtls_ssl_write(&ssl->ssl, buf, len);
@@ -190,7 +190,7 @@ void ConnectionTLS::write(const uint8_t* buf, size_t len) {
     }
 }
 
-ReadResult ConnectionTLS::read(uint8_t* buf, size_t len) {
+ReadResult ConnectionSSL::read(uint8_t* buf, size_t len) {
     // FIXME (aw): any assert best practices?
     assert(handshake_complete);
 
@@ -211,7 +211,7 @@ ReadResult ConnectionTLS::read(uint8_t* buf, size_t len) {
     return {false, 0};
 }
 
-void ConnectionTLS::handle_connect() {
+void ConnectionSSL::handle_connect() {
     const auto accept_result =
         mbedtls_net_accept(&ssl->accepting_net_ctx, &ssl->connection_net_ctx, nullptr, 0, nullptr);
     if (accept_result != 0) {
@@ -230,7 +230,7 @@ void ConnectionTLS::handle_connect() {
     poll_manager.register_fd(ssl->connection_net_ctx.fd, [this]() { this->handle_data(); });
 }
 
-void ConnectionTLS::handle_data() {
+void ConnectionSSL::handle_data() {
     if (not handshake_complete) {
         // FIXME (aw): proper handshake handling (howto?)
         const auto ssl_handshake_result = mbedtls_ssl_handshake(&ssl->ssl);
@@ -258,7 +258,7 @@ void ConnectionTLS::handle_data() {
     publish_event(ConnectionEvent::NEW_DATA);
 }
 
-void ConnectionTLS::close() {
+void ConnectionSSL::close() {
 
     /* tear down TLS connection gracefully */
     logf_info("Closing TLS connection\n");

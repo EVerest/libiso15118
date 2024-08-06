@@ -12,9 +12,9 @@ namespace iso15118::io {
 
 // forward declaration
 struct SSLContext;
-class ConnectionTLS : public IConnection {
+class ConnectionSSL : public IConnection {
 public:
-    ConnectionTLS(PollManager&, const std::string& interface_name, const config::SSLConfig&);
+    ConnectionSSL(PollManager&, const std::string& interface_name, const config::SSLConfig&);
 
     void set_event_callback(const ConnectionEventCallback&) final;
     Ipv6EndPoint get_public_endpoint() const final;
@@ -24,7 +24,7 @@ public:
 
     void close() final;
 
-    ~ConnectionTLS();
+    ~ConnectionSSL();
 
 private:
     PollManager& poll_manager;
