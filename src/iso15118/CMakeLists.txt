@@ -79,7 +79,7 @@ target_link_libraries(iso15118
         Threads::Threads
 )
 
-if (USING_OPENSSL)
+if (USE_OPENSSL)
     target_compile_definitions(iso15118
         PRIVATE
             LIBISO_OPENSSL
