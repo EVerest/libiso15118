@@ -50,125 +50,7 @@ struct SSLContext {
     int accept_fd{-1};
 };
 
-static std::tuple<int, sockaddr_in6> create_udp_socket(const char* interface_name, uint16_t port) {
-    int udp_socket = socket(AF_INET6, SOCK_DGRAM, 0);
-    if (udp_socket < 0) {
-        const auto error_msg = adding_err_msg("Could not create socket");
-        logf_error(error_msg.c_str());
-        return {udp_socket, {}};
-    }
-
-    // source setup
-
-    // find port between 49152-65535
-    auto could_bind = false;
-    auto source_port = 49152;
-    for (; source_port < 65535; source_port++) {
-        sockaddr_in6 source_address = {AF_INET6, htons(source_port)};
-        if (bind(udp_socket, reinterpret_cast<sockaddr*>(&source_address), sizeof(sockaddr_in6)) == 0) {
-            could_bind = true;
-            break;
-        }
-    }
-
-    if (!could_bind) {
-        const auto error_msg = adding_err_msg("Could not bind");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-
-    logf_info("UDP socket bound to source port: %u", source_port);
-
-    const auto index = if_nametoindex(interface_name);
-    auto mreq = ipv6_mreq{};
-    mreq.ipv6mr_interface = index;
-    if (inet_pton(AF_INET6, LINK_LOCAL_MULTICAST, &mreq.ipv6mr_multiaddr) <= 0) {
-        const auto error_msg = adding_err_msg("Failed to setup multicast address");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-    if (setsockopt(udp_socket, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0) {
-        const auto error_msg = adding_err_msg("Could not add multicast group membership");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-
-    if (setsockopt(udp_socket, IPPROTO_IPV6, IPV6_MULTICAST_IF, &index, sizeof(index)) < 0) {
-        const auto error_msg = adding_err_msg("Could not set interface name:" + std::string(interface_name));
-        logf_error(error_msg.c_str());
-    }
-
-    sockaddr_in6 dest_address = {AF_INET6, htons(port)};
-    if (inet_pton(AF_INET6, LINK_LOCAL_MULTICAST, &dest_address.sin6_addr) <= 0) {
-        const auto error_msg = adding_err_msg("Failed to setup server address, reset key_log_fd");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-
-    return {udp_socket, dest_address};
-}
-
-ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& interface_name_,
-                             const config::SSLConfig& ssl_config) :
-    poll_manager(poll_manager_),
-    interface_name(interface_name_),
-    enable_ssl_logging(ssl_config.enable_ssl_logging),
-    ssl(std::make_unique<SSLContext>()) {
-
-    sockaddr_in6 address;
-    if (not get_first_sockaddr_in6_for_interface(interface_name_, address)) {
-        const auto msg = "Failed to get ipv6 socket address for interface " + interface_name_;
-        log_and_throw(msg.c_str());
-    }
-
-    const auto address_name = sockaddr_in6_to_name(address);
-
-    if (not address_name) {
-        const auto msg =
-            "Failed to determine string representation of ipv6 socket address for interface " + interface_name_;
-        log_and_throw(msg.c_str());
-    }
-
-    // Todo(sl): Define constexpr -> 50000 is fixed?
-    end_point.port = 50000;
-    memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
-
-    // Openssl stuff missing!
-    init_ssl(ssl_config);
-
-    ssl->fd = socket(AF_INET6, SOCK_STREAM, 0);
-    if (ssl->fd == -1) {
-        log_and_throw("Failed to create an ipv6 socket");
-    }
-
-    // before bind, set the port
-    address.sin6_port = htobe16(end_point.port);
-
-    const auto bind_result = bind(ssl->fd, reinterpret_cast<const struct sockaddr*>(&address), sizeof(address));
-    if (bind_result == -1) {
-        const auto error = "Failed to bind ipv6 socket to interface " + interface_name_;
-        log_and_throw(error.c_str());
-    }
-
-    const auto listen_result = listen(ssl->fd, DEFAULT_SOCKET_BACKLOG);
-    if (listen_result == -1) {
-        log_and_throw("Listen on socket failed");
-    }
-
-    poll_manager.register_fd(ssl->fd, [this]() { this->handle_connect(); });
-}
-
-ConnectionSSL::~ConnectionSSL() = default;
-
-void ConnectionSSL::set_event_callback(const ConnectionEventCallback& callback) {
-    event_callback = callback;
-}
-
-Ipv6EndPoint ConnectionSSL::get_public_endpoint() const {
-    return end_point;
-}
-
-void ConnectionSSL::init_ssl(const config::SSLConfig& ssl_config) {
+static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
 
     // Note: openssl does not provide support for ECDH-ECDSA-AES128-SHA256 anymore
     static constexpr auto TLS1_2_CIPHERSUITES = "ECDHE-ECDSA-AES128-SHA256";
@@ -235,7 +117,126 @@ void ConnectionSSL::init_ssl(const config::SSLConfig& ssl_config) {
         });
     }
 
-    ssl->ssl_ctx = std::unique_ptr<SSL_CTX>(ctx);
+    return ctx;
+}
+
+static std::tuple<int, sockaddr_in6> create_udp_socket(const char* interface_name, uint16_t port) {
+    int udp_socket = socket(AF_INET6, SOCK_DGRAM, 0);
+    if (udp_socket < 0) {
+        const auto error_msg = adding_err_msg("Could not create socket");
+        logf_error(error_msg.c_str());
+        return {udp_socket, {}};
+    }
+
+    // source setup
+
+    // find port between 49152-65535
+    auto could_bind = false;
+    auto source_port = 49152;
+    for (; source_port < 65535; source_port++) {
+        sockaddr_in6 source_address = {AF_INET6, htons(source_port)};
+        if (bind(udp_socket, reinterpret_cast<sockaddr*>(&source_address), sizeof(sockaddr_in6)) == 0) {
+            could_bind = true;
+            break;
+        }
+    }
+
+    if (!could_bind) {
+        const auto error_msg = adding_err_msg("Could not bind");
+        logf_error(error_msg.c_str());
+        return {-1, {}};
+    }
+
+    logf_info("UDP socket bound to source port: %u", source_port);
+
+    const auto index = if_nametoindex(interface_name);
+    auto mreq = ipv6_mreq{};
+    mreq.ipv6mr_interface = index;
+    if (inet_pton(AF_INET6, LINK_LOCAL_MULTICAST, &mreq.ipv6mr_multiaddr) <= 0) {
+        const auto error_msg = adding_err_msg("Failed to setup multicast address");
+        logf_error(error_msg.c_str());
+        return {-1, {}};
+    }
+    if (setsockopt(udp_socket, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0) {
+        const auto error_msg = adding_err_msg("Could not add multicast group membership");
+        logf_error(error_msg.c_str());
+        return {-1, {}};
+    }
+
+    if (setsockopt(udp_socket, IPPROTO_IPV6, IPV6_MULTICAST_IF, &index, sizeof(index)) < 0) {
+        const auto error_msg = adding_err_msg("Could not set interface name:" + std::string(interface_name));
+        logf_error(error_msg.c_str());
+    }
+
+    sockaddr_in6 dest_address = {AF_INET6, htons(port)};
+    if (inet_pton(AF_INET6, LINK_LOCAL_MULTICAST, &dest_address.sin6_addr) <= 0) {
+        const auto error_msg = adding_err_msg("Failed to setup server address, reset key_log_fd");
+        logf_error(error_msg.c_str());
+        return {-1, {}};
+    }
+
+    return {udp_socket, dest_address};
+}
+
+ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& interface_name_,
+                             const config::SSLConfig& ssl_config) :
+    poll_manager(poll_manager_),
+    interface_name(interface_name_),
+    enable_ssl_logging(ssl_config.enable_ssl_logging),
+    ssl(std::make_unique<SSLContext>()) {
+    
+    // Openssl stuff missing!
+    const auto ssl_ctx = init_ssl(ssl_config);
+    ssl->ssl_ctx = std::unique_ptr<SSL_CTX>(ssl_ctx);
+
+    sockaddr_in6 address;
+    if (not get_first_sockaddr_in6_for_interface(interface_name_, address)) {
+        const auto msg = "Failed to get ipv6 socket address for interface " + interface_name_;
+        log_and_throw(msg.c_str());
+    }
+
+    const auto address_name = sockaddr_in6_to_name(address);
+
+    if (not address_name) {
+        const auto msg =
+            "Failed to determine string representation of ipv6 socket address for interface " + interface_name_;
+        log_and_throw(msg.c_str());
+    }
+
+    // Todo(sl): Define constexpr -> 50000 is fixed?
+    end_point.port = 50000;
+    memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
+
+    ssl->fd = socket(AF_INET6, SOCK_STREAM, 0);
+    if (ssl->fd == -1) {
+        log_and_throw("Failed to create an ipv6 socket");
+    }
+
+    // before bind, set the port
+    address.sin6_port = htobe16(end_point.port);
+
+    const auto bind_result = bind(ssl->fd, reinterpret_cast<const struct sockaddr*>(&address), sizeof(address));
+    if (bind_result == -1) {
+        const auto error = "Failed to bind ipv6 socket to interface " + interface_name_;
+        log_and_throw(error.c_str());
+    }
+
+    const auto listen_result = listen(ssl->fd, DEFAULT_SOCKET_BACKLOG);
+    if (listen_result == -1) {
+        log_and_throw("Listen on socket failed");
+    }
+
+    poll_manager.register_fd(ssl->fd, [this]() { this->handle_connect(); });
+}
+
+ConnectionSSL::~ConnectionSSL() = default;
+
+void ConnectionSSL::set_event_callback(const ConnectionEventCallback& callback) {
+    event_callback = callback;
+}
+
+Ipv6EndPoint ConnectionSSL::get_public_endpoint() const {
+    return end_point;
 }
 
 void ConnectionSSL::write(const uint8_t* buf, size_t len) {

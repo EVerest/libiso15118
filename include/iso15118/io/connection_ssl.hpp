@@ -19,8 +19,6 @@ public:
     void set_event_callback(const ConnectionEventCallback&) final;
     Ipv6EndPoint get_public_endpoint() const final;
 
-    void init_ssl(const config::SSLConfig&);
-
     void write(const uint8_t* buf, size_t len) final;
     ReadResult read(uint8_t* buf, size_t len) final;
 
