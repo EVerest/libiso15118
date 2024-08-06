@@ -177,7 +177,7 @@ void ConnectionSSL::init_ssl(const config::SSLConfig& ssl_config) {
     const std::filesystem::path prefix(ssl_config.config_string);
 
     const SSL_METHOD* method = TLS_server_method();
-    auto* ctx = SSL_CTX_new(method);
+    const auto ctx = SSL_CTX_new(method);
 
     if (ctx == nullptr) {
         log_and_raise_openssl_error("Failed in SSL_CTX_new()");
@@ -242,11 +242,12 @@ void ConnectionSSL::write(const uint8_t* buf, size_t len) {
     assert(handshake_complete); // TODO(sl): Adding states?
 
     size_t writebytes = 0;
+    const auto ssl_ptr = ssl->ssl.get();
 
-    const auto ssl_write_result = SSL_write_ex(ssl->ssl.get(), buf, len, &writebytes);
+    const auto ssl_write_result = SSL_write_ex(ssl_ptr, buf, len, &writebytes);
 
     if (ssl_write_result <= 0) {
-        const auto ssl_err_raw = SSL_get_error(ssl->ssl.get(), ssl_write_result);
+        const auto ssl_err_raw = SSL_get_error(ssl_ptr, ssl_write_result);
         log_and_raise_openssl_error("Failed to SSL_write_ex(): " + std::to_string(ssl_err_raw));
     } else if (writebytes != len) {
         log_and_throw("Didn't complete to write");
@@ -257,15 +258,16 @@ ReadResult ConnectionSSL::read(uint8_t* buf, size_t len) {
     assert(handshake_complete); // TODO(sl): Adding states?
 
     size_t readbytes = 0;
+    const auto ssl_ptr = ssl->ssl.get();
 
-    const auto ssl_read_result = SSL_read_ex(ssl->ssl.get(), buf, len, &readbytes);
+    const auto ssl_read_result = SSL_read_ex(ssl_ptr, buf, len, &readbytes);
 
     if (ssl_read_result > 0) {
         const auto would_block = (readbytes < len);
         return {would_block, readbytes};
     }
 
-    const auto ssl_error = SSL_get_error(ssl->ssl.get(), ssl_read_result);
+    const auto ssl_error = SSL_get_error(ssl_ptr, ssl_read_result);
 
     if ((ssl_error == SSL_ERROR_WANT_READ) or (ssl_error == SSL_ERROR_WANT_WRITE)) {
         return {true, 0};
@@ -278,15 +280,15 @@ ReadResult ConnectionSSL::read(uint8_t* buf, size_t len) {
 
 void ConnectionSSL::handle_connect() {
 
-    auto* peer = BIO_ADDR_new();
+    const auto peer = BIO_ADDR_new();
     ssl->accept_fd = BIO_accept_ex(ssl->fd, peer, BIO_SOCK_NONBLOCK);
 
     if (ssl->accept_fd < 0) {
         log_and_raise_openssl_error("Failed to BIO_accept_ex");
     }
 
-    auto* ip = BIO_ADDR_hostname_string(peer, 1);
-    auto* service = BIO_ADDR_service_string(peer, 1);
+    const auto ip = BIO_ADDR_hostname_string(peer, 1);
+    const auto service = BIO_ADDR_service_string(peer, 1);
 
     logf_info("Incoming connection from [%s]:%s", ip, service);
 
@@ -303,9 +305,11 @@ void ConnectionSSL::handle_connect() {
     ssl->ssl = std::unique_ptr<SSL>(SSL_new(ssl->ssl_ctx.get()));
     const auto socket_bio = BIO_new_socket(ssl->accept_fd, BIO_CLOSE);
 
-    SSL_set_bio(ssl->ssl.get(), socket_bio, socket_bio);
-    SSL_set_accept_state(ssl->ssl.get());
-    SSL_set_app_data(ssl->ssl.get(), this);
+    const auto ssl_ptr = ssl->ssl.get();
+
+    SSL_set_bio(ssl_ptr, socket_bio, socket_bio);
+    SSL_set_accept_state(ssl_ptr);
+    SSL_set_app_data(ssl_ptr, this);
 
     poll_manager.register_fd(ssl->accept_fd, [this]() { this->handle_data(); });
 
@@ -317,11 +321,13 @@ void ConnectionSSL::handle_connect() {
 
 void ConnectionSSL::handle_data() {
     if (not handshake_complete) {
-        const auto ssl_handshake_result = SSL_accept(ssl->ssl.get());
+        const auto ssl_ptr = ssl->ssl.get();
+
+        const auto ssl_handshake_result = SSL_accept(ssl_ptr);
 
         if (ssl_handshake_result <= 0) {
 
-            const auto ssl_error = SSL_get_error(ssl->ssl.get(), ssl_handshake_result);
+            const auto ssl_error = SSL_get_error(ssl_ptr, ssl_handshake_result);
 
             if ((ssl_error == SSL_ERROR_WANT_READ) or (ssl_error == SSL_ERROR_WANT_WRITE)) {
                 return;
@@ -350,10 +356,12 @@ void ConnectionSSL::close() {
     /* tear down TLS connection gracefully */
     logf_info("Closing TLS connection\n");
 
-    const auto ssl_close_result = SSL_shutdown(ssl->ssl.get()); // TODO(sl): Correct shutdown handling
+    const auto ssl_ptr = ssl->ssl.get();
+
+    const auto ssl_close_result = SSL_shutdown(ssl_ptr); // TODO(sl): Correct shutdown handling
 
     if (ssl_close_result < 0) {
-        const auto ssl_error = SSL_get_error(ssl->ssl.get(), ssl_close_result);
+        const auto ssl_error = SSL_get_error(ssl_ptr, ssl_close_result);
         if ((ssl_error != SSL_ERROR_WANT_READ) and (ssl_error != SSL_ERROR_WANT_WRITE)) {
             log_and_raise_openssl_error("Failed to SSL_shutdown(): " + std::to_string(ssl_error));
         }
@@ -366,7 +374,7 @@ void ConnectionSSL::close() {
 
     logf_info("TLS connection closed gracefully");
 
-    SSL_free(ssl->ssl.get());
+    SSL_free(ssl_ptr);
     SSL_CTX_free(ssl->ssl_ctx.get());
 
     call_if_available(event_callback, ConnectionEvent::CLOSED);
