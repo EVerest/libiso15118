@@ -44,8 +44,7 @@ private:
 
 class TlsKeyLoggingServer {
 public:
-    TlsKeyLoggingServer() = default;
-    TlsKeyLoggingServer(const std::string& interface_name, uint16_t port);
+    explicit TlsKeyLoggingServer(const std::string& interface_name, uint16_t port);
     ~TlsKeyLoggingServer();
 
     ssize_t send(const char* line);

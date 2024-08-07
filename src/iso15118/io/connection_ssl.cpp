@@ -37,7 +37,7 @@ namespace iso15118::io {
 
 static constexpr auto DEFAULT_SOCKET_BACKLOG = 4;
 
-static io::TlsKeyLoggingServer key_logging_server; // FIXME(sl): Check out SSL_set_ex_data & SSL_get_ex_data
+static int ex_data_idx;
 
 struct SSLContext {
     std::unique_ptr<SSL_CTX> ssl_ctx;
@@ -46,6 +46,7 @@ struct SSLContext {
     int accept_fd{-1};
     std::string interface_name;
     bool enable_key_logging{false};
+    std::unique_ptr<io::TlsKeyLoggingServer> key_server;
 };
 
 static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
@@ -99,13 +100,15 @@ static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
         SSL_CTX_set_keylog_callback(ctx, [](const SSL* ssl, const char* line) {
             logf_info("TLS handshake keys: %s\n", line);
 
+            auto& key_logging_server = *static_cast<io::TlsKeyLoggingServer*>(SSL_get_ex_data(ssl, ex_data_idx));
+
             if (key_logging_server.get_fd() == -1) {
-                logf_warning("Error - key_log_fd is not available");
+                logf_warning("Error - key_logging_server fd is not available");
                 return;
             }
             const auto result = key_logging_server.send(line);
             if (result != strlen(line)) {
-                const auto error_msg = adding_err_msg("UDP send() failed");
+                const auto error_msg = adding_err_msg("key_logging_server send() failed");
                 logf_error(error_msg.c_str());
             }
         });
@@ -229,11 +232,6 @@ void ConnectionSSL::handle_connect() {
 
     logf_info("Incoming connection from [%s]:%s", ip, service);
 
-    if (ssl->enable_key_logging) {
-        const auto port = std::stoul(service);
-        key_logging_server = io::TlsKeyLoggingServer(ssl->interface_name, port);
-    }
-
     poll_manager.unregister_fd(ssl->fd);
     ::close(ssl->fd);
 
@@ -247,6 +245,17 @@ void ConnectionSSL::handle_connect() {
     SSL_set_bio(ssl_ptr, socket_bio, socket_bio);
     SSL_set_accept_state(ssl_ptr);
     SSL_set_app_data(ssl_ptr, this);
+
+    if (ssl->enable_key_logging) {
+        const auto port = std::stoul(service);
+        ssl->key_server = std::make_unique<io::TlsKeyLoggingServer>(ssl->interface_name, port);
+
+        // NOTE(sl): SSL_get_ex_new_index does not work with "ex data" because of const
+        std::string tmp = "ex data";
+        ex_data_idx = SSL_get_ex_new_index(0, tmp.data(), nullptr, nullptr, nullptr);
+
+        SSL_set_ex_data(ssl_ptr, ex_data_idx, ssl->key_server.get());
+    }
 
     poll_manager.register_fd(ssl->accept_fd, [this]() { this->handle_data(); });
 
@@ -275,7 +284,7 @@ void ConnectionSSL::handle_data() {
 
             handshake_complete = true;
             if (ssl->enable_key_logging) {
-                key_logging_server.~TlsKeyLoggingServer(); // FIXME(sl): Not good........
+                ssl->key_server.reset();
             }
 
             call_if_available(event_callback, ConnectionEvent::OPEN);

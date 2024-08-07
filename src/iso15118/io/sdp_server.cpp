@@ -126,8 +126,8 @@ void SdpServer::send_response(const PeerRequestContext& request, const Ipv6EndPo
 TlsKeyLoggingServer::TlsKeyLoggingServer(const std::string& interface_name, uint16_t port) {
     static constexpr auto LINK_LOCAL_MULTICAST = "ff02::1";
 
-    int udp_socket = socket(AF_INET6, SOCK_DGRAM, 0);
-    if (udp_socket < 0) {
+    fd = socket(AF_INET6, SOCK_DGRAM, 0);
+    if (fd < 0) {
         const auto error_msg = adding_err_msg("Could not create socket");
         log_and_throw(error_msg.c_str()); // FIXME(sl): Find better handling
     }
@@ -139,7 +139,7 @@ TlsKeyLoggingServer::TlsKeyLoggingServer(const std::string& interface_name, uint
     auto source_port = 49152;
     for (; source_port < 65535; source_port++) {
         sockaddr_in6 source_address = {AF_INET6, htons(source_port)};
-        if (bind(udp_socket, reinterpret_cast<sockaddr*>(&source_address), sizeof(sockaddr_in6)) == 0) {
+        if (bind(fd, reinterpret_cast<sockaddr*>(&source_address), sizeof(sockaddr_in6)) == 0) {
             could_bind = true;
             break;
         }
@@ -159,12 +159,12 @@ TlsKeyLoggingServer::TlsKeyLoggingServer(const std::string& interface_name, uint
         const auto error_msg = adding_err_msg("Failed to setup multicast address");
         log_and_throw(error_msg.c_str());
     }
-    if (setsockopt(udp_socket, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0) {
+    if (setsockopt(fd, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0) {
         const auto error_msg = adding_err_msg("Could not add multicast group membership");
         log_and_throw(error_msg.c_str());
     }
 
-    if (setsockopt(udp_socket, IPPROTO_IPV6, IPV6_MULTICAST_IF, &index, sizeof(index)) < 0) {
+    if (setsockopt(fd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &index, sizeof(index)) < 0) {
         const auto error_msg = adding_err_msg("Could not set interface name:" + std::string(interface_name));
         log_and_throw(error_msg.c_str());
     }
