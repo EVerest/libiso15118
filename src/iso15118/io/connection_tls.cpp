@@ -14,6 +14,7 @@
 #include "mbedtls/ssl.h"
 
 #include <iso15118/detail/helper.hpp>
+#include <iso15118/detail/helper_mbedtls.hpp>
 #include <iso15118/detail/io/socket_helper.hpp>
 
 namespace iso15118::io {
