@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2023 Pionix GmbH and Contributors to EVerest
-#include <iso15118/io/connection_tls.hpp>
+// Copyright 2024 Pionix GmbH and Contributors to EVerest
+#include <iso15118/io/connection_ssl.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -225,7 +225,7 @@ void ConnectionSSL::handle_connect() {
     poll_manager.unregister_fd(ssl->accepting_net_ctx.fd);
     mbedtls_net_free(&ssl->accepting_net_ctx);
 
-    publish_event(ConnectionEvent::ACCEPTED);
+    call_if_available(event_callback, ConnectionEvent::ACCEPTED);
 
     poll_manager.register_fd(ssl->connection_net_ctx.fd, [this]() { this->handle_data(); });
 }
@@ -249,13 +249,13 @@ void ConnectionSSL::handle_data() {
 
             handshake_complete = true;
 
-            publish_event(ConnectionEvent::OPEN);
+            call_if_available(event_callback, ConnectionEvent::OPEN);
 
             return;
         }
     }
 
-    publish_event(ConnectionEvent::NEW_DATA);
+    call_if_available(event_callback, ConnectionEvent::NEW_DATA);
 }
 
 void ConnectionSSL::close() {
@@ -275,7 +275,7 @@ void ConnectionSSL::close() {
         logf_info("TLS connection closed gracefully\n");
     }
 
-    publish_event(ConnectionEvent::CLOSED);
+    call_if_available(event_callback, ConnectionEvent::CLOSED);
 
     mbedtls_net_free(&ssl->connection_net_ctx);
 

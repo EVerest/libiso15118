@@ -14,7 +14,7 @@ namespace iso15118::io {
 struct SSLContext;
 class ConnectionSSL : public IConnection {
 public:
-    ConnectionSSL(PollManager&, const std::string&, const config::SSLConfig&);
+    ConnectionSSL(PollManager&, const std::string& interface_name, const config::SSLConfig&);
 
     void set_event_callback(const ConnectionEventCallback&) final;
     Ipv6EndPoint get_public_endpoint() const final;
@@ -32,14 +32,9 @@ private:
 
     Ipv6EndPoint end_point;
 
-    bool connection_open{false};
-
     ConnectionEventCallback event_callback{nullptr};
 
     bool handshake_complete{false};
-
-    std::string interface_name;
-    bool enable_key_logging{false};
 
     void handle_connect();
     void handle_data();

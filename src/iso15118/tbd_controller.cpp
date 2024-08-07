@@ -7,12 +7,8 @@
 #include <cstdio>
 
 #include <iso15118/io/connection_plain.hpp>
-#include <iso15118/session/iso.hpp>
-#ifdef LIBISO_OPENSSL
 #include <iso15118/io/connection_ssl.hpp>
-#else
-#include <iso15118/io/connection_tls.hpp>
-#endif
+#include <iso15118/session/iso.hpp>
 
 #include <iso15118/detail/helper.hpp>
 

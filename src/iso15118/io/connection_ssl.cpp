@@ -44,6 +44,8 @@ struct SSLContext {
     std::unique_ptr<SSL> ssl;
     int fd{-1};
     int accept_fd{-1};
+    std::string interface_name;
+    bool enable_key_logging{false};
 };
 
 static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
@@ -114,10 +116,10 @@ static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
 
 ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& interface_name_,
                              const config::SSLConfig& ssl_config) :
-    poll_manager(poll_manager_),
-    interface_name(interface_name_),
-    enable_key_logging(ssl_config.enable_tls_key_logging),
-    ssl(std::make_unique<SSLContext>()) {
+    poll_manager(poll_manager_), ssl(std::make_unique<SSLContext>()) {
+
+    ssl->interface_name = interface_name_;
+    ssl->enable_key_logging = ssl_config.enable_tls_key_logging;
 
     // Openssl stuff missing!
     const auto ssl_ctx = init_ssl(ssl_config);
@@ -227,9 +229,9 @@ void ConnectionSSL::handle_connect() {
 
     logf_info("Incoming connection from [%s]:%s", ip, service);
 
-    if (enable_key_logging) {
+    if (ssl->enable_key_logging) {
         const auto port = std::stoul(service);
-        key_logging_server = io::TlsKeyLoggingServer(interface_name, port);
+        key_logging_server = io::TlsKeyLoggingServer(ssl->interface_name, port);
     }
 
     poll_manager.unregister_fd(ssl->fd);
@@ -272,7 +274,7 @@ void ConnectionSSL::handle_data() {
             logf_info("Handshake complete!\n");
 
             handshake_complete = true;
-            if (enable_key_logging) {
+            if (ssl->enable_key_logging) {
                 key_logging_server.~TlsKeyLoggingServer(); // FIXME(sl): Not good........
             }
 
