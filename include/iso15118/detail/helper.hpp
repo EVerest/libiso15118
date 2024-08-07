@@ -7,6 +7,7 @@
 #include <cstdarg>
 #include <cstdint>
 #include <cstdio>
+#include <functional>
 #include <string>
 
 namespace iso15118 {
@@ -34,7 +35,7 @@ template <typename CallbackType, typename... Args> bool call_if_available(const 
         return false;
     }
 
-    callback(std::forward<Args>(args)...);
+    std::invoke(callback, std::forward<Args>(args)...);
     return true;
 }
 
