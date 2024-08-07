@@ -17,6 +17,52 @@
 #include <iso15118/detail/helper_mbedtls.hpp>
 #include <iso15118/detail/io/socket_helper.hpp>
 
+namespace std {
+template <> class default_delete<mbedtls_ssl_context> {
+public:
+    void operator()(mbedtls_ssl_context* ptr) const {
+        ::mbedtls_ssl_free(ptr);
+    }
+};
+template <> class default_delete<mbedtls_net_context> {
+public:
+    void operator()(mbedtls_net_context* ptr) const {
+        ::mbedtls_net_free(ptr);
+    }
+};
+template <> class default_delete<mbedtls_ssl_config> {
+public:
+    void operator()(mbedtls_ssl_config* ptr) const {
+        ::mbedtls_ssl_config_free(ptr);
+    }
+};
+template <> class default_delete<mbedtls_x509_crt> {
+public:
+    void operator()(mbedtls_x509_crt* ptr) const {
+        ::mbedtls_x509_crt_free(ptr);
+    }
+};
+template <> class default_delete<mbedtls_ctr_drbg_context> {
+public:
+    void operator()(mbedtls_ctr_drbg_context* ptr) const {
+        ::mbedtls_ctr_drbg_free(ptr);
+    }
+};
+template <> class default_delete<mbedtls_entropy_context> {
+public:
+    void operator()(mbedtls_entropy_context* ptr) const {
+        ::mbedtls_entropy_free(ptr);
+    }
+};
+template <> class default_delete<mbedtls_pk_context> {
+public:
+    void operator()(mbedtls_pk_context* ptr) const {
+        ::mbedtls_pk_free(ptr);
+    }
+};
+
+} // namespace std
+
 namespace iso15118::io {
 
 struct SSLContext {
@@ -222,8 +268,8 @@ void ConnectionSSL::handle_connect() {
     mbedtls_ssl_set_bio(&ssl->ssl, &ssl->connection_net_ctx, mbedtls_net_send, mbedtls_net_recv, NULL);
 
     // FIXME (aw): is it okay (according to iso15118 and mbedtls) to close the accepting socket here?
+    // NOTE (sl): Closed when the SSLContext object is deleted by the default_delete
     poll_manager.unregister_fd(ssl->accepting_net_ctx.fd);
-    mbedtls_net_free(&ssl->accepting_net_ctx);
 
     call_if_available(event_callback, ConnectionEvent::ACCEPTED);
 
@@ -276,10 +322,6 @@ void ConnectionSSL::close() {
     }
 
     call_if_available(event_callback, ConnectionEvent::CLOSED);
-
-    mbedtls_net_free(&ssl->connection_net_ctx);
-
-    mbedtls_ssl_free(&ssl->ssl);
 }
 
 } // namespace iso15118::io
