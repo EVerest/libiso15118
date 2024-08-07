@@ -150,7 +150,7 @@ TlsKeyLoggingServer::TlsKeyLoggingServer(const std::string& interface_name, uint
         log_and_throw(error_msg.c_str());
     }
 
-    logf("UDP socket bound to source port: %u", source_port);
+    logf_info("UDP socket bound to source port: %u", source_port);
 
     const auto index = if_nametoindex(interface_name.c_str());
     auto mreq = ipv6_mreq{};
@@ -177,7 +177,7 @@ TlsKeyLoggingServer::TlsKeyLoggingServer(const std::string& interface_name, uint
 }
 
 TlsKeyLoggingServer::~TlsKeyLoggingServer() {
-    logf("Shutting down TlsKeyLoggingServer server!");
+    logf_info("Shutting down TlsKeyLoggingServer server!");
     if (fd != -1) {
         close(fd);
     }
