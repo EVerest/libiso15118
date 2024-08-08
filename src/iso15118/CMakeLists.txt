@@ -79,7 +79,7 @@ target_link_libraries(iso15118
         Threads::Threads
 )
 
-if (USING_OPENSSL)
+if (USE_OPENSSL)
     target_compile_definitions(iso15118
         PRIVATE
             LIBISO_OPENSSL
@@ -92,6 +92,7 @@ if (USING_OPENSSL)
     target_sources(iso15118
         PRIVATE
         io/connection_ssl.cpp
+        misc/helper_openssl.cpp
     )
 else()
     if (NOT ISO15118_LINK_CUSTOM_MBEDTLS)
@@ -114,6 +115,7 @@ else()
     target_sources(iso15118
         PRIVATE
         io/connection_tls.cpp
+        misc/helper_mbedtls.cpp
     )
 endif()
 

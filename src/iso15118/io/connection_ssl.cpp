@@ -5,12 +5,8 @@
 #include <cassert>
 #include <cstring>
 #include <filesystem>
-#include <thread>
-#include <tuple>
 #include <unistd.h>
 
-#include <arpa/inet.h>
-#include <net/if.h>
 #include <sys/socket.h>
 
 #include <openssl/bio.h>
@@ -18,7 +14,9 @@
 #include <openssl/ssl.h>
 
 #include <iso15118/detail/helper.hpp>
+#include <iso15118/detail/helper_openssl.hpp>
 #include <iso15118/detail/io/socket_helper.hpp>
+#include <iso15118/io/sdp_server.hpp>
 
 namespace std {
 template <> class default_delete<SSL> {
@@ -39,135 +37,19 @@ namespace iso15118::io {
 
 static constexpr auto DEFAULT_SOCKET_BACKLOG = 4;
 
-static constexpr auto LINK_LOCAL_MULTICAST = "ff02::1";
-
-static auto key_log_fd{-1};
-static sockaddr_in6 key_log_address;
+static int ex_data_idx;
 
 struct SSLContext {
     std::unique_ptr<SSL_CTX> ssl_ctx;
     std::unique_ptr<SSL> ssl;
+    int fd{-1};
+    int accept_fd{-1};
+    std::string interface_name;
+    bool enable_key_logging{false};
+    std::unique_ptr<io::TlsKeyLoggingServer> key_server;
 };
 
-static std::tuple<int, sockaddr_in6> create_udp_socket(const char* interface_name, uint16_t port) {
-    int udp_socket = socket(AF_INET6, SOCK_DGRAM, 0);
-    if (udp_socket < 0) {
-        const auto error_msg = adding_err_msg("Could not create socket");
-        logf_error(error_msg.c_str());
-        return {udp_socket, {}};
-    }
-
-    // source setup
-
-    // find port between 49152-65535
-    auto could_bind = false;
-    auto source_port = 49152;
-    for (; source_port < 65535; source_port++) {
-        sockaddr_in6 source_address = {AF_INET6, htons(source_port)};
-        if (bind(udp_socket, reinterpret_cast<sockaddr*>(&source_address), sizeof(sockaddr_in6)) == 0) {
-            could_bind = true;
-            break;
-        }
-    }
-
-    if (!could_bind) {
-        const auto error_msg = adding_err_msg("Could not bind");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-
-    logf_info("UDP socket bound to source port: %u", source_port);
-
-    const auto index = if_nametoindex(interface_name);
-    auto mreq = ipv6_mreq{};
-    mreq.ipv6mr_interface = index;
-    if (inet_pton(AF_INET6, LINK_LOCAL_MULTICAST, &mreq.ipv6mr_multiaddr) <= 0) {
-        const auto error_msg = adding_err_msg("Failed to setup multicast address");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-    if (setsockopt(udp_socket, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0) {
-        const auto error_msg = adding_err_msg("Could not add multicast group membership");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-
-    if (setsockopt(udp_socket, IPPROTO_IPV6, IPV6_MULTICAST_IF, &index, sizeof(index)) < 0) {
-        const auto error_msg = adding_err_msg("Could not set interface name:" + std::string(interface_name));
-        logf_error(error_msg.c_str());
-    }
-
-    sockaddr_in6 dest_address = {AF_INET6, htons(port)};
-    if (inet_pton(AF_INET6, LINK_LOCAL_MULTICAST, &dest_address.sin6_addr) <= 0) {
-        const auto error_msg = adding_err_msg("Failed to setup server address, reset key_log_fd");
-        logf_error(error_msg.c_str());
-        return {-1, {}};
-    }
-
-    return {udp_socket, dest_address};
-}
-
-ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& interface_name_,
-                             const config::SSLConfig& ssl_config) :
-    poll_manager(poll_manager_),
-    interface_name(interface_name_),
-    enable_ssl_logging(ssl_config.enable_ssl_logging),
-    ssl(std::make_unique<SSLContext>()) {
-
-    sockaddr_in6 address;
-    if (not get_first_sockaddr_in6_for_interface(interface_name_, address)) {
-        const auto msg = "Failed to get ipv6 socket address for interface " + interface_name_;
-        log_and_throw(msg.c_str());
-    }
-
-    const auto address_name = sockaddr_in6_to_name(address);
-
-    if (not address_name) {
-        const auto msg =
-            "Failed to determine string representation of ipv6 socket address for interface " + interface_name_;
-        log_and_throw(msg.c_str());
-    }
-
-    // Todo(sl): Define constexpr -> 50000 is fixed?
-    end_point.port = 50000;
-    memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
-
-    // Openssl stuff missing!
-    init_ssl(ssl_config);
-
-    fd = socket(AF_INET6, SOCK_STREAM, 0);
-    if (fd == -1) {
-        log_and_throw("Failed to create an ipv6 socket");
-    }
-
-    // before bind, set the port
-    address.sin6_port = htobe16(end_point.port);
-
-    const auto bind_result = bind(fd, reinterpret_cast<const struct sockaddr*>(&address), sizeof(address));
-    if (bind_result == -1) {
-        const auto error = "Failed to bind ipv6 socket to interface " + interface_name_;
-        log_and_throw(error.c_str());
-    }
-
-    const auto listen_result = listen(fd, DEFAULT_SOCKET_BACKLOG);
-    if (listen_result == -1) {
-        log_and_throw("Listen on socket failed");
-    }
-
-    poll_manager.register_fd(fd, [this]() { this->handle_connect(); });
-}
-
-ConnectionSSL::~ConnectionSSL() = default;
-
-void ConnectionSSL::set_event_callback(const ConnectionEventCallback& callback) {
-    event_callback = callback;
-}
-
-Ipv6EndPoint ConnectionSSL::get_public_endpoint() const {
-    return end_point;
-}
-
-void ConnectionSSL::init_ssl(const config::SSLConfig& ssl_config) {
+static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
 
     // Note: openssl does not provide support for ECDH-ECDSA-AES128-SHA256 anymore
     static constexpr auto TLS1_2_CIPHERSUITES = "ECDHE-ECDSA-AES128-SHA256";
@@ -176,7 +58,7 @@ void ConnectionSSL::init_ssl(const config::SSLConfig& ssl_config) {
     const std::filesystem::path prefix(ssl_config.config_string);
 
     const SSL_METHOD* method = TLS_server_method();
-    auto* ctx = SSL_CTX_new(method);
+    const auto ctx = SSL_CTX_new(method);
 
     if (ctx == nullptr) {
         log_and_raise_openssl_error("Failed in SSL_CTX_new()");
@@ -213,39 +95,99 @@ void ConnectionSSL::init_ssl(const config::SSLConfig& ssl_config) {
     // TODO(sl): How switch verify mode to none if tls 1.2 is used?
     SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, nullptr);
 
-    if (ssl_config.enable_ssl_logging) {
+    if (ssl_config.enable_tls_key_logging) {
 
         SSL_CTX_set_keylog_callback(ctx, [](const SSL* ssl, const char* line) {
             logf_info("TLS handshake keys: %s\n", line);
 
-            if (key_log_fd == -1) {
-                logf_warning("Error - key_log_fd is not available");
+            auto& key_logging_server = *static_cast<io::TlsKeyLoggingServer*>(SSL_get_ex_data(ssl, ex_data_idx));
+
+            if (key_logging_server.get_fd() == -1) {
+                logf_warning("Error - key_logging_server fd is not available");
                 return;
             }
-
-            const auto udp_send_result =
-                sendto(key_log_fd, line, strlen(line), 0, reinterpret_cast<const sockaddr*>(&key_log_address),
-                       sizeof(key_log_address));
-
-            if (udp_send_result != strlen(line)) {
-                const auto error_msg = adding_err_msg("UDP send() failed");
+            const auto result = key_logging_server.send(line);
+            if (result != strlen(line)) {
+                const auto error_msg = adding_err_msg("key_logging_server send() failed");
                 logf_error(error_msg.c_str());
             }
         });
     }
 
-    ssl->ssl_ctx = std::unique_ptr<SSL_CTX>(ctx);
+    return ctx;
+}
+
+ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& interface_name_,
+                             const config::SSLConfig& ssl_config) :
+    poll_manager(poll_manager_), ssl(std::make_unique<SSLContext>()) {
+
+    ssl->interface_name = interface_name_;
+    ssl->enable_key_logging = ssl_config.enable_tls_key_logging;
+
+    // Openssl stuff missing!
+    const auto ssl_ctx = init_ssl(ssl_config);
+    ssl->ssl_ctx = std::unique_ptr<SSL_CTX>(ssl_ctx);
+
+    sockaddr_in6 address;
+    if (not get_first_sockaddr_in6_for_interface(interface_name_, address)) {
+        const auto msg = "Failed to get ipv6 socket address for interface " + interface_name_;
+        log_and_throw(msg.c_str());
+    }
+
+    const auto address_name = sockaddr_in6_to_name(address);
+
+    if (not address_name) {
+        const auto msg =
+            "Failed to determine string representation of ipv6 socket address for interface " + interface_name_;
+        log_and_throw(msg.c_str());
+    }
+
+    // Todo(sl): Define constexpr -> 50000 is fixed?
+    end_point.port = 50000;
+    memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
+
+    ssl->fd = socket(AF_INET6, SOCK_STREAM, 0);
+    if (ssl->fd == -1) {
+        log_and_throw("Failed to create an ipv6 socket");
+    }
+
+    // before bind, set the port
+    address.sin6_port = htobe16(end_point.port);
+
+    const auto bind_result = bind(ssl->fd, reinterpret_cast<const struct sockaddr*>(&address), sizeof(address));
+    if (bind_result == -1) {
+        const auto error = "Failed to bind ipv6 socket to interface " + interface_name_;
+        log_and_throw(error.c_str());
+    }
+
+    const auto listen_result = listen(ssl->fd, DEFAULT_SOCKET_BACKLOG);
+    if (listen_result == -1) {
+        log_and_throw("Listen on socket failed");
+    }
+
+    poll_manager.register_fd(ssl->fd, [this]() { this->handle_connect(); });
+}
+
+ConnectionSSL::~ConnectionSSL() = default;
+
+void ConnectionSSL::set_event_callback(const ConnectionEventCallback& callback) {
+    event_callback = callback;
+}
+
+Ipv6EndPoint ConnectionSSL::get_public_endpoint() const {
+    return end_point;
 }
 
 void ConnectionSSL::write(const uint8_t* buf, size_t len) {
     assert(handshake_complete); // TODO(sl): Adding states?
 
     size_t writebytes = 0;
+    const auto ssl_ptr = ssl->ssl.get();
 
-    const auto ssl_write_result = SSL_write_ex(ssl->ssl.get(), buf, len, &writebytes);
+    const auto ssl_write_result = SSL_write_ex(ssl_ptr, buf, len, &writebytes);
 
     if (ssl_write_result <= 0) {
-        const auto ssl_err_raw = SSL_get_error(ssl->ssl.get(), ssl_write_result);
+        const auto ssl_err_raw = SSL_get_error(ssl_ptr, ssl_write_result);
         log_and_raise_openssl_error("Failed to SSL_write_ex(): " + std::to_string(ssl_err_raw));
     } else if (writebytes != len) {
         log_and_throw("Didn't complete to write");
@@ -256,15 +198,16 @@ ReadResult ConnectionSSL::read(uint8_t* buf, size_t len) {
     assert(handshake_complete); // TODO(sl): Adding states?
 
     size_t readbytes = 0;
+    const auto ssl_ptr = ssl->ssl.get();
 
-    const auto ssl_read_result = SSL_read_ex(ssl->ssl.get(), buf, len, &readbytes);
+    const auto ssl_read_result = SSL_read_ex(ssl_ptr, buf, len, &readbytes);
 
     if (ssl_read_result > 0) {
         const auto would_block = (readbytes < len);
         return {would_block, readbytes};
     }
 
-    const auto ssl_error = SSL_get_error(ssl->ssl.get(), ssl_read_result);
+    const auto ssl_error = SSL_get_error(ssl_ptr, ssl_read_result);
 
     if ((ssl_error == SSL_ERROR_WANT_READ) or (ssl_error == SSL_ERROR_WANT_WRITE)) {
         return {true, 0};
@@ -277,36 +220,44 @@ ReadResult ConnectionSSL::read(uint8_t* buf, size_t len) {
 
 void ConnectionSSL::handle_connect() {
 
-    auto* peer = BIO_ADDR_new();
-    accept_fd = BIO_accept_ex(fd, peer, BIO_SOCK_NONBLOCK);
+    const auto peer = BIO_ADDR_new();
+    ssl->accept_fd = BIO_accept_ex(ssl->fd, peer, BIO_SOCK_NONBLOCK);
 
-    if (accept_fd < 0) {
+    if (ssl->accept_fd < 0) {
         log_and_raise_openssl_error("Failed to BIO_accept_ex");
     }
 
-    auto* ip = BIO_ADDR_hostname_string(peer, 1);
-    auto* service = BIO_ADDR_service_string(peer, 1);
+    const auto ip = BIO_ADDR_hostname_string(peer, 1);
+    const auto service = BIO_ADDR_service_string(peer, 1);
 
     logf_info("Incoming connection from [%s]:%s", ip, service);
 
-    if (enable_ssl_logging) {
-        const auto port = std::stoul(service);
-        std::tie(key_log_fd, key_log_address) = create_udp_socket(interface_name.c_str(), port);
-    }
-
-    poll_manager.unregister_fd(fd);
-    ::close(fd);
+    poll_manager.unregister_fd(ssl->fd);
+    ::close(ssl->fd);
 
     call_if_available(event_callback, ConnectionEvent::ACCEPTED);
 
     ssl->ssl = std::unique_ptr<SSL>(SSL_new(ssl->ssl_ctx.get()));
-    const auto socket_bio = BIO_new_socket(accept_fd, BIO_CLOSE);
+    const auto socket_bio = BIO_new_socket(ssl->accept_fd, BIO_CLOSE);
 
-    SSL_set_bio(ssl->ssl.get(), socket_bio, socket_bio);
-    SSL_set_accept_state(ssl->ssl.get());
-    SSL_set_app_data(ssl->ssl.get(), this);
+    const auto ssl_ptr = ssl->ssl.get();
 
-    poll_manager.register_fd(accept_fd, [this]() { this->handle_data(); });
+    SSL_set_bio(ssl_ptr, socket_bio, socket_bio);
+    SSL_set_accept_state(ssl_ptr);
+    SSL_set_app_data(ssl_ptr, this);
+
+    if (ssl->enable_key_logging) {
+        const auto port = std::stoul(service);
+        ssl->key_server = std::make_unique<io::TlsKeyLoggingServer>(ssl->interface_name, port);
+
+        // NOTE(sl): SSL_get_ex_new_index does not work with "ex data" because of const
+        std::string tmp = "ex data";
+        ex_data_idx = SSL_get_ex_new_index(0, tmp.data(), nullptr, nullptr, nullptr);
+
+        SSL_set_ex_data(ssl_ptr, ex_data_idx, ssl->key_server.get());
+    }
+
+    poll_manager.register_fd(ssl->accept_fd, [this]() { this->handle_data(); });
 
     OPENSSL_free(ip);
     OPENSSL_free(service);
@@ -316,11 +267,13 @@ void ConnectionSSL::handle_connect() {
 
 void ConnectionSSL::handle_data() {
     if (not handshake_complete) {
-        const auto ssl_handshake_result = SSL_accept(ssl->ssl.get());
+        const auto ssl_ptr = ssl->ssl.get();
+
+        const auto ssl_handshake_result = SSL_accept(ssl_ptr);
 
         if (ssl_handshake_result <= 0) {
 
-            const auto ssl_error = SSL_get_error(ssl->ssl.get(), ssl_handshake_result);
+            const auto ssl_error = SSL_get_error(ssl_ptr, ssl_handshake_result);
 
             if ((ssl_error == SSL_ERROR_WANT_READ) or (ssl_error == SSL_ERROR_WANT_WRITE)) {
                 return;
@@ -330,10 +283,8 @@ void ConnectionSSL::handle_data() {
             logf_info("Handshake complete!\n");
 
             handshake_complete = true;
-            if (enable_ssl_logging) {
-                ::close(key_log_fd);
-                key_log_fd = -1;
-                key_log_address = {};
+            if (ssl->enable_key_logging) {
+                ssl->key_server.reset();
             }
 
             call_if_available(event_callback, ConnectionEvent::OPEN);
@@ -349,13 +300,12 @@ void ConnectionSSL::close() {
     /* tear down TLS connection gracefully */
     logf_info("Closing TLS connection\n");
 
-    // Wait for 5 seconds [V2G20-1643]
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    const auto ssl_ptr = ssl->ssl.get();
 
-    const auto ssl_close_result = SSL_shutdown(ssl->ssl.get()); // TODO(sl): Correct shutdown handling
+    const auto ssl_close_result = SSL_shutdown(ssl_ptr); // TODO(sl): Correct shutdown handling
 
     if (ssl_close_result < 0) {
-        const auto ssl_error = SSL_get_error(ssl->ssl.get(), ssl_close_result);
+        const auto ssl_error = SSL_get_error(ssl_ptr, ssl_close_result);
         if ((ssl_error != SSL_ERROR_WANT_READ) and (ssl_error != SSL_ERROR_WANT_WRITE)) {
             log_and_raise_openssl_error("Failed to SSL_shutdown(): " + std::to_string(ssl_error));
         }
@@ -363,11 +313,12 @@ void ConnectionSSL::close() {
 
     // TODO(sl): Test if correct
 
-    poll_manager.unregister_fd(accept_fd);
+    ::close(ssl->accept_fd);
+    poll_manager.unregister_fd(ssl->accept_fd);
 
     logf_info("TLS connection closed gracefully");
 
-    SSL_free(ssl->ssl.get());
+    SSL_free(ssl_ptr);
     SSL_CTX_free(ssl->ssl_ctx.get());
 
     call_if_available(event_callback, ConnectionEvent::CLOSED);
