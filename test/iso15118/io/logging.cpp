@@ -82,7 +82,7 @@ SCENARIO("Logging Tests") {
         }
     }
 
-     GIVEN("Test logf_warning") {
+    GIVEN("Test logf_warning") {
 
         const LogLevel expected_log_level{LogLevel::Warning};
         const std::string expected_msg = "Test logf_warning";
@@ -108,7 +108,7 @@ SCENARIO("Logging Tests") {
         }
     }
 
-     GIVEN("Test logf_info") {
+    GIVEN("Test logf_info") {
 
         const LogLevel expected_log_level{LogLevel::Info};
         const std::string expected_msg = "Test logf_info";
@@ -134,7 +134,7 @@ SCENARIO("Logging Tests") {
         }
     }
 
-     GIVEN("Test logf_debug") {
+    GIVEN("Test logf_debug") {
 
         const LogLevel expected_log_level{LogLevel::Debug};
         const std::string expected_msg = "Test logf_debug";
@@ -160,7 +160,7 @@ SCENARIO("Logging Tests") {
         }
     }
 
-     GIVEN("Test logf_trace") {
+    GIVEN("Test logf_trace") {
 
         const LogLevel expected_log_level{LogLevel::Trace};
         const std::string expected_msg = "Test logf_trace";
@@ -185,5 +185,4 @@ SCENARIO("Logging Tests") {
             REQUIRE(log_msg == expected_msg);
         }
     }
-
 }
