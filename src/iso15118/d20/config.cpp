@@ -4,26 +4,30 @@
 
 namespace iso15118::d20 {
 
-SessionConfig::SessionConfig() {
-    evse_id = "everest se";
+SessionConfig::SessionConfig(const std::string& evse_id_,
+                             const std::vector<message_20::ServiceCategory>& supported_energy_services_,
+                             bool cert_install_service_,
+                             std::vector<message_20::Authorization> authorization_services_) :
+    evse_id(evse_id_),
+    supported_energy_transfer_services(supported_energy_services_),
+    cert_install_service(cert_install_service_),
+    authorization_services(authorization_services_) {
 
-    supported_energy_transfer_services = {message_20::ServiceCategory::DC, message_20::ServiceCategory::DC_BPT};
-
-    dc_parameter_list.push_back({
+    dc_parameter_list = {{
         message_20::DcConnector::Extended,
         message_20::ControlMode::Scheduled,
         message_20::MobilityNeedsMode::ProvidedByEvcc,
         message_20::Pricing::NoPricing,
-    });
+    }};
 
-    dc_bpt_parameter_list.push_back({{
-                                         message_20::DcConnector::Extended,
-                                         message_20::ControlMode::Scheduled,
-                                         message_20::MobilityNeedsMode::ProvidedByEvcc,
-                                         message_20::Pricing::NoPricing,
-                                     },
-                                     message_20::BptChannel::Unified,
-                                     message_20::GeneratorMode::GridFollowing});
+    dc_bpt_parameter_list = {{{
+                                  message_20::DcConnector::Extended,
+                                  message_20::ControlMode::Scheduled,
+                                  message_20::MobilityNeedsMode::ProvidedByEvcc,
+                                  message_20::Pricing::NoPricing,
+                              },
+                              message_20::BptChannel::Unified,
+                              message_20::GeneratorMode::GridFollowing}};
 
     evse_dc_parameter = {
         {22, 3},  // max_charge_power

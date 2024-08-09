@@ -79,7 +79,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeParameterDiscovery::handle_event(
 
         logf_info("Max charge current %de%d\n", max_current.value, max_current.exponent);
 
-        const auto res = handle_request(*req, ctx.session, ctx.config);
+        const auto res = handle_request(*req, ctx.session, ctx.session_config);
 
         ctx.respond(res);
 

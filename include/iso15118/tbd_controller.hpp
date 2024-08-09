@@ -4,6 +4,8 @@
 
 #include <list>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "config.hpp"
 #include "d20/control_event.hpp"
@@ -23,23 +25,28 @@ struct TbdConfig {
     bool enable_sdp_server{true};
 };
 
+// FIXME(sl): Integrate in TbdConfig?
+struct EvseSetupConfig {
+    std::string evse_id;
+    std::vector<message_20::ServiceCategory> supported_energy_services;
+    std::vector<message_20::Authorization> authorization_services;
+    bool enable_certificate_install_service;
+};
+
 class TbdController {
 public:
-    TbdController(TbdConfig, session::feedback::Callbacks);
+    TbdController(TbdConfig, session::feedback::Callbacks, EvseSetupConfig);
 
     void loop();
 
     void send_control_event(const d20::ControlEvent&);
 
-    void setup_config();
-
-    void setup_session(const std::vector<message_20::Authorization>& auth_services, bool cert_install_service);
+    void update_authorization_services(const std::vector<message_20::Authorization>& services,
+                                       bool cert_install_service);
 
 private:
     io::PollManager poll_manager;
     std::unique_ptr<io::SdpServer> sdp_server;
-
-    d20::SessionConfig session_config;
 
     std::unique_ptr<Session> session;
 
@@ -48,6 +55,8 @@ private:
 
     const TbdConfig config;
     const session::feedback::Callbacks callbacks;
+
+    EvseSetupConfig evse_setup;
 };
 
 } // namespace iso15118
