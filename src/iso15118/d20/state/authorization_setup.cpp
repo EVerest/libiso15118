@@ -66,7 +66,7 @@ FsmSimpleState::HandleEventReturnType AuthorizationSetup::handle_event(Allocator
 
     if (const auto req = variant->get_if<message_20::AuthorizationSetupRequest>()) {
         const auto res =
-            handle_request(*req, ctx.session, ctx.config.cert_install_service, ctx.config.authorization_services);
+            handle_request(*req, ctx.session, ctx.session_config.cert_install_service, ctx.session_config.authorization_services);
 
         logf_info("Timestamp: %d\n", req->header.timestamp);
 

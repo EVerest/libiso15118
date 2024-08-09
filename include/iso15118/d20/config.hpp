@@ -12,10 +12,14 @@
 namespace iso15118::d20 {
 
 struct SessionConfig {
-    std::string evse_id{""};
+    explicit SessionConfig(const std::string& evse_id_,
+                           const std::vector<message_20::ServiceCategory>& supported_energy_services_,
+                           bool cert_install_service_, std::vector<message_20::Authorization> authorization_services_);
 
-    bool cert_install_service{false};
-    std::vector<message_20::Authorization> authorization_services{{message_20::Authorization::EIM}};
+    std::string evse_id;
+
+    bool cert_install_service;
+    std::vector<message_20::Authorization> authorization_services;
 
     std::vector<message_20::ServiceCategory> supported_energy_transfer_services;
     std::vector<message_20::ServiceCategory> supported_vas_services;
@@ -31,8 +35,6 @@ struct SessionConfig {
 
     DC_ModeRes evse_dc_parameter;
     BPT_DC_ModeRes evse_dc_bpt_parameter;
-
-    SessionConfig();
 };
 
 } // namespace iso15118::d20
