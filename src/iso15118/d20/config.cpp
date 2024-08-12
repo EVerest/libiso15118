@@ -2,6 +2,10 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <iso15118/d20/config.hpp>
 
+#include <algorithm>
+
+#include <iso15118/detail/helper.hpp>
+
 namespace iso15118::d20 {
 
 SessionConfig::SessionConfig(const EvseSetupConfig& config) :
@@ -10,6 +14,14 @@ SessionConfig::SessionConfig(const EvseSetupConfig& config) :
     cert_install_service(config.enable_certificate_install_service),
     authorization_services(config.authorization_services),
     dc_limits(config.dc_limits) {
+
+    const auto dc_bpt_found =
+        std::find(supported_energy_transfer_services.begin(), supported_energy_transfer_services.end(),
+                  message_20::ServiceCategory::DC_BPT) != supported_energy_transfer_services.end();
+    if (dc_bpt_found and std::holds_alternative<d20::DcChargeLimits>(dc_limits)) {
+        logf_warning("The supported energy services contain DC_BPT, but dc limits does not contain BPT "
+                     "limits. This can lead to session shutdowns.");
+    }
 
     dc_parameter_list = {{
         message_20::DcConnector::Extended,
@@ -26,30 +38,6 @@ SessionConfig::SessionConfig(const EvseSetupConfig& config) :
                               },
                               message_20::BptChannel::Unified,
                               message_20::GeneratorMode::GridFollowing}};
-
-    evse_dc_parameter = {
-        {22, 3},  // max_charge_power
-        {0, 0},   // min_charge_power
-        {25, 0},  // max_charge_current
-        {0, 0},   // min_charge_current
-        {900, 0}, // max_voltage
-        {0, 0},   // min_voltage
-    };
-
-    evse_dc_bpt_parameter = {
-        {
-            {22, 3},  // max_charge_power
-            {0, 0},   // min_charge_power
-            {25, 0},  // max_charge_current
-            {0, 0},   // min_charge_current
-            {900, 0}, // max_voltage
-            {0, 0},   // min_voltage
-        },
-        {11, 3}, // max_discharge_power
-        {0, 0},  // min_discharge_power
-        {25, 0}, // max_discharge_current
-        {0, 0},  // min_discharge_current
-    };
 }
 
 } // namespace iso15118::d20

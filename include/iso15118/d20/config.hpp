@@ -6,9 +6,8 @@
 #include <variant>
 #include <vector>
 
-#include <iso15118/message/common.hpp>
-#include <iso15118/message/dc_charge_parameter_discovery.hpp>
 #include <iso15118/d20/limits.hpp>
+#include <iso15118/message/common.hpp>
 
 namespace iso15118::d20 {
 
@@ -38,12 +37,6 @@ struct SessionConfig {
     std::vector<message_20::ParkingParameterList> parking_parameter_list;
 
     DcLimits dc_limits;
-
-    using DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::DC_CPDResEnergyTransferMode;
-    using BPT_DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::BPT_DC_CPDResEnergyTransferMode;
-
-    DC_ModeRes evse_dc_parameter;
-    BPT_DC_ModeRes evse_dc_bpt_parameter;
 };
 
 } // namespace iso15118::d20
