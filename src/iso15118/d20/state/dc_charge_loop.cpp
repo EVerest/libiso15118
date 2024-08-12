@@ -101,10 +101,9 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
             present_current = control_data->current;
         } else if (const auto control_data = ctx.get_control_event<StopCharging>()) {
             stop = *control_data;
-        } else {
-            // FIXME (aw): error handling
         }
 
+        // Ignore control message
         return sa.HANDLED_INTERNALLY;
     }
 

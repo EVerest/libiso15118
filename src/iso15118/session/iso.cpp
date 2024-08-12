@@ -156,6 +156,15 @@ TimePoint const& Session::poll() {
 
     // send all of our queued control events
     while (active_control_event = control_event_queue.pop()) {
+
+        if (const auto control_data = ctx.get_control_event<d20::DcChargeLimits>()) {
+            ctx.session_config.dc_limits = *control_data;
+            continue;
+        } else if (const auto control_data = ctx.get_control_event<d20::DcDischargeLimits>()) {
+            ctx.session_config.dc_limits = *control_data;
+            continue;
+        }
+
         const auto res = fsm.handle_event(d20::FsmEvent::CONTROL_MESSAGE);
         // FIXME (aw): check result!
     }

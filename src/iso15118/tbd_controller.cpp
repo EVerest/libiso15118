@@ -20,7 +20,7 @@ using ConnectionType = iso15118::io::ConnectionTLS;
 
 namespace iso15118 {
 
-TbdController::TbdController(TbdConfig config_, session::feedback::Callbacks callbacks_, EvseSetupConfig setup_) :
+TbdController::TbdController(TbdConfig config_, session::feedback::Callbacks callbacks_, d20::EvseSetupConfig setup_) :
     config(std::move(config_)), callbacks(std::move(callbacks_)), evse_setup(std::move(setup_)) {
 
     if (config.enable_sdp_server) {
@@ -34,9 +34,7 @@ void TbdController::loop() {
 
     if (not config.enable_sdp_server) {
         auto connection = std::make_unique<io::ConnectionPlain>(poll_manager, config.interface_name);
-        auto session_config =
-            d20::SessionConfig(evse_setup.evse_id, evse_setup.supported_energy_services,
-                               evse_setup.enable_certificate_install_service, evse_setup.authorization_services);
+        auto session_config = d20::SessionConfig(evse_setup);
         session = std::make_unique<Session>(std::move(connection), std::move(session_config), callbacks);
     }
 
@@ -56,9 +54,7 @@ void TbdController::loop() {
 
                 if (not config.enable_sdp_server) {
                     auto connection = std::make_unique<io::ConnectionPlain>(poll_manager, config.interface_name);
-                    auto session_config = d20::SessionConfig(evse_setup.evse_id, evse_setup.supported_energy_services,
-                                                             evse_setup.enable_certificate_install_service,
-                                                             evse_setup.authorization_services);
+                    auto session_config = d20::SessionConfig(evse_setup);
                     session = std::make_unique<Session>(std::move(connection), std::move(session_config), callbacks);
                 }
             }
@@ -82,6 +78,21 @@ void TbdController::update_authorization_services(const std::vector<message_20::
         return;
     }
     evse_setup.authorization_services = services;
+}
+
+void TbdController::update_dc_limits(const d20::DcLimits& limits) {
+
+    evse_setup.dc_limits = limits;
+
+    if (session) {
+        if (std::holds_alternative<d20::DcChargeLimits>(limits)) {
+            const auto dc_limits = std::get<d20::DcChargeLimits>(limits);
+            session->push_control_event(dc_limits);
+        } else if (std::holds_alternative<d20::DcDischargeLimits>(limits)) {
+            const auto dc_discharge_limits = std::get<d20::DcDischargeLimits>(limits);
+            session->push_control_event(dc_discharge_limits);
+        }
+    }
 }
 
 void TbdController::handle_sdp_server_input() {
@@ -113,9 +124,7 @@ void TbdController::handle_sdp_server_input() {
 
     const auto ipv6_endpoint = connection->get_public_endpoint();
 
-    auto session_config =
-        d20::SessionConfig(evse_setup.evse_id, evse_setup.supported_energy_services,
-                           evse_setup.enable_certificate_install_service, evse_setup.authorization_services);
+    auto session_config = d20::SessionConfig(evse_setup);
 
     session = std::make_unique<Session>(std::move(connection), std::move(session_config), callbacks);
 

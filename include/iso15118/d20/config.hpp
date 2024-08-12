@@ -8,13 +8,20 @@
 
 #include <iso15118/message/common.hpp>
 #include <iso15118/message/dc_charge_parameter_discovery.hpp>
+#include <iso15118/d20/limits.hpp>
 
 namespace iso15118::d20 {
 
+struct EvseSetupConfig {
+    std::string evse_id;
+    std::vector<message_20::ServiceCategory> supported_energy_services;
+    std::vector<message_20::Authorization> authorization_services;
+    bool enable_certificate_install_service;
+    d20::DcLimits dc_limits;
+};
+
 struct SessionConfig {
-    explicit SessionConfig(const std::string& evse_id_,
-                           const std::vector<message_20::ServiceCategory>& supported_energy_services_,
-                           bool cert_install_service_, std::vector<message_20::Authorization> authorization_services_);
+    explicit SessionConfig(const EvseSetupConfig&);
 
     std::string evse_id;
 
@@ -29,6 +36,8 @@ struct SessionConfig {
 
     std::vector<message_20::InternetParameterList> internet_parameter_list;
     std::vector<message_20::ParkingParameterList> parking_parameter_list;
+
+    DcLimits dc_limits;
 
     using DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::DC_CPDResEnergyTransferMode;
     using BPT_DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::BPT_DC_CPDResEnergyTransferMode;

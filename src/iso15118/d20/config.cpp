@@ -4,14 +4,12 @@
 
 namespace iso15118::d20 {
 
-SessionConfig::SessionConfig(const std::string& evse_id_,
-                             const std::vector<message_20::ServiceCategory>& supported_energy_services_,
-                             bool cert_install_service_,
-                             std::vector<message_20::Authorization> authorization_services_) :
-    evse_id(evse_id_),
-    supported_energy_transfer_services(supported_energy_services_),
-    cert_install_service(cert_install_service_),
-    authorization_services(authorization_services_) {
+SessionConfig::SessionConfig(const EvseSetupConfig& config) :
+    evse_id(config.evse_id),
+    supported_energy_transfer_services(config.supported_energy_services),
+    cert_install_service(config.enable_certificate_install_service),
+    authorization_services(config.authorization_services),
+    dc_limits(config.dc_limits) {
 
     dc_parameter_list = {{
         message_20::DcConnector::Extended,
