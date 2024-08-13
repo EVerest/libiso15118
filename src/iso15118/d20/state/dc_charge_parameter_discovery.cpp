@@ -69,7 +69,7 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
             return response_with_code(res, message_20::ResponseCode::FAILED_WrongChargeParameter);
         }
 
-        if (const auto dc_charge_limits = std::get_if<d20::DcChargeLimits>(&dc_limits)) {
+        if (std::holds_alternative<d20::DcChargeLimits>(dc_limits)) {
             logf_error("Transfer mode is BPT, but only dc limits without discharge are provided!");
             return response_with_code(res, message_20::ResponseCode::FAILED);
         } else if (const auto dc_discharge_limits = std::get_if<d20::DcDischargeLimits>(&dc_limits)) {
