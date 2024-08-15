@@ -28,7 +28,7 @@ static auto fill_parameters(const message_20::DisplayParameters& req_parameters)
     parameters.remaining_time_to_minimum_soc = req_parameters.remaining_time_to_min_soc;
     parameters.remaining_time_to_target_soc = req_parameters.remaining_time_to_target_soc;
     parameters.remaining_time_to_maximum_soc = req_parameters.remaining_time_to_max_soc;
-    if (req_parameters.battery_energy_capacity.has_value()) {
+    if (req_parameters.battery_energy_capacity) {
         parameters.battery_energy_capacity = message_20::from_RationalNumber(*req_parameters.battery_energy_capacity);
     }
     parameters.inlet_hot = req_parameters.inlet_hot;
@@ -150,8 +150,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
         ctx.respond(res);
 
         if (req->display_parameters.has_value()) {
-            const auto& req_display_parameters = req->display_parameters.value();
-            const auto feedback_parameters = fill_parameters(req_display_parameters);
+            const auto feedback_parameters = fill_parameters(*req->display_parameters);
 
             ctx.feedback.display_parameters(feedback_parameters);
         }
