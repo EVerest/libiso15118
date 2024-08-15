@@ -12,13 +12,12 @@
 
 namespace iso15118::message_20 {
 
-template <>
-void convert(const struct iso20_EVPowerScheduleEntryType& in, ScheduleExchangeRequest::EVPowerScheduleEntry& out) {
+template <> void convert(const struct iso20_EVPowerScheduleEntryType& in, datatypes::EVPowerScheduleEntry& out) {
     out.duration = in.Duration;
     convert(in.Power, out.power);
 }
 
-template <> void convert(const struct iso20_EVPowerScheduleType& in, ScheduleExchangeRequest::EVPowerSchedule& out) {
+template <> void convert(const struct iso20_EVPowerScheduleType& in, datatypes::EVPowerSchedule& out) {
     out.time_anchor = in.TimeAnchor;
     const auto& entries_in = in.EVPowerScheduleEntries.EVPowerScheduleEntry;
     out.entries.reserve(entries_in.arrayLen);
@@ -29,12 +28,12 @@ template <> void convert(const struct iso20_EVPowerScheduleType& in, ScheduleExc
     }
 }
 
-template <> void convert(const struct iso20_EVPriceRuleType& in, ScheduleExchangeRequest::EVPriceRule& out) {
+template <> void convert(const struct iso20_EVPriceRuleType& in, datatypes::EVPriceRule& out) {
     convert(in.EnergyFee, out.energy_fee);
     convert(in.PowerRangeStart, out.power_range_start);
 }
 
-template <> void convert(const struct iso20_EVPriceRuleStackType& in, ScheduleExchangeRequest::EVPriceRuleStack& out) {
+template <> void convert(const struct iso20_EVPriceRuleStackType& in, datatypes::EVPriceRuleStack& out) {
     out.duration = in.Duration;
 
     const auto& rules_in = in.EVPriceRule;
@@ -46,9 +45,7 @@ template <> void convert(const struct iso20_EVPriceRuleStackType& in, ScheduleEx
     }
 }
 
-template <>
-void convert(const struct iso20_EVAbsolutePriceScheduleType& in,
-             ScheduleExchangeRequest::EVAbsolutePriceSchedule& out) {
+template <> void convert(const struct iso20_EVAbsolutePriceScheduleType& in, datatypes::EVAbsolutePriceSchedule& out) {
     out.time_anchor = in.TimeAnchor;
     out.currency = CB2CPP_STRING(in.Currency);
     out.price_algorithm = CB2CPP_STRING(in.PriceAlgorithm);
@@ -62,14 +59,13 @@ void convert(const struct iso20_EVAbsolutePriceScheduleType& in,
     }
 }
 
-template <> void convert(const struct iso20_EVEnergyOfferType& in, ScheduleExchangeRequest::EVEnergyOffer& out) {
+template <> void convert(const struct iso20_EVEnergyOfferType& in, datatypes::EVEnergyOffer& out) {
     convert(in.EVPowerSchedule, out.power_schedule);
     convert(in.EVAbsolutePriceSchedule, out.absolute_price_schedule);
 }
 
 template <>
-void convert(const struct iso20_Scheduled_SEReqControlModeType& in,
-             ScheduleExchangeRequest::Scheduled_SEReqControlMode& out) {
+void convert(const struct iso20_Scheduled_SEReqControlModeType& in, datatypes::Scheduled_SEReqControlMode& out) {
     CB2CPP_ASSIGN_IF_USED(in.DepartureTime, out.departure_time);
     CB2CPP_CONVERT_IF_USED(in.EVTargetEnergyRequest, out.target_energy);
     CB2CPP_CONVERT_IF_USED(in.EVMaximumEnergyRequest, out.max_energy);
@@ -78,8 +74,7 @@ void convert(const struct iso20_Scheduled_SEReqControlModeType& in,
 }
 
 template <>
-void convert(const struct iso20_Dynamic_SEReqControlModeType& in,
-             ScheduleExchangeRequest::Dynamic_SEReqControlMode& out) {
+void convert(const struct iso20_Dynamic_SEReqControlModeType& in, datatypes::Dynamic_SEReqControlMode& out) {
     out.departure_time = in.DepartureTime;
     CB2CPP_ASSIGN_IF_USED(in.MinimumSOC, out.minimum_soc);
     CB2CPP_ASSIGN_IF_USED(in.TargetSOC, out.target_soc);
@@ -96,17 +91,17 @@ template <> void convert(const struct iso20_ScheduleExchangeReqType& in, Schedul
     out.max_supporting_points = in.MaximumSupportingPoints;
 
     if (in.Dynamic_SEReqControlMode_isUsed) {
-        auto& mode_out = out.control_mode.emplace<ScheduleExchangeRequest::Dynamic_SEReqControlMode>();
+        auto& mode_out = out.control_mode.emplace<datatypes::Dynamic_SEReqControlMode>();
         convert(in.Dynamic_SEReqControlMode, mode_out);
     } else if (in.Scheduled_SEReqControlMode_isUsed) {
-        auto& mode_out = out.control_mode.emplace<ScheduleExchangeRequest::Scheduled_SEReqControlMode>();
+        auto& mode_out = out.control_mode.emplace<datatypes::Scheduled_SEReqControlMode>();
         convert(in.Scheduled_SEReqControlMode, mode_out);
     } else {
         throw std::runtime_error("No control mode selected in iso20_ScheduleExchangeReqType");
     }
 }
 
-template <> void convert(const ScheduleExchangeResponse::PowerSchedule& in, struct iso20_PowerScheduleType& out) {
+template <> void convert(const datatypes::PowerSchedule& in, struct iso20_PowerScheduleType& out) {
     init_iso20_PowerScheduleType(&out);
 
     out.TimeAnchor = in.time_anchor;
@@ -130,7 +125,7 @@ template <> void convert(const ScheduleExchangeResponse::PowerSchedule& in, stru
     out.PowerScheduleEntries.PowerScheduleEntry.arrayLen = in.entries.size();
 }
 
-template <> void convert(const ScheduleExchangeResponse::ChargingSchedule& in, struct iso20_ChargingScheduleType& out) {
+template <> void convert(const datatypes::ChargingSchedule& in, struct iso20_ChargingScheduleType& out) {
     init_iso20_ChargingScheduleType(&out);
 
     convert(in.power_schedule, out.PowerSchedule);
@@ -138,7 +133,7 @@ template <> void convert(const ScheduleExchangeResponse::ChargingSchedule& in, s
     // todo(sl): price_schedule
 }
 
-template <> void convert(const ScheduleExchangeResponse::ScheduleTuple& in, struct iso20_ScheduleTupleType& out) {
+template <> void convert(const datatypes::ScheduleTuple& in, struct iso20_ScheduleTupleType& out) {
     init_iso20_ScheduleTupleType(&out);
 
     out.ScheduleTupleID = in.schedule_tuple_id;
@@ -148,7 +143,7 @@ template <> void convert(const ScheduleExchangeResponse::ScheduleTuple& in, stru
 
 struct ModeResponseVisitor {
     ModeResponseVisitor(iso20_ScheduleExchangeResType& res_) : res(res_){};
-    void operator()(const ScheduleExchangeResponse::Dynamic_SEResControlMode& in) {
+    void operator()(const datatypes::Dynamic_SEResControlMode& in) {
         init_iso20_Dynamic_SEResControlModeType(&res.Dynamic_SEResControlMode);
         CB_SET_USED(res.Dynamic_SEResControlMode);
 
@@ -161,7 +156,7 @@ struct ModeResponseVisitor {
         // Todo(sl): price_schedule
     }
 
-    void operator()(const ScheduleExchangeResponse::Scheduled_SEResControlMode& in) {
+    void operator()(const datatypes::Scheduled_SEResControlMode& in) {
         init_iso20_Scheduled_SEResControlModeType(&res.Scheduled_SEResControlMode);
         CB_SET_USED(res.Dynamic_SEResControlMode);
 

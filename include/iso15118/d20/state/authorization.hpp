@@ -15,7 +15,7 @@ struct Authorization : public FsmSimpleState {
     HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
 
 private:
-    message_20::AuthStatus authorization_status{message_20::AuthStatus::Pending};
+    datatypes::AuthStatus authorization_status{datatypes::AuthStatus::Pending};
 };
 
 } // namespace iso15118::d20::state

@@ -16,16 +16,16 @@ message_20::DC_CableCheckResponse handle_request(const message_20::DC_CableCheck
     message_20::DC_CableCheckResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
+        return response_with_code(res, datatypes::ResponseCode::FAILED_UnknownSession);
     }
 
     if (not cable_check_done) {
-        res.processing = message_20::Processing::Ongoing;
+        res.processing = datatypes::Processing::Ongoing;
     } else {
-        res.processing = message_20::Processing::Finished;
+        res.processing = datatypes::Processing::Finished;
     }
 
-    return response_with_code(res, message_20::ResponseCode::OK);
+    return response_with_code(res, datatypes::ResponseCode::OK);
 }
 
 void DC_CableCheck::enter() {
@@ -62,7 +62,7 @@ FsmSimpleState::HandleEventReturnType DC_CableCheck::handle_event(AllocatorType&
 
         ctx.respond(res);
 
-        if (res.response_code >= message_20::ResponseCode::FAILED) {
+        if (res.response_code >= datatypes::ResponseCode::FAILED) {
             ctx.session_stopped = true;
             return sa.PASS_ON;
         }

@@ -12,65 +12,67 @@
 
 namespace iso15118::d20 {
 
+namespace datatypes = message_20::datatypes;
+
 struct OfferedServices {
 
-    std::vector<message_20::Authorization> auth_services;
-    std::vector<message_20::ServiceCategory> energy_services;
-    std::vector<message_20::ServiceCategory> vas_services;
+    std::vector<datatypes::Authorization> auth_services;
+    std::vector<datatypes::ServiceCategory> energy_services;
+    std::vector<datatypes::ServiceCategory> vas_services;
 
-    std::map<uint8_t, message_20::DcParameterList> dc_parameter_list;
-    std::map<uint8_t, message_20::DcBptParameterList> dc_bpt_parameter_list;
-    std::map<uint8_t, message_20::InternetParameterList> internet_parameter_list;
-    std::map<uint8_t, message_20::ParkingParameterList> parking_parameter_list;
+    std::map<uint8_t, datatypes::DcParameterList> dc_parameter_list;
+    std::map<uint8_t, datatypes::DcBptParameterList> dc_bpt_parameter_list;
+    std::map<uint8_t, datatypes::InternetParameterList> internet_parameter_list;
+    std::map<uint8_t, datatypes::ParkingParameterList> parking_parameter_list;
 };
 
 struct SelectedServiceParameters {
 
-    message_20::ServiceCategory selected_energy_service;
+    datatypes::ServiceCategory selected_energy_service;
 
-    std::variant<message_20::AcConnector, message_20::DcConnector> selected_connector;
-    message_20::ControlMode selected_control_mode;
-    message_20::MobilityNeedsMode selected_mobility_needs_mode;
-    message_20::Pricing selected_pricing;
+    std::variant<datatypes::AcConnector, datatypes::DcConnector> selected_connector;
+    datatypes::ControlMode selected_control_mode;
+    datatypes::MobilityNeedsMode selected_mobility_needs_mode;
+    datatypes::Pricing selected_pricing;
 
-    message_20::BptChannel selected_bpt_channel;
-    message_20::GeneratorMode selected_generator_mode;
+    datatypes::BptChannel selected_bpt_channel;
+    datatypes::GeneratorMode selected_generator_mode;
 
     SelectedServiceParameters(){}; // TODO(sl): What to do here?
     // Constructor for DC
-    SelectedServiceParameters(message_20::ServiceCategory energy_service_, message_20::DcConnector dc_connector_,
-                              message_20::ControlMode control_mode_, message_20::MobilityNeedsMode mobility_,
-                              message_20::Pricing pricing_) :
+    SelectedServiceParameters(datatypes::ServiceCategory energy_service_, datatypes::DcConnector dc_connector_,
+                              datatypes::ControlMode control_mode_, datatypes::MobilityNeedsMode mobility_,
+                              datatypes::Pricing pricing_) :
         selected_energy_service(energy_service_),
         selected_control_mode(control_mode_),
         selected_mobility_needs_mode(mobility_),
         selected_pricing(pricing_) {
-        selected_connector.emplace<message_20::DcConnector>(dc_connector_);
+        selected_connector.emplace<datatypes::DcConnector>(dc_connector_);
     };
 
     // Constructor for DC_BPT
-    SelectedServiceParameters(message_20::ServiceCategory energy_service_, message_20::DcConnector dc_connector_,
-                              message_20::ControlMode control_mode_, message_20::MobilityNeedsMode mobility_,
-                              message_20::Pricing pricing_, message_20::BptChannel channel_,
-                              message_20::GeneratorMode generator_) :
+    SelectedServiceParameters(datatypes::ServiceCategory energy_service_, datatypes::DcConnector dc_connector_,
+                              datatypes::ControlMode control_mode_, datatypes::MobilityNeedsMode mobility_,
+                              datatypes::Pricing pricing_, datatypes::BptChannel channel_,
+                              datatypes::GeneratorMode generator_) :
         selected_energy_service(energy_service_),
         selected_control_mode(control_mode_),
         selected_mobility_needs_mode(mobility_),
         selected_pricing(pricing_),
         selected_bpt_channel(channel_),
         selected_generator_mode(generator_) {
-        selected_connector.emplace<message_20::DcConnector>(dc_connector_);
+        selected_connector.emplace<datatypes::DcConnector>(dc_connector_);
     };
 };
 
 struct SelectedVasParameter {
-    std::vector<message_20::ServiceCategory> vas_services;
+    std::vector<datatypes::ServiceCategory> vas_services;
 
-    message_20::Protocol internet_protocol;
-    message_20::Port internet_port;
+    datatypes::Protocol internet_protocol;
+    datatypes::Port internet_port;
 
-    message_20::IntendedService parking_intended_service;
-    message_20::ParkingStatus parking_status;
+    datatypes::IntendedService parking_intended_service;
+    datatypes::ParkingStatus parking_status;
 };
 
 class Session {
@@ -87,15 +89,15 @@ public:
         return id;
     }
 
-    bool find_parameter_set_id(const message_20::ServiceCategory service, int16_t id);
+    bool find_parameter_set_id(const datatypes::ServiceCategory service, int16_t id);
 
-    void selected_service_parameters(const message_20::ServiceCategory service, const uint16_t id);
+    void selected_service_parameters(const datatypes::ServiceCategory service, const uint16_t id);
 
-    message_20::ServiceCategory get_selected_energy_service() const {
+    datatypes::ServiceCategory get_selected_energy_service() const {
         return selected_services.selected_energy_service;
     }
 
-    message_20::ControlMode get_selected_control_mode() const {
+    datatypes::ControlMode get_selected_control_mode() const {
         return selected_services.selected_control_mode;
     }
 

@@ -9,16 +9,16 @@ namespace iso15118::message_20 {
 struct DC_PreChargeRequest {
     Header header;
 
-    Processing processing;
-    RationalNumber present_voltage;
-    RationalNumber target_voltage;
+    datatypes::Processing processing;
+    datatypes::RationalNumber present_voltage;
+    datatypes::RationalNumber target_voltage;
 };
 
 struct DC_PreChargeResponse {
     Header header;
-    ResponseCode response_code;
+    datatypes::ResponseCode response_code;
 
-    RationalNumber present_voltage;
+    datatypes::RationalNumber present_voltage;
 };
 
 } // namespace iso15118::message_20

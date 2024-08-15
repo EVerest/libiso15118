@@ -6,12 +6,15 @@
 
 using namespace iso15118;
 
+namespace datatypes = message_20::datatypes;
+
 SCENARIO("Service detail state handling") {
 
     const auto evse_id = std::string("everest se");
-    const std::vector<message_20::ServiceCategory> supported_energy_services = {message_20::ServiceCategory::DC};
+    const std::vector<message_20::datatypes::ServiceCategory> supported_energy_services = {
+        message_20::datatypes::ServiceCategory::DC};
     const auto cert_install{false};
-    const std::vector<message_20::Authorization> auth_services = {message_20::Authorization::EIM};
+    const std::vector<message_20::datatypes::Authorization> auth_services = {message_20::datatypes::Authorization::EIM};
     const d20::DcTransferLimits dc_limits;
 
     const d20::EvseSetupConfig evse_setup{evse_id, supported_energy_services, auth_services, cert_install, dc_limits};
@@ -23,7 +26,7 @@ SCENARIO("Service detail state handling") {
         message_20::ServiceDetailRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
-        req.service = message_20::ServiceCategory::DC;
+        req.service = datatypes::ServiceCategory::DC;
 
         session = d20::Session();
         const auto session_config = d20::SessionConfig(evse_setup);
@@ -31,8 +34,8 @@ SCENARIO("Service detail state handling") {
         const auto res = d20::state::handle_request(req, session, session_config);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
-            REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
-            REQUIRE(res.service == message_20::ServiceCategory::DC);
+            REQUIRE(res.response_code == datatypes::ResponseCode::FAILED_UnknownSession);
+            REQUIRE(res.service == datatypes::ServiceCategory::DC);
             REQUIRE(res.service_parameter_list.size() == 1);
             auto& parameter = res.service_parameter_list[0];
             REQUIRE(parameter.id == 0);
@@ -41,27 +44,27 @@ SCENARIO("Service detail state handling") {
             REQUIRE(std::holds_alternative<int32_t>(parameter.parameter[0].value));
 
             const auto& connector = std::get<int32_t>(parameter.parameter[0].value);
-            REQUIRE(static_cast<message_20::DcConnector>(connector) == message_20::DcConnector::Core);
+            REQUIRE(static_cast<datatypes::DcConnector>(connector) == datatypes::DcConnector::Core);
         }
     }
 
     GIVEN("Bad Case - FAILED_ServiceIDInvalid") {
 
         d20::Session session = d20::Session();
-        session.offered_services.energy_services = {message_20::ServiceCategory::DC_BPT};
+        session.offered_services.energy_services = {datatypes::ServiceCategory::DC_BPT};
 
         message_20::ServiceDetailRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
-        req.service = message_20::ServiceCategory::AC;
+        req.service = datatypes::ServiceCategory::AC;
 
         const auto session_config = d20::SessionConfig(evse_setup);
 
         const auto res = d20::state::handle_request(req, session, session_config);
 
         THEN("ResponseCode: FAILED_ServiceIDInvalid, mandatory fields should be set") {
-            REQUIRE(res.response_code == message_20::ResponseCode::FAILED_ServiceIDInvalid);
-            REQUIRE(res.service == message_20::ServiceCategory::DC);
+            REQUIRE(res.response_code == datatypes::ResponseCode::FAILED_ServiceIDInvalid);
+            REQUIRE(res.service == datatypes::ServiceCategory::DC);
             REQUIRE(res.service_parameter_list.size() == 1);
             auto& parameter = res.service_parameter_list[0];
             REQUIRE(parameter.id == 0);
@@ -70,33 +73,33 @@ SCENARIO("Service detail state handling") {
             REQUIRE(std::holds_alternative<int32_t>(parameter.parameter[0].value));
 
             const auto& connector = std::get<int32_t>(parameter.parameter[0].value);
-            REQUIRE(static_cast<message_20::DcConnector>(connector) == message_20::DcConnector::Core);
+            REQUIRE(static_cast<datatypes::DcConnector>(connector) == datatypes::DcConnector::Core);
         }
     }
 
     GIVEN("Good Case - DC Service") {
 
         d20::Session session = d20::Session();
-        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
+        session.offered_services.energy_services = {datatypes::ServiceCategory::DC};
 
         auto session_config = d20::SessionConfig(evse_setup);
         session_config.dc_parameter_list = {{
-            message_20::DcConnector::Extended,
-            message_20::ControlMode::Scheduled,
-            message_20::MobilityNeedsMode::ProvidedByEvcc,
-            message_20::Pricing::NoPricing,
+            datatypes::DcConnector::Extended,
+            datatypes::ControlMode::Scheduled,
+            datatypes::MobilityNeedsMode::ProvidedByEvcc,
+            datatypes::Pricing::NoPricing,
         }};
 
         message_20::ServiceDetailRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
-        req.service = message_20::ServiceCategory::DC;
+        req.service = datatypes::ServiceCategory::DC;
 
         const auto res = d20::state::handle_request(req, session, session_config);
 
         THEN("ResponseCode: OK") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
-            REQUIRE(res.service == message_20::ServiceCategory::DC);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
+            REQUIRE(res.service == datatypes::ServiceCategory::DC);
             REQUIRE(res.service_parameter_list.size() == 1);
             auto& parameters = res.service_parameter_list[0];
             REQUIRE(parameters.id == 0);
@@ -123,30 +126,30 @@ SCENARIO("Service detail state handling") {
 
     GIVEN("Good Case - DC_BPT Service") {
         d20::Session session = d20::Session();
-        session.offered_services.energy_services = {message_20::ServiceCategory::DC_BPT};
+        session.offered_services.energy_services = {datatypes::ServiceCategory::DC_BPT};
 
         auto session_config = d20::SessionConfig(evse_setup);
         session_config.dc_bpt_parameter_list = {{
             {
-                message_20::DcConnector::Extended,
-                message_20::ControlMode::Scheduled,
-                message_20::MobilityNeedsMode::ProvidedByEvcc,
-                message_20::Pricing::NoPricing,
+                datatypes::DcConnector::Extended,
+                datatypes::ControlMode::Scheduled,
+                datatypes::MobilityNeedsMode::ProvidedByEvcc,
+                datatypes::Pricing::NoPricing,
             },
-            message_20::BptChannel::Unified,
-            message_20::GeneratorMode::GridFollowing,
+            datatypes::BptChannel::Unified,
+            datatypes::GeneratorMode::GridFollowing,
         }};
 
         message_20::ServiceDetailRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
-        req.service = message_20::ServiceCategory::DC_BPT;
+        req.service = datatypes::ServiceCategory::DC_BPT;
 
         const auto res = d20::state::handle_request(req, session, session_config);
 
         THEN("ResponseCode: OK") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
-            REQUIRE(res.service == message_20::ServiceCategory::DC_BPT);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
+            REQUIRE(res.service == datatypes::ServiceCategory::DC_BPT);
             REQUIRE(res.service_parameter_list.size() == 1);
             auto& parameters = res.service_parameter_list[0];
             REQUIRE(parameters.id == 0);
@@ -182,32 +185,32 @@ SCENARIO("Service detail state handling") {
     GIVEN("Good Case - 2x DC Services") {
 
         d20::Session session = d20::Session();
-        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
+        session.offered_services.energy_services = {datatypes::ServiceCategory::DC};
 
         auto session_config = d20::SessionConfig(evse_setup);
         session_config.dc_parameter_list = {{
-                                                message_20::DcConnector::Extended,
-                                                message_20::ControlMode::Scheduled,
-                                                message_20::MobilityNeedsMode::ProvidedByEvcc,
-                                                message_20::Pricing::NoPricing,
+                                                datatypes::DcConnector::Extended,
+                                                datatypes::ControlMode::Scheduled,
+                                                datatypes::MobilityNeedsMode::ProvidedByEvcc,
+                                                datatypes::Pricing::NoPricing,
                                             },
                                             {
-                                                message_20::DcConnector::Extended,
-                                                message_20::ControlMode::Dynamic,
-                                                message_20::MobilityNeedsMode::ProvidedBySecc,
-                                                message_20::Pricing::NoPricing,
+                                                datatypes::DcConnector::Extended,
+                                                datatypes::ControlMode::Dynamic,
+                                                datatypes::MobilityNeedsMode::ProvidedBySecc,
+                                                datatypes::Pricing::NoPricing,
                                             }};
 
         message_20::ServiceDetailRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
-        req.service = message_20::ServiceCategory::DC;
+        req.service = datatypes::ServiceCategory::DC;
 
         const auto res = d20::state::handle_request(req, session, session_config);
 
         THEN("ResponseCode: OK") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
-            REQUIRE(res.service == message_20::ServiceCategory::DC);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
+            REQUIRE(res.service == datatypes::ServiceCategory::DC);
             REQUIRE(res.service_parameter_list.size() == 2);
             auto& parameters_0 = res.service_parameter_list[0];
             REQUIRE(parameters_0.id == 0);
@@ -256,26 +259,26 @@ SCENARIO("Service detail state handling") {
     GIVEN("Bad Case - DC Service: Scheduled Mode: 1, MobilityNeedsMode: 2 change to 1") {
 
         d20::Session session = d20::Session();
-        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
+        session.offered_services.energy_services = {datatypes::ServiceCategory::DC};
 
         auto session_config = d20::SessionConfig(evse_setup);
         session_config.dc_parameter_list = {{
-            message_20::DcConnector::Extended,
-            message_20::ControlMode::Scheduled,
-            message_20::MobilityNeedsMode::ProvidedBySecc,
-            message_20::Pricing::NoPricing,
+            datatypes::DcConnector::Extended,
+            datatypes::ControlMode::Scheduled,
+            datatypes::MobilityNeedsMode::ProvidedBySecc,
+            datatypes::Pricing::NoPricing,
         }};
 
         message_20::ServiceDetailRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
-        req.service = message_20::ServiceCategory::DC;
+        req.service = datatypes::ServiceCategory::DC;
 
         const auto res = d20::state::handle_request(req, session, session_config);
 
         THEN("ResponseCode: OK") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
-            REQUIRE(res.service == message_20::ServiceCategory::DC);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
+            REQUIRE(res.service == datatypes::ServiceCategory::DC);
             REQUIRE(res.service_parameter_list.size() == 1);
             auto& parameters = res.service_parameter_list[0];
             REQUIRE(parameters.id == 0);
@@ -302,28 +305,28 @@ SCENARIO("Service detail state handling") {
 
     GIVEN("Good case - Internet service") {
         d20::Session session = d20::Session();
-        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
-        session.offered_services.vas_services = {message_20::ServiceCategory::Internet};
+        session.offered_services.energy_services = {datatypes::ServiceCategory::DC};
+        session.offered_services.vas_services = {datatypes::ServiceCategory::Internet};
 
         auto session_config = d20::SessionConfig(evse_setup);
-        session_config.internet_parameter_list = {{message_20::Protocol::Http, message_20::Port::Port80}};
+        session_config.internet_parameter_list = {{datatypes::Protocol::Http, datatypes::Port::Port80}};
         session_config.dc_parameter_list = {{
-            message_20::DcConnector::Extended,
-            message_20::ControlMode::Scheduled,
-            message_20::MobilityNeedsMode::ProvidedByEvcc,
-            message_20::Pricing::NoPricing,
+            datatypes::DcConnector::Extended,
+            datatypes::ControlMode::Scheduled,
+            datatypes::MobilityNeedsMode::ProvidedByEvcc,
+            datatypes::Pricing::NoPricing,
         }};
 
         message_20::ServiceDetailRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
-        req.service = message_20::ServiceCategory::Internet;
+        req.service = datatypes::ServiceCategory::Internet;
 
         const auto res = d20::state::handle_request(req, session, session_config);
 
         THEN("ResponseCode: OK") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
-            REQUIRE(res.service == message_20::ServiceCategory::Internet);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
+            REQUIRE(res.service == datatypes::ServiceCategory::Internet);
             REQUIRE(res.service_parameter_list.size() == 1);
             auto& parameters = res.service_parameter_list[0];
             REQUIRE(parameters.id == 3);
@@ -342,29 +345,29 @@ SCENARIO("Service detail state handling") {
 
     GIVEN("Good case - Parking status service") {
         d20::Session session = d20::Session();
-        session.offered_services.energy_services = {message_20::ServiceCategory::DC};
-        session.offered_services.vas_services = {message_20::ServiceCategory::ParkingStatus};
+        session.offered_services.energy_services = {datatypes::ServiceCategory::DC};
+        session.offered_services.vas_services = {datatypes::ServiceCategory::ParkingStatus};
 
         auto session_config = d20::SessionConfig(evse_setup);
         session_config.parking_parameter_list = {
-            {message_20::IntendedService::VehicleCheckIn, message_20::ParkingStatus::ManualExternal}};
+            {datatypes::IntendedService::VehicleCheckIn, datatypes::ParkingStatus::ManualExternal}};
         session_config.dc_parameter_list = {{
-            message_20::DcConnector::Extended,
-            message_20::ControlMode::Scheduled,
-            message_20::MobilityNeedsMode::ProvidedByEvcc,
-            message_20::Pricing::NoPricing,
+            datatypes::DcConnector::Extended,
+            datatypes::ControlMode::Scheduled,
+            datatypes::MobilityNeedsMode::ProvidedByEvcc,
+            datatypes::Pricing::NoPricing,
         }};
 
         message_20::ServiceDetailRequest req;
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
-        req.service = message_20::ServiceCategory::ParkingStatus;
+        req.service = datatypes::ServiceCategory::ParkingStatus;
 
         const auto res = d20::state::handle_request(req, session, session_config);
 
         THEN("ResponseCode: OK") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
-            REQUIRE(res.service == message_20::ServiceCategory::ParkingStatus);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
+            REQUIRE(res.service == datatypes::ServiceCategory::ParkingStatus);
             REQUIRE(res.service_parameter_list.size() == 1);
             auto& parameters = res.service_parameter_list[0];
             REQUIRE(parameters.id == 0);

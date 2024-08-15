@@ -17,7 +17,7 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
     message_20::ServiceDetailResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
+        return response_with_code(res, datatypes::ResponseCode::FAILED_UnknownSession);
     }
 
     bool service_found = false;
@@ -37,7 +37,7 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
     }
 
     if (!service_found) {
-        return response_with_code(res, message_20::ResponseCode::FAILED_ServiceIDInvalid);
+        return response_with_code(res, datatypes::ResponseCode::FAILED_ServiceIDInvalid);
     }
 
     res.service_parameter_list.clear(); // reset default values
@@ -45,47 +45,47 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
     uint8_t id = 0;
 
     switch (req.service) {
-    case message_20::ServiceCategory::DC:
-        res.service = message_20::ServiceCategory::DC;
+    case datatypes::ServiceCategory::DC:
+        res.service = datatypes::ServiceCategory::DC;
         for (auto& parameter_set : config.dc_parameter_list) {
             session.offered_services.dc_parameter_list[id] = parameter_set;
-            res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id++, parameter_set));
+            res.service_parameter_list.push_back(datatypes::ParameterSet(id++, parameter_set));
         }
         break;
-    case message_20::ServiceCategory::DC_BPT:
-        res.service = message_20::ServiceCategory::DC_BPT;
+    case datatypes::ServiceCategory::DC_BPT:
+        res.service = datatypes::ServiceCategory::DC_BPT;
         for (auto& parameter_set : config.dc_bpt_parameter_list) {
             session.offered_services.dc_bpt_parameter_list[id] = parameter_set;
-            res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id++, parameter_set));
+            res.service_parameter_list.push_back(datatypes::ParameterSet(id++, parameter_set));
         }
         break;
 
-    case message_20::ServiceCategory::Internet:
-        res.service = message_20::ServiceCategory::Internet;
+    case datatypes::ServiceCategory::Internet:
+        res.service = datatypes::ServiceCategory::Internet;
 
         for (auto& parameter_set : config.internet_parameter_list) {
             // TODO(sl): Possibly refactor, define const
-            if (parameter_set.port == message_20::Port::Port20) {
+            if (parameter_set.port == datatypes::Port::Port20) {
                 id = 1;
-            } else if (parameter_set.port == message_20::Port::Port21) {
+            } else if (parameter_set.port == datatypes::Port::Port21) {
                 id = 2;
-            } else if (parameter_set.port == message_20::Port::Port80) {
+            } else if (parameter_set.port == datatypes::Port::Port80) {
                 id = 3;
-            } else if (parameter_set.port == message_20::Port::Port443) {
+            } else if (parameter_set.port == datatypes::Port::Port443) {
                 id = 4;
             }
             session.offered_services.internet_parameter_list[id] = parameter_set;
-            res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id, parameter_set));
+            res.service_parameter_list.push_back(datatypes::ParameterSet(id, parameter_set));
         }
 
         break;
 
-    case message_20::ServiceCategory::ParkingStatus:
-        res.service = message_20::ServiceCategory::ParkingStatus;
+    case datatypes::ServiceCategory::ParkingStatus:
+        res.service = datatypes::ServiceCategory::ParkingStatus;
 
         for (auto& parameter_set : config.parking_parameter_list) {
             session.offered_services.parking_parameter_list[id] = parameter_set;
-            res.service_parameter_list.push_back(message_20::ServiceDetailResponse::ParameterSet(id++, parameter_set));
+            res.service_parameter_list.push_back(datatypes::ParameterSet(id++, parameter_set));
         }
         break;
 
@@ -94,7 +94,7 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
         break;
     }
 
-    return response_with_code(res, message_20::ResponseCode::OK);
+    return response_with_code(res, datatypes::ResponseCode::OK);
 }
 
 void ServiceDetail::enter() {
@@ -116,7 +116,7 @@ FsmSimpleState::HandleEventReturnType ServiceDetail::handle_event(AllocatorType&
 
         ctx.respond(res);
 
-        if (res.response_code >= message_20::ResponseCode::FAILED) {
+        if (res.response_code >= datatypes::ResponseCode::FAILED) {
             ctx.session_stopped = true;
             return sa.PASS_ON;
         }

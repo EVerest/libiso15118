@@ -20,17 +20,17 @@ message_20::SessionStopResponse handle_request(const message_20::SessionStopRequ
     message_20::SessionStopResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
+        return response_with_code(res, datatypes::ResponseCode::FAILED_UnknownSession);
     }
 
-    if (req.charging_session == message_20::ChargingSession::ServiceRenegotiation &&
+    if (req.charging_session == datatypes::ChargingSession::ServiceRenegotiation &&
         session.service_renegotiation_supported == false) {
-        return response_with_code(res, message_20::ResponseCode::FAILED_NoServiceRenegotiationSupported);
+        return response_with_code(res, datatypes::ResponseCode::FAILED_NoServiceRenegotiationSupported);
     }
 
     // Todo(sl): Check req.charging_session
 
-    return response_with_code(res, message_20::ResponseCode::OK);
+    return response_with_code(res, datatypes::ResponseCode::OK);
 }
 
 void SessionStop::enter() {

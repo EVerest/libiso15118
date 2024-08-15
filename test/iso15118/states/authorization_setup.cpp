@@ -6,6 +6,8 @@
 
 using namespace iso15118;
 
+namespace datatypes = message_20::datatypes;
+
 SCENARIO("Authorization setup state handling") {
 
     GIVEN("Bad Case - Unknown session") {
@@ -18,17 +20,17 @@ SCENARIO("Authorization setup state handling") {
         session = d20::Session();
 
         const auto cert_install_service = false;
-        const std::vector<message_20::Authorization> authorization_services = {message_20::Authorization::EIM};
+        const std::vector<message_20::datatypes::Authorization> authorization_services = {
+            message_20::datatypes::Authorization::EIM};
 
         const auto res = d20::state::handle_request(req, session, cert_install_service, authorization_services);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
-            REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
+            REQUIRE(res.response_code == datatypes::ResponseCode::FAILED_UnknownSession);
             REQUIRE(res.certificate_installation_service == false);
             REQUIRE(res.authorization_services.size() == 1);
-            REQUIRE(res.authorization_services[0] == message_20::Authorization::EIM);
-            REQUIRE(std::holds_alternative<message_20::AuthorizationSetupResponse::EIM_ASResAuthorizationMode>(
-                res.authorization_mode));
+            REQUIRE(res.authorization_services[0] == datatypes::Authorization::EIM);
+            REQUIRE(std::holds_alternative<datatypes::EIM_ASResAuthorizationMode>(res.authorization_mode));
         }
     }
 
@@ -41,18 +43,17 @@ SCENARIO("Authorization setup state handling") {
         req.header.timestamp = 1691411798;
 
         const auto cert_install_service = false;
-        const std::vector<message_20::Authorization> authorization_services = {message_20::Authorization::EIM};
+        const std::vector<datatypes::Authorization> authorization_services = {datatypes::Authorization::EIM};
 
         const auto res = d20::state::handle_request(req, session, cert_install_service, authorization_services);
 
         THEN("ResponseCode: Ok, cert_install = false, authorization_servie = EIM") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
             REQUIRE(res.certificate_installation_service == false);
             REQUIRE(res.authorization_services.size() == 1);
-            REQUIRE(res.authorization_services[0] == message_20::Authorization::EIM);
-            REQUIRE(std::holds_alternative<message_20::AuthorizationSetupResponse::EIM_ASResAuthorizationMode>(
-                res.authorization_mode));
-            REQUIRE(session.offered_services.auth_services[0] == message_20::Authorization::EIM);
+            REQUIRE(res.authorization_services[0] == datatypes::Authorization::EIM);
+            REQUIRE(std::holds_alternative<datatypes::EIM_ASResAuthorizationMode>(res.authorization_mode));
+            REQUIRE(session.offered_services.auth_services[0] == datatypes::Authorization::EIM);
         }
     }
 
@@ -65,21 +66,19 @@ SCENARIO("Authorization setup state handling") {
         req.header.timestamp = 1691411798;
 
         const auto cert_install_service = false;
-        const std::vector<message_20::Authorization> authorization_services = {message_20::Authorization::PnC};
+        const std::vector<datatypes::Authorization> authorization_services = {datatypes::Authorization::PnC};
 
         const auto res = d20::state::handle_request(req, session, cert_install_service, authorization_services);
 
         THEN("ResponseCode: Ok, cert_install = false, authorization_servie = PnC, authorization_mode = PnC_Mode") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
             REQUIRE(res.certificate_installation_service == false);
             REQUIRE(res.authorization_services.size() == 1);
-            REQUIRE(res.authorization_services[0] == message_20::Authorization::PnC);
-            REQUIRE(std::holds_alternative<message_20::AuthorizationSetupResponse::PnC_ASResAuthorizationMode>(
-                res.authorization_mode));
-            const auto& auth_mode =
-                std::get<message_20::AuthorizationSetupResponse::PnC_ASResAuthorizationMode>(res.authorization_mode);
+            REQUIRE(res.authorization_services[0] == datatypes::Authorization::PnC);
+            REQUIRE(std::holds_alternative<datatypes::PnC_ASResAuthorizationMode>(res.authorization_mode));
+            const auto& auth_mode = std::get<datatypes::PnC_ASResAuthorizationMode>(res.authorization_mode);
             REQUIRE(auth_mode.gen_challenge.empty() == false);
-            REQUIRE(session.offered_services.auth_services[0] == message_20::Authorization::PnC);
+            REQUIRE(session.offered_services.auth_services[0] == datatypes::Authorization::PnC);
         }
     }
 
@@ -92,29 +91,27 @@ SCENARIO("Authorization setup state handling") {
         req.header.timestamp = 1691411798;
 
         const auto cert_install_service = true;
-        const std::vector<message_20::Authorization> authorization_services = {message_20::Authorization::PnC,
-                                                                               message_20::Authorization::EIM};
+        const std::vector<datatypes::Authorization> authorization_services = {datatypes::Authorization::PnC,
+                                                                              datatypes::Authorization::EIM};
 
         const auto res = d20::state::handle_request(req, session, cert_install_service, authorization_services);
 
         THEN("ResponseCode: Ok, cert_install = true, authorization_servie = EIM & PnC, authorization_mode = PnC_Mode") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
             REQUIRE(res.certificate_installation_service == true);
             REQUIRE(res.authorization_services.size() == 2);
-            REQUIRE((res.authorization_services[0] == message_20::Authorization::EIM ||
-                     res.authorization_services[0] == message_20::Authorization::PnC));
-            REQUIRE((res.authorization_services[1] == message_20::Authorization::EIM ||
-                     res.authorization_services[1] == message_20::Authorization::PnC));
-            REQUIRE(std::holds_alternative<message_20::AuthorizationSetupResponse::PnC_ASResAuthorizationMode>(
-                res.authorization_mode));
-            const auto& auth_mode =
-                std::get<message_20::AuthorizationSetupResponse::PnC_ASResAuthorizationMode>(res.authorization_mode);
+            REQUIRE((res.authorization_services[0] == datatypes::Authorization::EIM ||
+                     res.authorization_services[0] == datatypes::Authorization::PnC));
+            REQUIRE((res.authorization_services[1] == datatypes::Authorization::EIM ||
+                     res.authorization_services[1] == datatypes::Authorization::PnC));
+            REQUIRE(std::holds_alternative<datatypes::PnC_ASResAuthorizationMode>(res.authorization_mode));
+            const auto& auth_mode = std::get<datatypes::PnC_ASResAuthorizationMode>(res.authorization_mode);
             REQUIRE(auth_mode.gen_challenge.empty() == false);
 
-            REQUIRE((session.offered_services.auth_services[0] == message_20::Authorization::EIM ||
-                     session.offered_services.auth_services[0] == message_20::Authorization::PnC));
-            REQUIRE((session.offered_services.auth_services[1] == message_20::Authorization::EIM ||
-                     session.offered_services.auth_services[1] == message_20::Authorization::PnC));
+            REQUIRE((session.offered_services.auth_services[0] == datatypes::Authorization::EIM ||
+                     session.offered_services.auth_services[0] == datatypes::Authorization::PnC));
+            REQUIRE((session.offered_services.auth_services[1] == datatypes::Authorization::EIM ||
+                     session.offered_services.auth_services[1] == datatypes::Authorization::PnC));
         }
     }
 

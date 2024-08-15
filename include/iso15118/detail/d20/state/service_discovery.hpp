@@ -13,7 +13,7 @@ namespace iso15118::d20::state {
 
 message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDiscoveryRequest& req,
                                                     d20::Session& session,
-                                                    const std::vector<message_20::ServiceCategory>& energy_services,
-                                                    const std::vector<message_20::ServiceCategory>& vas_services);
+                                                    const std::vector<datatypes::ServiceCategory>& energy_services,
+                                                    const std::vector<datatypes::ServiceCategory>& vas_services);
 
 } // namespace iso15118::d20::state

@@ -10,13 +10,13 @@ namespace iso15118::message_20 {
 
 struct SessionSetupRequest {
     Header header;
-    std::string evccid;
+    datatypes::identifier_type evccid;
 };
 
 struct SessionSetupResponse {
     Header header;
-    ResponseCode response_code;
-    std::string evseid;
+    datatypes::ResponseCode response_code;
+    datatypes::identifier_type evseid;
 };
 
 } // namespace iso15118::message_20

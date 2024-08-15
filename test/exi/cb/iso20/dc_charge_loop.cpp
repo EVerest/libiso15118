@@ -27,14 +27,14 @@ SCENARIO("Se/Deserialize dc charge loop messages") {
             REQUIRE(header.session_id == std::array<uint8_t, 8>{0x3D, 0x4C, 0xBF, 0x93, 0x37, 0x4E, 0xD8, 0x9B});
             REQUIRE(header.timestamp == 1725456333);
             REQUIRE(msg.meter_info_requested == false);
-            REQUIRE(message_20::from_RationalNumber(msg.present_voltage) == 400);
+            REQUIRE(message_20::datatypes::from_RationalNumber(msg.present_voltage) == 400);
 
-            using ScheduledMode = message_20::DC_ChargeLoopRequest::Scheduled_DC_CLReqControlMode;
+            using ScheduledMode = message_20::datatypes::Scheduled_DC_CLReqControlMode;
 
             REQUIRE(std::holds_alternative<ScheduledMode>(msg.control_mode));
             const auto& control_mode = std::get<ScheduledMode>(msg.control_mode);
-            REQUIRE(message_20::from_RationalNumber(control_mode.target_current) == 20);
-            REQUIRE(message_20::from_RationalNumber(control_mode.target_voltage) == 400);
+            REQUIRE(message_20::datatypes::from_RationalNumber(control_mode.target_current) == 20);
+            REQUIRE(message_20::datatypes::from_RationalNumber(control_mode.target_voltage) == 400);
         }
     }
 
@@ -43,8 +43,8 @@ SCENARIO("Se/Deserialize dc charge loop messages") {
         message_20::DC_ChargeLoopResponse res;
 
         res.header = message_20::Header{{0x3D, 0x4C, 0xBF, 0x93, 0x37, 0x4E, 0xD8, 0x9B}, 1725456334};
-        res.response_code = message_20::ResponseCode::OK;
-        res.control_mode.emplace<message_20::DC_ChargeLoopResponse::Scheduled_DC_CLResControlMode>();
+        res.response_code = message_20::datatypes::ResponseCode::OK;
+        res.control_mode.emplace<message_20::datatypes::Scheduled_DC_CLResControlMode>();
         res.current_limit_achieved = true;
         res.power_limit_achieved = true;
         res.voltage_limit_achieved = true;

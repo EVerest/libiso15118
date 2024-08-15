@@ -6,6 +6,8 @@
 
 using namespace iso15118;
 
+namespace datatypes = message_20::datatypes;
+
 SCENARIO("Power delivery state handling") {
     GIVEN("Bad case - Unknown session") {
         d20::Session session = d20::Session();
@@ -14,13 +16,13 @@ SCENARIO("Power delivery state handling") {
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        req.processing = message_20::Processing::Ongoing;
-        req.charge_progress = message_20::PowerDeliveryRequest::Progress::Start;
+        req.processing = datatypes::Processing::Ongoing;
+        req.charge_progress = datatypes::Progress::Start;
 
         const auto res = d20::state::handle_request(req, d20::Session());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
-            REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
+            REQUIRE(res.response_code == datatypes::ResponseCode::FAILED_UnknownSession);
             REQUIRE(res.status.has_value() == false);
         }
     }
@@ -31,15 +33,15 @@ SCENARIO("Power delivery state handling") {
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        req.processing = message_20::Processing::Ongoing;
-        req.charge_progress = message_20::PowerDeliveryRequest::Progress::Standby;
+        req.processing = datatypes::Processing::Ongoing;
+        req.charge_progress = datatypes::Progress::Standby;
 
         const auto res = d20::state::handle_request(req, session);
 
         // Right now standby ist not supported
 
         THEN("ResponseCode: WARNING_StandbyNotAllowed, mandatory fields should be set") {
-            REQUIRE(res.response_code == message_20::ResponseCode::WARNING_StandbyNotAllowed);
+            REQUIRE(res.response_code == datatypes::ResponseCode::WARNING_StandbyNotAllowed);
             REQUIRE(res.status.has_value() == false);
         }
     }

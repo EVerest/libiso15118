@@ -9,14 +9,14 @@ namespace iso15118::message_20 {
 struct DC_WeldingDetectionRequest {
     Header header;
 
-    Processing processing;
+    datatypes::Processing processing;
 };
 
 struct DC_WeldingDetectionResponse {
     Header header;
-    ResponseCode response_code;
+    datatypes::ResponseCode response_code;
 
-    RationalNumber present_voltage;
+    datatypes::RationalNumber present_voltage;
 };
 
 } // namespace iso15118::message_20

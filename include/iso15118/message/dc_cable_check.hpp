@@ -12,12 +12,12 @@ struct DC_CableCheckRequest {
 
 struct DC_CableCheckResponse {
 
-    DC_CableCheckResponse() : processing(Processing::Ongoing){};
+    DC_CableCheckResponse() : processing(datatypes::Processing::Ongoing){};
 
     Header header;
-    ResponseCode response_code;
+    datatypes::ResponseCode response_code;
 
-    Processing processing;
+    datatypes::Processing processing;
 };
 
 } // namespace iso15118::message_20
