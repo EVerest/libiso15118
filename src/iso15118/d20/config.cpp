@@ -42,7 +42,7 @@ SessionConfig::SessionConfig(EvseSetupConfig config) :
     const auto dc_bpt_found = std::any_of(supported_energy_transfer_services.begin(),
                                           supported_energy_transfer_services.end(), is_bpt_service);
 
-    if (dc_bpt_found and std::holds_alternative<d20::DcChargeLimits>(dc_limits)) {
+    if (dc_bpt_found and not dc_limits.discharge_limits.has_value()) {
         logf_warning("The supported energy services contain DC_BPT, but dc limits does not contain BPT "
                      "limits. This can lead to session shutdowns.");
     }

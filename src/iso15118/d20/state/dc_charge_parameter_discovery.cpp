@@ -16,34 +16,39 @@ using BPT_DC_ModeReq = message_20::DC_ChargeParameterDiscoveryRequest::BPT_DC_CP
 using DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::DC_CPDResEnergyTransferMode;
 using BPT_DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::BPT_DC_CPDResEnergyTransferMode;
 
-template <typename In> void convert(DC_ModeRes& out, const In& in) {
-    out.max_charge_power = in.max_charge_power;
-    out.min_charge_power = in.min_charge_power;
-    out.max_charge_current = in.max_charge_current;
-    out.min_charge_current = in.min_charge_current;
-    out.max_voltage = in.max_voltage;
-    out.min_voltage = in.min_voltage;
+template <typename In, typename Out> void convert(Out& out, const In& in);
+
+template <> void convert(DC_ModeRes& out, const d20::DcTransferLimits& in) {
+    out.max_charge_power = in.charge_limits.power.max;
+    out.min_charge_power = in.charge_limits.power.min;
+    out.max_charge_current = in.charge_limits.current.max;
+    out.min_charge_current = in.charge_limits.current.min;
+    out.max_voltage = in.voltage.max;
+    out.min_voltage = in.voltage.min;
     out.power_ramp_limit = in.power_ramp_limit;
 }
 
-template <typename In> void convert(BPT_DC_ModeRes& out, const In& in) {
-    out.max_charge_power = in.max_charge_power;
-    out.min_charge_power = in.min_charge_power;
-    out.max_charge_current = in.max_charge_current;
-    out.min_charge_current = in.min_charge_current;
-    out.max_voltage = in.max_voltage;
-    out.min_voltage = in.min_voltage;
+template <> void convert(BPT_DC_ModeRes& out, const d20::DcTransferLimits& in) {
+    out.max_charge_power = in.charge_limits.power.max;
+    out.min_charge_power = in.charge_limits.power.min;
+    out.max_charge_current = in.charge_limits.current.max;
+    out.min_charge_current = in.charge_limits.current.min;
+    out.max_voltage = in.voltage.max;
+    out.min_voltage = in.voltage.min;
     out.power_ramp_limit = in.power_ramp_limit;
 
-    out.max_discharge_power = in.max_discharge_power;
-    out.min_discharge_power = in.min_discharge_power;
-    out.max_discharge_current = in.max_discharge_current;
-    out.min_discharge_current = in.min_discharge_current;
+    if (in.discharge_limits.has_value()) {
+        auto& discharge_limits = in.discharge_limits.value();
+        out.max_discharge_power = discharge_limits.power.max;
+        out.min_discharge_power = discharge_limits.power.min;
+        out.max_discharge_current = discharge_limits.current.max;
+        out.min_discharge_current = discharge_limits.current.min;
+    }
 }
 
 message_20::DC_ChargeParameterDiscoveryResponse
 handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const d20::Session& session,
-               const d20::DcLimits& dc_limits) {
+               const d20::DcTransferLimits& dc_limits) {
 
     message_20::DC_ChargeParameterDiscoveryResponse res;
 
@@ -57,25 +62,20 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
         }
 
         auto& mode = res.transfer_mode.emplace<DC_ModeRes>();
-
-        if (const auto dc_charge_limits = std::get_if<d20::DcChargeLimits>(&dc_limits)) {
-            convert(mode, *dc_charge_limits);
-        } else if (const auto dc_discharge_limits = std::get_if<d20::DcDischargeLimits>(&dc_limits)) {
-            convert(mode, *dc_discharge_limits);
-        }
+        convert(mode, dc_limits);
 
     } else if (std::holds_alternative<BPT_DC_ModeReq>(req.transfer_mode)) {
         if (session.get_selected_energy_service() != message_20::ServiceCategory::DC_BPT) {
             return response_with_code(res, message_20::ResponseCode::FAILED_WrongChargeParameter);
         }
 
-        if (std::holds_alternative<d20::DcChargeLimits>(dc_limits)) {
-            logf_error("Transfer mode is BPT, but only dc limits without discharge are provided!");
+        if (not dc_limits.discharge_limits.has_value()) {
+            logf_error("Transfer mode is BPT, but only dc limits without discharge limits are provided!");
             return response_with_code(res, message_20::ResponseCode::FAILED);
-        } else if (const auto dc_discharge_limits = std::get_if<d20::DcDischargeLimits>(&dc_limits)) {
-            auto& mode = res.transfer_mode.emplace<BPT_DC_ModeRes>();
-            convert(mode, *dc_discharge_limits);
         }
+
+        auto& mode = res.transfer_mode.emplace<BPT_DC_ModeRes>();
+        convert(mode, dc_limits);
 
     } else {
         // Not supported transfer_mode

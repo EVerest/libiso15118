@@ -17,14 +17,11 @@ SCENARIO("ISO15118-20 state transitions") {
     const std::vector<message_20::ServiceCategory> supported_energy_services = {message_20::ServiceCategory::DC};
     const auto cert_install{false};
     const std::vector<message_20::Authorization> auth_services = {message_20::Authorization::EIM};
-    const d20::DcChargeLimits dc_charge_limits;
+    const d20::DcTransferLimits dc_limits;
 
-    const d20::EvseSetupConfig evse_setup{evse_id, supported_energy_services, auth_services, cert_install,
-                                          dc_charge_limits};
+    const d20::EvseSetupConfig evse_setup{evse_id, supported_energy_services, auth_services, cert_install, dc_limits};
 
-    const auto session_config = d20::SessionConfig(evse_setup);
-
-    auto state_helper = FsmStateHelper(session_config);
+    auto state_helper = FsmStateHelper(d20::SessionConfig(evse_setup));
 
     d20::state::SupportedAppProtocol state(state_helper.get_context());
 

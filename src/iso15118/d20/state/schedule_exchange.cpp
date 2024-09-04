@@ -82,12 +82,7 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
 
         if (selected_energy_service == message_20::ServiceCategory::DC or
             selected_energy_service == message_20::ServiceCategory::DC_BPT) {
-            if (const auto dc_charge_limits = std::get_if<d20::DcChargeLimits>(&ctx.session_config.dc_limits)) {
-                max_charge_power = dc_charge_limits->max_charge_power;
-            } else if (const auto dc_discharge_limits =
-                           std::get_if<d20::DcDischargeLimits>(&ctx.session_config.dc_limits)) {
-                max_charge_power = dc_discharge_limits->max_charge_power;
-            }
+            max_charge_power = ctx.session_config.dc_limits.charge_limits.power.max;
         }
 
         const auto res = handle_request(*req, ctx.session, max_charge_power);

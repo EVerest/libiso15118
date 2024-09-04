@@ -80,18 +80,12 @@ void TbdController::update_authorization_services(const std::vector<message_20::
     evse_setup.authorization_services = services;
 }
 
-void TbdController::update_dc_limits(const d20::DcLimits& limits) {
+void TbdController::update_dc_limits(const d20::DcTransferLimits& limits) {
 
     evse_setup.dc_limits = limits;
 
     if (session) {
-        if (std::holds_alternative<d20::DcChargeLimits>(limits)) {
-            const auto dc_limits = std::get<d20::DcChargeLimits>(limits);
-            session->push_control_event(dc_limits);
-        } else if (std::holds_alternative<d20::DcDischargeLimits>(limits)) {
-            const auto dc_discharge_limits = std::get<d20::DcDischargeLimits>(limits);
-            session->push_control_event(dc_discharge_limits);
-        }
+        session->push_control_event(limits);
     }
 }
 

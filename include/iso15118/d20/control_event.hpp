@@ -51,7 +51,7 @@ private:
     bool stop;
 };
 
-using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse, StopCharging,
-                                  DcChargeLimits, DcDischargeLimits>;
+using ControlEvent =
+    std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse, StopCharging, DcTransferLimits>;
 
 } // namespace iso15118::d20

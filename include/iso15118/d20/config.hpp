@@ -16,7 +16,7 @@ struct EvseSetupConfig {
     std::vector<message_20::ServiceCategory> supported_energy_services;
     std::vector<message_20::Authorization> authorization_services;
     bool enable_certificate_install_service;
-    d20::DcLimits dc_limits;
+    d20::DcTransferLimits dc_limits;
 };
 
 struct SessionConfig {
@@ -36,7 +36,7 @@ struct SessionConfig {
     std::vector<message_20::InternetParameterList> internet_parameter_list;
     std::vector<message_20::ParkingParameterList> parking_parameter_list;
 
-    DcLimits dc_limits;
+    DcTransferLimits dc_limits;
 };
 
 } // namespace iso15118::d20

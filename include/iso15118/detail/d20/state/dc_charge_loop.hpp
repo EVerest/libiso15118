@@ -15,6 +15,6 @@ namespace iso15118::d20::state {
 
 std::tuple<message_20::DC_ChargeLoopResponse, std::optional<session::feedback::DcChargeTarget>>
 handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& session, const float present_voltage,
-               const float present_current, const bool stop, const DcLimits& dc_limits);
+               const float present_current, const bool stop, const DcTransferLimits& dc_limits);
 
 } // namespace iso15118::d20::state

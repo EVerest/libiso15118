@@ -18,10 +18,9 @@ SCENARIO("DC charge parameter discovery state handling") {
     const std::vector<message_20::ServiceCategory> supported_energy_services = {message_20::ServiceCategory::DC};
     const auto cert_install{false};
     const std::vector<message_20::Authorization> auth_services = {message_20::Authorization::EIM};
-    const d20::DcChargeLimits dc_charge_limits;
+    const d20::DcTransferLimits dc_limits;
 
-    const d20::EvseSetupConfig evse_setup{evse_id, supported_energy_services, auth_services, cert_install,
-                                          dc_charge_limits};
+    const d20::EvseSetupConfig evse_setup{evse_id, supported_energy_services, auth_services, cert_install, dc_limits};
 
     GIVEN("Bad Case - Unknown session") {
 
@@ -161,14 +160,10 @@ SCENARIO("DC charge parameter discovery state handling") {
 
         d20::Session session = d20::Session(service_parameters);
 
-        d20::DcChargeLimits dc_limits = {
-            {22, 3},  // max_charge_power
-            {0, 0},   // min_charge_power
-            {25, 0},  // max_charge_current
-            {0, 0},   // min_charge_current
-            {900, 0}, // max_voltage
-            {0, 0},   // min_voltage
-        };
+        d20::DcTransferLimits dc_limits;
+        dc_limits.charge_limits.power.max = {22, 3};
+        dc_limits.charge_limits.current.max = {25, 0};
+        dc_limits.voltage.max = {900, 0};
         message_20::RationalNumber power_ramp_limit = {20, 0};
         dc_limits.power_ramp_limit.emplace<>(power_ramp_limit);
 
@@ -218,20 +213,14 @@ SCENARIO("DC charge parameter discovery state handling") {
 
         d20::Session session = d20::Session(service_parameters);
 
-        const d20::DcDischargeLimits dc_limits = {
-            {
-                {22, 3},  // max_charge_power
-                {0, 0},   // min_charge_power
-                {25, 0},  // max_charge_current
-                {0, 0},   // min_charge_current
-                {900, 0}, // max_voltage
-                {0, 0},   // min_voltage
-            },
-            {11, 3}, // max_discharge_power
-            {0, 0},  // min_discharge_power
-            {25, 0}, // max_discharge_current
-            {0, 0},  // min_discharge_current
-        };
+        d20::DcTransferLimits dc_limits;
+        dc_limits.charge_limits.power.max = {22, 3};
+        dc_limits.charge_limits.current.max = {25, 0};
+        dc_limits.voltage.max = {900, 0};
+
+        auto& discharge_limits = dc_limits.discharge_limits.emplace();
+        discharge_limits.power.max = {11, 3};
+        discharge_limits.current.max = {25, 0};
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -288,14 +277,10 @@ SCENARIO("DC charge parameter discovery state handling") {
 
         d20::Session session = d20::Session(service_parameters);
 
-        const d20::DcChargeLimits dc_limits = {
-            {22, 3},  // max_charge_power
-            {0, 0},   // min_charge_power
-            {25, 0},  // max_charge_current
-            {0, 0},   // min_charge_current
-            {900, 0}, // max_voltage
-            {0, 0},   // min_voltage
-        };
+        d20::DcTransferLimits dc_limits;
+        dc_limits.charge_limits.power.max = {22, 3};
+        dc_limits.charge_limits.current.max = {25, 0};
+        dc_limits.voltage.max = {900, 0};
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
