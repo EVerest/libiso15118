@@ -40,4 +40,9 @@ ninja -C build
 
 # Running tests
 ninja -C build test
+
+# Generating a code coverage (BUILD_TESTING should be enabled)
+ninja -C build iso15118_gcovr_coverage
 ```
+
+The coverage report will be available in the index.html file in the `build/iso15118_gcovr_coverage` directory.
