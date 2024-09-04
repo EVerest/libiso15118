@@ -20,7 +20,7 @@ struct EvseSetupConfig {
 };
 
 struct SessionConfig {
-    explicit SessionConfig(const EvseSetupConfig&);
+    explicit SessionConfig(EvseSetupConfig);
 
     std::string evse_id;
 

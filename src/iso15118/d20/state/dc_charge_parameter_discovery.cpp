@@ -16,7 +16,7 @@ using BPT_DC_ModeReq = message_20::DC_ChargeParameterDiscoveryRequest::BPT_DC_CP
 using DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::DC_CPDResEnergyTransferMode;
 using BPT_DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::BPT_DC_CPDResEnergyTransferMode;
 
-template <typename In> void fill_transfer_mode(const In& in, DC_ModeRes& out) {
+template <typename In> void convert(DC_ModeRes& out, const In& in) {
     out.max_charge_power = in.max_charge_power;
     out.min_charge_power = in.min_charge_power;
     out.max_charge_current = in.max_charge_current;
@@ -26,7 +26,7 @@ template <typename In> void fill_transfer_mode(const In& in, DC_ModeRes& out) {
     out.power_ramp_limit = in.power_ramp_limit;
 }
 
-template <typename In> void fill_transfer_mode(const In& in, BPT_DC_ModeRes& out) {
+template <typename In> void convert(BPT_DC_ModeRes& out, const In& in) {
     out.max_charge_power = in.max_charge_power;
     out.min_charge_power = in.min_charge_power;
     out.max_charge_current = in.max_charge_current;
@@ -59,9 +59,9 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
         auto& mode = res.transfer_mode.emplace<DC_ModeRes>();
 
         if (const auto dc_charge_limits = std::get_if<d20::DcChargeLimits>(&dc_limits)) {
-            fill_transfer_mode(*dc_charge_limits, mode);
+            convert(mode, *dc_charge_limits);
         } else if (const auto dc_discharge_limits = std::get_if<d20::DcDischargeLimits>(&dc_limits)) {
-            fill_transfer_mode(*dc_discharge_limits, mode);
+            convert(mode, *dc_discharge_limits);
         }
 
     } else if (std::holds_alternative<BPT_DC_ModeReq>(req.transfer_mode)) {
@@ -74,7 +74,7 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
             return response_with_code(res, message_20::ResponseCode::FAILED);
         } else if (const auto dc_discharge_limits = std::get_if<d20::DcDischargeLimits>(&dc_limits)) {
             auto& mode = res.transfer_mode.emplace<BPT_DC_ModeRes>();
-            fill_transfer_mode(*dc_discharge_limits, mode);
+            convert(mode, *dc_discharge_limits);
         }
 
     } else {

@@ -18,14 +18,14 @@ using Dynamic_BPT_DC_Req = message_20::DC_ChargeLoopRequest::BPT_Dynamic_DC_CLRe
 using Scheduled_DC_Res = message_20::DC_ChargeLoopResponse::Scheduled_DC_CLResControlMode;
 using Scheduled_BPT_DC_Res = message_20::DC_ChargeLoopResponse::BPT_Scheduled_DC_CLResControlMode;
 
-template <typename In> void fill_control_mode(const In& in, Scheduled_DC_Res& out) {
+template <typename In> void convert(Scheduled_DC_Res& out, const In& in) {
     out.max_charge_power = in.max_charge_power;
     out.min_charge_power = in.min_charge_power;
     out.max_charge_current = in.max_charge_current;
     out.max_voltage = in.max_voltage;
 }
 
-template <typename In> void fill_control_mode(const In& in, Scheduled_BPT_DC_Res& out) {
+template <typename In> void convert(Scheduled_BPT_DC_Res& out, const In& in) {
     out.max_charge_power = in.max_charge_power;
     out.min_charge_power = in.min_charge_power;
     out.max_charge_current = in.max_charge_current;
@@ -81,9 +81,9 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
         auto& mode = res.control_mode.emplace<Scheduled_DC_Res>();
 
         if (const auto dc_charge_limits = std::get_if<d20::DcChargeLimits>(&dc_limits)) {
-            fill_control_mode(*dc_charge_limits, mode);
+            convert(mode, *dc_charge_limits);
         } else if (const auto dc_discharge_limits = std::get_if<d20::DcDischargeLimits>(&dc_limits)) {
-            fill_control_mode(*dc_discharge_limits, mode);
+            convert(mode, *dc_discharge_limits);
         }
 
     } else if (std::holds_alternative<Scheduled_BPT_DC_Req>(req.control_mode)) {
@@ -97,7 +97,7 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
             return {response_with_code(res, message_20::ResponseCode::FAILED), charge_target};
         } else if (const auto dc_discharge_limits = std::get_if<d20::DcDischargeLimits>(&dc_limits)) {
             auto& mode = res.control_mode.emplace<Scheduled_BPT_DC_Res>();
-            fill_control_mode(*dc_discharge_limits, mode);
+            convert(mode, *dc_discharge_limits);
         }
 
         const auto& req_mode = std::get<Scheduled_BPT_DC_Req>(req.control_mode);
