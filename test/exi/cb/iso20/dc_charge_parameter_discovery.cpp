@@ -55,7 +55,7 @@ SCENARIO("Se/Deserialize dc charge parameter discovery messages") {
         mode.max_charge_current = {2000, -1};
         mode.max_charge_power = {2208, 1};
         mode.max_voltage = {9000, -1};
-        mode.min_charge_current= {1000, -3};
+        mode.min_charge_current = {1000, -3};
         mode.min_charge_power = {2000, -1};
         mode.min_voltage = {2000, -1};
 

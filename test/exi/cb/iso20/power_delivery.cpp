@@ -34,7 +34,7 @@ SCENARIO("Se/Deserialize power delivery messages") {
             REQUIRE(power_profile.time_anchor == 0);
             REQUIRE(power_profile.entries[0].duration == 23);
             REQUIRE(message_20::from_RationalNumber(power_profile.entries[0].power) == 1000);
-            
+
             REQUIRE(std::holds_alternative<message_20::PowerDeliveryRequest::Scheduled_EVPPTControlMode>(
                 power_profile.control_mode));
             const auto& mode =
