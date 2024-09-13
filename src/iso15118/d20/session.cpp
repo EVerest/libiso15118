@@ -37,31 +37,31 @@ Session::Session(OfferedServices services_) : offered_services(services_) {
 
 Session::~Session() = default;
 
-bool Session::find_parameter_set_id(const message_20::ServiceCategory service, int16_t id) {
+bool Session::find_parameter_set_id(const datatypes::ServiceCategory service, int16_t id) {
 
     switch (service) {
-    case message_20::ServiceCategory::DC:
+    case datatypes::ServiceCategory::DC:
 
         if (this->offered_services.dc_parameter_list.find(id) != this->offered_services.dc_parameter_list.end()) {
             return true;
         }
         break;
 
-    case message_20::ServiceCategory::DC_BPT:
+    case datatypes::ServiceCategory::DC_BPT:
         if (this->offered_services.dc_bpt_parameter_list.find(id) !=
             this->offered_services.dc_bpt_parameter_list.end()) {
             return true;
         }
         break;
 
-    case message_20::ServiceCategory::Internet:
+    case datatypes::ServiceCategory::Internet:
         if (this->offered_services.internet_parameter_list.find(id) !=
             this->offered_services.internet_parameter_list.end()) {
             return true;
         }
         break;
 
-    case message_20::ServiceCategory::ParkingStatus:
+    case datatypes::ServiceCategory::ParkingStatus:
         if (this->offered_services.parking_parameter_list.find(id) !=
             this->offered_services.parking_parameter_list.end()) {
             return true;
@@ -75,49 +75,49 @@ bool Session::find_parameter_set_id(const message_20::ServiceCategory service, i
     return false;
 }
 
-void Session::selected_service_parameters(const message_20::ServiceCategory service, const uint16_t id) {
+void Session::selected_service_parameters(const datatypes::ServiceCategory service, const uint16_t id) {
 
     switch (service) {
-    case message_20::ServiceCategory::DC:
+    case datatypes::ServiceCategory::DC:
 
         if (this->offered_services.dc_parameter_list.find(id) != this->offered_services.dc_parameter_list.end()) {
             auto& parameters = this->offered_services.dc_parameter_list.at(id);
             this->selected_services =
-                SelectedServiceParameters(message_20::ServiceCategory::DC, parameters.connector,
-                                          parameters.control_mode, parameters.mobility_needs_mode, parameters.pricing);
+                SelectedServiceParameters(datatypes::ServiceCategory::DC, parameters.connector, parameters.control_mode,
+                                          parameters.mobility_needs_mode, parameters.pricing);
         } else {
             // Todo(sl): Should be not the case -> Raise Error?
         }
         break;
 
-    case message_20::ServiceCategory::DC_BPT:
+    case datatypes::ServiceCategory::DC_BPT:
         if (this->offered_services.dc_bpt_parameter_list.find(id) !=
             this->offered_services.dc_bpt_parameter_list.end()) {
             auto& parameters = this->offered_services.dc_bpt_parameter_list.at(id);
             this->selected_services = SelectedServiceParameters(
-                message_20::ServiceCategory::DC_BPT, parameters.connector, parameters.control_mode,
+                datatypes::ServiceCategory::DC_BPT, parameters.connector, parameters.control_mode,
                 parameters.mobility_needs_mode, parameters.pricing, parameters.bpt_channel, parameters.generator_mode);
         } else {
             // Todo(sl): Should be not the case -> Raise Error?
         }
         break;
 
-    case message_20::ServiceCategory::Internet:
+    case datatypes::ServiceCategory::Internet:
 
         if (this->offered_services.internet_parameter_list.find(id) !=
             this->offered_services.internet_parameter_list.end()) {
-            this->selected_vas_services.vas_services.push_back(message_20::ServiceCategory::Internet);
+            this->selected_vas_services.vas_services.push_back(datatypes::ServiceCategory::Internet);
             auto& parameters = this->offered_services.internet_parameter_list.at(id);
             this->selected_vas_services.internet_port = parameters.port;
             this->selected_vas_services.internet_protocol = parameters.protocol;
         }
         break;
 
-    case message_20::ServiceCategory::ParkingStatus:
+    case datatypes::ServiceCategory::ParkingStatus:
 
         if (this->offered_services.parking_parameter_list.find(id) !=
             this->offered_services.parking_parameter_list.end()) {
-            this->selected_vas_services.vas_services.push_back(message_20::ServiceCategory::ParkingStatus);
+            this->selected_vas_services.vas_services.push_back(datatypes::ServiceCategory::ParkingStatus);
             auto& parameters = this->offered_services.parking_parameter_list.at(id);
             this->selected_vas_services.parking_intended_service = parameters.intended_service;
             this->selected_vas_services.parking_status = parameters.parking_status;

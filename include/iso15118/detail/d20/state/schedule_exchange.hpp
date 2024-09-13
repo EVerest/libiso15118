@@ -9,6 +9,6 @@ namespace iso15118::d20::state {
 
 message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleExchangeRequest& req,
                                                     const d20::Session& session,
-                                                    const message_20::RationalNumber& max_power);
+                                                    const datatypes::RationalNumber& max_power);
 
 } // namespace iso15118::d20::state

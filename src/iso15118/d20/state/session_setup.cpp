@@ -24,9 +24,9 @@ message_20::SessionSetupResponse handle_request(const message_20::SessionSetupRe
     res.evseid = evse_id;
 
     if (new_session) {
-        return response_with_code(res, message_20::ResponseCode::OK_NewSessionEstablished);
+        return response_with_code(res, datatypes::ResponseCode::OK_NewSessionEstablished);
     } else {
-        return response_with_code(res, message_20::ResponseCode::OK_OldSessionJoined);
+        return response_with_code(res, datatypes::ResponseCode::OK_OldSessionJoined);
     }
 }
 

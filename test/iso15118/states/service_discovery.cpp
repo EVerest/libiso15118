@@ -6,6 +6,8 @@
 
 using namespace iso15118;
 
+namespace datatypes = message_20::datatypes;
+
 SCENARIO("Service discovery state handling") {
 
     GIVEN("Bad Case - Unknown session") {
@@ -17,16 +19,16 @@ SCENARIO("Service discovery state handling") {
 
         session = d20::Session();
 
-        std::vector<message_20::ServiceCategory> energy_services = {message_20::ServiceCategory::DC};
+        std::vector<datatypes::ServiceCategory> energy_services = {datatypes::ServiceCategory::DC};
 
         const auto res = d20::state::handle_request(req, session, energy_services, {});
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
-            REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
+            REQUIRE(res.response_code == datatypes::ResponseCode::FAILED_UnknownSession);
             REQUIRE(res.service_renegotiation_supported == false);
             REQUIRE(res.energy_transfer_service_list.size() == 1);
             REQUIRE(res.energy_transfer_service_list[0].free_service == false);
-            REQUIRE(res.energy_transfer_service_list[0].service_id == message_20::ServiceCategory::AC);
+            REQUIRE(res.energy_transfer_service_list[0].service_id == datatypes::ServiceCategory::AC);
             REQUIRE(res.vas_list.has_value() == false);
         }
     }
@@ -39,21 +41,21 @@ SCENARIO("Service discovery state handling") {
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        std::vector<message_20::ServiceCategory> supported_energy_transfer_services = {
-            message_20::ServiceCategory::DC, message_20::ServiceCategory::DC_BPT};
+        std::vector<datatypes::ServiceCategory> supported_energy_transfer_services = {
+            datatypes::ServiceCategory::DC, datatypes::ServiceCategory::DC_BPT};
 
         const auto res = d20::state::handle_request(req, session, supported_energy_transfer_services, {});
 
         THEN("ResponseCode: OK, energy_transfer_service_list: DC & DC_WPT, vaslist: empty") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
             REQUIRE(res.service_renegotiation_supported == false);
             REQUIRE(res.energy_transfer_service_list.size() == 2);
             REQUIRE(res.energy_transfer_service_list[0].free_service == false);
-            REQUIRE((res.energy_transfer_service_list[0].service_id == message_20::ServiceCategory::DC ||
-                     res.energy_transfer_service_list[0].service_id == message_20::ServiceCategory::DC_BPT));
+            REQUIRE((res.energy_transfer_service_list[0].service_id == datatypes::ServiceCategory::DC ||
+                     res.energy_transfer_service_list[0].service_id == datatypes::ServiceCategory::DC_BPT));
             REQUIRE(res.energy_transfer_service_list[1].free_service == false);
-            REQUIRE((res.energy_transfer_service_list[1].service_id == message_20::ServiceCategory::DC ||
-                     res.energy_transfer_service_list[1].service_id == message_20::ServiceCategory::DC_BPT));
+            REQUIRE((res.energy_transfer_service_list[1].service_id == datatypes::ServiceCategory::DC ||
+                     res.energy_transfer_service_list[1].service_id == datatypes::ServiceCategory::DC_BPT));
             REQUIRE(res.vas_list.has_value() == false);
         }
     }
@@ -66,26 +68,26 @@ SCENARIO("Service discovery state handling") {
         req.header.session_id = session.get_id();
         req.header.timestamp = 1691411798;
 
-        std::vector<message_20::ServiceCategory> supported_energy_transfer_services = {
-            message_20::ServiceCategory::DC, message_20::ServiceCategory::DC_BPT};
-        std::vector<message_20::ServiceCategory> supported_vas_services = {message_20::ServiceCategory::ParkingStatus};
+        std::vector<datatypes::ServiceCategory> supported_energy_transfer_services = {
+            datatypes::ServiceCategory::DC, datatypes::ServiceCategory::DC_BPT};
+        std::vector<datatypes::ServiceCategory> supported_vas_services = {datatypes::ServiceCategory::ParkingStatus};
 
         const auto res =
             d20::state::handle_request(req, session, supported_energy_transfer_services, supported_vas_services);
 
         THEN("ResponseCode: OK, energy_transfer_service_list: DC & DC_BPT, vaslist: ParkingStatus") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
             REQUIRE(res.service_renegotiation_supported == false);
             REQUIRE(res.energy_transfer_service_list.size() == 2);
             REQUIRE(res.energy_transfer_service_list[0].free_service == false);
-            REQUIRE((res.energy_transfer_service_list[0].service_id == message_20::ServiceCategory::DC ||
-                     res.energy_transfer_service_list[0].service_id == message_20::ServiceCategory::DC_BPT));
+            REQUIRE((res.energy_transfer_service_list[0].service_id == datatypes::ServiceCategory::DC ||
+                     res.energy_transfer_service_list[0].service_id == datatypes::ServiceCategory::DC_BPT));
             REQUIRE(res.energy_transfer_service_list[1].free_service == false);
-            REQUIRE((res.energy_transfer_service_list[1].service_id == message_20::ServiceCategory::DC ||
-                     res.energy_transfer_service_list[1].service_id == message_20::ServiceCategory::DC_BPT));
+            REQUIRE((res.energy_transfer_service_list[1].service_id == datatypes::ServiceCategory::DC ||
+                     res.energy_transfer_service_list[1].service_id == datatypes::ServiceCategory::DC_BPT));
             REQUIRE(res.vas_list.has_value() == true);
             REQUIRE(res.vas_list.value()[0].free_service == false);
-            REQUIRE(res.vas_list.value()[0].service_id == message_20::ServiceCategory::ParkingStatus);
+            REQUIRE(res.vas_list.value()[0].service_id == datatypes::ServiceCategory::ParkingStatus);
         }
     }
 
@@ -101,19 +103,19 @@ SCENARIO("Service discovery state handling") {
         supported_service_ids.push_back(2);
         supported_service_ids.push_back(65);
 
-        std::vector<message_20::ServiceCategory> supported_energy_transfer_services = {
-            message_20::ServiceCategory::DC, message_20::ServiceCategory::DC_BPT};
-        std::vector<message_20::ServiceCategory> supported_vas_services = {message_20::ServiceCategory::ParkingStatus};
+        std::vector<datatypes::ServiceCategory> supported_energy_transfer_services = {
+            datatypes::ServiceCategory::DC, datatypes::ServiceCategory::DC_BPT};
+        std::vector<datatypes::ServiceCategory> supported_vas_services = {datatypes::ServiceCategory::ParkingStatus};
 
         const auto res =
             d20::state::handle_request(req, session, supported_energy_transfer_services, supported_vas_services);
 
         THEN("ResponseCode: OK, energy_transfer_service_list: DC, vaslist: empty") {
-            REQUIRE(res.response_code == message_20::ResponseCode::OK);
+            REQUIRE(res.response_code == datatypes::ResponseCode::OK);
             REQUIRE(res.service_renegotiation_supported == false);
             REQUIRE(res.energy_transfer_service_list.size() == 1);
             REQUIRE(res.energy_transfer_service_list[0].free_service == false);
-            REQUIRE(res.energy_transfer_service_list[0].service_id == message_20::ServiceCategory::DC);
+            REQUIRE(res.energy_transfer_service_list[0].service_id == datatypes::ServiceCategory::DC);
             REQUIRE(res.vas_list.has_value() == false);
         }
     }

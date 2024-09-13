@@ -8,25 +8,25 @@
 
 namespace iso15118::d20 {
 
-static std::vector<message_20::DcParameterList> get_default_dc_parameter_list() {
+static std::vector<message_20::datatypes::DcParameterList> get_default_dc_parameter_list() {
     return {{
-        message_20::DcConnector::Extended,
-        message_20::ControlMode::Scheduled,
-        message_20::MobilityNeedsMode::ProvidedByEvcc,
-        message_20::Pricing::NoPricing,
+        message_20::datatypes::DcConnector::Extended,
+        message_20::datatypes::ControlMode::Scheduled,
+        message_20::datatypes::MobilityNeedsMode::ProvidedByEvcc,
+        message_20::datatypes::Pricing::NoPricing,
     }};
 }
 
-static std::vector<message_20::DcBptParameterList> get_default_dc_bpt_parameter_list() {
+static std::vector<message_20::datatypes::DcBptParameterList> get_default_dc_bpt_parameter_list() {
 
     return {{{
-                 message_20::DcConnector::Extended,
-                 message_20::ControlMode::Scheduled,
-                 message_20::MobilityNeedsMode::ProvidedByEvcc,
-                 message_20::Pricing::NoPricing,
+                 message_20::datatypes::DcConnector::Extended,
+                 message_20::datatypes::ControlMode::Scheduled,
+                 message_20::datatypes::MobilityNeedsMode::ProvidedByEvcc,
+                 message_20::datatypes::Pricing::NoPricing,
              },
-             message_20::BptChannel::Unified,
-             message_20::GeneratorMode::GridFollowing}};
+             message_20::datatypes::BptChannel::Unified,
+             message_20::datatypes::GeneratorMode::GridFollowing}};
 }
 
 SessionConfig::SessionConfig(EvseSetupConfig config) :
@@ -36,8 +36,8 @@ SessionConfig::SessionConfig(EvseSetupConfig config) :
     authorization_services(std::move(config.authorization_services)),
     dc_limits(std::move(config.dc_limits)) {
 
-    const auto is_bpt_service = [](message_20::ServiceCategory service) {
-        return service == message_20::ServiceCategory::DC_BPT;
+    const auto is_bpt_service = [](message_20::datatypes::ServiceCategory service) {
+        return service == message_20::datatypes::ServiceCategory::DC_BPT;
     };
     const auto dc_bpt_found = std::any_of(supported_energy_transfer_services.begin(),
                                           supported_energy_transfer_services.end(), is_bpt_service);

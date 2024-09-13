@@ -17,15 +17,15 @@ message_20::PowerDeliveryResponse handle_request(const message_20::PowerDelivery
     message_20::PowerDeliveryResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
+        return response_with_code(res, datatypes::ResponseCode::FAILED_UnknownSession);
     }
 
     // Todo(sl): Add standby feature and define as everest module config
-    if (req.charge_progress == message_20::PowerDeliveryRequest::Progress::Standby) {
-        return response_with_code(res, message_20::ResponseCode::WARNING_StandbyNotAllowed);
+    if (req.charge_progress == datatypes::Progress::Standby) {
+        return response_with_code(res, datatypes::ResponseCode::WARNING_StandbyNotAllowed);
     }
 
-    return response_with_code(res, message_20::ResponseCode::OK);
+    return response_with_code(res, datatypes::ResponseCode::OK);
 }
 
 void PowerDelivery::enter() {
@@ -60,14 +60,14 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
 
         ctx.respond(res);
 
-        if (res.response_code >= message_20::ResponseCode::FAILED) {
+        if (res.response_code >= datatypes::ResponseCode::FAILED) {
             ctx.session_stopped = true;
             return sa.PASS_ON;
         }
 
         return sa.HANDLED_INTERNALLY;
     } else if (const auto req = variant->get_if<message_20::PowerDeliveryRequest>()) {
-        if (req->charge_progress == message_20::PowerDeliveryRequest::Progress::Start) {
+        if (req->charge_progress == datatypes::Progress::Start) {
             ctx.feedback.signal(session::feedback::Signal::SETUP_FINISHED);
         }
 
@@ -75,7 +75,7 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
 
         ctx.respond(res);
 
-        if (res.response_code >= message_20::ResponseCode::FAILED) {
+        if (res.response_code >= datatypes::ResponseCode::FAILED) {
             ctx.session_stopped = true;
             return sa.PASS_ON;
         }

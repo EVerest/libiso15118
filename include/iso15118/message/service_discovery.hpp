@@ -5,29 +5,37 @@
 #include <optional>
 #include <vector>
 
-#include "common.hpp"
+#include "msg_data_types.hpp"
 
 namespace iso15118::message_20 {
 
+namespace datatypes {
+using service_id_list_type = std::vector<std::uint16_t>; //
+
+struct Service {
+    ServiceCategory service_id;
+    bool free_service;
+};
+using service_list_type = std::vector<Service>; // max: 8
+
+} // namespace datatypes
+
 struct ServiceDiscoveryRequest {
     Header header;
-    std::optional<std::vector<uint16_t>> supported_service_ids;
+    std::optional<datatypes::service_id_list_type> supported_service_ids;
 };
 
 struct ServiceDiscoveryResponse {
-    struct Service {
-        ServiceCategory service_id;
-        bool free_service;
-    };
 
     Header header;
-    ResponseCode response_code;
+    datatypes::ResponseCode response_code;
     bool service_renegotiation_supported = false;
-    std::vector<Service> energy_transfer_service_list = {{
-        ServiceCategory::AC, // service_id
-        false                // free_service
+    // FIXME(sl): Adding constructor
+    datatypes::service_list_type energy_transfer_service_list = {{
+        datatypes::ServiceCategory::AC, // service_id
+        false                           // free_service
     }};
-    std::optional<std::vector<Service>> vas_list;
+    std::optional<datatypes::service_list_type> vas_list;
 };
 
 } // namespace iso15118::message_20

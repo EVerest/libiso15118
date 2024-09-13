@@ -10,13 +10,13 @@
 
 namespace iso15118::d20::state {
 
-using Scheduled_DC_Req = message_20::DC_ChargeLoopRequest::Scheduled_DC_CLReqControlMode;
-using Scheduled_BPT_DC_Req = message_20::DC_ChargeLoopRequest::BPT_Scheduled_DC_CLReqControlMode;
-using Dynamic_DC_Req = message_20::DC_ChargeLoopRequest::Dynamic_DC_CLReqControlMode;
-using Dynamic_BPT_DC_Req = message_20::DC_ChargeLoopRequest::BPT_Dynamic_DC_CLReqControlMode;
+using Scheduled_DC_Req = datatypes::Scheduled_DC_CLReqControlMode;
+using Scheduled_BPT_DC_Req = datatypes::BPT_Scheduled_DC_CLReqControlMode;
+using Dynamic_DC_Req = datatypes::Dynamic_DC_CLReqControlMode;
+using Dynamic_BPT_DC_Req = datatypes::BPT_Dynamic_DC_CLReqControlMode;
 
-using Scheduled_DC_Res = message_20::DC_ChargeLoopResponse::Scheduled_DC_CLResControlMode;
-using Scheduled_BPT_DC_Res = message_20::DC_ChargeLoopResponse::BPT_Scheduled_DC_CLResControlMode;
+using Scheduled_DC_Res = datatypes::Scheduled_DC_CLResControlMode;
+using Scheduled_BPT_DC_Res = datatypes::BPT_Scheduled_DC_CLResControlMode;
 
 template <typename In, typename Out> void convert(Out& out, const In& in);
 
@@ -42,7 +42,7 @@ template <> void convert(Scheduled_BPT_DC_Res& out, const d20::DcTransferLimits&
     }
 }
 
-static auto fill_parameters(const message_20::DisplayParameters& req_parameters) {
+static auto fill_parameters(const datatypes::DisplayParameters& req_parameters) {
     auto parameters = session::feedback::DisplayParameters{};
 
     parameters.present_soc = req_parameters.present_soc;
@@ -53,7 +53,7 @@ static auto fill_parameters(const message_20::DisplayParameters& req_parameters)
     parameters.remaining_time_to_target_soc = req_parameters.remaining_time_to_target_soc;
     parameters.remaining_time_to_maximum_soc = req_parameters.remaining_time_to_max_soc;
     if (req_parameters.battery_energy_capacity) {
-        parameters.battery_energy_capacity = message_20::from_RationalNumber(*req_parameters.battery_energy_capacity);
+        parameters.battery_energy_capacity = datatypes::from_RationalNumber(*req_parameters.battery_energy_capacity);
     }
     parameters.inlet_hot = req_parameters.inlet_hot;
 
@@ -68,20 +68,20 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
     std::optional<session::feedback::DcChargeTarget> charge_target{std::nullopt};
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return {response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession), charge_target};
+        return {response_with_code(res, datatypes::ResponseCode::FAILED_UnknownSession), charge_target};
     }
 
     if (std::holds_alternative<Scheduled_DC_Req>(req.control_mode)) {
 
-        if (session.get_selected_energy_service() != message_20::ServiceCategory::DC) {
-            return {response_with_code(res, message_20::ResponseCode::FAILED), charge_target};
+        if (session.get_selected_energy_service() != datatypes::ServiceCategory::DC) {
+            return {response_with_code(res, datatypes::ResponseCode::FAILED), charge_target};
         }
 
         const auto& req_mode = std::get<Scheduled_DC_Req>(req.control_mode);
 
         charge_target = {
-            message_20::from_RationalNumber(req_mode.target_voltage),
-            message_20::from_RationalNumber(req_mode.target_current),
+            datatypes::from_RationalNumber(req_mode.target_voltage),
+            datatypes::from_RationalNumber(req_mode.target_current),
         };
 
         auto& mode = res.control_mode.emplace<Scheduled_DC_Res>();
@@ -89,13 +89,13 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
 
     } else if (std::holds_alternative<Scheduled_BPT_DC_Req>(req.control_mode)) {
 
-        if (session.get_selected_energy_service() != message_20::ServiceCategory::DC_BPT) {
-            return {response_with_code(res, message_20::ResponseCode::FAILED), charge_target};
+        if (session.get_selected_energy_service() != datatypes::ServiceCategory::DC_BPT) {
+            return {response_with_code(res, datatypes::ResponseCode::FAILED), charge_target};
         }
 
         if (not dc_limits.discharge_limits.has_value()) {
             logf_error("Transfer mode is BPT, but only dc limits without discharge limits are provided!");
-            return {response_with_code(res, message_20::ResponseCode::FAILED), charge_target};
+            return {response_with_code(res, datatypes::ResponseCode::FAILED), charge_target};
         }
 
         auto& mode = res.control_mode.emplace<Scheduled_BPT_DC_Res>();
@@ -104,19 +104,19 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
         const auto& req_mode = std::get<Scheduled_BPT_DC_Req>(req.control_mode);
 
         charge_target = {
-            message_20::from_RationalNumber(req_mode.target_voltage),
-            message_20::from_RationalNumber(req_mode.target_current),
+            datatypes::from_RationalNumber(req_mode.target_voltage),
+            datatypes::from_RationalNumber(req_mode.target_current),
         };
     }
 
-    res.present_voltage = iso15118::message_20::from_float(present_voltage);
-    res.present_current = iso15118::message_20::from_float(present_current);
+    res.present_voltage = datatypes::from_float(present_voltage);
+    res.present_current = datatypes::from_float(present_current);
 
     if (stop) {
-        res.status = {0, iso15118::message_20::EvseNotification::Terminate};
+        res.status = {0, datatypes::EvseNotification::Terminate};
     }
 
-    return {response_with_code(res, message_20::ResponseCode::OK), charge_target};
+    return {response_with_code(res, datatypes::ResponseCode::OK), charge_target};
 }
 
 void DC_ChargeLoop::enter() {
@@ -149,7 +149,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
 
         ctx.respond(res);
 
-        if (res.response_code >= message_20::ResponseCode::FAILED) {
+        if (res.response_code >= datatypes::ResponseCode::FAILED) {
             ctx.session_stopped = true;
             return sa.PASS_ON;
         }
@@ -158,7 +158,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
         first_entry_in_charge_loop = true;
 
         // Todo(sl): React properly to Start, Stop, Standby and ScheduleRenegotiation
-        if (req->charge_progress == message_20::PowerDeliveryRequest::Progress::Stop) {
+        if (req->charge_progress == datatypes::Progress::Stop) {
             ctx.feedback.signal(session::feedback::Signal::CHARGE_LOOP_FINISHED);
             ctx.feedback.signal(session::feedback::Signal::DC_OPEN_CONTACTOR);
             return sa.create_simple<DC_WeldingDetection>(ctx);
@@ -186,7 +186,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
             ctx.feedback.display_parameters(feedback_parameters);
         }
 
-        if (res.response_code >= message_20::ResponseCode::FAILED) {
+        if (res.response_code >= datatypes::ResponseCode::FAILED) {
             ctx.session_stopped = true;
             return sa.PASS_ON;
         }

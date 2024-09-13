@@ -19,13 +19,13 @@ static bool find_service_id(const std::vector<uint16_t>& req_service_ids, const 
 
 message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDiscoveryRequest& req,
                                                     d20::Session& session,
-                                                    const std::vector<message_20::ServiceCategory>& energy_services,
-                                                    const std::vector<message_20::ServiceCategory>& vas_services) {
+                                                    const std::vector<datatypes::ServiceCategory>& energy_services,
+                                                    const std::vector<datatypes::ServiceCategory>& vas_services) {
 
-    message_20::ServiceDiscoveryResponse res = message_20::ServiceDiscoveryResponse();
+    message_20::ServiceDiscoveryResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
+        return response_with_code(res, datatypes::ResponseCode::FAILED_UnknownSession);
     }
 
     // Service renegotiation is not yet supported
@@ -35,8 +35,8 @@ message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDis
     // Reset default value
     res.energy_transfer_service_list.clear();
 
-    std::vector<message_20::ServiceDiscoveryResponse::Service> energy_services_list;
-    std::vector<message_20::ServiceDiscoveryResponse::Service> vas_services_list;
+    std::vector<datatypes::Service> energy_services_list;
+    std::vector<datatypes::Service> vas_services_list;
 
     // EV supported service ID's
     if (req.supported_service_ids.has_value() == true) {
@@ -75,7 +75,7 @@ message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDis
         }
     }
 
-    return response_with_code(res, message_20::ResponseCode::OK);
+    return response_with_code(res, datatypes::ResponseCode::OK);
 }
 
 void ServiceDiscovery::enter() {
@@ -102,7 +102,7 @@ FsmSimpleState::HandleEventReturnType ServiceDiscovery::handle_event(AllocatorTy
 
         ctx.respond(res);
 
-        if (res.response_code >= message_20::ResponseCode::FAILED) {
+        if (res.response_code >= datatypes::ResponseCode::FAILED) {
             ctx.session_stopped = true;
             return sa.PASS_ON;
         }

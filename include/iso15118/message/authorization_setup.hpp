@@ -8,35 +8,37 @@
 #include <variant>
 #include <vector>
 
-#include "common.hpp"
+#include "msg_data_types.hpp"
 
 namespace iso15118::message_20 {
+
+namespace datatypes {
+using supported_providers_list_type = std::vector<name_type>; // [0 - 128]
+
+struct EIM_ASResAuthorizationMode {};
+struct PnC_ASResAuthorizationMode {
+    gen_challenge_type gen_challenge;
+    std::optional<datatypes::supported_providers_list_type> supported_providers;
+};
+
+} // namespace datatypes
 
 struct AuthorizationSetupRequest {
     Header header;
 };
 
 struct AuthorizationSetupResponse {
-
-    static constexpr auto GEN_CHALLENGE_LENGTH = 16;
-
     AuthorizationSetupResponse() :
         certificate_installation_service(false),
-        authorization_services({Authorization::EIM}),
-        authorization_mode(std::in_place_type<AuthorizationSetupResponse::EIM_ASResAuthorizationMode>){};
+        authorization_services({datatypes::Authorization::EIM}),
+        authorization_mode(std::in_place_type<datatypes::EIM_ASResAuthorizationMode>){};
 
     Header header;
-    ResponseCode response_code;
+    datatypes::ResponseCode response_code;
 
-    struct EIM_ASResAuthorizationMode {};
-    struct PnC_ASResAuthorizationMode {
-        std::array<uint8_t, GEN_CHALLENGE_LENGTH> gen_challenge;
-        std::optional<std::vector<std::string>> supported_providers;
-    };
-
-    std::vector<Authorization> authorization_services;
+    std::vector<datatypes::Authorization> authorization_services;
     bool certificate_installation_service;
-    std::variant<EIM_ASResAuthorizationMode, PnC_ASResAuthorizationMode> authorization_mode;
+    std::variant<datatypes::EIM_ASResAuthorizationMode, datatypes::PnC_ASResAuthorizationMode> authorization_mode;
 };
 
 } // namespace iso15118::message_20

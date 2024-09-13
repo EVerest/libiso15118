@@ -14,53 +14,51 @@ namespace iso15118::d20::state {
 
 message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleExchangeRequest& req,
                                                     const d20::Session& session,
-                                                    const message_20::RationalNumber& max_power) {
+                                                    const datatypes::RationalNumber& max_power) {
 
     message_20::ScheduleExchangeResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
+        return response_with_code(res, datatypes::ResponseCode::FAILED_UnknownSession);
     }
 
     // Todo(SL): Publish data from request?
 
-    if (session.get_selected_control_mode() == message_20::ControlMode::Scheduled &&
-        std::holds_alternative<message_20::ScheduleExchangeRequest::Scheduled_SEReqControlMode>(req.control_mode)) {
+    if (session.get_selected_control_mode() == datatypes::ControlMode::Scheduled &&
+        std::holds_alternative<datatypes::Scheduled_SEReqControlMode>(req.control_mode)) {
 
-        auto& control_mode =
-            res.control_mode.emplace<message_20::ScheduleExchangeResponse::Scheduled_SEResControlMode>();
+        auto& control_mode = res.control_mode.emplace<datatypes::Scheduled_SEResControlMode>();
 
         // Define one minimal default schedule
         // No price schedule, no discharging power schedule
         // Todo(sl): Adding price schedule
         // Todo(sl): Adding discharging schedule
-        message_20::ScheduleExchangeResponse::ScheduleTuple schedule;
+        datatypes::ScheduleTuple schedule;
         schedule.schedule_tuple_id = 1;
         schedule.charging_schedule.power_schedule.time_anchor =
             static_cast<uint64_t>(std::time(nullptr)); // PowerSchedule is now active
 
-        message_20::ScheduleExchangeResponse::PowerScheduleEntry power_schedule;
+        datatypes::PowerScheduleEntry power_schedule;
         power_schedule.power = max_power;
-        power_schedule.duration = message_20::ScheduleExchangeResponse::SCHEDULED_POWER_DURATION_S;
+        power_schedule.duration = datatypes::SCHEDULED_POWER_DURATION_S;
 
         schedule.charging_schedule.power_schedule.entries.push_back(power_schedule);
 
         control_mode.schedule_tuple.push_back(schedule);
 
-    } else if (session.get_selected_control_mode() == message_20::ControlMode::Dynamic &&
-               std::holds_alternative<message_20::ScheduleExchangeRequest::Dynamic_SEReqControlMode>(
-                   req.control_mode)) {
+    } else if (session.get_selected_control_mode() == datatypes::ControlMode::Dynamic &&
+               std::holds_alternative<datatypes::Dynamic_SEReqControlMode>(req.control_mode)) {
 
-        auto& control_mode = res.control_mode.emplace<message_20::ScheduleExchangeResponse::Dynamic_SEResControlMode>();
+        auto& control_mode = res.control_mode.emplace<datatypes::Dynamic_SEResControlMode>();
 
     } else {
         logf_error("The control mode of the req message does not match the previously agreed contol mode.");
-        return response_with_code(res, message_20::ResponseCode::FAILED);
+        return response_with_code(res, datatypes::ResponseCode::FAILED);
     }
 
-    res.processing = message_20::Processing::Finished;
+    res.processing = datatypes::Processing::Finished;
 
-    return response_with_code(res, message_20::ResponseCode::OK);
+    return response_with_code(res, datatypes::ResponseCode::OK);
 }
 
 void ScheduleExchange::enter() {
@@ -76,12 +74,12 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
 
     if (const auto req = variant->get_if<message_20::ScheduleExchangeRequest>()) {
 
-        message_20::RationalNumber max_charge_power = {0, 0};
+        datatypes::RationalNumber max_charge_power = {0, 0};
 
         const auto selected_energy_service = ctx.session.get_selected_energy_service();
 
-        if (selected_energy_service == message_20::ServiceCategory::DC or
-            selected_energy_service == message_20::ServiceCategory::DC_BPT) {
+        if (selected_energy_service == datatypes::ServiceCategory::DC or
+            selected_energy_service == datatypes::ServiceCategory::DC_BPT) {
             max_charge_power = ctx.session_config.dc_limits.charge_limits.power.max;
         }
 
@@ -89,12 +87,12 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
 
         ctx.respond(res);
 
-        if (res.response_code >= message_20::ResponseCode::FAILED) {
+        if (res.response_code >= datatypes::ResponseCode::FAILED) {
             ctx.session_stopped = true;
             return sa.PASS_ON;
         }
 
-        if (res.processing == message_20::Processing::Ongoing) {
+        if (res.processing == datatypes::Processing::Ongoing) {
             return sa.HANDLED_INTERNALLY;
         }
 
