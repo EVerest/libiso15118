@@ -11,6 +11,13 @@
 
 namespace iso15118::message_2 {
 
+namespace data_types {
+
+constexpr auto EVCC_ID_LENGTH = 6;
+using evcc_id_type = std::array<uint8_t, EVCC_ID_LENGTH>; // hexBinary, max length 6
+
+} // namespace data_types
+
 struct SessionSetupRequest {
     V2GMessageHeader header;
     data_types::evcc_id_type evccid;

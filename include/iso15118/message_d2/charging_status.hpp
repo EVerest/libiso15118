@@ -8,6 +8,14 @@
 
 namespace iso15118::message_2 {
 
+namespace data_types {
+
+struct AcEvseStatus : public EvseStatus {
+    bool rcd;
+};
+
+} // namespace data_types
+
 struct ChargingStatusReq {
     V2GMessageHeader header;
 };

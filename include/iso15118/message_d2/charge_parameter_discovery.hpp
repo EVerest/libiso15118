@@ -8,6 +8,23 @@
 
 namespace iso15118::message_2 {
 
+namespace data_types {
+
+struct EvseChargeParameter {
+    virtual ~EvseChargeParameter() = default; // To ensure polymorphic behavior
+};
+
+struct EvChargeParameter {
+    std::optional<uint64_t> departure_time; // minOccurs="0"
+    virtual ~EvChargeParameter() = default; // To ensure polymorphic behavior
+};
+
+struct SaSchedules {
+    virtual ~SaSchedules() = default; // To ensure polymorphic behavior
+};
+
+} // namespace data_types
+
 struct ChargeParameterDiscoveryReq {
     V2GMessageHeader header;
     std::optional<uint16_t> max_entries_sa_schedule_tuple;

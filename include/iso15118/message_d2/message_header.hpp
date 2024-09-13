@@ -10,6 +10,23 @@
 
 namespace iso15118::message_2 {
 
+namespace data_types {
+
+using fault_msg_type = std::string; // max length 64
+
+enum class FaultCode {
+    ParsingError,
+    NoTLSRootCertificatAvailable,
+    UnknownError
+};
+
+struct Notification {
+    FaultCode fault_code;
+    std::optional<fault_msg_type> fault_msg;
+};
+
+} // namespace data_types
+
 const uint8_t SESSION_ID_LENGTH = 8;
 
 struct V2GMessageHeader {

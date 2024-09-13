@@ -11,12 +11,42 @@ namespace iso15118::message_2 {
 
 namespace data_types {
 
+using service_scope_type = std::string; // max length 64
+
 struct SupportedEnergyTransferMode {
     std::vector<data_types::EnergyTransferMode> energy_transfer_mode; // maxOccurs="6"
 };
 
+enum class ServiceCategory {
+    EVCharging,
+    Internet,
+    ContractCertificate,
+    OtherCustom
+};
+
+struct Service {
+    service_id_type service_id;
+    std::string service_name; // minOccurs="0"
+    ServiceCategory service_category;
+    std::string service_scope; // minOccurs="0"
+    bool free_service;
+};
+
 struct ChargeService : public data_types::Service {
     SupportedEnergyTransferMode supported_energy_transfer_mode;
+};
+
+struct PaymentOptionList {
+    std::vector<std::string> payment_option; // paymentOptionType, minOccurs=1, maxOccurs=2
+};
+
+enum class PaymentOption {
+    Contract,
+    ExternalPayment
+};
+
+struct ServiceList {
+    std::vector<data_types::Service> service; // maxOccurs="8"
 };
 
 } // namespace data_types

@@ -7,6 +7,12 @@
 
 namespace iso15118::message_2 {
 
+namespace data_types {
+
+using session_id_type = std::string; // hexBinary, max length 8
+
+}
+
 struct MeteringReceiptReq {
     V2GMessageHeader header;
     data_types::session_id_type session_id;

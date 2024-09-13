@@ -12,12 +12,8 @@
 
 namespace iso15118::message_2::data_types {
 
-// Simple types
-
 // general types
 using percent_value_type = uint8_t; // range 0-100
-
-using fault_msg_type = std::string; // max length 64
 
 enum class EvseProcessing {
     Finished,
@@ -30,12 +26,6 @@ enum class EvseNotification {
     StopCharging,
     ReNegotiation
 };
-
-using service_name_type = std::string; // max length 32
-
-using service_scope_type = std::string; // max length 64
-
-using max_num_phases_type = uint8_t; // range 1-3
 
 using meter_status_type = int16_t;
 
@@ -51,30 +41,8 @@ enum class EnergyTransferMode {
 
 // tariffs and payment types
 using sa_id_type = uint8_t;                  // unsignedByte, range 1-255
-using tariff_description_type = std::string; // max length 32
 
-enum class CostKind {
-    relative_price_percentage,
-    renewable_generation_percentage,
-    carbon_dioxide_emission
-};
-
-struct PaymentOptionList {
-    std::vector<std::string> payment_option; // paymentOptionType, minOccurs=1, maxOccurs=2
-};
-
-enum class PaymentOption {
-    Contract,
-    ExternalPayment
-};
-
-// fault and response code types
-enum class FaultCode {
-    ParsingError,
-    NoTLSRootCertificatAvailable,
-    UnknownError
-};
-
+// response code types
 enum class ResponseCode {
     OK,
     OK_NewSessionEstablished,
@@ -105,11 +73,6 @@ enum class ResponseCode {
 };
 
 // identification_number types
-using session_id_type = std::string; // hexBinary, max length 8
-
-constexpr auto EVCC_ID_LENGTH = 6;
-
-using evcc_id_type = std::array<uint8_t, EVCC_ID_LENGTH>; // hexBinary, max length 6
 
 using evse_id_type = std::string; // string, min length 7 max length 37
 
@@ -213,26 +176,11 @@ struct PhysicalValue {
     };
 };
 
-// charging profile types
-struct ProfileEntry {
-    uint64_t charging_profile_entry_start;
-    PhysicalValue charging_profile_entry_max_power;
-    std::optional<max_num_phases_type> charging_profile_entry_max_number_of_phases_in_use; // minOccurs="0"
-};
-
-struct ChargingProfile {
-    std::vector<ProfileEntry> profile_entry; // maxOccurs="24"
-};
-
 // ev evse related types
 struct EvseStatus {
     uint16_t notification_max_delay;
     EvseNotification evse_notification;
     virtual ~EvseStatus() = default; // To ensure polymorphic behavior
-};
-
-struct AcEvseStatus : public EvseStatus {
-    bool rcd;
 };
 
 struct EvStatus {
@@ -250,69 +198,6 @@ struct DcEvStatus : public EvStatus {
     percent_value_type ev_ress_soc;
 };
 
-// ev power delivery related types
-struct EvPowerDeliveryParameter {
-    virtual ~EvPowerDeliveryParameter() = default; // To ensure polymorphic behavior
-};
-
-struct DcEvPowerDeliveryParameter : public EvPowerDeliveryParameter {
-    DcEvStatus dc_ev_status;
-    std::optional<bool> bulk_charging_complete; // minOccurs="0"
-    bool charging_complete;
-};
-
-// evse ev charge paramter related types
-struct EvChargeParameter {
-    std::optional<uint64_t> departure_time; // minOccurs="0"
-    virtual ~EvChargeParameter() = default; // To ensure polymorphic behavior
-};
-
-struct AcEvChargeParameter : public EvChargeParameter {
-    PhysicalValue e_amount;
-    PhysicalValue ev_max_voltage;
-    PhysicalValue ev_max_current;
-    PhysicalValue ev_min_current;
-};
-
-struct DcEvChargeParameter : public EvChargeParameter {
-    DcEvStatus dc_ev_status;
-    PhysicalValue ev_maximum_current_limit;
-    std::optional<PhysicalValue> ev_maximum_power_limit; // minOccurs="0"
-    PhysicalValue ev_maximum_voltage_limit;
-    std::optional<PhysicalValue> ev_energy_capacity; // minOccurs="0"
-    std::optional<PhysicalValue> ev_energy_request;  // minOccurs="0"
-    std::optional<percent_value_type> full_soc;      // minOccurs="0"
-    std::optional<percent_value_type> bulk_soc;      // minOccurs="0"
-};
-
-struct EvseChargeParameter {
-    virtual ~EvseChargeParameter() = default; // To ensure polymorphic behavior
-};
-
-struct AcEvseChargeParameter : public EvseChargeParameter {
-    AcEvseStatus ac_evse_status;
-    PhysicalValue evse_nominal_voltage;
-    PhysicalValue evse_max_current;
-};
-
-struct DcEvseChargeParameter : public EvseChargeParameter {
-    DcEvseStatus dc_evse_status;
-    PhysicalValue evse_maximum_current_limit;
-    PhysicalValue evse_maximum_power_limit;
-    PhysicalValue evse_maximum_voltage_limit;
-    PhysicalValue evse_minimum_current_limit;
-    PhysicalValue evse_minimum_voltage_limit;
-    std::optional<PhysicalValue> evse_current_regulation_tolerance; // minOccurs="0"
-    PhysicalValue evse_peak_current_ripple;
-    std::optional<PhysicalValue> evse_energy_to_be_delivered; // minOccurs="0"
-};
-
-// header related types
-struct Notification {
-    FaultCode fault_code;
-    std::optional<fault_msg_type> fault_msg;
-};
-
 // metering related types
 struct MeterInfo {
     meter_id_type meter_id;
@@ -324,7 +209,6 @@ struct MeterInfo {
 
 // security related types
 using id_type = std::string;
-using emaid_type = id_type;
 
 struct X509IssuerSerial {
     std::string x509_issuer_name;
@@ -355,83 +239,4 @@ struct ListOfRootCertificateIds {
     std::vector<X509IssuerSerial> root_certificate_id; // maxOccurs="20"
 };
 
-// service related types
-enum class ServiceCategory {
-    EVCharging,
-    Internet,
-    ContractCertificate,
-    OtherCustom
-};
-
-struct Service {
-    service_id_type service_id;
-    std::string service_name; // minOccurs="0"
-    ServiceCategory service_category;
-    std::string service_scope; // minOccurs="0"
-    bool free_service;
-};
-
-struct ServiceList {
-    std::vector<data_types::Service> service; // maxOccurs="8"
-};
-
-// tariff related types
-struct Entry {
-    virtual ~Entry() = default; // To ensure polymorphic behavior
-};
-
-struct SaSchedules {
-    virtual ~SaSchedules() = default; // To ensure polymorphic behavior
-};
-
-struct Cost {
-    CostKind cost_kind;
-    uint64_t amount;
-    std::optional<unit_multiplier_type> amount_multiplier; // minOccurs="0"
-};
-
-struct ConsumptionCost {
-    PhysicalValue start_value;
-    std::vector<Cost> cost; // maxOccurs="3"
-};
-
-struct SalesTariffEntry : public Entry {
-    std::optional<uint8_t> e_price_level;          // minOccurs="0"
-    std::vector<ConsumptionCost> consumption_cost; // minOccurs="0", maxOccurs="3"
-};
-
-struct PmaxScheduleEntry : public Entry {
-    PhysicalValue pmax;
-};
-
-struct PmaxSchedule {
-    std::vector<PmaxScheduleEntry> pmax_schedule_entry; // maxOccurs="1024"
-};
-
-struct SalesTariff {
-    sa_id_type sales_tariff_id;
-    std::optional<tariff_description_type> sales_tariff_description; // minOccurs="0"
-    std::optional<uint8_t> num_e_price_levels;                       // minOccurs="0"
-    std::vector<SalesTariffEntry> sales_tariff_entry;                // maxOccurs="1024"
-    id_type id;
-};
-
-struct SaScheduleTuple {
-    sa_id_type sa_schedule_tuple_id;
-    PmaxSchedule pmax_schedule;
-    std::optional<SalesTariff> sales_tariff; // minOccurs="0"
-};
-
-struct SaScheduleList : public SaSchedules {
-    std::vector<SaScheduleTuple> sa_schedule_tuple; // maxOccurs="3"
-};
-
-struct Interval {
-    virtual ~Interval() = default; // To ensure polymorphic behavior
-};
-
-struct RelativeTimeInterval : public Interval {
-    uint64_t start;
-    std::optional<uint64_t> duration; // minOccurs="0"
-};
 } // namespace iso15118::message_2::data_types

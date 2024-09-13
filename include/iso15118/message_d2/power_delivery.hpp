@@ -9,10 +9,26 @@ namespace iso15118::message_2 {
 
 namespace data_types {
 
+using max_num_phases_type = uint8_t; // range 1-3
+
+struct ProfileEntry {
+    uint64_t charging_profile_entry_start;
+    PhysicalValue charging_profile_entry_max_power;
+    std::optional<max_num_phases_type> charging_profile_entry_max_number_of_phases_in_use; // minOccurs="0"
+};
+
+struct ChargingProfile {
+    std::vector<ProfileEntry> profile_entry; // maxOccurs="24"
+};
+
 enum class ChargeProgress {
     Start,
     Stop,
     Renegotiate
+};
+
+struct EvPowerDeliveryParameter {
+    virtual ~EvPowerDeliveryParameter() = default; // To ensure polymorphic behavior
 };
 
 } // namespace data_types
