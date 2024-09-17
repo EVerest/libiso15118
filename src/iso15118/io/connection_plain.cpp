@@ -80,7 +80,8 @@ void ConnectionPlain::write(const uint8_t* buf, size_t len) {
 
     if (write_result == -1) {
         log_and_throw("Failed to write()");
-    } else if (write_result != len) {
+    } else if (static_cast<size_t>(write_result) != len) {
+        // write_result is here positive, then it should be no problem to cast write_result to size_t
         log_and_throw("Could not complete write");
     }
 }
@@ -89,7 +90,8 @@ ReadResult ConnectionPlain::read(uint8_t* buf, size_t len) {
     assert(connection_open);
 
     const auto read_result = ::read(fd, buf, len);
-    const auto did_block = (len > 0) and (read_result != len);
+    // Note: cast read_result to size_t only if read_result is positive
+    const auto did_block = (len > 0) and (read_result >= 0 and static_cast<size_t>(read_result) != len);
 
     if (read_result >= 0) {
         return {did_block, static_cast<size_t>(read_result)};
