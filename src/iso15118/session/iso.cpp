@@ -157,9 +157,7 @@ TimePoint const& Session::poll() {
     }
 
     // send all of our queued control events
-    active_control_event =
-        control_event_queue.pop(); // TODO(sl): Not sure, -Wparentheses does not like the previous solution
-    while (active_control_event) {
+    while ((active_control_event = control_event_queue.pop()) != std::nullopt) {
 
         if (const auto control_data = ctx.get_control_event<d20::DcTransferLimits>()) {
             ctx.session_config.dc_limits = *control_data;
@@ -167,8 +165,6 @@ TimePoint const& Session::poll() {
 
         [[maybe_unused]] const auto res = fsm.handle_event(d20::FsmEvent::CONTROL_MESSAGE);
         // FIXME (aw): check result!
-
-        active_control_event = control_event_queue.pop();
     }
 
     // check for complete sdp packet
