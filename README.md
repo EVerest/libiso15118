@@ -35,6 +35,9 @@ To build this library you need [everest-cmake](https://github.com/EVerest/everes
 # Run cmake (BUILD_TESTING to enable/disable unit tests)
 cmake -S . -B build -G Ninja -DBUILD_TESTING=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
+# Run cmake with enabled compiler warnings
+cmake -S . -B build -G Ninja -DBUILD_TESTING=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DISO15118_ENABLE_COMPILE_WARNINGS=ON
+
 # Build
 ninja -C build
 

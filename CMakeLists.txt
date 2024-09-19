@@ -37,6 +37,7 @@ option(ISO15118_ENABLE_COMPILE_WARNINGS "Enable compile warnings set in the ISO1
 set(ISO15118_COMPILE_OPTIONS "-Wall;-Wextra;-Wno-unused-function" CACHE STRING "A list of compile options used for building modules")
 
 if(ISO15118_ENABLE_COMPILE_WARNINGS)
+    message(STATUS "Building libiso15118 with the following compile options: ${ISO15118_COMPILE_OPTIONS}")
     add_compile_options(${ISO15118_COMPILE_OPTIONS})
 endif()
 
