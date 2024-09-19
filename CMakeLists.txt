@@ -31,15 +31,9 @@ if (USE_OPENSSL)
     find_package(OpenSSL 3 REQUIRED)
 endif()
 
-option(ISO15118_ENABLE_COMPILE_WARNINGS "Enable compile warnings set in the ISO15118_ENABLE_COMPILE_WARNINGS flag" OFF)
-# list of compile options that are passed to modules if ISO15118_ENABLE_COMPILE_WARNINGS=ON
-# generated code has functions often not used
-set(ISO15118_COMPILE_OPTIONS "-Wall;-Wextra;-Wno-unused-function" CACHE STRING "A list of compile options used for building modules")
-
-if(ISO15118_ENABLE_COMPILE_WARNINGS)
-    message(STATUS "Building libiso15118 with the following compile options: ${ISO15118_COMPILE_OPTIONS}")
-    add_compile_options(${ISO15118_COMPILE_OPTIONS})
-endif()
+# list of compile options
+set(ISO15118_COMPILE_OPTIONS_WARNING "-Wall;-Wextra;-Wno-unused-function;-Werror" CACHE STRING "A list of compile options used")
+message(STATUS "Building libiso15118 with the following compile options: ${ISO15118_COMPILE_OPTIONS_WARNING}")
 
 if((${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME} OR ${PROJECT_NAME}_BUILD_TESTING) AND BUILD_TESTING)
     set(ISO15118_BUILD_TESTING ON)
