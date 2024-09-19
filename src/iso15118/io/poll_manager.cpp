@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <sys/eventfd.h>
-#include <sys/poll.h>
+#include <poll.h>
 #include <unistd.h>
 
 #include <iso15118/detail/helper.hpp>

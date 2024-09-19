@@ -7,8 +7,7 @@ cmake \
     -S "$EXT_MOUNT/source" \
     -G Ninja \
     -DBUILD_TESTING=ON  \
-    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  \
-    -DISO15118_COMPILE_OPTIONS_WARNING="-Wall;-Wextra;-Wno-unused-function"
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 ninja -j$(nproc) -C build
 
