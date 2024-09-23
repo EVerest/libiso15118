@@ -13,8 +13,16 @@ void Feedback::signal(feedback::Signal signal) const {
     call_if_available(callbacks.signal, signal);
 }
 
-void Feedback::dc_charge_target(const feedback::DcChargeTarget& charge_target) const {
-    call_if_available(callbacks.dc_charge_target, charge_target);
+void Feedback::dc_pre_charge_target_voltage(float voltage) const {
+    call_if_available(callbacks.dc_pre_charge_target_voltage, voltage);
+}
+
+void Feedback::dc_charge_scheduled_mode(const feedback::DcChargeScheduledMode& values) const {
+    call_if_available(callbacks.dc_charge_scheduled_mode, values);
+}
+
+void Feedback::dc_charge_dynamic_mode(const feedback::DcChargeDynamicMode& values) const {
+    call_if_available(callbacks.dc_charge_dynamic_mode, values);
 }
 
 void Feedback::dc_max_limits(const feedback::DcMaximumLimits& max_limits) const {

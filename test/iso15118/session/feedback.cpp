@@ -8,7 +8,9 @@ using namespace iso15118::session;
 
 struct FeedbackResults {
     feedback::Signal signal;
-    feedback::DcChargeTarget dc_charge_target;
+    float target_voltage;
+    feedback::DcChargeScheduledMode dc_charge_scheduled_mode;
+    feedback::DcChargeDynamicMode dc_charge_dynamic_mode;
     feedback::DcMaximumLimits dc_max_limits;
     iso15118::message_20::Type v2g_message;
     std::string evcc_id;
@@ -22,8 +24,15 @@ SCENARIO("Feedback Tests") {
     feedback::Callbacks callbacks;
 
     callbacks.signal = [&feedback_results](feedback::Signal signal_) { feedback_results.signal = signal_; };
-    callbacks.dc_charge_target = [&feedback_results](const feedback::DcChargeTarget& dc_charge_target_) {
-        feedback_results.dc_charge_target = dc_charge_target_;
+    callbacks.dc_pre_charge_target_voltage = [&feedback_results](float target_voltage_) {
+        feedback_results.target_voltage = target_voltage_;
+    };
+    callbacks.dc_charge_scheduled_mode =
+        [&feedback_results](const feedback::DcChargeScheduledMode& dc_scheduled_values_) {
+            feedback_results.dc_charge_scheduled_mode = dc_scheduled_values_;
+        };
+    callbacks.dc_charge_dynamic_mode = [&feedback_results](const feedback::DcChargeDynamicMode& dc_dynamic_values_) {
+        feedback_results.dc_charge_dynamic_mode = dc_dynamic_values_;
     };
     callbacks.dc_max_limits = [&feedback_results](const feedback::DcMaximumLimits& dc_max_limits_) {
         feedback_results.dc_max_limits = dc_max_limits_;
@@ -50,13 +59,62 @@ SCENARIO("Feedback Tests") {
         }
     }
 
-    GIVEN("Test dc_charge_target") {
-        const feedback::DcChargeTarget expected{421.4, 200.4};
-        feedback.dc_charge_target({421.4, 200.4});
+    GIVEN("Test dc_pre_charge_target_voltage") {
+        float expected{421.4};
+        feedback.dc_pre_charge_target_voltage(421.4);
 
-        THEN("dc_charge_target should be like expected") {
-            REQUIRE(feedback_results.dc_charge_target.voltage == expected.voltage);
-            REQUIRE(feedback_results.dc_charge_target.current == expected.current);
+        THEN("dc_pre_charge_target_voltage should be like expected") {
+            REQUIRE(feedback_results.target_voltage == expected);
+        }
+    }
+
+    GIVEN("Test dc_charge_scheduled_mode") {
+        const feedback::DcChargeScheduledMode expected{
+            440.2f,       30.0f,        std::nullopt, 34.0f,        std::nullopt, std::nullopt, std::nullopt,
+            std::nullopt, std::nullopt, std::nullopt, std::nullopt, 22220.0f,     std::nullopt};
+        feedback.dc_charge_scheduled_mode({440.2f, 30.0f, std::nullopt, 34.0f, std::nullopt, std::nullopt, std::nullopt,
+                                           std::nullopt, std::nullopt, std::nullopt, std::nullopt, 22220.0f,
+                                           std::nullopt});
+
+        THEN("dc_charge_scheduled_mode should be like expected") {
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.target_voltage == expected.target_voltage);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.target_current == expected.target_current);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_energy_request == expected.max_energy_request);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.min_discharge_power == expected.min_discharge_power);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.target_energy_request == expected.target_energy_request);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.min_energy_request == expected.min_energy_request);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_charge_power == expected.max_charge_power);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.min_charge_power == expected.min_charge_power);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_charge_current == expected.max_charge_current);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_voltage == expected.max_voltage);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.min_voltage == expected.min_voltage);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_discharge_power == expected.max_discharge_power);
+            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_discharge_current == expected.max_discharge_current);
+        }
+    }
+
+    GIVEN("Test dc_charge_dynamic_mode") {
+        const feedback::DcChargeDynamicMode expected{
+            std::nullopt, 23440.0f,     22000.0f,     0,           900.0f, 10.0f, 300.0f, 1500.0f, 150.0f, std::nullopt,
+            std::nullopt, std::nullopt, std::nullopt, std::nullopt};
+        feedback.dc_charge_dynamic_mode({std::nullopt, 23440.0f, 22000.0f, 0, 900.0f, 10.0f, 300.0f, 1500.0f, 150.0f,
+                                         std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt});
+
+        THEN("dc_charge_dynamic_mode should be like expected") {
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.departure_time == expected.departure_time);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.target_energy_request == expected.target_energy_request);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_energy_request == expected.max_energy_request);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.min_energy_request == expected.min_energy_request);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_charge_power == expected.max_charge_power);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.min_charge_power == expected.min_charge_power);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_charge_current == expected.max_charge_current);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_voltage == expected.max_voltage);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.min_voltage == expected.min_voltage);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_discharge_power == expected.max_discharge_power);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.min_discharge_power == expected.min_discharge_power);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_discharge_current == expected.max_discharge_current);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_v2x_energy_request == expected.max_v2x_energy_request);
+            REQUIRE(feedback_results.dc_charge_dynamic_mode.min_v2x_energy_request == expected.min_v2x_energy_request);
         }
     }
 

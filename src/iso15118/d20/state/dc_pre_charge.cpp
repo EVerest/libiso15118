@@ -10,22 +10,18 @@
 
 namespace iso15118::d20::state {
 
-std::tuple<message_20::DC_PreChargeResponse, session::feedback::DcChargeTarget>
+std::tuple<message_20::DC_PreChargeResponse, std::optional<float>>
 handle_request(const message_20::DC_PreChargeRequest& req, const d20::Session& session, const float present_voltage) {
 
     message_20::DC_PreChargeResponse res;
-    session::feedback::DcChargeTarget charge_target{};
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return {response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession), charge_target};
+        return {response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession), std::nullopt};
     }
-
-    charge_target.voltage = message_20::from_RationalNumber(req.target_voltage);
-    charge_target.current = 0;
 
     res.present_voltage = message_20::from_float(present_voltage);
 
-    return {response_with_code(res, message_20::ResponseCode::OK), charge_target};
+    return {response_with_code(res, message_20::ResponseCode::OK), message_20::from_RationalNumber(req.target_voltage)};
 }
 
 void DC_PreCharge::enter() {
@@ -53,10 +49,11 @@ FsmSimpleState::HandleEventReturnType DC_PreCharge::handle_event(AllocatorType& 
     const auto variant = ctx.pull_request();
 
     if (const auto req = variant->get_if<message_20::DC_PreChargeRequest>()) {
-        const auto [res, charge_target] = handle_request(*req, ctx.session, present_voltage);
+        const auto [res, target_voltage] = handle_request(*req, ctx.session, present_voltage);
 
-        // FIXME (aw): should we always send this charge_target, even if the res errored?
-        ctx.feedback.dc_charge_target(charge_target);
+        if (target_voltage.has_value()) {
+            ctx.feedback.dc_pre_charge_target_voltage(*target_voltage);
+        }
 
         ctx.respond(res);
 
