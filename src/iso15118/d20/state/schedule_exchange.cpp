@@ -26,14 +26,9 @@ message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleEx
 
     if (session.get_selected_control_mode() == message_20::ControlMode::Scheduled &&
         std::holds_alternative<message_20::ScheduleExchangeRequest::Scheduled_SEReqControlMode>(req.control_mode)) {
-
         auto& control_mode =
             res.control_mode.emplace<message_20::ScheduleExchangeResponse::Scheduled_SEResControlMode>();
 
-        // Define one minimal default schedule
-        // No price schedule, no discharging power schedule
-        // Todo(sl): Adding price schedule
-        // Todo(sl): Adding discharging schedule
         message_20::ScheduleExchangeResponse::ScheduleTuple schedule;
         schedule.schedule_tuple_id = 1;
         schedule.charging_schedule.power_schedule.time_anchor =
@@ -42,17 +37,22 @@ message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleEx
         message_20::ScheduleExchangeResponse::PowerScheduleEntry power_schedule;
         power_schedule.power = max_power;
         power_schedule.duration = message_20::ScheduleExchangeResponse::SCHEDULED_POWER_DURATION_S;
-
         schedule.charging_schedule.power_schedule.entries.push_back(power_schedule);
 
+        // Providing no price schedule!
+        // NOTE: Agreement on iso15118.elaad.io: [V2G20-2176] is not required and should be ignored.
         control_mode.schedule_tuple.push_back(schedule);
+
+        // TODO(sl): Adding price schedule
+        // TODO(sl): Adding discharging schedule
 
     } else if (session.get_selected_control_mode() == message_20::ControlMode::Dynamic &&
                std::holds_alternative<message_20::ScheduleExchangeRequest::Dynamic_SEReqControlMode>(
                    req.control_mode)) {
-        // TODO(sl): Adding Dynamic Mode
-        [[maybe_unused]] auto& control_mode =
-            res.control_mode.emplace<message_20::ScheduleExchangeResponse::Dynamic_SEResControlMode>();
+        
+        // TODO(sl): Publish req dynamic mode parameters
+        // Note(sl): Right now with MobilityNeedsMode == 1 the values are really optional
+        res.control_mode.emplace<message_20::ScheduleExchangeResponse::Dynamic_SEResControlMode>();
 
     } else {
         logf_error("The control mode of the req message does not match the previously agreed contol mode.");

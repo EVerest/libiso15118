@@ -94,12 +94,35 @@ SCENARIO("Schedule Exchange state handling") {
             REQUIRE(res_control_mode.schedule_tuple.size() == 1);
             const auto& schedule_tuple = res_control_mode.schedule_tuple[0];
 
-            REQUIRE(schedule_tuple.charging_schedule.power_schedule.entries[0].power.value == 22);
-            REQUIRE(schedule_tuple.charging_schedule.power_schedule.entries[0].power.exponent == 3);
+            REQUIRE(message_20::from_RationalNumber(
+                        schedule_tuple.charging_schedule.power_schedule.entries.at(0).power) == 22000);
         }
     }
 
-    // GIVEN("Good case - Dynamic Mode") {} // todo(sl): dynamic mode is missing
+    GIVEN("Good case - Dynamic Mode") {
+        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+            message_20::ServiceCategory::DC, message_20::DcConnector::Extended, message_20::ControlMode::Dynamic,
+            message_20::MobilityNeedsMode::ProvidedByEvcc, message_20::Pricing::NoPricing);
+
+        auto session = d20::Session(service_parameters);
+
+        message_20::ScheduleExchangeRequest req;
+        req.header.session_id = session.get_id();
+        req.header.timestamp = 1691411798;
+
+        req.control_mode.emplace<Dynamic_ModeReq>();
+
+        message_20::RationalNumber max_power = {22, 3};
+
+        const auto res = d20::state::handle_request(req, session, max_power);
+
+        THEN("ResponseCode: OK") {
+            REQUIRE(res.response_code == message_20::ResponseCode::OK);
+            REQUIRE(res.processing == message_20::Processing::Finished);
+
+            REQUIRE(std::holds_alternative<Dynamic_ModeRes>(res.control_mode) == true);
+        }
+    }
 
     // GIVEN("Bad Case - sequence error") {} // todo(sl): not here
 
