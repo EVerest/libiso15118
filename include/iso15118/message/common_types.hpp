@@ -21,8 +21,6 @@ struct Header {
     // missing signature
 };
 
-template <typename cb_HeaderType> void convert(const cb_HeaderType& in, Header& out);
-
 enum class ResponseCode {
     OK = 0,
     OK_CertificateExpiresSoon = 1,
@@ -277,13 +275,5 @@ struct Receipt {
     std::optional<DetailedCost> overstay_costs;
     std::vector<DetailedTax> tax_costs; // 0 to 10 elements!
 };
-
-template <typename cb_RationalNumberType> void convert(const cb_RationalNumberType& in, RationalNumber& out);
-template <typename cb_RationalNumberType> void convert(const RationalNumber& in, cb_RationalNumberType& out);
-
-float from_RationalNumber(const RationalNumber& in);
-RationalNumber from_float(float in);
-
-std::string from_Protocol(const Protocol& in);
 
 } // namespace iso15118::message_20

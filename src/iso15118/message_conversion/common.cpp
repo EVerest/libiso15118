@@ -5,8 +5,8 @@
 #include <iso15118/message/common_types.hpp>
 #include <iso15118/message/variant.hpp>
 
-
 #include <iso15118/detail/message_conversion/cb_exi.hpp>
+#include <iso15118/detail/message_conversion/common_types.hpp>
 
 #include <cbv2g/iso_20/iso20_AC_Datatypes.h>
 #include <cbv2g/iso_20/iso20_CommonMessages_Datatypes.h>

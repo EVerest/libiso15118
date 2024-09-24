@@ -7,6 +7,7 @@
 #include <iso15118/detail/d20/state/dc_charge_loop.hpp>
 #include <iso15118/detail/d20/state/power_delivery.hpp>
 #include <iso15118/detail/helper.hpp>
+#include <iso15118/detail/message_conversion/common_types.hpp>
 
 namespace iso15118::d20::state {
 
@@ -18,16 +19,15 @@ using Dynamic_BPT_DC_Req = message_20::DC_ChargeLoopRequest::BPT_Dynamic_DC_CLRe
 using Scheduled_DC_Res = message_20::DC_ChargeLoopResponse::Scheduled_DC_CLResControlMode;
 using Scheduled_BPT_DC_Res = message_20::DC_ChargeLoopResponse::BPT_Scheduled_DC_CLResControlMode;
 
-template <typename In, typename Out> void convert(Out& out, const In& in);
-
-template <> void convert(Scheduled_DC_Res& out, const d20::DcTransferLimits& in) {
+namespace {
+void fill_limits(Scheduled_DC_Res& out, const d20::DcTransferLimits& in) {
     out.max_charge_power = in.charge_limits.power.max;
     out.min_charge_power = in.charge_limits.power.min;
     out.max_charge_current = in.charge_limits.current.max;
     out.max_voltage = in.voltage.max;
 }
 
-template <> void convert(Scheduled_BPT_DC_Res& out, const d20::DcTransferLimits& in) {
+void fill_limits(Scheduled_BPT_DC_Res& out, const d20::DcTransferLimits& in) {
     out.max_charge_power = in.charge_limits.power.max;
     out.min_charge_power = in.charge_limits.power.min;
     out.max_charge_current = in.charge_limits.current.max;
@@ -42,7 +42,7 @@ template <> void convert(Scheduled_BPT_DC_Res& out, const d20::DcTransferLimits&
     }
 }
 
-static auto fill_parameters(const message_20::DisplayParameters& req_parameters) {
+auto construct_response_parameters(const message_20::DisplayParameters& req_parameters) {
     auto parameters = session::feedback::DisplayParameters{};
 
     parameters.present_soc = req_parameters.present_soc;
@@ -59,6 +59,8 @@ static auto fill_parameters(const message_20::DisplayParameters& req_parameters)
 
     return parameters;
 }
+
+} // namespace
 
 std::tuple<message_20::DC_ChargeLoopResponse, std::optional<session::feedback::DcChargeTarget>>
 handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& session, const float present_voltage,
@@ -85,7 +87,7 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
         };
 
         auto& mode = res.control_mode.emplace<Scheduled_DC_Res>();
-        convert(mode, dc_limits);
+        fill_limits(mode, dc_limits);
 
     } else if (std::holds_alternative<Scheduled_BPT_DC_Req>(req.control_mode)) {
 
@@ -99,7 +101,7 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
         }
 
         auto& mode = res.control_mode.emplace<Scheduled_BPT_DC_Res>();
-        convert(mode, dc_limits);
+        fill_limits(mode, dc_limits);
 
         const auto& req_mode = std::get<Scheduled_BPT_DC_Req>(req.control_mode);
 
@@ -181,7 +183,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
         ctx.respond(res);
 
         if (req->display_parameters.has_value()) {
-            const auto feedback_parameters = fill_parameters(*req->display_parameters);
+            const auto feedback_parameters = construct_response_parameters(*req->display_parameters);
 
             ctx.feedback.display_parameters(feedback_parameters);
         }

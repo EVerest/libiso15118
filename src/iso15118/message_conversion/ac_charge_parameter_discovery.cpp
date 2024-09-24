@@ -4,6 +4,7 @@
 
 #include <type_traits>
 
+#include <iso15118/detail/message_conversion/common_types.hpp>
 #include <iso15118/detail/variant_access.hpp>
 
 #include <cbv2g/iso_20/iso20_AC_Decoder.h>

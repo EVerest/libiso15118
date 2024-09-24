@@ -3,6 +3,8 @@
 #include <iso15118/message/dc_pre_charge.hpp>
 #include <iso15118/message/variant.hpp>
 
+#include <iso15118/detail/message_conversion/common_types.hpp>
+
 #include "helper.hpp"
 
 using namespace iso15118;

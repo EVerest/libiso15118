@@ -4,6 +4,7 @@
 
 #include <type_traits>
 
+#include <iso15118/detail/message_conversion/common_types.hpp>
 #include <iso15118/detail/variant_access.hpp>
 
 #include <cbv2g/app_handshake/appHand_Encoder.h>

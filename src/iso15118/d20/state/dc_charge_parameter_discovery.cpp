@@ -16,9 +16,7 @@ using BPT_DC_ModeReq = message_20::DC_ChargeParameterDiscoveryRequest::BPT_DC_CP
 using DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::DC_CPDResEnergyTransferMode;
 using BPT_DC_ModeRes = message_20::DC_ChargeParameterDiscoveryResponse::BPT_DC_CPDResEnergyTransferMode;
 
-template <typename In, typename Out> void convert(Out& out, const In& in);
-
-template <> void convert(DC_ModeRes& out, const d20::DcTransferLimits& in) {
+void fill_limits(DC_ModeRes& out, const d20::DcTransferLimits& in) {
     out.max_charge_power = in.charge_limits.power.max;
     out.min_charge_power = in.charge_limits.power.min;
     out.max_charge_current = in.charge_limits.current.max;
@@ -28,7 +26,7 @@ template <> void convert(DC_ModeRes& out, const d20::DcTransferLimits& in) {
     out.power_ramp_limit = in.power_ramp_limit;
 }
 
-template <> void convert(BPT_DC_ModeRes& out, const d20::DcTransferLimits& in) {
+void fill_limits(BPT_DC_ModeRes& out, const d20::DcTransferLimits& in) {
     out.max_charge_power = in.charge_limits.power.max;
     out.min_charge_power = in.charge_limits.power.min;
     out.max_charge_current = in.charge_limits.current.max;
@@ -62,7 +60,7 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
         }
 
         auto& mode = res.transfer_mode.emplace<DC_ModeRes>();
-        convert(mode, dc_limits);
+        fill_limits(mode, dc_limits);
 
     } else if (std::holds_alternative<BPT_DC_ModeReq>(req.transfer_mode)) {
         if (session.get_selected_energy_service() != message_20::ServiceCategory::DC_BPT) {
@@ -75,7 +73,7 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
         }
 
         auto& mode = res.transfer_mode.emplace<BPT_DC_ModeRes>();
-        convert(mode, dc_limits);
+        fill_limits(mode, dc_limits);
 
     } else {
         // Not supported transfer_mode
