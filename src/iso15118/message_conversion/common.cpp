@@ -131,11 +131,11 @@ std::string from_Protocol(const Protocol& in) {
 
     switch (in) {
     case Protocol::Ftp:
-        return std::string("ftp");
+        return "ftp";
     case Protocol::Http:
-        return std::string("http");
+        return "http";
     case Protocol::Https:
-        return std::string("https");
+        return "https";
     }
     return "";
 }
