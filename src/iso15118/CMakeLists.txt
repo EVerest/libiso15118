@@ -45,11 +45,10 @@ target_sources(iso15118
         d20/state/dc_welding_detection.cpp
         d20/state/session_stop.cpp
 
-        message_conversion/variant.cpp
+        message_conversion/common.cpp
         message_conversion/cb_exi.cpp
         message_conversion/supported_app_protocol.cpp
         message_conversion/session_setup.cpp
-        message_conversion/common.cpp
         message_conversion/authorization_setup.cpp
         message_conversion/authorization.cpp
         message_conversion/service_discovery.cpp
@@ -65,6 +64,8 @@ target_sources(iso15118
         message_conversion/session_stop.cpp
         message_conversion/ac_charge_parameter_discovery.cpp
         message_conversion/ac_charge_loop.cpp
+
+        message_conversion/variant.cpp
 
         tbd_controller.cpp    
 )
