@@ -2,7 +2,7 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <cmath>
 
-#include <iso15118/message/common.hpp>
+#include <iso15118/message/common_types.hpp>
 
 #include <iso15118/detail/cb_exi.hpp>
 #include <iso15118/message/variant.hpp>

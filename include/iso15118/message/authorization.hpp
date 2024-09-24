@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "common.hpp"
+#include "common_types.hpp"
 
 namespace iso15118::message_20 {
 

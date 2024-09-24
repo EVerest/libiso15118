@@ -6,7 +6,7 @@
 
 #include <iso15118/d20/config.hpp>
 #include <iso15118/d20/session.hpp>
-#include <iso15118/message/common.hpp>
+#include <iso15118/message/common_types.hpp>
 #include <iso15118/message/service_discovery.hpp>
 
 namespace iso15118::d20::state {

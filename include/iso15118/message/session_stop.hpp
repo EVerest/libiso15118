@@ -5,7 +5,7 @@
 #include <optional>
 #include <string>
 
-#include "common.hpp"
+#include "common_types.hpp"
 
 namespace iso15118::message_20 {
 
