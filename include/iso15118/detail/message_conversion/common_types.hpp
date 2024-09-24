@@ -11,6 +11,9 @@ template <typename cb_HeaderType> void convert(const cb_HeaderType& in, Header& 
 template <typename cb_RationalNumberType> void convert(const cb_RationalNumberType& in, RationalNumber& out);
 template <typename cb_RationalNumberType> void convert(const RationalNumber& in, cb_RationalNumberType& out);
 
+template <typename InType> void convert(const InType& in, Dynamic_CLReqControlMode& out);
+template <typename InType> void convert(const InType& in, Scheduled_CLReqControlMode& out);
+
 float from_RationalNumber(const RationalNumber& in);
 RationalNumber from_float(float in);
 

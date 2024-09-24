@@ -28,13 +28,6 @@ template <> void convert(const struct iso20_ac_DisplayParametersType& in, Displa
     CB2CPP_ASSIGN_IF_USED(in.InletHot, out.inlet_hot);
 }
 
-// Todo(sl): this should go to common.cpp
-template <typename InType> void convert(const InType& in, Scheduled_CLReqControlMode& out) {
-    CB2CPP_CONVERT_IF_USED(in.EVTargetEnergyRequest, out.target_energy_request);
-    CB2CPP_CONVERT_IF_USED(in.EVMaximumEnergyRequest, out.max_energy_request);
-    CB2CPP_CONVERT_IF_USED(in.EVMinimumEnergyRequest, out.min_energy_request);
-}
-
 template <typename InType> void convert(const InType& in, AC_ChargeLoopRequest::Scheduled_AC_CLReqControlMode& out) {
     static_assert(std::is_same_v<InType, iso20_ac_Scheduled_AC_CLReqControlModeType> or
                   std::is_same_v<InType, iso20_ac_BPT_Scheduled_AC_CLReqControlModeType>);
@@ -69,14 +62,6 @@ void convert(const struct iso20_ac_BPT_Scheduled_AC_CLReqControlModeType& in,
     CB2CPP_CONVERT_IF_USED(in.EVMinimumDischargePower, out.min_discharge_power);
     CB2CPP_CONVERT_IF_USED(in.EVMinimumDischargePower_L2, out.min_discharge_power_L2);
     CB2CPP_CONVERT_IF_USED(in.EVMinimumDischargePower_L3, out.min_discharge_power_L3);
-}
-
-// Todo(sl): this should go to common.cpp
-template <typename InType> void convert(const InType& in, Dynamic_CLReqControlMode& out) {
-    CB2CPP_ASSIGN_IF_USED(in.DepartureTime, out.departure_time);
-    convert(in.EVTargetEnergyRequest, out.target_energy_request);
-    convert(in.EVMaximumEnergyRequest, out.max_energy_request);
-    convert(in.EVMinimumEnergyRequest, out.min_energy_request);
 }
 
 template <typename InType> void convert(const InType& in, AC_ChargeLoopRequest::Dynamic_AC_CLReqControlMode& out) {

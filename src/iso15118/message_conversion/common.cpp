@@ -110,6 +110,29 @@ template <> void convert(const EvseStatus& in, iso20_EVSEStatusType& out) {
     cb_convert_enum(in.notification, out.EVSENotification);
 }
 
+template <typename InType> void convert(const InType& in, Dynamic_CLReqControlMode& out) {
+    CB2CPP_ASSIGN_IF_USED(in.DepartureTime, out.departure_time);
+    convert(in.EVTargetEnergyRequest, out.target_energy_request);
+    convert(in.EVMaximumEnergyRequest, out.max_energy_request);
+    convert(in.EVMinimumEnergyRequest, out.min_energy_request);
+}
+
+template void convert(const iso20_dc_Dynamic_DC_CLReqControlModeType&, struct Dynamic_CLReqControlMode&);
+template void convert(const iso20_dc_BPT_Dynamic_DC_CLReqControlModeType&, struct Dynamic_CLReqControlMode&);
+template void convert(const iso20_ac_Dynamic_AC_CLReqControlModeType&, struct Dynamic_CLReqControlMode&);
+template void convert(const iso20_ac_BPT_Dynamic_AC_CLReqControlModeType&, struct Dynamic_CLReqControlMode&);
+
+template <typename InType> void convert(const InType& in, Scheduled_CLReqControlMode& out) {
+    CB2CPP_CONVERT_IF_USED(in.EVTargetEnergyRequest, out.target_energy_request);
+    CB2CPP_CONVERT_IF_USED(in.EVMaximumEnergyRequest, out.max_energy_request);
+    CB2CPP_CONVERT_IF_USED(in.EVMinimumEnergyRequest, out.min_energy_request);
+}
+
+template void convert(const iso20_dc_Scheduled_DC_CLReqControlModeType&, Scheduled_CLReqControlMode&);
+template void convert(const iso20_dc_BPT_Scheduled_DC_CLReqControlModeType&, Scheduled_CLReqControlMode&);
+template void convert(const iso20_ac_Scheduled_AC_CLReqControlModeType&, Scheduled_CLReqControlMode&);
+template void convert(const iso20_ac_BPT_Scheduled_AC_CLReqControlModeType&, Scheduled_CLReqControlMode&);
+
 float from_RationalNumber(const RationalNumber& in) {
     return in.value * pow(10, in.exponent);
 }
