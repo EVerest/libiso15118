@@ -6,7 +6,7 @@
 
 #include <iso15118/message/variant.hpp>
 
-#include "cb_exi.hpp"
+#include "message_conversion/cb_exi.hpp"
 
 namespace iso15118::message_20 {
 

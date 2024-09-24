@@ -7,11 +7,13 @@
 #include <iso15118/d20/config.hpp>
 #include <iso15118/d20/control_event.hpp>
 #include <iso15118/d20/fsm.hpp>
-#include <iso15118/detail/cb_exi.hpp>
 #include <iso15118/io/sdp.hpp>
 #include <iso15118/io/stream_view.hpp>
 #include <iso15118/message/variant.hpp>
 #include <iso15118/session/feedback.hpp>
+
+#include <iso15118/detail/message_conversion/cb_exi.hpp>
+
 
 using namespace iso15118;
 

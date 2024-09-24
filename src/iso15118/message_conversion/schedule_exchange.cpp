@@ -4,7 +4,6 @@
 
 #include <type_traits>
 
-#include <iso15118/detail/cb_exi.hpp>
 #include <iso15118/detail/variant_access.hpp>
 
 #include <cbv2g/iso_20/iso20_CommonMessages_Decoder.h>

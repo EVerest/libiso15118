@@ -10,7 +10,6 @@ target_include_directories(iso15118
 target_sources(iso15118
     PRIVATE
         misc/helper.cpp
-        misc/cb_exi.cpp
 
         io/connection_plain.cpp
         io/logging.cpp
@@ -47,6 +46,7 @@ target_sources(iso15118
         d20/state/session_stop.cpp
 
         message_conversion/variant.cpp
+        message_conversion/cb_exi.cpp
         message_conversion/supported_app_protocol.cpp
         message_conversion/session_setup.cpp
         message_conversion/common.cpp
