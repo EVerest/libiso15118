@@ -67,8 +67,8 @@ template <> void insert_type(VariantAccess& va, const struct iso20_dc_DC_ChargeP
     va.insert_type<DC_ChargeParameterDiscoveryRequest>(in);
 }
 
-struct ModeResponseVisitor {
-    ModeResponseVisitor(iso20_dc_DC_ChargeParameterDiscoveryResType& res_) : res(res_){};
+template <> struct ConversionVisitor<iso20_dc_DC_ChargeParameterDiscoveryResType> {
+    ConversionVisitor(iso20_dc_DC_ChargeParameterDiscoveryResType& res_) : res(res_){};
     void operator()(const DC_ModeRes& in) {
         init_iso20_dc_DC_CPDResEnergyTransferModeType(&res.DC_CPDResEnergyTransferMode);
         CB_SET_USED(res.DC_CPDResEnergyTransferMode);
@@ -114,7 +114,7 @@ void convert(const DC_ChargeParameterDiscoveryResponse& in, struct iso20_dc_DC_C
     init_iso20_dc_DC_ChargeParameterDiscoveryResType(&out);
     convert(in.header, out.Header);
     cb_convert_enum(in.response_code, out.ResponseCode);
-    std::visit(ModeResponseVisitor(out), in.transfer_mode);
+    std::visit(ConversionVisitor(out), in.transfer_mode);
 }
 
 template <> int serialize_to_exi(const DC_ChargeParameterDiscoveryResponse& in, exi_bitstream_t& out) {

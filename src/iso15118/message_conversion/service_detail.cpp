@@ -118,8 +118,8 @@ template <> void convert(const struct iso20_ServiceDetailReqType& in, ServiceDet
     out.service = static_cast<ServiceCategory>(in.ServiceID);
 }
 
-struct ParamterValueVisitor {
-    ParamterValueVisitor(iso20_ParameterType& parameter_) : parameter(parameter_){};
+template <> struct ConversionVisitor<iso20_ParameterType> {
+    ConversionVisitor(iso20_ParameterType& parameter_) : parameter(parameter_){};
     void operator()(const bool& in) {
         CB_SET_USED(parameter.boolValue);
         parameter.boolValue = in;
@@ -168,7 +168,7 @@ template <> void convert(const ServiceDetailResponse& in, iso20_ServiceDetailRes
         for (auto const& in_parameter : in_parameter_set.parameter) {
             auto& out_parameter = out_paramater_set.Parameter.array[t++];
             CPP2CB_STRING(in_parameter.name, out_parameter.Name);
-            std::visit(ParamterValueVisitor(out_parameter), in_parameter.value);
+            std::visit(ConversionVisitor(out_parameter), in_parameter.value);
         }
         out_paramater_set.Parameter.arrayLen = in_parameter_set.parameter.size();
     }

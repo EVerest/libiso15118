@@ -133,6 +133,18 @@ template void convert(const iso20_dc_BPT_Scheduled_DC_CLReqControlModeType&, Sch
 template void convert(const iso20_ac_Scheduled_AC_CLReqControlModeType&, Scheduled_CLReqControlMode&);
 template void convert(const iso20_ac_BPT_Scheduled_AC_CLReqControlModeType&, Scheduled_CLReqControlMode&);
 
+template <typename cb_Type> void convert(const Dynamic_CLResControlMode& in, cb_Type& out) {
+    CPP2CB_ASSIGN_IF_USED(in.departure_time, out.DepartureTime);
+    CPP2CB_ASSIGN_IF_USED(in.minimum_soc, out.MinimumSOC);
+    CPP2CB_ASSIGN_IF_USED(in.target_soc, out.TargetSOC);
+    CPP2CB_ASSIGN_IF_USED(in.ack_max_delay, out.AckMaxDelay);
+}
+
+template void convert(const Dynamic_CLResControlMode&, iso20_dc_Dynamic_DC_CLResControlModeType&);
+template void convert(const Dynamic_CLResControlMode&, iso20_dc_BPT_Dynamic_DC_CLResControlModeType&);
+template void convert(const Dynamic_CLResControlMode&, iso20_ac_Dynamic_AC_CLResControlModeType&);
+template void convert(const Dynamic_CLResControlMode&, iso20_ac_BPT_Dynamic_AC_CLResControlModeType&);
+
 float from_RationalNumber(const RationalNumber& in) {
     return in.value * pow(10, in.exponent);
 }

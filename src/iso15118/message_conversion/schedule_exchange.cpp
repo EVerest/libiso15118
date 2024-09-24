@@ -146,8 +146,8 @@ template <> void convert(const ScheduleExchangeResponse::ScheduleTuple& in, stru
     CPP2CB_CONVERT_IF_USED(in.discharging_schedule, out.DischargingSchedule);
 }
 
-struct ModeResponseVisitor {
-    ModeResponseVisitor(iso20_ScheduleExchangeResType& res_) : res(res_){};
+template <> struct ConversionVisitor<iso20_ScheduleExchangeResType> {
+    ConversionVisitor(iso20_ScheduleExchangeResType& res_) : res(res_){};
     void operator()(const ScheduleExchangeResponse::Dynamic_SEResControlMode& in) {
         init_iso20_Dynamic_SEResControlModeType(&res.Dynamic_SEResControlMode);
         CB_SET_USED(res.Dynamic_SEResControlMode);
@@ -189,8 +189,9 @@ template <> void convert(const ScheduleExchangeResponse& in, struct iso20_Schedu
 
     cb_convert_enum(in.processing, out.EVSEProcessing);
 
+    // FIXME (aw): why is this commented out?
     // CPP2CB_ASSIGN_IF_USED(in.go_to_pause, out.GoToPause);
-    // std::visit(ModeResponseVisitor(out), in.control_mode);
+    // std::visit(ConversionVisitor(out), in.control_mode);
 
     // -----------------------------------------------------------------------------------
 

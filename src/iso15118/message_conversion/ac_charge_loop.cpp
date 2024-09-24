@@ -182,13 +182,6 @@ void convert(const AC_ChargeLoopResponse::BPT_Scheduled_AC_CLResControlMode& in,
     convert(static_cast<const AC_ChargeLoopResponse::Scheduled_AC_CLResControlMode&>(in), out);
 }
 
-template <typename cb_Type> void convert(const Dynamic_CLResControlMode& in, cb_Type& out) {
-    CPP2CB_ASSIGN_IF_USED(in.departure_time, out.DepartureTime);
-    CPP2CB_ASSIGN_IF_USED(in.minimum_soc, out.MinimumSOC);
-    CPP2CB_ASSIGN_IF_USED(in.target_soc, out.TargetSOC);
-    CPP2CB_ASSIGN_IF_USED(in.ack_max_delay, out.AckMaxDelay);
-}
-
 template <typename cb_Type> void convert(const AC_ChargeLoopResponse::Dynamic_AC_CLResControlMode& in, cb_Type& out) {
     convert(static_cast<const Dynamic_CLResControlMode&>(in), out);
 
@@ -211,13 +204,13 @@ void convert(const AC_ChargeLoopResponse::BPT_Dynamic_AC_CLResControlMode& in,
     convert(static_cast<const AC_ChargeLoopResponse::Dynamic_AC_CLResControlMode&>(in), out);
 }
 
-struct ControlModeVisitor {
+template <> struct ConversionVisitor<iso20_ac_AC_ChargeLoopResType> {
     using ScheduledCM = AC_ChargeLoopResponse::Scheduled_AC_CLResControlMode;
     using BPT_ScheduledCM = AC_ChargeLoopResponse::BPT_Scheduled_AC_CLResControlMode;
     using DynamicCM = AC_ChargeLoopResponse::Dynamic_AC_CLResControlMode;
     using BPT_DynamicCM = AC_ChargeLoopResponse::BPT_Dynamic_AC_CLResControlMode;
 
-    ControlModeVisitor(iso20_ac_AC_ChargeLoopResType& res_) : res(res_){};
+    ConversionVisitor(iso20_ac_AC_ChargeLoopResType& res_) : res(res_){};
 
     void operator()(const ScheduledCM& in) {
         auto& out = res.Scheduled_AC_CLResControlMode;
@@ -263,7 +256,7 @@ template <> void convert(const AC_ChargeLoopResponse& in, struct iso20_ac_AC_Cha
 
     CPP2CB_CONVERT_IF_USED(in.target_frequency, out.EVSETargetFrequency);
 
-    std::visit(ControlModeVisitor(out), in.control_mode);
+    std::visit(ConversionVisitor(out), in.control_mode);
 }
 
 template <> int serialize_to_exi(const AC_ChargeLoopResponse& in, exi_bitstream_t& out) {

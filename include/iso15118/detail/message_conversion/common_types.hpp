@@ -14,6 +14,11 @@ template <typename cb_RationalNumberType> void convert(const RationalNumber& in,
 template <typename InType> void convert(const InType& in, Dynamic_CLReqControlMode& out);
 template <typename InType> void convert(const InType& in, Scheduled_CLReqControlMode& out);
 
+template <typename cb_Type> void convert(const Dynamic_CLResControlMode& in, cb_Type& out);
+
+template <typename T> struct ConversionVisitor;
+template <typename T> ConversionVisitor(T&) -> ConversionVisitor<T>;
+
 float from_RationalNumber(const RationalNumber& in);
 RationalNumber from_float(float in);
 

@@ -15,8 +15,8 @@ template <> void convert(const struct iso20_AuthorizationSetupReqType& in, Autho
     convert(in.Header, out.header);
 }
 
-struct AuthorizationModeVisitor {
-    AuthorizationModeVisitor(iso20_AuthorizationSetupResType& out_) : out(out_){};
+template <> struct ConversionVisitor<iso20_AuthorizationSetupResType> {
+    ConversionVisitor(iso20_AuthorizationSetupResType& out_) : out(out_){};
     void operator()([[maybe_unused]] const AuthorizationSetupResponse::EIM_ASResAuthorizationMode& in) {
         CB_SET_USED(out.EIM_ASResAuthorizationMode);
         init_iso20_EIM_ASResAuthorizationModeType(&out.EIM_ASResAuthorizationMode);
@@ -46,7 +46,7 @@ template <> void convert(const AuthorizationSetupResponse& in, iso20_Authorizati
 
     out.CertificateInstallationService = in.certificate_installation_service;
 
-    std::visit(AuthorizationModeVisitor(out), in.authorization_mode);
+    std::visit(ConversionVisitor(out), in.authorization_mode);
 
     convert(in.header, out.Header);
 }
