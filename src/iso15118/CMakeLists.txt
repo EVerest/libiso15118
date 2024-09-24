@@ -46,25 +46,25 @@ target_sources(iso15118
         d20/state/dc_welding_detection.cpp
         d20/state/session_stop.cpp
 
-        message/variant.cpp
-        message/supported_app_protocol.cpp
-        message/session_setup.cpp
-        message/common.cpp
-        message/authorization_setup.cpp
-        message/authorization.cpp
-        message/service_discovery.cpp
-        message/service_detail.cpp
-        message/service_selection.cpp
-        message/dc_charge_parameter_discovery.cpp
-        message/schedule_exchange.cpp
-        message/dc_cable_check.cpp
-        message/dc_pre_charge.cpp
-        message/power_delivery.cpp
-        message/dc_charge_loop.cpp
-        message/dc_welding_detection.cpp
-        message/session_stop.cpp
-        message/ac_charge_parameter_discovery.cpp
-        message/ac_charge_loop.cpp
+        message_conversion/variant.cpp
+        message_conversion/supported_app_protocol.cpp
+        message_conversion/session_setup.cpp
+        message_conversion/common.cpp
+        message_conversion/authorization_setup.cpp
+        message_conversion/authorization.cpp
+        message_conversion/service_discovery.cpp
+        message_conversion/service_detail.cpp
+        message_conversion/service_selection.cpp
+        message_conversion/dc_charge_parameter_discovery.cpp
+        message_conversion/schedule_exchange.cpp
+        message_conversion/dc_cable_check.cpp
+        message_conversion/dc_pre_charge.cpp
+        message_conversion/power_delivery.cpp
+        message_conversion/dc_charge_loop.cpp
+        message_conversion/dc_welding_detection.cpp
+        message_conversion/session_stop.cpp
+        message_conversion/ac_charge_parameter_discovery.cpp
+        message_conversion/ac_charge_loop.cpp
 
         tbd_controller.cpp    
 )
