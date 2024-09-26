@@ -99,6 +99,10 @@ public:
         return selected_services.selected_control_mode;
     }
 
+    message_20::MobilityNeedsMode get_selected_mobility_needs_mode() const {
+        return selected_services.selected_mobility_needs_mode;
+    }
+
     // TODO(sl): Define get_selected_*() if necessary
 
     ~Session();
