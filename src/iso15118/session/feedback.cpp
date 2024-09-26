@@ -45,4 +45,12 @@ void Feedback::display_parameters(const feedback::DisplayParameters& display_par
     call_if_available(callbacks.display_parameters, display_parameters_);
 }
 
+void Feedback::dc_present_voltage(float present_voltage_) const {
+    call_if_available(callbacks.dc_present_voltage, present_voltage_);
+}
+
+void Feedback::meter_info_requested(bool requested) const {
+    call_if_available(callbacks.meter_info_requested, requested);
+}
+
 } // namespace iso15118::session

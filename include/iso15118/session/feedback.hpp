@@ -86,6 +86,8 @@ struct Callbacks {
     std::function<void(const std::string&)> evccid;
     std::function<void(const std::string&)> selected_protocol;
     std::function<void(const DisplayParameters&)> display_parameters;
+    std::function<void(float)> dc_present_voltage;
+    std::function<void(bool)> meter_info_requested;
 };
 
 } // namespace feedback
@@ -103,6 +105,8 @@ public:
     void evcc_id(const std::string&) const;
     void selected_protocol(const std::string&) const;
     void display_parameters(const feedback::DisplayParameters&) const;
+    void dc_present_voltage(float) const;
+    void meter_info_requested(bool) const;
 
 private:
     feedback::Callbacks callbacks;

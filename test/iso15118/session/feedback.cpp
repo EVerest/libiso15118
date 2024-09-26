@@ -16,6 +16,8 @@ struct FeedbackResults {
     std::string evcc_id;
     std::string selected_protocol;
     feedback::DisplayParameters display_parameters;
+    float present_voltage;
+    bool meter_info_requested;
 };
 
 SCENARIO("Feedback Tests") {
@@ -46,6 +48,12 @@ SCENARIO("Feedback Tests") {
     };
     callbacks.display_parameters = [&feedback_results](const feedback::DisplayParameters& parameters) {
         feedback_results.display_parameters = parameters;
+    };
+    callbacks.dc_present_voltage = [&feedback_results](float present_voltage_) {
+        feedback_results.present_voltage = present_voltage_;
+    };
+    callbacks.meter_info_requested = [&feedback_results](bool requested) {
+        feedback_results.meter_info_requested = requested;
     };
 
     const auto feedback = Feedback(callbacks);
@@ -169,6 +177,24 @@ SCENARIO("Feedback Tests") {
             REQUIRE(feedback_results.display_parameters.minimum_soc.has_value() == false);
             REQUIRE(feedback_results.display_parameters.target_soc.has_value() == true);
             REQUIRE(*feedback_results.display_parameters.target_soc == expected.target_soc.value_or(0));
+        }
+    }
+
+    GIVEN("Test dc_present_voltage") {
+        float expected{704.4};
+        feedback.dc_present_voltage(704.4);
+
+        THEN("dc_present_voltage should be like expected") {
+            REQUIRE(feedback_results.present_voltage == expected);
+        }
+    }
+
+    GIVEN("Test meter_info_requested") {
+        bool expected{true};
+        feedback.meter_info_requested(true);
+
+        THEN("meter_info_requested should be like expected") {
+            REQUIRE(feedback_results.meter_info_requested == expected);
         }
     }
 }
