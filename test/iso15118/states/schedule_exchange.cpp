@@ -25,7 +25,8 @@ SCENARIO("Schedule Exchange state handling") {
 
         message_20::RationalNumber max_power = {0, 0};
 
-        const auto res = d20::state::handle_request(req, d20::Session(), max_power);
+        const auto res =
+            d20::state::handle_request(req, d20::Session(), max_power, std::nullopt, std::nullopt, std::nullopt);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -53,7 +54,7 @@ SCENARIO("Schedule Exchange state handling") {
 
         message_20::RationalNumber max_power = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, max_power);
+        const auto res = d20::state::handle_request(req, session, max_power, std::nullopt, std::nullopt, std::nullopt);
 
         THEN("ResponseCode: FAILED, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED);
@@ -81,7 +82,7 @@ SCENARIO("Schedule Exchange state handling") {
 
         message_20::RationalNumber max_power = {22, 3};
 
-        const auto res = d20::state::handle_request(req, session, max_power);
+        const auto res = d20::state::handle_request(req, session, max_power, std::nullopt, std::nullopt, std::nullopt);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -114,7 +115,7 @@ SCENARIO("Schedule Exchange state handling") {
 
         message_20::RationalNumber max_power = {22, 3};
 
-        const auto res = d20::state::handle_request(req, session, max_power);
+        const auto res = d20::state::handle_request(req, session, max_power, std::nullopt, std::nullopt, std::nullopt);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -123,6 +124,8 @@ SCENARIO("Schedule Exchange state handling") {
             REQUIRE(std::holds_alternative<Dynamic_ModeRes>(res.control_mode) == true);
         }
     }
+
+    // GIVEN("Good case - setting new departure_time, target_soc & min_soc") // TODO(sl)
 
     // GIVEN("Bad Case - sequence error") {} // todo(sl): not here
 

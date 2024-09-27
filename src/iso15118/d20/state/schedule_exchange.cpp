@@ -12,9 +12,10 @@
 
 namespace iso15118::d20::state {
 
-message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleExchangeRequest& req,
-                                                    const d20::Session& session,
-                                                    const message_20::RationalNumber& max_power) {
+message_20::ScheduleExchangeResponse
+handle_request(const message_20::ScheduleExchangeRequest& req, const d20::Session& session,
+               const message_20::RationalNumber& max_power, std::optional<std::time_t> new_departure_time,
+               std::optional<uint8_t> new_target_soc, std::optional<uint8_t> new_min_soc) {
 
     message_20::ScheduleExchangeResponse res;
 
@@ -49,10 +50,20 @@ message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleEx
     } else if (session.get_selected_control_mode() == message_20::ControlMode::Dynamic &&
                std::holds_alternative<message_20::ScheduleExchangeRequest::Dynamic_SEReqControlMode>(
                    req.control_mode)) {
-        
+
         // TODO(sl): Publish req dynamic mode parameters
-        // Note(sl): Right now with MobilityNeedsMode == 1 the values are really optional
-        res.control_mode.emplace<message_20::ScheduleExchangeResponse::Dynamic_SEResControlMode>();
+        auto& mode = res.control_mode.emplace<message_20::ScheduleExchangeResponse::Dynamic_SEResControlMode>();
+
+        if (session.get_selected_mobility_needs_mode() == message_20::MobilityNeedsMode::ProvidedBySecc) {
+            if (new_departure_time.has_value()) {
+                const auto departure_time = static_cast<uint64_t>(new_departure_time.value());
+                if (departure_time > res.header.timestamp) {
+                    mode.departure_time = static_cast<uint32_t>(departure_time - res.header.timestamp);
+                }
+            }
+            mode.target_soc = new_target_soc;
+            mode.minimum_soc = new_min_soc;
+        }
 
     } else {
         logf_error("The control mode of the req message does not match the previously agreed contol mode.");
@@ -69,6 +80,19 @@ void ScheduleExchange::enter() {
 }
 
 FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorType& sa, FsmEvent ev) {
+
+    if (ev == FsmEvent::CONTROL_MESSAGE) {
+
+        if (const auto control_data = ctx.get_control_event<UpdateDynamicModeParameters>()) {
+            new_departure_time = *control_data->departure_time;
+            new_target_soc = *control_data->target_soc;
+            new_min_soc = *control_data->min_soc;
+        }
+
+        // Ignore control message
+        return sa.HANDLED_INTERNALLY;
+    }
+
     if (ev != FsmEvent::V2GTP_MESSAGE) {
         return sa.PASS_ON;
     }
@@ -86,7 +110,8 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
             max_charge_power = ctx.session_config.dc_limits.charge_limits.power.max;
         }
 
-        const auto res = handle_request(*req, ctx.session, max_charge_power);
+        const auto res =
+            handle_request(*req, ctx.session, max_charge_power, new_departure_time, new_target_soc, new_min_soc);
 
         ctx.respond(res);
 

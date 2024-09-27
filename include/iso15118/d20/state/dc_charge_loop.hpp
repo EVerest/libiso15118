@@ -4,6 +4,10 @@
 
 #include "../fsm.hpp"
 
+#include <cstdint>
+#include <ctime>
+#include <optional>
+
 namespace iso15118::d20::state {
 
 struct DC_ChargeLoop : public FsmSimpleState {
@@ -17,6 +21,10 @@ private:
     float present_voltage{0};
     float present_current{0};
     bool stop{false};
+
+    std::optional<std::time_t> new_departure_time;
+    std::optional<uint8_t> new_target_soc;
+    std::optional<uint8_t> new_min_soc;
 
     bool first_entry_in_charge_loop{true};
 };
