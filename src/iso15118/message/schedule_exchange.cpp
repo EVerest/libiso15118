@@ -115,7 +115,7 @@ template <> void convert(const ScheduleExchangeResponse::PowerSchedule& in, stru
 
     if ((sizeof(out.PowerScheduleEntries.PowerScheduleEntry.array) /
          sizeof(out.PowerScheduleEntries.PowerScheduleEntry.array[0])) < in.entries.size()) {
-        throw std::runtime_error("array is too large");
+        throw std::runtime_error("array is too large"); // FIXME(SL): Change error message
     }
 
     for (std::size_t i = 0; i < in.entries.size(); i++) {
@@ -154,7 +154,7 @@ template <> void convert(const ScheduleExchangeResponse::PriceRuleStack& in, str
     out.Duration = in.duration;
 
     if ((sizeof(out.PriceRule.array) / sizeof(out.PriceRule.array[0])) < in.price_rule.size()) {
-        throw std::runtime_error("array is too large");
+        throw std::runtime_error("array is too large"); // FIXME(SL): Change error message
     }
     for (std::size_t i = 0; i < in.price_rule.size(); i++) {
         convert(in.price_rule.at(i), out.PriceRule.array[i]);
@@ -187,7 +187,7 @@ void convert(const ScheduleExchangeResponse::AbsolutePriceSchedule& in, struct i
         const auto& in_tax_rules = in.tax_rules.value();
 
         if ((sizeof(out.TaxRules.TaxRule.array) / sizeof(out.TaxRules.TaxRule.array[0])) < in_tax_rules.size()) {
-            throw std::runtime_error("array is too large");
+            throw std::runtime_error("array is too large"); // FIXME(SL): Change error message
         }
 
         for (std::size_t i = 0; i < in_tax_rules.size(); i++) {
@@ -198,7 +198,7 @@ void convert(const ScheduleExchangeResponse::AbsolutePriceSchedule& in, struct i
 
     if ((sizeof(out.PriceRuleStacks.PriceRuleStack.array) / sizeof(out.PriceRuleStacks.PriceRuleStack.array[0])) <
         in.price_rule_stacks.size()) {
-        throw std::runtime_error("array is too large");
+        throw std::runtime_error("array is too large"); // FIXME(SL): Change error message
     }
     for (std::size_t i = 0; i < in.price_rule_stacks.size(); i++) {
         convert(in.price_rule_stacks.at(i), out.PriceRuleStacks.PriceRuleStack.array[i]);
@@ -214,7 +214,7 @@ void convert(const ScheduleExchangeResponse::AbsolutePriceSchedule& in, struct i
 
         if ((sizeof(out.OverstayRules.OverstayRule.array) / sizeof(out.OverstayRules.OverstayRule.array[0])) <
             in_overstay_rules.overstay_rule.size()) {
-            throw std::runtime_error("array is too large");
+            throw std::runtime_error("array is too large"); // FIXME(SL): Change error message
         }
 
         for (std::size_t i = 0; i < in_overstay_rules.overstay_rule.size(); i++) {
@@ -229,7 +229,7 @@ void convert(const ScheduleExchangeResponse::AbsolutePriceSchedule& in, struct i
 
         if ((sizeof(out.AdditionalSelectedServices.AdditionalService.array) /
              sizeof(out.AdditionalSelectedServices.AdditionalService.array[0])) < in_add_services.size()) {
-            throw std::runtime_error("array is too large");
+            throw std::runtime_error("array is too large"); // FIXME(SL): Change error message
         }
 
         for (std::size_t i = 0; i < in_add_services.size(); i++) {
@@ -254,7 +254,7 @@ void convert(const ScheduleExchangeResponse::PriceLevelSchedule& in, struct iso2
     if ((sizeof(out.PriceLevelScheduleEntries.PriceLevelScheduleEntry.array) /
          sizeof(out.PriceLevelScheduleEntries.PriceLevelScheduleEntry.array[0])) <
         in.price_level_schedule_entries.size()) {
-        throw std::runtime_error("array is too large");
+        throw std::runtime_error("array is too large"); // FIXME(SL): Change error message
     }
 
     for (std::size_t i = 0; i < in.price_level_schedule_entries.size(); i++) {
@@ -267,23 +267,34 @@ void convert(const ScheduleExchangeResponse::PriceLevelSchedule& in, struct iso2
     out.PriceLevelScheduleEntries.PriceLevelScheduleEntry.arrayLen = in.price_level_schedule_entries.size();
 }
 
-template <> void convert(const ScheduleExchangeResponse::ChargingSchedule& in, struct iso20_ChargingScheduleType& out) {
-    init_iso20_ChargingScheduleType(&out);
+using PriceSchedule = std::variant<std::monostate, ScheduleExchangeResponse::AbsolutePriceSchedule,
+                                   ScheduleExchangeResponse::PriceLevelSchedule>;
+template <typename CbMessageType> void convert_price_schedule(const PriceSchedule& in, CbMessageType& out) {
 
-    convert(in.power_schedule, out.PowerSchedule);
-
-    if (std::holds_alternative<ScheduleExchangeResponse::AbsolutePriceSchedule>(in.price_schedule)) {
+    if (const auto* absolute_price = std::get_if<ScheduleExchangeResponse::AbsolutePriceSchedule>(&in)) {
+        convert(*absolute_price, out.AbsolutePriceSchedule);
         out.AbsolutePriceSchedule_isUsed = true;
-        const auto& absolute_price = std::get<ScheduleExchangeResponse::AbsolutePriceSchedule>(in.price_schedule);
-        convert(absolute_price, out.AbsolutePriceSchedule);
-    } else if (std::holds_alternative<ScheduleExchangeResponse::PriceLevelSchedule>(in.price_schedule)) {
+    } else if (const auto* price_level_schedule = std::get_if<ScheduleExchangeResponse::PriceLevelSchedule>(&in)) {
+        convert(*price_level_schedule, out.PriceLevelSchedule);
         out.PriceLevelSchedule_isUsed = true;
-        const auto& price_level_schedule = std::get<ScheduleExchangeResponse::PriceLevelSchedule>(in.price_schedule);
-        convert(price_level_schedule, out.PriceLevelSchedule);
     } else {
         out.AbsolutePriceSchedule_isUsed = false;
         out.PriceLevelSchedule_isUsed = false;
     }
+}
+
+template <> void convert(const PriceSchedule& in, struct iso20_ChargingScheduleType& out) {
+    convert_price_schedule(in, out);
+}
+template <> void convert(const PriceSchedule& in, struct iso20_Dynamic_SEResControlModeType& out) {
+    convert_price_schedule(in, out);
+}
+
+template <> void convert(const ScheduleExchangeResponse::ChargingSchedule& in, struct iso20_ChargingScheduleType& out) {
+    init_iso20_ChargingScheduleType(&out);
+
+    convert(in.power_schedule, out.PowerSchedule);
+    convert(in.price_schedule, out);
 }
 
 template <> void convert(const ScheduleExchangeResponse::ScheduleTuple& in, struct iso20_ScheduleTupleType& out) {
@@ -306,19 +317,7 @@ struct ModeResponseVisitor {
         CPP2CB_ASSIGN_IF_USED(in.minimum_soc, out.MinimumSOC);
         CPP2CB_ASSIGN_IF_USED(in.target_soc, out.TargetSOC);
 
-        if (std::holds_alternative<ScheduleExchangeResponse::AbsolutePriceSchedule>(in.price_schedule)) {
-            out.AbsolutePriceSchedule_isUsed = true;
-            const auto& absolute_price = std::get<ScheduleExchangeResponse::AbsolutePriceSchedule>(in.price_schedule);
-            convert(absolute_price, out.AbsolutePriceSchedule);
-        } else if (std::holds_alternative<ScheduleExchangeResponse::PriceLevelSchedule>(in.price_schedule)) {
-            out.PriceLevelSchedule_isUsed = true;
-            const auto& price_level_schedule =
-                std::get<ScheduleExchangeResponse::PriceLevelSchedule>(in.price_schedule);
-            convert(price_level_schedule, out.PriceLevelSchedule);
-        } else {
-            out.AbsolutePriceSchedule_isUsed = false;
-            out.PriceLevelSchedule_isUsed = false;
-        }
+        convert(in.price_schedule, out);
     }
 
     void operator()(const ScheduleExchangeResponse::Scheduled_SEResControlMode& in) {
@@ -328,7 +327,7 @@ struct ModeResponseVisitor {
         auto& out = res.Scheduled_SEResControlMode;
 
         if ((sizeof(out.ScheduleTuple.array) / sizeof(out.ScheduleTuple.array[0])) < in.schedule_tuple.size()) {
-            throw std::runtime_error("array is too large");
+            throw std::runtime_error("array is too large"); // FIXME(SL): Change error message
         }
 
         for (std::size_t i = 0; i < in.schedule_tuple.size(); i++) {
