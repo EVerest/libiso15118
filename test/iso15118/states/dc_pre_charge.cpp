@@ -22,13 +22,12 @@ SCENARIO("DC Pre charge state handling") {
 
         const float present_voltage = 0.1;
 
-        const auto [res, target_voltage] = d20::state::handle_request(req, d20::Session(), present_voltage);
+        const auto res = d20::state::handle_request(req, d20::Session(), present_voltage);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
             REQUIRE(res.present_voltage.value == 0);
             REQUIRE(res.present_voltage.exponent == 0);
-            REQUIRE(target_voltage.has_value() == false);
         }
     }
 
@@ -45,14 +44,12 @@ SCENARIO("DC Pre charge state handling") {
 
         const float present_voltage = 400.1;
 
-        const auto [res, target_voltage] = d20::state::handle_request(req, session, present_voltage);
+        const auto res = d20::state::handle_request(req, session, present_voltage);
 
         THEN("ResponseCode: OK, present_voltage should be 400.1V") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
             REQUIRE(res.present_voltage.value == 4001);
             REQUIRE(res.present_voltage.exponent == -1);
-            REQUIRE(target_voltage.has_value() == true);
-            REQUIRE(*target_voltage == 400.0);
         }
     }
 

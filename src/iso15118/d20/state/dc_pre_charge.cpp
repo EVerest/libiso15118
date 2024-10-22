@@ -10,18 +10,18 @@
 
 namespace iso15118::d20::state {
 
-std::tuple<message_20::DC_PreChargeResponse, std::optional<float>>
-handle_request(const message_20::DC_PreChargeRequest& req, const d20::Session& session, const float present_voltage) {
+message_20::DC_PreChargeResponse handle_request(const message_20::DC_PreChargeRequest& req, const d20::Session& session,
+                                                const float present_voltage) {
 
     message_20::DC_PreChargeResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return {response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession), std::nullopt};
+        return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
     }
 
     res.present_voltage = message_20::from_float(present_voltage);
 
-    return {response_with_code(res, message_20::ResponseCode::OK), message_20::from_RationalNumber(req.target_voltage)};
+    return response_with_code(res, message_20::ResponseCode::OK);
 }
 
 void DC_PreCharge::enter() {
@@ -49,11 +49,9 @@ FsmSimpleState::HandleEventReturnType DC_PreCharge::handle_event(AllocatorType& 
     const auto variant = ctx.pull_request();
 
     if (const auto req = variant->get_if<message_20::DC_PreChargeRequest>()) {
-        const auto [res, target_voltage] = handle_request(*req, ctx.session, present_voltage);
+        const auto res = handle_request(*req, ctx.session, present_voltage);
 
-        if (target_voltage.has_value()) {
-            ctx.feedback.dc_pre_charge_target_voltage(*target_voltage);
-        }
+        ctx.feedback.dc_pre_charge_target_voltage(message_20::from_RationalNumber(req->target_voltage));
 
         ctx.respond(res);
 

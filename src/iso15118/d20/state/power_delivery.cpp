@@ -55,11 +55,9 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
     const auto variant = ctx.pull_request();
 
     if (const auto req = variant->get_if<message_20::DC_PreChargeRequest>()) {
-        const auto [res, target_voltage] = handle_request(*req, ctx.session, present_voltage);
+        const auto res = handle_request(*req, ctx.session, present_voltage);
 
-        if (target_voltage.has_value()) {
-            ctx.feedback.dc_pre_charge_target_voltage(*target_voltage);
-        }
+        ctx.feedback.dc_pre_charge_target_voltage(message_20::from_RationalNumber(req->target_voltage));
 
         ctx.respond(res);
 

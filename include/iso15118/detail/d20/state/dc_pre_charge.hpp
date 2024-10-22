@@ -12,7 +12,7 @@
 
 namespace iso15118::d20::state {
 
-std::tuple<message_20::DC_PreChargeResponse, std::optional<float>>
-handle_request(const message_20::DC_PreChargeRequest& req, const d20::Session& session, const float present_voltage);
+message_20::DC_PreChargeResponse handle_request(const message_20::DC_PreChargeRequest& req, const d20::Session& session,
+                                                const float present_voltage);
 
 } // namespace iso15118::d20::state
