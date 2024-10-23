@@ -16,10 +16,7 @@
 
 namespace iso15118::d20::state {
 
-using EvFeedbackControlMode =
-    std::variant<std::monostate, session::feedback::DcChargeScheduledMode, session::feedback::DcChargeDynamicMode>;
-
-std::tuple<message_20::DC_ChargeLoopResponse, EvFeedbackControlMode>
+message_20::DC_ChargeLoopResponse
 handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& session, const float present_voltage,
                const float present_current, const bool stop, const DcTransferLimits& dc_limits,
                std::optional<std::time_t> new_departure_time, std::optional<uint8_t> new_target_soc,

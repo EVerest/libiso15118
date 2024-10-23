@@ -61,7 +61,7 @@ SCENARIO("DC charge loop state handling") {
         req.meter_info_requested = false;
         req.present_voltage = {330, 0};
 
-        const auto [res, ev_feedback] = d20::state::handle_request(
+        const auto res = d20::state::handle_request(
             req, d20::Session(), 330, 30, false, evse_setup.dc_limits, std::nullopt, std::nullopt, std::nullopt);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
@@ -72,8 +72,6 @@ SCENARIO("DC charge loop state handling") {
             REQUIRE(res.power_limit_achieved == false);
             REQUIRE(res.voltage_limit_achieved == false);
             REQUIRE(std::holds_alternative<Scheduled_DC_Res>(res.control_mode));
-
-            REQUIRE(std::holds_alternative<std::monostate>(ev_feedback) == true);
         }
     }
 
@@ -97,7 +95,7 @@ SCENARIO("DC charge loop state handling") {
         req.meter_info_requested = false;
         req.present_voltage = {330, 0};
 
-        const auto [res, ev_feedback] = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
+        const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
                                                                    std::nullopt, std::nullopt, std::nullopt);
 
         THEN("ResponseCode: FAILED, mandatory fields should be set") {
@@ -108,8 +106,6 @@ SCENARIO("DC charge loop state handling") {
             REQUIRE(res.power_limit_achieved == false);
             REQUIRE(res.voltage_limit_achieved == false);
             REQUIRE(std::holds_alternative<Scheduled_DC_Res>(res.control_mode));
-
-            REQUIRE(std::holds_alternative<std::monostate>(ev_feedback) == true);
         }
     }
 
@@ -132,7 +128,7 @@ SCENARIO("DC charge loop state handling") {
         req.meter_info_requested = false;
         req.present_voltage = {330, 0};
 
-        const auto [res, ev_feedback] = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
+        const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
                                                                    std::nullopt, std::nullopt, std::nullopt);
 
         THEN("ResponseCode: FAILED, mandatory fields should be set") {
@@ -143,8 +139,6 @@ SCENARIO("DC charge loop state handling") {
             REQUIRE(res.power_limit_achieved == false);
             REQUIRE(res.voltage_limit_achieved == false);
             REQUIRE(std::holds_alternative<Scheduled_DC_Res>(res.control_mode));
-
-            REQUIRE(std::holds_alternative<std::monostate>(ev_feedback) == true);
         }
     }
 
@@ -167,7 +161,7 @@ SCENARIO("DC charge loop state handling") {
         req.meter_info_requested = false;
         req.present_voltage = {330, 0};
 
-        const auto [res, ev_feedback] = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
+        const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
                                                                    std::nullopt, std::nullopt, std::nullopt);
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
@@ -188,11 +182,6 @@ SCENARIO("DC charge loop state handling") {
                         res_control_mode.max_charge_current.value_or(message_20::RationalNumber{0, 0})) == 250.0f);
             REQUIRE(message_20::from_RationalNumber(
                         res_control_mode.max_voltage.value_or(message_20::RationalNumber{0, 0})) == 900.0f);
-
-            REQUIRE(std::holds_alternative<session::feedback::DcChargeScheduledMode>(ev_feedback) == true);
-            const auto& scheduled_feedback = std::get<session::feedback::DcChargeScheduledMode>(ev_feedback);
-            REQUIRE(scheduled_feedback.target_current == 40.0f);
-            REQUIRE(scheduled_feedback.target_voltage == 400.0f);
         }
     }
 
@@ -216,7 +205,7 @@ SCENARIO("DC charge loop state handling") {
         req.meter_info_requested = false;
         req.present_voltage = {330, 0};
 
-        const auto [res, ev_feedback] = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
+        const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
                                                                    std::nullopt, std::nullopt, std::nullopt);
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
@@ -243,12 +232,6 @@ SCENARIO("DC charge loop state handling") {
                         res_control_mode.min_discharge_power.value_or(message_20::RationalNumber{0, 0})) == 10.0f);
             REQUIRE(message_20::from_RationalNumber(
                         res_control_mode.max_discharge_current.value_or(message_20::RationalNumber{0, 0})) == 30.0f);
-
-            REQUIRE(std::holds_alternative<session::feedback::DcChargeScheduledMode>(ev_feedback) == true);
-            const auto& scheduled_feedback = std::get<session::feedback::DcChargeScheduledMode>(ev_feedback);
-            REQUIRE(scheduled_feedback.target_current == 40.0f);
-            REQUIRE(scheduled_feedback.target_voltage == 400.0f);
-            REQUIRE(scheduled_feedback.max_discharge_power.value_or(0.0f) == 11000.0f);
         }
     }
 
@@ -276,7 +259,7 @@ SCENARIO("DC charge loop state handling") {
         req.meter_info_requested = false;
         req.present_voltage = {330, 0};
 
-        const auto [res, ev_feedback] = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
+        const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
                                                                    std::nullopt, std::nullopt, std::nullopt);
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
@@ -293,17 +276,6 @@ SCENARIO("DC charge loop state handling") {
             REQUIRE(message_20::from_RationalNumber(res_control_mode.min_charge_power) == 10.0f);
             REQUIRE(message_20::from_RationalNumber(res_control_mode.max_charge_current) == 250.0f);
             REQUIRE(message_20::from_RationalNumber(res_control_mode.max_voltage) == 900.0f);
-
-            REQUIRE(std::holds_alternative<session::feedback::DcChargeDynamicMode>(ev_feedback) == true);
-            const auto& dynamic_feedback = std::get<session::feedback::DcChargeDynamicMode>(ev_feedback);
-            REQUIRE(dynamic_feedback.target_energy_request == 68000.0f);
-            REQUIRE(dynamic_feedback.max_energy_request == 70000.0f);
-            REQUIRE(dynamic_feedback.min_energy_request == 40000.0f);
-            REQUIRE(dynamic_feedback.max_charge_power == 30000.0f);
-            REQUIRE(dynamic_feedback.min_charge_power == 2700.0f);
-            REQUIRE(dynamic_feedback.max_charge_current == 400.0f);
-            REQUIRE(dynamic_feedback.max_voltage == 950.0f);
-            REQUIRE(dynamic_feedback.min_voltage == 150.0f);
         }
     }
 
@@ -335,7 +307,7 @@ SCENARIO("DC charge loop state handling") {
         req.meter_info_requested = false;
         req.present_voltage = {330, 0};
 
-        const auto [res, ev_feedback] = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
+        const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
                                                                    std::nullopt, std::nullopt, std::nullopt);
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
@@ -355,20 +327,6 @@ SCENARIO("DC charge loop state handling") {
             REQUIRE(message_20::from_RationalNumber(res_control_mode.max_discharge_power) == 11000.0f);
             REQUIRE(message_20::from_RationalNumber(res_control_mode.min_discharge_power) == 10.0f);
             REQUIRE(message_20::from_RationalNumber(res_control_mode.max_discharge_current) == 30.0f);
-
-            REQUIRE(std::holds_alternative<session::feedback::DcChargeDynamicMode>(ev_feedback) == true);
-            const auto& dynamic_feedback = std::get<session::feedback::DcChargeDynamicMode>(ev_feedback);
-            REQUIRE(dynamic_feedback.target_energy_request == 68000.0f);
-            REQUIRE(dynamic_feedback.max_energy_request == 70000.0f);
-            REQUIRE(dynamic_feedback.min_energy_request == 40000.0f);
-            REQUIRE(dynamic_feedback.max_charge_power == 30000.0f);
-            REQUIRE(dynamic_feedback.min_charge_power == 2700.0f);
-            REQUIRE(dynamic_feedback.max_charge_current == 400.0f);
-            REQUIRE(dynamic_feedback.max_voltage == 950.0f);
-            REQUIRE(dynamic_feedback.min_voltage == 150.0f);
-            REQUIRE(dynamic_feedback.max_discharge_power.value_or(0.0f) == 11000.0f);
-            REQUIRE(dynamic_feedback.min_discharge_power.value_or(0.0f) == 10.0f);
-            REQUIRE(dynamic_feedback.max_discharge_current.value_or(0.0f) == 30.0f);
         }
     }
 
@@ -399,7 +357,7 @@ SCENARIO("DC charge loop state handling") {
         std::time_t new_departure_time = std::time(nullptr) + 60;
         uint8_t new_target_soc = 95;
 
-        const auto [res, ev_feedback] = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
+        const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
                                                                    new_departure_time, new_target_soc, std::nullopt);
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
@@ -420,17 +378,6 @@ SCENARIO("DC charge loop state handling") {
             REQUIRE(res_control_mode.departure_time.value_or(0) >= 59);
             REQUIRE(res_control_mode.target_soc.value_or(0) == 95);
             REQUIRE(res_control_mode.ack_max_delay.value_or(0) == 30);
-
-            REQUIRE(std::holds_alternative<session::feedback::DcChargeDynamicMode>(ev_feedback) == true);
-            const auto& dynamic_feedback = std::get<session::feedback::DcChargeDynamicMode>(ev_feedback);
-            REQUIRE(dynamic_feedback.target_energy_request == 68000.0f);
-            REQUIRE(dynamic_feedback.max_energy_request == 70000.0f);
-            REQUIRE(dynamic_feedback.min_energy_request == 40000.0f);
-            REQUIRE(dynamic_feedback.max_charge_power == 30000.0f);
-            REQUIRE(dynamic_feedback.min_charge_power == 2700.0f);
-            REQUIRE(dynamic_feedback.max_charge_current == 400.0f);
-            REQUIRE(dynamic_feedback.max_voltage == 950.0f);
-            REQUIRE(dynamic_feedback.min_voltage == 150.0f);
         }
     }
 
@@ -464,7 +411,7 @@ SCENARIO("DC charge loop state handling") {
         std::time_t new_departure_time = std::time(nullptr) + 40;
         uint8_t new_min_soc = 95;
 
-        const auto [res, ev_feedback] = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
+        const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
                                                                    new_departure_time, std::nullopt, new_min_soc);
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
@@ -488,20 +435,6 @@ SCENARIO("DC charge loop state handling") {
             REQUIRE(res_control_mode.departure_time.value_or(0) >= 39);
             REQUIRE(res_control_mode.minimum_soc.value_or(0) == 95);
             REQUIRE(res_control_mode.ack_max_delay.value_or(0) == 30);
-
-            REQUIRE(std::holds_alternative<session::feedback::DcChargeDynamicMode>(ev_feedback) == true);
-            const auto& dynamic_feedback = std::get<session::feedback::DcChargeDynamicMode>(ev_feedback);
-            REQUIRE(dynamic_feedback.target_energy_request == 68000.0f);
-            REQUIRE(dynamic_feedback.max_energy_request == 70000.0f);
-            REQUIRE(dynamic_feedback.min_energy_request == 40000.0f);
-            REQUIRE(dynamic_feedback.max_charge_power == 30000.0f);
-            REQUIRE(dynamic_feedback.min_charge_power == 2700.0f);
-            REQUIRE(dynamic_feedback.max_charge_current == 400.0f);
-            REQUIRE(dynamic_feedback.max_voltage == 950.0f);
-            REQUIRE(dynamic_feedback.min_voltage == 150.0f);
-            REQUIRE(dynamic_feedback.max_discharge_power.value_or(0.0f) == 11000.0f);
-            REQUIRE(dynamic_feedback.min_discharge_power.value_or(0.0f) == 10.0f);
-            REQUIRE(dynamic_feedback.max_discharge_current.value_or(0.0f) == 30.0f);
         }
     }
 

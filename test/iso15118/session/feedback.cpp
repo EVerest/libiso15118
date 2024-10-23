@@ -9,15 +9,11 @@ using namespace iso15118::session;
 struct FeedbackResults {
     feedback::Signal signal;
     float target_voltage;
-    feedback::DcChargeScheduledMode dc_charge_scheduled_mode;
-    feedback::DcChargeDynamicMode dc_charge_dynamic_mode;
+    feedback::DcChargeLoopReq dc_charge_loop_req;
     feedback::DcMaximumLimits dc_max_limits;
     iso15118::message_20::Type v2g_message;
     std::string evcc_id;
     std::string selected_protocol;
-    feedback::DisplayParameters display_parameters;
-    float present_voltage;
-    bool meter_info_requested;
 };
 
 SCENARIO("Feedback Tests") {
@@ -29,12 +25,8 @@ SCENARIO("Feedback Tests") {
     callbacks.dc_pre_charge_target_voltage = [&feedback_results](float target_voltage_) {
         feedback_results.target_voltage = target_voltage_;
     };
-    callbacks.dc_charge_scheduled_mode =
-        [&feedback_results](const feedback::DcChargeScheduledMode& dc_scheduled_values_) {
-            feedback_results.dc_charge_scheduled_mode = dc_scheduled_values_;
-        };
-    callbacks.dc_charge_dynamic_mode = [&feedback_results](const feedback::DcChargeDynamicMode& dc_dynamic_values_) {
-        feedback_results.dc_charge_dynamic_mode = dc_dynamic_values_;
+    callbacks.dc_charge_loop_req = [&feedback_results](const feedback::DcChargeLoopReq& dc_charge_loop_req) {
+        feedback_results.dc_charge_loop_req = dc_charge_loop_req;
     };
     callbacks.dc_max_limits = [&feedback_results](const feedback::DcMaximumLimits& dc_max_limits_) {
         feedback_results.dc_max_limits = dc_max_limits_;
@@ -45,15 +37,6 @@ SCENARIO("Feedback Tests") {
     callbacks.evccid = [&feedback_results](const std::string& evcc_id_) { feedback_results.evcc_id = evcc_id_; };
     callbacks.selected_protocol = [&feedback_results](const std::string& protocol) {
         feedback_results.selected_protocol = protocol;
-    };
-    callbacks.display_parameters = [&feedback_results](const feedback::DisplayParameters& parameters) {
-        feedback_results.display_parameters = parameters;
-    };
-    callbacks.dc_present_voltage = [&feedback_results](float present_voltage_) {
-        feedback_results.present_voltage = present_voltage_;
-    };
-    callbacks.meter_info_requested = [&feedback_results](bool requested) {
-        feedback_results.meter_info_requested = requested;
     };
 
     const auto feedback = Feedback(callbacks);
@@ -76,53 +59,93 @@ SCENARIO("Feedback Tests") {
         }
     }
 
-    GIVEN("Test dc_charge_scheduled_mode") {
-        const feedback::DcChargeScheduledMode expected{
-            440.2f,       30.0f,        std::nullopt, 34.0f,        std::nullopt, std::nullopt, std::nullopt,
-            std::nullopt, std::nullopt, std::nullopt, std::nullopt, 22220.0f,     std::nullopt};
-        feedback.dc_charge_scheduled_mode({440.2f, 30.0f, std::nullopt, 34.0f, std::nullopt, std::nullopt, std::nullopt,
-                                           std::nullopt, std::nullopt, std::nullopt, std::nullopt, 22220.0f,
-                                           std::nullopt});
+    GIVEN("Test dc_charge_loop_req - bpt scheduled") {
 
-        THEN("dc_charge_scheduled_mode should be like expected") {
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.target_voltage == expected.target_voltage);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.target_current == expected.target_current);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_energy_request == expected.max_energy_request);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.min_discharge_power == expected.min_discharge_power);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.target_energy_request == expected.target_energy_request);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.min_energy_request == expected.min_energy_request);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_charge_power == expected.max_charge_power);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.min_charge_power == expected.min_charge_power);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_charge_current == expected.max_charge_current);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_voltage == expected.max_voltage);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.min_voltage == expected.min_voltage);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_discharge_power == expected.max_discharge_power);
-            REQUIRE(feedback_results.dc_charge_scheduled_mode.max_discharge_current == expected.max_discharge_current);
+        using BPT_ScheduleReqControlMode =
+            iso15118::message_20::DC_ChargeLoopRequest::BPT_Scheduled_DC_CLReqControlMode;
+
+        const BPT_ScheduleReqControlMode expected = {{
+                                                         {std::nullopt, std::nullopt, std::nullopt},
+                                                         {4402, -1},
+                                                         {30, 0},
+                                                         std::nullopt,
+                                                         iso15118::message_20::RationalNumber{34, 0},
+                                                         std::nullopt,
+                                                         std::nullopt,
+                                                         std::nullopt,
+                                                     },
+                                                     iso15118::message_20::RationalNumber{11, 3},
+                                                     iso15118::message_20::RationalNumber{32, 1},
+                                                     std::nullopt};
+
+        feedback.dc_charge_loop_req(expected);
+
+        THEN("dc_charge_loop_req should be like expected") {
+
+            const auto* dc_control_mode = std::get_if<feedback::DcReqControlMode>(&feedback_results.dc_charge_loop_req);
+
+            const auto* bpt_scheduled_control_mode = std::get_if<BPT_ScheduleReqControlMode>(dc_control_mode);
+
+            REQUIRE(bpt_scheduled_control_mode->target_energy_request.has_value() == false);
+            REQUIRE(bpt_scheduled_control_mode->max_energy_request.has_value() == false);
+            REQUIRE(bpt_scheduled_control_mode->min_energy_request.has_value() == false);
+
+            REQUIRE(from_RationalNumber(bpt_scheduled_control_mode->target_current) ==
+                    from_RationalNumber(expected.target_current));
+            REQUIRE(from_RationalNumber(bpt_scheduled_control_mode->target_voltage) ==
+                    from_RationalNumber(expected.target_voltage));
+            REQUIRE(bpt_scheduled_control_mode->max_charge_power.has_value() == false);
+            REQUIRE(bpt_scheduled_control_mode->min_charge_power.has_value() == true);
+            REQUIRE(from_RationalNumber(*bpt_scheduled_control_mode->min_charge_power) ==
+                    from_RationalNumber(expected.min_charge_power.value_or(iso15118::message_20::RationalNumber{})));
+            REQUIRE(bpt_scheduled_control_mode->max_charge_current.has_value() == false);
+            REQUIRE(bpt_scheduled_control_mode->max_voltage.has_value() == false);
+            REQUIRE(bpt_scheduled_control_mode->min_voltage.has_value() == false);
+
+            REQUIRE(bpt_scheduled_control_mode->max_discharge_power.has_value() == true);
+            REQUIRE(from_RationalNumber(*bpt_scheduled_control_mode->max_discharge_power) ==
+                    from_RationalNumber(expected.max_discharge_power.value_or(iso15118::message_20::RationalNumber{})));
+            REQUIRE(bpt_scheduled_control_mode->min_discharge_power.has_value() == true);
+            REQUIRE(from_RationalNumber(*bpt_scheduled_control_mode->min_discharge_power) ==
+                    from_RationalNumber(expected.min_discharge_power.value_or(iso15118::message_20::RationalNumber{})));
+            REQUIRE(bpt_scheduled_control_mode->max_discharge_current.has_value() == false);
         }
     }
 
-    GIVEN("Test dc_charge_dynamic_mode") {
-        const feedback::DcChargeDynamicMode expected{
-            std::nullopt, 23440.0f,     22000.0f,     0,           900.0f, 10.0f, 300.0f, 1500.0f, 150.0f, std::nullopt,
-            std::nullopt, std::nullopt, std::nullopt, std::nullopt};
-        feedback.dc_charge_dynamic_mode({std::nullopt, 23440.0f, 22000.0f, 0, 900.0f, 10.0f, 300.0f, 1500.0f, 150.0f,
-                                         std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt});
+    GIVEN("Test dc_charge_loop_req - dynamic") {
 
-        THEN("dc_charge_dynamic_mode should be like expected") {
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.departure_time == expected.departure_time);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.target_energy_request == expected.target_energy_request);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_energy_request == expected.max_energy_request);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.min_energy_request == expected.min_energy_request);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_charge_power == expected.max_charge_power);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.min_charge_power == expected.min_charge_power);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_charge_current == expected.max_charge_current);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_voltage == expected.max_voltage);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.min_voltage == expected.min_voltage);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_discharge_power == expected.max_discharge_power);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.min_discharge_power == expected.min_discharge_power);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_discharge_current == expected.max_discharge_current);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.max_v2x_energy_request == expected.max_v2x_energy_request);
-            REQUIRE(feedback_results.dc_charge_dynamic_mode.min_v2x_energy_request == expected.min_v2x_energy_request);
+        using DynamicReqControlMode = iso15118::message_20::DC_ChargeLoopRequest::Dynamic_DC_CLReqControlMode;
+
+        const DynamicReqControlMode expected = {
+            {std::nullopt, {2344, 1}, {30, 3}, {10, 3}}, {22, 3}, {0, 0}, {5, 2}, {9, 2}, {25, 1}};
+
+        feedback.dc_charge_loop_req(expected);
+
+        THEN("dc_charge_loop_req should be like expected") {
+
+            const auto* dc_control_mode = std::get_if<feedback::DcReqControlMode>(&feedback_results.dc_charge_loop_req);
+
+            const auto* dynamic_control_mode = std::get_if<DynamicReqControlMode>(dc_control_mode);
+
+            REQUIRE(dynamic_control_mode->departure_time.has_value() == false);
+
+            REQUIRE(from_RationalNumber(dynamic_control_mode->target_energy_request) ==
+                    from_RationalNumber(expected.target_energy_request));
+            REQUIRE(from_RationalNumber(dynamic_control_mode->max_energy_request) ==
+                    from_RationalNumber(expected.max_energy_request));
+            REQUIRE(from_RationalNumber(dynamic_control_mode->min_energy_request) ==
+                    from_RationalNumber(expected.min_energy_request));
+
+            REQUIRE(from_RationalNumber(dynamic_control_mode->max_charge_power) ==
+                    from_RationalNumber(expected.max_charge_power));
+            REQUIRE(from_RationalNumber(dynamic_control_mode->min_charge_power) ==
+                    from_RationalNumber(expected.min_charge_power));
+            REQUIRE(from_RationalNumber(dynamic_control_mode->max_charge_current) ==
+                    from_RationalNumber(expected.max_charge_current));
+            REQUIRE(from_RationalNumber(dynamic_control_mode->max_voltage) ==
+                    from_RationalNumber(expected.max_voltage));
+            REQUIRE(from_RationalNumber(dynamic_control_mode->min_voltage) ==
+                    from_RationalNumber(expected.min_voltage));
         }
     }
 
@@ -166,35 +189,40 @@ SCENARIO("Feedback Tests") {
     }
 
     GIVEN("Test display_parameters") {
-        const feedback::DisplayParameters expected{40,           std::nullopt, 95,           std::nullopt, std::nullopt,
-                                                   std::nullopt, std::nullopt, std::nullopt, std::nullopt};
-        feedback.display_parameters(
-            {40, std::nullopt, 95, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt});
+        const iso15118::message_20::DisplayParameters expected{40,           std::nullopt, 95,           std::nullopt,
+                                                               std::nullopt, std::nullopt, std::nullopt, std::nullopt,
+                                                               std::nullopt, std::nullopt};
+
+        feedback.dc_charge_loop_req(expected);
 
         THEN("display_parameters should be like expected") {
-            REQUIRE(feedback_results.display_parameters.present_soc.has_value() == true);
-            REQUIRE(*feedback_results.display_parameters.present_soc == expected.present_soc.value_or(0));
-            REQUIRE(feedback_results.display_parameters.minimum_soc.has_value() == false);
-            REQUIRE(feedback_results.display_parameters.target_soc.has_value() == true);
-            REQUIRE(*feedback_results.display_parameters.target_soc == expected.target_soc.value_or(0));
+            const auto* display_parameters =
+                std::get_if<iso15118::message_20::DisplayParameters>(&feedback_results.dc_charge_loop_req);
+            REQUIRE(display_parameters->present_soc.has_value() == true);
+            REQUIRE(*display_parameters->present_soc == expected.present_soc.value_or(0));
+            REQUIRE(display_parameters->min_soc.has_value() == false);
+            REQUIRE(display_parameters->target_soc.has_value() == true);
+            REQUIRE(*display_parameters->target_soc == expected.target_soc.value_or(0));
         }
     }
 
     GIVEN("Test dc_present_voltage") {
-        float expected{704.4};
-        feedback.dc_present_voltage(704.4);
+        feedback::PresentVoltage expected{7044, -1};
+        feedback.dc_charge_loop_req(expected);
 
         THEN("dc_present_voltage should be like expected") {
-            REQUIRE(feedback_results.present_voltage == expected);
+            const auto* present_voltage = std::get_if<feedback::PresentVoltage>(&feedback_results.dc_charge_loop_req);
+            REQUIRE(iso15118::message_20::from_RationalNumber(*present_voltage) ==
+                    iso15118::message_20::from_RationalNumber(expected));
         }
     }
 
     GIVEN("Test meter_info_requested") {
-        bool expected{true};
-        feedback.meter_info_requested(true);
+        feedback::MeterInfoRequested expected{true};
+        feedback.dc_charge_loop_req(true);
 
         THEN("meter_info_requested should be like expected") {
-            REQUIRE(feedback_results.meter_info_requested == expected);
+            REQUIRE(*std::get_if<feedback::MeterInfoRequested>(&feedback_results.dc_charge_loop_req) == expected);
         }
     }
 }
