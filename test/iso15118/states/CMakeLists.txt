@@ -1,6 +1,6 @@
 include(Catch)
 
-macro(create_states_test_target NAME)
+function(create_states_test_target NAME)
     add_executable(test_${NAME} ${NAME}.cpp)
     target_link_libraries(test_${NAME}
         PRIVATE
@@ -8,7 +8,7 @@ macro(create_states_test_target NAME)
             Catch2::Catch2WithMain
     )
     catch_discover_tests(test_${NAME})
-endmacro()
+endfunction()
 
 create_states_test_target(authorization_setup)
 create_states_test_target(authorization)
