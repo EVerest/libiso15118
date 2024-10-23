@@ -8,55 +8,60 @@
 
 namespace iso15118::d20 {
 
-static auto get_default_dc_parameter_list(const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
+namespace {
 
-    std::vector<message_20::DcParameterList> param_list;
+auto get_mobility_needs_mode(const ControlMobilityNeedsModes& mode) {
+    using namespace message_20;
+
+    if (mode.control_mode == ControlMode::Scheduled and mode.mobility_mode == MobilityNeedsMode::ProvidedBySecc) {
+        logf_info("Setting the mobility needs mode to ProvidedByEvcc. In scheduled mode only ProvidedByEvcc is "
+                  "supported.");
+        return MobilityNeedsMode::ProvidedByEvcc;
+    }
+
+    return mode.mobility_mode;
+}
+
+void get_default_dc_parameter_list(std::vector<message_20::DcParameterList>& param_list,
+                                   const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
+    using namespace message_20;
+
+    param_list.clear(); // Reset param_list ?
+
     // TODO(sl): Add check if a control mode is more than one in that vector
 
-    for (auto& mode : control_mobility_modes) {
-        auto mobility_needs_mode = mode.mobility_mode;
-
-        if (mode.control_mode == message_20::ControlMode::Scheduled) {
-            mobility_needs_mode = message_20::MobilityNeedsMode::ProvidedByEvcc;
-        }
-
+    for (const auto& mode : control_mobility_modes) {
         param_list.push_back({
-            message_20::DcConnector::Extended,
+            DcConnector::Extended,
             mode.control_mode,
-            mobility_needs_mode,
-            message_20::Pricing::NoPricing,
+            get_mobility_needs_mode(mode),
+            Pricing::NoPricing,
         });
     }
-
-    return param_list;
 }
 
-static auto get_default_dc_bpt_parameter_list(const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
+void get_default_dc_parameter_list(std::vector<message_20::DcBptParameterList>& param_list,
+                                   const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
 
-    std::vector<message_20::DcBptParameterList> param_list;
+    using namespace message_20;
+
+    param_list.clear(); // Reset param_list ?
+
     // TODO(sl): Add check if a control mode is more than one in that vector
 
-    for (auto& mode : control_mobility_modes) {
-
-        auto mobility_needs_mode = mode.mobility_mode;
-
-        if (mode.control_mode == message_20::ControlMode::Scheduled) {
-            // Scheduled mode supports only ProvidedByEvcc
-            mobility_needs_mode = message_20::MobilityNeedsMode::ProvidedByEvcc;
-        }
-
+    for (const auto& mode : control_mobility_modes) {
         param_list.push_back({{
-                                  message_20::DcConnector::Extended,
+                                  DcConnector::Extended,
                                   mode.control_mode,
-                                  mobility_needs_mode,
-                                  message_20::Pricing::NoPricing,
+                                  get_mobility_needs_mode(mode),
+                                  Pricing::NoPricing,
                               },
-                              message_20::BptChannel::Unified,
-                              message_20::GeneratorMode::GridFollowing});
+                              BptChannel::Unified,
+                              GeneratorMode::GridFollowing});
     }
-
-    return param_list;
 }
+
+} // namespace
 
 SessionConfig::SessionConfig(EvseSetupConfig config) :
     evse_id(std::move(config.evse_id)),
@@ -83,8 +88,8 @@ SessionConfig::SessionConfig(EvseSetupConfig config) :
             {message_20::ControlMode::Scheduled, message_20::MobilityNeedsMode::ProvidedByEvcc}};
     }
 
-    dc_parameter_list = get_default_dc_parameter_list(supported_control_mobility_modes);
-    dc_bpt_parameter_list = get_default_dc_bpt_parameter_list(supported_control_mobility_modes);
+    get_default_dc_parameter_list(dc_parameter_list, supported_control_mobility_modes);
+    get_default_dc_parameter_list(dc_bpt_parameter_list, supported_control_mobility_modes);
 }
 
 } // namespace iso15118::d20
