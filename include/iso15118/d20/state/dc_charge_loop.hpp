@@ -5,8 +5,9 @@
 #include "../fsm.hpp"
 
 #include <cstdint>
-#include <ctime>
 #include <optional>
+
+#include <iso15118/d20/dynamic_mode_parameters.hpp>
 
 namespace iso15118::d20::state {
 
@@ -22,9 +23,7 @@ private:
     float present_current{0};
     bool stop{false};
 
-    std::optional<std::time_t> new_departure_time;
-    std::optional<uint8_t> new_target_soc;
-    std::optional<uint8_t> new_min_soc;
+    UpdateDynamicModeParameters dynamic_parameters;
 
     bool first_entry_in_charge_loop{true};
 };

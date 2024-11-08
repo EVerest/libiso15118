@@ -25,8 +25,7 @@ SCENARIO("Schedule Exchange state handling") {
 
         message_20::RationalNumber max_power = {0, 0};
 
-        const auto res =
-            d20::state::handle_request(req, d20::Session(), max_power, std::nullopt, std::nullopt, std::nullopt);
+        const auto res = d20::state::handle_request(req, d20::Session(), max_power, d20::UpdateDynamicModeParameters());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -54,7 +53,7 @@ SCENARIO("Schedule Exchange state handling") {
 
         message_20::RationalNumber max_power = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, max_power, std::nullopt, std::nullopt, std::nullopt);
+        const auto res = d20::state::handle_request(req, session, max_power, d20::UpdateDynamicModeParameters());
 
         THEN("ResponseCode: FAILED, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED);
@@ -82,7 +81,7 @@ SCENARIO("Schedule Exchange state handling") {
 
         message_20::RationalNumber max_power = {22, 3};
 
-        const auto res = d20::state::handle_request(req, session, max_power, std::nullopt, std::nullopt, std::nullopt);
+        const auto res = d20::state::handle_request(req, session, max_power, d20::UpdateDynamicModeParameters());
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -115,7 +114,7 @@ SCENARIO("Schedule Exchange state handling") {
 
         message_20::RationalNumber max_power = {22, 3};
 
-        const auto res = d20::state::handle_request(req, session, max_power, std::nullopt, std::nullopt, std::nullopt);
+        const auto res = d20::state::handle_request(req, session, max_power, d20::UpdateDynamicModeParameters());
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);

@@ -102,7 +102,7 @@ struct DC_ChargeLoopResponse {
                  BPT_Dynamic_DC_CLResControlMode>
         control_mode;
 
-    DC_ChargeLoopResponse() : control_mode(std::in_place_type<DC_ChargeLoopResponse::Scheduled_DC_CLResControlMode>) {};
+    DC_ChargeLoopResponse() : control_mode(std::in_place_type<DC_ChargeLoopResponse::Scheduled_DC_CLResControlMode>){};
 };
 
 } // namespace iso15118::message_20

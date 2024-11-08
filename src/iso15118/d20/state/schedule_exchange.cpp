@@ -37,12 +37,26 @@ auto create_default_scheduled_control_mode(const message_20::RationalNumber& max
     scheduled_mode.schedule_tuple = {schedule};
     return scheduled_mode;
 }
+
+namespace {
+void set_dynamic_parameters_in_res(DynamicResControlMode& res_mode, const UpdateDynamicModeParameters& parameters,
+                                   uint64_t header_timestamp) {
+    if (parameters.departure_time) {
+        const auto departure_time = static_cast<uint64_t>(parameters.departure_time.value());
+        if (departure_time > header_timestamp) {
+            res_mode.departure_time = static_cast<uint32_t>(departure_time - header_timestamp);
+        }
+    }
+    res_mode.target_soc = parameters.target_soc;
+    res_mode.minimum_soc = parameters.min_soc;
+}
+} // namespace
 } // namespace
 
-message_20::ScheduleExchangeResponse
-handle_request(const message_20::ScheduleExchangeRequest& req, const d20::Session& session,
-               const message_20::RationalNumber& max_power, std::optional<std::time_t> new_departure_time,
-               std::optional<uint8_t> new_target_soc, std::optional<uint8_t> new_min_soc) {
+message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleExchangeRequest& req,
+                                                    const d20::Session& session,
+                                                    const message_20::RationalNumber& max_power,
+                                                    const UpdateDynamicModeParameters& dynamic_parameters) {
 
     message_20::ScheduleExchangeResponse res;
 
@@ -67,14 +81,7 @@ handle_request(const message_20::ScheduleExchangeRequest& req, const d20::Sessio
         auto& mode = res.control_mode.emplace<DynamicResControlMode>();
 
         if (session.get_selected_mobility_needs_mode() == message_20::MobilityNeedsMode::ProvidedBySecc) {
-            if (new_departure_time.has_value()) {
-                const auto departure_time = static_cast<uint64_t>(new_departure_time.value());
-                if (departure_time > res.header.timestamp) {
-                    mode.departure_time = static_cast<uint32_t>(departure_time - res.header.timestamp);
-                }
-            }
-            mode.target_soc = new_target_soc;
-            mode.minimum_soc = new_min_soc;
+            set_dynamic_parameters_in_res(mode, dynamic_parameters, res.header.timestamp);
         }
 
     } else {
@@ -95,10 +102,9 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
 
     if (ev == FsmEvent::CONTROL_MESSAGE) {
 
-        if (const auto control_data = ctx.get_control_event<UpdateDynamicModeParameters>()) {
-            new_departure_time = *control_data->departure_time;
-            new_target_soc = *control_data->target_soc;
-            new_min_soc = *control_data->min_soc;
+        // TODO(sl): Not sure if the data comes here just in time?
+        if (const auto* control_data = ctx.get_control_event<UpdateDynamicModeParameters>()) {
+            dynamic_parameters = *control_data;
         }
 
         // Ignore control message
@@ -122,8 +128,7 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
             max_charge_power = ctx.session_config.dc_limits.charge_limits.power.max;
         }
 
-        const auto res =
-            handle_request(*req, ctx.session, max_charge_power, new_departure_time, new_target_soc, new_min_soc);
+        const auto res = handle_request(*req, ctx.session, max_charge_power, dynamic_parameters);
 
         ctx.respond(res);
 

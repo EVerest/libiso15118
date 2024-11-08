@@ -61,8 +61,8 @@ SCENARIO("DC charge loop state handling") {
         req.meter_info_requested = false;
         req.present_voltage = {330, 0};
 
-        const auto res = d20::state::handle_request(
-            req, d20::Session(), 330, 30, false, evse_setup.dc_limits, std::nullopt, std::nullopt, std::nullopt);
+        const auto res = d20::state::handle_request(req, d20::Session(), 330, 30, false, evse_setup.dc_limits,
+                                                    d20::UpdateDynamicModeParameters());
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED_UnknownSession);
@@ -96,7 +96,7 @@ SCENARIO("DC charge loop state handling") {
         req.present_voltage = {330, 0};
 
         const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
-                                                                   std::nullopt, std::nullopt, std::nullopt);
+                                                    d20::UpdateDynamicModeParameters());
 
         THEN("ResponseCode: FAILED, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED);
@@ -129,7 +129,7 @@ SCENARIO("DC charge loop state handling") {
         req.present_voltage = {330, 0};
 
         const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
-                                                                   std::nullopt, std::nullopt, std::nullopt);
+                                                    d20::UpdateDynamicModeParameters());
 
         THEN("ResponseCode: FAILED, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::FAILED);
@@ -162,7 +162,7 @@ SCENARIO("DC charge loop state handling") {
         req.present_voltage = {330, 0};
 
         const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
-                                                                   std::nullopt, std::nullopt, std::nullopt);
+                                                    d20::UpdateDynamicModeParameters());
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -206,7 +206,7 @@ SCENARIO("DC charge loop state handling") {
         req.present_voltage = {330, 0};
 
         const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
-                                                                   std::nullopt, std::nullopt, std::nullopt);
+                                                    d20::UpdateDynamicModeParameters());
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -260,7 +260,7 @@ SCENARIO("DC charge loop state handling") {
         req.present_voltage = {330, 0};
 
         const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
-                                                                   std::nullopt, std::nullopt, std::nullopt);
+                                                    d20::UpdateDynamicModeParameters());
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -308,7 +308,7 @@ SCENARIO("DC charge loop state handling") {
         req.present_voltage = {330, 0};
 
         const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
-                                                                   std::nullopt, std::nullopt, std::nullopt);
+                                                    d20::UpdateDynamicModeParameters());
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -354,11 +354,10 @@ SCENARIO("DC charge loop state handling") {
         req.meter_info_requested = false;
         req.present_voltage = {330, 0};
 
-        std::time_t new_departure_time = std::time(nullptr) + 60;
-        uint8_t new_target_soc = 95;
+        const d20::UpdateDynamicModeParameters dynamic_parameters = {std::time(nullptr) + 60, 95, std::nullopt};
 
-        const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
-                                                                   new_departure_time, new_target_soc, std::nullopt);
+        const auto res =
+            d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits, dynamic_parameters);
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);
@@ -408,11 +407,10 @@ SCENARIO("DC charge loop state handling") {
         req.meter_info_requested = false;
         req.present_voltage = {330, 0};
 
-        std::time_t new_departure_time = std::time(nullptr) + 40;
-        uint8_t new_min_soc = 95;
+        const d20::UpdateDynamicModeParameters dynamic_parameters = {std::time(nullptr) + 40, std::nullopt, 95};
 
-        const auto res = d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits,
-                                                                   new_departure_time, std::nullopt, new_min_soc);
+        const auto res =
+            d20::state::handle_request(req, session, 330, 30, false, evse_setup.dc_limits, dynamic_parameters);
 
         THEN("ResponseCode: OK, mandatory fields should be set") {
             REQUIRE(res.response_code == message_20::ResponseCode::OK);

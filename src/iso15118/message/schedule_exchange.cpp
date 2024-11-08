@@ -306,7 +306,7 @@ template <> void convert(const ScheduleExchangeResponse::ScheduleTuple& in, stru
 }
 
 struct ModeResponseVisitor {
-    ModeResponseVisitor(iso20_ScheduleExchangeResType& res_) : res(res_) {};
+    ModeResponseVisitor(iso20_ScheduleExchangeResType& res_) : res(res_){};
     void operator()(const ScheduleExchangeResponse::Dynamic_SEResControlMode& in) {
         init_iso20_Dynamic_SEResControlModeType(&res.Dynamic_SEResControlMode);
         CB_SET_USED(res.Dynamic_SEResControlMode);

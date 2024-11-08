@@ -66,11 +66,27 @@ template <> void convert(Dynamic_BPT_DC_Res& out, const d20::DcTransferLimits& i
     }
 }
 
-message_20::DC_ChargeLoopResponse
-handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& session, const float present_voltage,
-               const float present_current, const bool stop, const DcTransferLimits& dc_limits,
-               std::optional<std::time_t> new_departure_time, std::optional<uint8_t> new_target_soc,
-               std::optional<uint8_t> new_min_soc) {
+namespace {
+template <typename T>
+void set_dynamic_parameters_in_res(T& res_mode, const UpdateDynamicModeParameters& parameters,
+                                   uint64_t header_timestamp) {
+    if (parameters.departure_time) {
+        const auto departure_time = static_cast<uint64_t>(parameters.departure_time.value());
+        if (departure_time > header_timestamp) {
+            res_mode.departure_time = static_cast<uint32_t>(departure_time - header_timestamp);
+        }
+    }
+    res_mode.target_soc = parameters.target_soc;
+    res_mode.minimum_soc = parameters.min_soc;
+    res_mode.ack_max_delay = 30; // TODO(sl) what to send here and define 30 seconds as const
+}
+} // namespace
+
+message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoopRequest& req,
+                                                 const d20::Session& session, const float present_voltage,
+                                                 const float present_current, const bool stop,
+                                                 const DcTransferLimits& dc_limits,
+                                                 const UpdateDynamicModeParameters& dynamic_parameters) {
 
     message_20::DC_ChargeLoopResponse res;
 
@@ -80,6 +96,8 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
 
     if (std::holds_alternative<Scheduled_DC_Req>(req.control_mode)) {
 
+        // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
+        // the charger should terminate the session
         if (session.get_selected_control_mode() != message_20::ControlMode::Scheduled or
             session.get_selected_energy_service() != message_20::ServiceCategory::DC) {
             return response_with_code(res, message_20::ResponseCode::FAILED);
@@ -90,6 +108,8 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
 
     } else if (std::holds_alternative<Scheduled_BPT_DC_Req>(req.control_mode)) {
 
+        // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
+        // the charger should terminate the session
         if (session.get_selected_control_mode() != message_20::ControlMode::Scheduled or
             session.get_selected_energy_service() != message_20::ServiceCategory::DC_BPT) {
             return response_with_code(res, message_20::ResponseCode::FAILED);
@@ -105,6 +125,8 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
 
     } else if (std::holds_alternative<Dynamic_DC_Req>(req.control_mode)) {
 
+        // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
+        // the charger should terminate the session
         if (session.get_selected_control_mode() != message_20::ControlMode::Dynamic or
             session.get_selected_energy_service() != message_20::ServiceCategory::DC) {
             return response_with_code(res, message_20::ResponseCode::FAILED);
@@ -114,19 +136,13 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
         convert(res_mode, dc_limits);
 
         if (session.get_selected_mobility_needs_mode() == message_20::MobilityNeedsMode::ProvidedBySecc) {
-            if (new_departure_time.has_value()) {
-                const auto departure_time = static_cast<uint64_t>(new_departure_time.value());
-                if (departure_time > res.header.timestamp) {
-                    res_mode.departure_time = static_cast<uint32_t>(departure_time - res.header.timestamp);
-                }
-            }
-            res_mode.target_soc = new_target_soc;
-            res_mode.minimum_soc = new_min_soc;
-            res_mode.ack_max_delay = 30; // TODO(sl) what to send here and define 30 seconds as const
+            set_dynamic_parameters_in_res(res_mode, dynamic_parameters, res.header.timestamp);
         }
 
     } else if (std::holds_alternative<Dynamic_BPT_DC_Req>(req.control_mode)) {
 
+        // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
+        // the charger should terminate the session
         if (session.get_selected_control_mode() != message_20::ControlMode::Dynamic or
             session.get_selected_energy_service() != message_20::ServiceCategory::DC_BPT) {
             return response_with_code(res, message_20::ResponseCode::FAILED);
@@ -141,15 +157,7 @@ handle_request(const message_20::DC_ChargeLoopRequest& req, const d20::Session& 
         convert(res_mode, dc_limits);
 
         if (session.get_selected_mobility_needs_mode() == message_20::MobilityNeedsMode::ProvidedBySecc) {
-            if (new_departure_time.has_value()) {
-                const auto departure_time = static_cast<uint64_t>(new_departure_time.value());
-                if (departure_time > res.header.timestamp) {
-                    res_mode.departure_time = static_cast<uint32_t>(departure_time - res.header.timestamp);
-                }
-            }
-            res_mode.target_soc = new_target_soc;
-            res_mode.minimum_soc = new_min_soc;
-            res_mode.ack_max_delay = 30; // TODO(sl) what to send here and define 30 seconds as const
+            set_dynamic_parameters_in_res(res_mode, dynamic_parameters, res.header.timestamp);
         }
     }
 
@@ -173,15 +181,13 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
 
     if (ev == FsmEvent::CONTROL_MESSAGE) {
 
-        if (const auto control_data = ctx.get_control_event<PresentVoltageCurrent>()) {
+        if (const auto* control_data = ctx.get_control_event<PresentVoltageCurrent>()) {
             present_voltage = control_data->voltage;
             present_current = control_data->current;
-        } else if (const auto control_data = ctx.get_control_event<StopCharging>()) {
+        } else if (const auto* control_data = ctx.get_control_event<StopCharging>()) {
             stop = *control_data;
-        } else if (const auto control_data = ctx.get_control_event<UpdateDynamicModeParameters>()) {
-            new_departure_time = *control_data->departure_time;
-            new_target_soc = *control_data->target_soc;
-            new_min_soc = *control_data->min_soc;
+        } else if (const auto* control_data = ctx.get_control_event<UpdateDynamicModeParameters>()) {
+            dynamic_parameters = *control_data;
         }
 
         // Ignore control message
@@ -222,7 +228,7 @@ FsmSimpleState::HandleEventReturnType DC_ChargeLoop::handle_event(AllocatorType&
         }
 
         const auto res = handle_request(*req, ctx.session, present_voltage, present_current, stop,
-                                        ctx.session_config.dc_limits, new_departure_time, new_target_soc, new_min_soc);
+                                        ctx.session_config.dc_limits, dynamic_parameters);
 
         ctx.respond(res);
 
