@@ -91,7 +91,7 @@ public:
 
     void selected_service_parameters(const message_20::ServiceCategory service, const uint16_t id);
 
-    auto get_selected_services() const & {
+    auto get_selected_services() const& {
         return selected_services;
     }
 
