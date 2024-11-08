@@ -22,13 +22,12 @@ auto get_mobility_needs_mode(const ControlMobilityNeedsModes& mode) {
     return mode.mobility_mode;
 }
 
-void get_default_dc_parameter_list(std::vector<message_20::DcParameterList>& param_list,
-                                   const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
+auto get_default_dc_parameter_list(const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
     using namespace message_20;
 
-    param_list.clear(); // Reset param_list ?
-
     // TODO(sl): Add check if a control mode is more than one in that vector
+
+    std::vector<DcParameterList> param_list;
 
     for (const auto& mode : control_mobility_modes) {
         param_list.push_back({
@@ -38,16 +37,16 @@ void get_default_dc_parameter_list(std::vector<message_20::DcParameterList>& par
             Pricing::NoPricing,
         });
     }
+
+    return param_list;
 }
 
-void get_default_dc_parameter_list(std::vector<message_20::DcBptParameterList>& param_list,
-                                   const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
-
+auto get_default_dc_bpt_parameter_list(const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
     using namespace message_20;
 
-    param_list.clear(); // Reset param_list ?
-
     // TODO(sl): Add check if a control mode is more than one in that vector
+
+    std::vector<DcBptParameterList> param_list;
 
     for (const auto& mode : control_mobility_modes) {
         param_list.push_back({{
@@ -59,6 +58,8 @@ void get_default_dc_parameter_list(std::vector<message_20::DcBptParameterList>& 
                               BptChannel::Unified,
                               GeneratorMode::GridFollowing});
     }
+
+    return param_list;
 }
 
 } // namespace
@@ -88,8 +89,8 @@ SessionConfig::SessionConfig(EvseSetupConfig config) :
             {message_20::ControlMode::Scheduled, message_20::MobilityNeedsMode::ProvidedByEvcc}};
     }
 
-    get_default_dc_parameter_list(dc_parameter_list, supported_control_mobility_modes);
-    get_default_dc_parameter_list(dc_bpt_parameter_list, supported_control_mobility_modes);
+    dc_parameter_list = get_default_dc_parameter_list(supported_control_mobility_modes);
+    dc_bpt_parameter_list = get_default_dc_bpt_parameter_list(supported_control_mobility_modes);
 }
 
 } // namespace iso15118::d20
