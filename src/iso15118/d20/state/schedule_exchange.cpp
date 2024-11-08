@@ -64,9 +64,13 @@ message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleEx
         return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
     }
 
+    const auto selected_services = session.get_selected_services();
+    const auto selected_control_mode = selected_services.selected_control_mode;
+    const auto selected_mobility_needs_mode = selected_services.selected_mobility_needs_mode;
+
     // Todo(SL): Publish data from request?
 
-    if (session.get_selected_control_mode() == message_20::ControlMode::Scheduled &&
+    if (selected_control_mode == message_20::ControlMode::Scheduled &&
         std::holds_alternative<ScheduledReqControlMode>(req.control_mode)) {
 
         res.control_mode.emplace<ScheduledResControlMode>(create_default_scheduled_control_mode(max_power));
@@ -74,13 +78,13 @@ message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleEx
         // TODO(sl): Adding price schedule
         // TODO(sl): Adding discharging schedule
 
-    } else if (session.get_selected_control_mode() == message_20::ControlMode::Dynamic &&
+    } else if (selected_control_mode == message_20::ControlMode::Dynamic &&
                std::holds_alternative<DynamicReqControlMode>(req.control_mode)) {
 
         // TODO(sl): Publish req dynamic mode parameters
         auto& mode = res.control_mode.emplace<DynamicResControlMode>();
 
-        if (session.get_selected_mobility_needs_mode() == message_20::MobilityNeedsMode::ProvidedBySecc) {
+        if (selected_mobility_needs_mode == message_20::MobilityNeedsMode::ProvidedBySecc) {
             set_dynamic_parameters_in_res(mode, dynamic_parameters, res.header.timestamp);
         }
 
@@ -121,7 +125,7 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
 
         message_20::RationalNumber max_charge_power = {0, 0};
 
-        const auto selected_energy_service = ctx.session.get_selected_energy_service();
+        const auto selected_energy_service = ctx.session.get_selected_services().selected_energy_service;
 
         if (selected_energy_service == message_20::ServiceCategory::DC or
             selected_energy_service == message_20::ServiceCategory::DC_BPT) {

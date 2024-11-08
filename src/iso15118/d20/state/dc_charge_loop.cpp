@@ -94,12 +94,17 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
         return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
     }
 
+    const auto selected_services = session.get_selected_services();
+    const auto selected_control_mode = selected_services.selected_control_mode;
+    const auto selected_energy_service = selected_services.selected_energy_service;
+    const auto selected_mobility_needs_mode = selected_services.selected_mobility_needs_mode;
+
     if (std::holds_alternative<Scheduled_DC_Req>(req.control_mode)) {
 
         // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
         // the charger should terminate the session
-        if (session.get_selected_control_mode() != message_20::ControlMode::Scheduled or
-            session.get_selected_energy_service() != message_20::ServiceCategory::DC) {
+        if (selected_control_mode != message_20::ControlMode::Scheduled or
+            selected_energy_service != message_20::ServiceCategory::DC) {
             return response_with_code(res, message_20::ResponseCode::FAILED);
         }
 
@@ -110,8 +115,8 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
 
         // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
         // the charger should terminate the session
-        if (session.get_selected_control_mode() != message_20::ControlMode::Scheduled or
-            session.get_selected_energy_service() != message_20::ServiceCategory::DC_BPT) {
+        if (selected_control_mode != message_20::ControlMode::Scheduled or
+            selected_energy_service != message_20::ServiceCategory::DC_BPT) {
             return response_with_code(res, message_20::ResponseCode::FAILED);
         }
 
@@ -127,15 +132,15 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
 
         // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
         // the charger should terminate the session
-        if (session.get_selected_control_mode() != message_20::ControlMode::Dynamic or
-            session.get_selected_energy_service() != message_20::ServiceCategory::DC) {
+        if (selected_control_mode != message_20::ControlMode::Dynamic or
+            selected_energy_service != message_20::ServiceCategory::DC) {
             return response_with_code(res, message_20::ResponseCode::FAILED);
         }
 
         auto& res_mode = res.control_mode.emplace<Dynamic_DC_Res>();
         convert(res_mode, dc_limits);
 
-        if (session.get_selected_mobility_needs_mode() == message_20::MobilityNeedsMode::ProvidedBySecc) {
+        if (selected_mobility_needs_mode == message_20::MobilityNeedsMode::ProvidedBySecc) {
             set_dynamic_parameters_in_res(res_mode, dynamic_parameters, res.header.timestamp);
         }
 
@@ -143,8 +148,8 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
 
         // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
         // the charger should terminate the session
-        if (session.get_selected_control_mode() != message_20::ControlMode::Dynamic or
-            session.get_selected_energy_service() != message_20::ServiceCategory::DC_BPT) {
+        if (selected_control_mode != message_20::ControlMode::Dynamic or
+            selected_energy_service != message_20::ServiceCategory::DC_BPT) {
             return response_with_code(res, message_20::ResponseCode::FAILED);
         }
 
@@ -156,7 +161,7 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
         auto& res_mode = res.control_mode.emplace<Dynamic_BPT_DC_Res>();
         convert(res_mode, dc_limits);
 
-        if (session.get_selected_mobility_needs_mode() == message_20::MobilityNeedsMode::ProvidedBySecc) {
+        if (selected_mobility_needs_mode == message_20::MobilityNeedsMode::ProvidedBySecc) {
             set_dynamic_parameters_in_res(res_mode, dynamic_parameters, res.header.timestamp);
         }
     }
