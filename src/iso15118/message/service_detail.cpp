@@ -183,7 +183,7 @@ template <> void insert_type(VariantAccess& va, const struct iso20_ServiceDetail
 }
 
 template <> int serialize_to_exi(const ServiceDetailResponse& in, exi_bitstream_t& out) {
-    iso20_exiDocument doc {};
+    iso20_exiDocument doc{};
     init_iso20_exiDocument(&doc);
 
     CB_SET_USED(doc.ServiceDetailRes);

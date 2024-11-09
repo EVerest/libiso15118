@@ -28,7 +28,8 @@ SCENARIO("Se/Deserialize authorization messages") {
             REQUIRE(header.timestamp == 1691411798);
 
             REQUIRE(msg.selected_authorization_service == message_20::Authorization::EIM);
-            REQUIRE(std::holds_alternative<message_20::AuthorizationRequest::EIM_ASReqAuthorizationMode>(msg.authorization_mode));
+            REQUIRE(std::holds_alternative<message_20::AuthorizationRequest::EIM_ASReqAuthorizationMode>(
+                msg.authorization_mode));
         }
     }
 
