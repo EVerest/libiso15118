@@ -17,7 +17,7 @@ SCENARIO("Authorization state handling") {
         req.header.timestamp = 1691411798;
 
         req.selected_authorization_service = message_20::Authorization::EIM;
-        req.eim_as_req_authorization_mode.emplace();
+        req.authorization_mode = message_20::AuthorizationRequest::EIM_ASReqAuthorizationMode{};
 
         const auto res = d20::state::handle_request(req, d20::Session(), AuthStatus::Pending);
 
@@ -37,7 +37,7 @@ SCENARIO("Authorization state handling") {
         req.header.timestamp = 1691411798;
 
         req.selected_authorization_service = message_20::Authorization::EIM;
-        req.eim_as_req_authorization_mode.emplace();
+        req.authorization_mode = message_20::AuthorizationRequest::EIM_ASReqAuthorizationMode{};
 
         const auto res = d20::state::handle_request(req, session, AuthStatus::Pending);
 
@@ -59,7 +59,7 @@ SCENARIO("Authorization state handling") {
         req.header.timestamp = 1691411798;
 
         req.selected_authorization_service = message_20::Authorization::EIM;
-        req.eim_as_req_authorization_mode.emplace();
+        req.authorization_mode = message_20::AuthorizationRequest::EIM_ASReqAuthorizationMode{};
 
         const auto res = d20::state::handle_request(req, session, AuthStatus::Rejected);
 
@@ -79,7 +79,7 @@ SCENARIO("Authorization state handling") {
         req.header.timestamp = 1691411798;
 
         req.selected_authorization_service = message_20::Authorization::EIM;
-        req.eim_as_req_authorization_mode.emplace();
+        req.authorization_mode = message_20::AuthorizationRequest::EIM_ASReqAuthorizationMode{};
 
         const auto res = d20::state::handle_request(req, session, AuthStatus::Pending);
 
@@ -99,7 +99,7 @@ SCENARIO("Authorization state handling") {
         req.header.timestamp = 1691411798;
 
         req.selected_authorization_service = message_20::Authorization::EIM;
-        req.eim_as_req_authorization_mode.emplace();
+        req.authorization_mode = message_20::AuthorizationRequest::EIM_ASReqAuthorizationMode{};
 
         const auto res = d20::state::handle_request(req, session, AuthStatus::Accepted);
 

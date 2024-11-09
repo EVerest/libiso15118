@@ -159,16 +159,20 @@ template <> void convert(const ServiceDetailResponse& in, iso20_ServiceDetailRes
 
     uint8_t index = 0;
     for (auto const& in_parameter_set : in.service_parameter_list) {
-        auto& out_paramater_set = out.ServiceParameterList.ParameterSet.array[index++];
-        out_paramater_set.ParameterSetID = in_parameter_set.id;
+        auto& out_parameter_set = out.ServiceParameterList.ParameterSet.array[index++];
+        init_iso20_ParameterSetType(&out_parameter_set);
+
+        out_parameter_set.ParameterSetID = in_parameter_set.id;
 
         uint8_t t = 0;
         for (auto const& in_parameter : in_parameter_set.parameter) {
-            auto& out_parameter = out_paramater_set.Parameter.array[t++];
+            auto& out_parameter = out_parameter_set.Parameter.array[t++];
+            init_iso20_ParameterType(&out_parameter);
+
             CPP2CB_STRING(in_parameter.name, out_parameter.Name);
             std::visit(ParamterValueVisitor(out_parameter), in_parameter.value);
         }
-        out_paramater_set.Parameter.arrayLen = in_parameter_set.parameter.size();
+        out_parameter_set.Parameter.arrayLen = in_parameter_set.parameter.size();
     }
 
     out.ServiceParameterList.ParameterSet.arrayLen = in.service_parameter_list.size();
@@ -179,7 +183,7 @@ template <> void insert_type(VariantAccess& va, const struct iso20_ServiceDetail
 }
 
 template <> int serialize_to_exi(const ServiceDetailResponse& in, exi_bitstream_t& out) {
-    iso20_exiDocument doc;
+    iso20_exiDocument doc {};
     init_iso20_exiDocument(&doc);
 
     CB_SET_USED(doc.ServiceDetailRes);

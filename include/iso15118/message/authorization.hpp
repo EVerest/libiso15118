@@ -2,8 +2,8 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include "common.hpp"
@@ -20,11 +20,8 @@ struct AuthorizationRequest {
 
     // Todo(sl): Refactor in common
     struct ContractCertificateChain {
-        struct Certificate {
-            std::vector<uint8_t> certificate;
-        };
-        Certificate certificate;
-        std::vector<Certificate> sub_certificates;
+        std::vector<uint8_t> certificate;
+        std::vector<std::vector<uint8_t>> sub_certificates;
     };
 
     struct EIM_ASReqAuthorizationMode {};
@@ -36,8 +33,7 @@ struct AuthorizationRequest {
 
     Header header;
     Authorization selected_authorization_service;
-    std::optional<EIM_ASReqAuthorizationMode> eim_as_req_authorization_mode;
-    std::optional<PnC_ASReqAuthorizationMode> pnc_as_req_authorization_mode;
+    std::variant<EIM_ASReqAuthorizationMode, PnC_ASReqAuthorizationMode> authorization_mode;
 };
 
 struct AuthorizationResponse {

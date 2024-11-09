@@ -13,6 +13,16 @@
 
 namespace iso15118::d20::state {
 
+namespace {
+auto required_auth_signal(const message_20::AuthorizationSetupResponse& res) {
+    using Signal = session::feedback::Signal;
+    return (std::holds_alternative<message_20::AuthorizationSetupResponse::PnC_ASResAuthorizationMode>(
+               res.authorization_mode))
+               ? Signal::REQUIRE_AUTH_PNC
+               : Signal::REQUIRE_AUTH_EIM;
+}
+} // namespace
+
 message_20::AuthorizationSetupResponse
 handle_request(const message_20::AuthorizationSetupRequest& req, d20::Session& session, bool cert_install_service,
                const std::vector<message_20::Authorization>& authorization_services) {
@@ -40,6 +50,7 @@ handle_request(const message_20::AuthorizationSetupRequest& req, d20::Session& s
         auto& pnc_auth_mode =
             res.authorization_mode.emplace<message_20::AuthorizationSetupResponse::PnC_ASResAuthorizationMode>();
 
+        // FIXME (aw): refactor to utilities
         std::random_device rd;
         std::mt19937 generator(rd());
         std::uniform_int_distribution<uint8_t> distribution(0x00, 0xff);
@@ -77,8 +88,7 @@ FsmSimpleState::HandleEventReturnType AuthorizationSetup::handle_event(Allocator
             return sa.PASS_ON;
         }
 
-        // Todo(sl): PnC is currently not supported
-        ctx.feedback.signal(session::feedback::Signal::REQUIRE_AUTH_EIM);
+        ctx.feedback.signal(required_auth_signal(res));
 
         return sa.create_simple<Authorization>(ctx);
     } else if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {

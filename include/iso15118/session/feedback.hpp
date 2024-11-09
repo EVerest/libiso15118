@@ -17,6 +17,7 @@ namespace feedback {
 
 enum class Signal {
     REQUIRE_AUTH_EIM,
+    REQUIRE_AUTH_PNC,
     START_CABLE_CHECK,
     SETUP_FINISHED,
     CHARGE_LOOP_STARTED,
