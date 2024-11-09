@@ -38,31 +38,24 @@ message_20::AuthorizationResponse handle_request(const message_20::Authorization
 
     auto response_code = message_20::ResponseCode::OK;
 
-    switch (req.selected_authorization_service) {
-    case message_20::Authorization::EIM:
-        switch (authorization_status) {
-        case AuthStatus::Accepted:
-            res.evse_processing = message_20::Processing::Finished;
-            response_code = message_20::ResponseCode::OK;
-            break;
-        case AuthStatus::Rejected: // Failure [V2G20-2230]
-            res.evse_processing = message_20::Processing::Finished;
-            response_code = message_20::ResponseCode::WARNING_EIMAuthorizationFailure;
-            break;
-        case AuthStatus::Pending:
-        default:
-            res.evse_processing = message_20::Processing::Ongoing;
-            response_code = message_20::ResponseCode::OK;
-            break;
-        }
-        break;
+    const auto get_rejection_response_code = [](message_20::Authorization auth_method) {
+        return (auth_method == message_20::Authorization::EIM)
+                   ? message_20::ResponseCode::WARNING_EIMAuthorizationFailure
+                   : message_20::ResponseCode::WARNING_GeneralPnCAuthorizationError;
+    };
 
-    case message_20::Authorization::PnC:
-        // todo(SL): Handle PnC
+    switch (authorization_status) {
+    case AuthStatus::Accepted:
+        res.evse_processing = message_20::Processing::Finished;
+        response_code = message_20::ResponseCode::OK;
         break;
-
-    default:
-        // todo(SL): Fill
+    case AuthStatus::Rejected: // Failure [V2G20-2230]
+        res.evse_processing = message_20::Processing::Finished;
+        response_code = get_rejection_response_code(req.selected_authorization_service);
+        break;
+    case AuthStatus::Pending:
+        res.evse_processing = message_20::Processing::Ongoing;
+        response_code = message_20::ResponseCode::OK;
         break;
     }
 
@@ -82,11 +75,7 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
             return sa.HANDLED_INTERNALLY;
         }
 
-        if (*control_data) {
-            authorization_status = AuthStatus::Accepted;
-        } else {
-            authorization_status = AuthStatus::Rejected;
-        }
+        authorization_status = (*control_data) ? AuthStatus::Accepted : AuthStatus::Rejected;
 
         return sa.HANDLED_INTERNALLY;
     }

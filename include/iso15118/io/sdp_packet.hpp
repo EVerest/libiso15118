@@ -65,7 +65,9 @@ private:
     void parse_header();
 
     State state{State::EMPTY};
-    uint8_t buffer[2048];
+    // FIXME (aw): what buffer size to allow here?  Could also be made
+    // dynamic
+    uint8_t buffer[4096];
     size_t bytes_read{0};
     size_t length; // length includes V2GTP_HEADER_SIZE
 };

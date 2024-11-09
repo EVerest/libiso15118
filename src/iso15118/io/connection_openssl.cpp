@@ -64,6 +64,8 @@ static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
         log_and_raise_openssl_error("Failed in SSL_CTX_new()");
     }
 
+    // NOTE (aw): this could also be set to TLS1_3_VERSION in order to
+    // enforce TLS1.3
     if (SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION) == 0) {
         log_and_raise_openssl_error("Failed in SSL_CTX_set_min_proto_version()");
     }
@@ -289,6 +291,8 @@ void ConnectionSSL::handle_data() {
             if ((ssl_error == SSL_ERROR_WANT_READ) or (ssl_error == SSL_ERROR_WANT_WRITE)) {
                 return;
             }
+
+            // FIXME (aw): need to handle this gracefully
             log_and_raise_openssl_error("Failed to SSL_accept(): " + std::to_string(ssl_error));
         } else {
             logf_info("Handshake complete!");

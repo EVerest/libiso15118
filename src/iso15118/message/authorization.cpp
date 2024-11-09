@@ -10,22 +10,37 @@
 
 namespace iso15118::message_20 {
 
+// FIXME (aw): this template should be commonly reused
+template <typename T, typename SourceType> void copy_bytes_to_vector(std::vector<T>& out, const SourceType& in) {
+    static_assert(std::is_same_v<T, std::remove_all_extents_t<decltype(in.bytes)>>);
+    out.reserve(in.bytesLen);
+    std::copy(in.bytes, in.bytes + in.bytesLen, std::back_inserter(out));
+}
+
+template <>
+void convert(const struct iso20_PnC_AReqAuthorizationModeType& in,
+             AuthorizationRequest::PnC_ASReqAuthorizationMode& out) {
+    out.id = CB2CPP_STRING(in.Id);
+
+    copy_bytes_to_vector(out.gen_challenge, in.GenChallenge);
+    copy_bytes_to_vector(out.contract_certificate_chain.certificate, in.ContractCertificateChain.Certificate);
+
+    for (std::size_t i = 0; i < in.ContractCertificateChain.SubCertificates.Certificate.arrayLen; ++i) {
+        const auto& sub_certificate_in = in.ContractCertificateChain.SubCertificates.Certificate.array[i];
+        auto& sub_certificate_out = out.contract_certificate_chain.sub_certificates.emplace_back();
+        copy_bytes_to_vector(sub_certificate_out, sub_certificate_in);
+    }
+}
+
 template <> void convert(const struct iso20_AuthorizationReqType& in, AuthorizationRequest& out) {
     convert(in.Header, out.header);
 
     out.selected_authorization_service = static_cast<Authorization>(in.SelectedAuthorizationService);
     if (in.EIM_AReqAuthorizationMode_isUsed) {
-        out.eim_as_req_authorization_mode.emplace();
+        out.authorization_mode = AuthorizationRequest::EIM_ASReqAuthorizationMode{};
     } else if (in.PnC_AReqAuthorizationMode_isUsed) {
-
-        auto& pnc_out = out.pnc_as_req_authorization_mode.emplace();
-
-        pnc_out.id = CB2CPP_STRING(in.PnC_AReqAuthorizationMode.Id);
-        pnc_out.gen_challenge.reserve(in.PnC_AReqAuthorizationMode.GenChallenge.bytesLen);
-        pnc_out.gen_challenge.insert(
-            pnc_out.gen_challenge.end(), &in.PnC_AReqAuthorizationMode.GenChallenge.bytes[0],
-            &in.PnC_AReqAuthorizationMode.GenChallenge.bytes[in.PnC_AReqAuthorizationMode.GenChallenge.bytesLen]);
-        // Todo(sl): Adding certificate
+        auto& pnc_out = out.authorization_mode.emplace<AuthorizationRequest::PnC_ASReqAuthorizationMode>();
+        convert(in.PnC_AReqAuthorizationMode, pnc_out);
     }
 }
 

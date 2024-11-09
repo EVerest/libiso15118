@@ -22,43 +22,18 @@ using Dynamic_BPT_DC_Res = message_20::DC_ChargeLoopResponse::BPT_Dynamic_DC_CLR
 
 template <typename In, typename Out> void convert(Out& out, const In& in);
 
-template <> void convert(Scheduled_DC_Res& out, const d20::DcTransferLimits& in) {
+template <typename Out> void convert(Out& out, const d20::DcTransferLimits& in) {
     out.max_charge_power = in.charge_limits.power.max;
     out.min_charge_power = in.charge_limits.power.min;
     out.max_charge_current = in.charge_limits.current.max;
     out.max_voltage = in.voltage.max;
-}
 
-template <> void convert(Scheduled_BPT_DC_Res& out, const d20::DcTransferLimits& in) {
-    out.max_charge_power = in.charge_limits.power.max;
-    out.min_charge_power = in.charge_limits.power.min;
-    out.max_charge_current = in.charge_limits.current.max;
-    out.max_voltage = in.voltage.max;
-    out.min_voltage = in.voltage.min;
+    if constexpr (std::is_same_v<Out, Scheduled_BPT_DC_Res> || std::is_same_v<Out, Dynamic_BPT_DC_Res>) {
+        out.min_voltage = in.voltage.min;
 
-    if (in.discharge_limits.has_value()) {
-        auto& discharge_limits = in.discharge_limits.value();
-        out.max_discharge_power = discharge_limits.power.max;
-        out.min_discharge_power = discharge_limits.power.min;
-        out.max_discharge_current = discharge_limits.current.max;
-    }
-}
-
-template <> void convert(Dynamic_DC_Res& out, const d20::DcTransferLimits& in) {
-    out.max_charge_power = in.charge_limits.power.max;
-    out.min_charge_power = in.charge_limits.power.min;
-    out.max_charge_current = in.charge_limits.current.max;
-    out.max_voltage = in.voltage.max;
-}
-
-template <> void convert(Dynamic_BPT_DC_Res& out, const d20::DcTransferLimits& in) {
-    out.max_charge_power = in.charge_limits.power.max;
-    out.min_charge_power = in.charge_limits.power.min;
-    out.max_charge_current = in.charge_limits.current.max;
-    out.max_voltage = in.voltage.max;
-    out.min_voltage = in.voltage.min;
-
-    if (in.discharge_limits.has_value()) {
+        if (not in.discharge_limits) {
+            return;
+        }
         auto& discharge_limits = in.discharge_limits.value();
         out.max_discharge_power = discharge_limits.power.max;
         out.min_discharge_power = discharge_limits.power.min;
