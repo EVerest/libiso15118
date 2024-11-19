@@ -3,6 +3,7 @@
 #include <iso15118/io/connection_ssl.hpp>
 
 #include <cassert>
+#include <cinttypes>
 #include <cstring>
 #include <filesystem>
 #include <unistd.h>
@@ -141,6 +142,8 @@ ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& inte
             "Failed to determine string representation of ipv6 socket address for interface " + interface_name_;
         log_and_throw(msg.c_str());
     }
+
+    logf_info("Incoming connection from [%s]:%" PRIu16, address_name.get(), ntohs(address.sin6_port));
 
     // Todo(sl): Define constexpr -> 50000 is fixed?
     end_point.port = 50000;
