@@ -224,6 +224,10 @@ Ipv6EndPoint ConnectionSSL::get_public_endpoint() const {
     return end_point;
 }
 
+std::optional<sha512_hash_t> ConnectionSSL::get_vehicle_cert_hash() const {
+    return std::nullopt;
+}
+
 void ConnectionSSL::write(const uint8_t* buf, size_t len) {
     assert(handshake_complete);
 

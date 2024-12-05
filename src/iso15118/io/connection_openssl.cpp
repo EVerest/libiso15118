@@ -2,15 +2,22 @@
 // Copyright 2024 Pionix GmbH and Contributors to EVerest
 #include <iso15118/io/connection_ssl.hpp>
 
+#include <algorithm>
+#include <array>
 #include <cassert>
+#include <cinttypes>
 #include <cstring>
 #include <filesystem>
+#include <fstream>
+#include <sstream>
 #include <unistd.h>
+#include <vector>
 
 #include <sys/socket.h>
 
 #include <openssl/bio.h>
 #include <openssl/err.h>
+#include <openssl/evp.h>
 #include <openssl/ssl.h>
 
 #include <iso15118/detail/helper.hpp>
@@ -35,10 +42,6 @@ public:
 
 namespace iso15118::io {
 
-static constexpr auto DEFAULT_SOCKET_BACKLOG = 4;
-
-static int ex_data_idx;
-
 struct SSLContext {
     std::unique_ptr<SSL_CTX> ssl_ctx;
     std::unique_ptr<SSL> ssl;
@@ -46,16 +49,164 @@ struct SSLContext {
     int accept_fd{-1};
     std::string interface_name;
     bool enable_key_logging{false};
+    std::filesystem::path tls_key_log_file_path{};
     std::unique_ptr<io::TlsKeyLoggingServer> key_server;
+    bool enforce_tls_1_3{false};
+    std::optional<sha512_hash_t> vehicle_cert_hash{std::nullopt};
 };
 
-static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
+namespace {
+
+constexpr auto DEFAULT_SOCKET_BACKLOG = 4;
+
+int ssl_keylog_server_index{-1};
+int ssl_keylog_file_index{-1};
+
+std::vector<uint16_t> extract_supported_versions(const uint8_t* data, std::size_t remaining) {
+    uint8_t length_supported_versions = *(data++);
+    remaining -= 1;
+
+    if (length_supported_versions != remaining) {
+        logf_error("length_supported_versions is not remaining");
+        return {};
+    }
+
+    if (length_supported_versions % 2 != 0) {
+        logf_error("length_supported_versions is not diveded by 2");
+        return {};
+    }
+
+    // First Byte: length
+    // Byte 2+3 -> First Version (03, 04)
+    // Byte 4+5 -> Second Version (03, 03)
+    // ....
+
+    std::vector<uint16_t> tls_versions{};
+    for (auto i = 0; i < length_supported_versions; i += 2) {
+        const uint8_t first_byte = *(data++);
+        const uint8_t second_byte = *(data++);
+        tls_versions.push_back(first_byte << 8 | second_byte);
+    }
+    return tls_versions;
+}
+
+std::string convert_ssl_tls_versions_to_string(uint16_t version) {
+    switch (version) {
+    case SSL3_VERSION:
+        return "SSL3";
+    case TLS1_VERSION:
+        return "TLS1";
+    case TLS1_1_VERSION:
+        return "TLS1_1";
+    case TLS1_2_VERSION:
+        return "TLS1_2";
+    case TLS1_3_VERSION:
+        return "TLS1_3";
+    default:
+        return "Unknown";
+    }
+}
+
+int client_hello_cb(SSL* ssl, int* alert, void* object) {
+
+    // To shut up the compiler...
+    (void)alert;
+    (void)object;
+
+    int* extensions{nullptr};
+    std::size_t length{0};
+    if (SSL_client_hello_get1_extensions_present(ssl, &extensions, &length) == 1) {
+        for (std::size_t i = 0; i < length; i++) {
+            if (extensions[i] == TLSEXT_TYPE_supported_versions) {
+                const unsigned char* data;
+                std::size_t datalen{0};
+
+                // NOTE(SL): I found no get or callback function for the supported_versions extension, so I wrote
+                // my own parser
+                if (SSL_client_hello_get0_ext(ssl, TLSEXT_TYPE_supported_versions, &data, &datalen)) {
+                    const auto tls_versions = extract_supported_versions(data, datalen);
+
+                    for (auto tls_version : tls_versions) {
+                        logf_debug("Client supported tls version: %s",
+                                   convert_ssl_tls_versions_to_string(tls_version).c_str());
+                    }
+
+                    const auto tls_1_3_found =
+                        std::any_of(tls_versions.begin(), tls_versions.end(),
+                                    [](std::uint16_t version) { return version == TLS1_3_VERSION; });
+                    if (tls_1_3_found) {
+                        logf_info("Client supports TLS1.3: Change verify mode to SSL_VERIFY_PEER and "
+                                  "SSL_VERIFY_FAIL_IF_NO_PEER_CERT");
+                        int mode = SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT;
+                        SSL_set_verify(ssl, mode, nullptr);
+                    }
+                }
+            } else if (extensions[i] == TLSEXT_TYPE_certificate_authorities) {
+                logf_info("Extension certificate_authorities found!");
+                // TODO(SL): Setting var for handle_certificate_cb
+            }
+        }
+        OPENSSL_free(extensions);
+    }
+    return SSL_CLIENT_HELLO_SUCCESS;
+}
+
+int handle_certificate_cb(SSL* ssl, void* arg) {
+
+    // To shut up the compiler...
+    (void)arg;
+
+    // TODO(sl): Check only after names if the extension is there
+    const STACK_OF(X509_NAME)* names = SSL_get0_peer_CA_list(ssl);
+
+    if (names == NULL || sk_X509_NAME_num(names) == 0) {
+        logf_error("No certificate CA names sent");
+    } else {
+        logf_info("Found certificate CA names!");
+
+        for (auto i = 0; i < sk_X509_NAME_num(names); i++) {
+            char name[256]{};
+            X509_NAME_oneline(sk_X509_NAME_value(names, i), name, sizeof(name));
+            logf_info("Name: %s", name);
+        }
+    }
+
+    return 1;
+}
+
+void keylog_callback(const SSL* ssl, const char* line) {
+    auto key_logging_server = static_cast<io::TlsKeyLoggingServer*>(SSL_get_ex_data(ssl, ssl_keylog_server_index));
+
+    std::string key_log_msg = "TLS Handshake keys on port ";
+    key_log_msg += std::to_string(key_logging_server->get_port()) + ": ";
+    key_log_msg += std::string(line);
+
+    logf_info(key_log_msg.c_str());
+
+    if (key_logging_server->get_fd() != -1) {
+        const auto result = key_logging_server->send(line);
+        if (not cmp_equal(result, strlen(line))) {
+            const auto error_msg = adding_err_msg("key_logging_server send() failed");
+            logf_error(error_msg.c_str());
+        }
+    }
+
+    const auto keylog_file_path =
+        static_cast<std::filesystem::path*>(SSL_CTX_get_ex_data(SSL_get_SSL_CTX(ssl), ssl_keylog_file_index));
+
+    if (not keylog_file_path->empty()) {
+        std::ofstream ofs;
+        ofs.open(keylog_file_path->string(), std::ofstream::out | std::ofstream::app);
+        ofs << line << std::endl;
+        ofs.close();
+    }
+}
+
+SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
 
     // Note: openssl does not provide support for ECDH-ECDSA-AES128-SHA256 anymore
     static constexpr auto TLS1_2_CIPHERSUITES = "ECDHE-ECDSA-AES128-SHA256";
     static constexpr auto TLS1_3_CIPHERSUITES = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256";
-
-    const std::filesystem::path prefix(ssl_config.config_string);
 
     const SSL_METHOD* method = TLS_server_method();
     const auto ctx = SSL_CTX_new(method);
@@ -64,11 +215,15 @@ static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
         log_and_raise_openssl_error("Failed in SSL_CTX_new()");
     }
 
-    if (SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION) == 0) {
+    const int result_set_min_proto_version = (ssl_config.enforce_tls_1_3)
+                                                 ? SSL_CTX_set_min_proto_version(ctx, TLS1_3_VERSION)
+                                                 : SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION);
+
+    if (result_set_min_proto_version == 0) {
         log_and_raise_openssl_error("Failed in SSL_CTX_set_min_proto_version()");
     }
 
-    if (SSL_CTX_set_cipher_list(ctx, TLS1_2_CIPHERSUITES) == 0) {
+    if (not ssl_config.enforce_tls_1_3 and SSL_CTX_set_cipher_list(ctx, TLS1_2_CIPHERSUITES) == 0) {
         log_and_raise_openssl_error("Failed in SSL_CTX_set_cipher_list()");
     }
 
@@ -76,10 +231,8 @@ static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
         log_and_raise_openssl_error("Failed in SSL_CTX_set_ciphersuites()");
     }
 
-    // TODO(sl): Better cert path handling
-    const std::filesystem::path certificate_chain_file_path = prefix / "client/cso/CPO_CERT_CHAIN.pem";
-
-    if (SSL_CTX_use_certificate_chain_file(ctx, certificate_chain_file_path.c_str()) != 1) {
+    // FIXME(sl): Check if files are valid
+    if (SSL_CTX_use_certificate_chain_file(ctx, ssl_config.certificate_paths.cpo_cert_chain_path.c_str()) != 1) {
         log_and_raise_openssl_error("Failed in SSL_CTX_use_certificate_chain_file()");
     }
 
@@ -87,35 +240,42 @@ static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
     std::string pass_str = ssl_config.private_key_password;
     SSL_CTX_set_default_passwd_cb_userdata(ctx, pass_str.data());
 
-    const std::filesystem::path private_key_file_path = prefix / "client/cso/SECC_LEAF.key";
-    if (SSL_CTX_use_PrivateKey_file(ctx, private_key_file_path.c_str(), SSL_FILETYPE_PEM) != 1) {
+    if (SSL_CTX_use_PrivateKey_file(ctx, ssl_config.certificate_paths.secc_leaf_key_path.c_str(), SSL_FILETYPE_PEM) !=
+        1) {
         log_and_raise_openssl_error("Failed in SSL_CTX_use_PrivateKey_file()");
     }
 
-    // TODO(sl): How switch verify mode to none if tls 1.2 is used?
+    // Loading root certificates to verify client
+    if (SSL_CTX_load_verify_file(ctx, ssl_config.certificate_paths.v2g_root_cert_path.c_str()) == 0) {
+        logf_error("Verify V2G root not found!");
+    }
+
+    if (SSL_CTX_load_verify_file(ctx, ssl_config.certificate_paths.oem_root_cert_path.c_str()) == 0) {
+        logf_error("Verify OEM root not found!");
+    }
+
     SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, nullptr);
 
+    SSL_CTX_set_client_hello_cb(ctx, &client_hello_cb, nullptr);
+    // SSL_CTX_set_cert_cb(ctx, &handle_certificate_cb, nullptr);
+
     if (ssl_config.enable_tls_key_logging) {
+        ssl_keylog_file_index = SSL_CTX_get_ex_new_index(0, std::string("").data(), nullptr, nullptr, nullptr);
+        ssl_keylog_server_index = SSL_get_ex_new_index(0, std::string("").data(), nullptr, nullptr, nullptr);
 
-        SSL_CTX_set_keylog_callback(ctx, [](const SSL* ssl, const char* line) {
-            logf_info("TLS handshake keys: %s", line);
-
-            auto& key_logging_server = *static_cast<io::TlsKeyLoggingServer*>(SSL_get_ex_data(ssl, ex_data_idx));
-
-            if (key_logging_server.get_fd() == -1) {
-                logf_warning("Error - key_logging_server fd is not available");
-                return;
-            }
-            const auto result = key_logging_server.send(line);
-            if (not cmp_equal(result, strlen(line))) {
-                const auto error_msg = adding_err_msg("key_logging_server send() failed");
-                logf_error(error_msg.c_str());
-            }
-        });
+        if (ssl_keylog_file_index == -1 or ssl_keylog_server_index == -1) {
+            auto error_msg = std::string("_get_ex_new_index failed: ssl_keylog_file_index: ");
+            error_msg += std::to_string(ssl_keylog_file_index);
+            error_msg += ", ssl_keylog_server_index: " + std::to_string(ssl_keylog_server_index);
+            logf_error(error_msg.c_str());
+        } else {
+            SSL_CTX_set_keylog_callback(ctx, keylog_callback);
+        }
     }
 
     return ctx;
 }
+} // namespace
 
 ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& interface_name_,
                              const config::SSLConfig& ssl_config) :
@@ -123,16 +283,25 @@ ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& inte
 
     ssl->interface_name = interface_name_;
     ssl->enable_key_logging = ssl_config.enable_tls_key_logging;
+    ssl->enforce_tls_1_3 = ssl_config.enforce_tls_1_3;
 
     // Openssl stuff missing!
     const auto ssl_ctx = init_ssl(ssl_config);
     ssl->ssl_ctx = std::unique_ptr<SSL_CTX>(ssl_ctx);
 
+    if (ssl_keylog_file_index != -1) {
+        ssl->tls_key_log_file_path = ssl_config.tls_key_logging_path / "tls_session_keys.log";
+        SSL_CTX_set_ex_data(ssl->ssl_ctx.get(), ssl_keylog_file_index, &ssl->tls_key_log_file_path);
+    }
     sockaddr_in6 address;
     if (not get_first_sockaddr_in6_for_interface(interface_name_, address)) {
         const auto msg = "Failed to get ipv6 socket address for interface " + interface_name_;
         log_and_throw(msg.c_str());
     }
+
+    // Todo(sl): Define constexpr -> 50000 is fixed?
+    end_point.port = 50000;
+    memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
 
     const auto address_name = sockaddr_in6_to_name(address);
 
@@ -142,9 +311,7 @@ ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& inte
         log_and_throw(msg.c_str());
     }
 
-    // Todo(sl): Define constexpr -> 50000 is fixed?
-    end_point.port = 50000;
-    memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
+    logf_info("Start TLS server [%s]:%" PRIu16, address_name.get(), end_point.port);
 
     ssl->fd = socket(AF_INET6, SOCK_STREAM, 0);
     if (ssl->fd == -1) {
@@ -187,6 +354,10 @@ void ConnectionSSL::set_event_callback(const ConnectionEventCallback& callback) 
 
 Ipv6EndPoint ConnectionSSL::get_public_endpoint() const {
     return end_point;
+}
+
+std::optional<sha512_hash_t> ConnectionSSL::get_vehicle_cert_hash() const {
+    return ssl->vehicle_cert_hash;
 }
 
 void ConnectionSSL::write(const uint8_t* buf, size_t len) {
@@ -260,12 +431,7 @@ void ConnectionSSL::handle_connect() {
     if (ssl->enable_key_logging) {
         const auto port = std::stoul(service);
         ssl->key_server = std::make_unique<io::TlsKeyLoggingServer>(ssl->interface_name, port);
-
-        // NOTE(sl): SSL_get_ex_new_index does not work with "ex data" because of const
-        std::string tmp = "ex data";
-        ex_data_idx = SSL_get_ex_new_index(0, tmp.data(), nullptr, nullptr, nullptr);
-
-        SSL_set_ex_data(ssl_ptr, ex_data_idx, ssl->key_server.get());
+        SSL_set_ex_data(ssl_ptr, ssl_keylog_server_index, ssl->key_server.get());
     }
 
     poll_manager.register_fd(ssl->accept_fd, [this]() { this->handle_data(); });
@@ -292,6 +458,43 @@ void ConnectionSSL::handle_data() {
             log_and_raise_openssl_error("Failed to SSL_accept(): " + std::to_string(ssl_error));
         } else {
             logf_info("Handshake complete!");
+
+            const auto peer = SSL_get0_peer_certificate(ssl_ptr);
+
+            if (SSL_get_verify_mode(ssl_ptr) > SSL_VERIFY_NONE and peer) {
+
+                const auto verify_result = SSL_get_verify_result(ssl_ptr);
+                if (verify_result == X509_V_OK) {
+                    logf_info("Verify certificate result is okay");
+
+                    char name[256]{};
+                    X509_NAME_oneline(X509_get_subject_name(peer), name, sizeof(name));
+                    logf_debug("Peer subject name: %s", name);
+                    memset(name, 0x00, sizeof(name));
+                    X509_NAME_oneline(X509_get_issuer_name(peer), name, sizeof(name));
+                    logf_debug("Peer issuer name: %s", name);
+
+                    unsigned int length = 0;
+                    auto& vehicle_hash = ssl->vehicle_cert_hash.emplace();
+                    const auto result_digest = X509_digest(peer, EVP_sha512(), vehicle_hash.data(), &length);
+
+                    if (result_digest) {
+                        std::stringstream ss;
+                        ss << std::uppercase << std::hex << std::setw(2) << std::setfill('0')
+                           << static_cast<int>(vehicle_hash[0]);
+                        for (unsigned int i = 1; i < length; ++i) {
+                            ss << ":" << std::uppercase << std::hex << std::setw(2) << std::setfill('0')
+                               << (int)static_cast<int>(vehicle_hash[i]);
+                        }
+                        logf_debug("sha512 fingerprint: %s", ss.str().c_str());
+                        // openssl command: openssl x509 -in *.pem -noout -fingerprint -sha512
+                    } else {
+                        logf_error("X509_digest failed");
+                    }
+                } else {
+                    logf_error("Verify certificate result is not okay");
+                }
+            }
 
             handshake_complete = true;
             if (ssl->enable_key_logging) {

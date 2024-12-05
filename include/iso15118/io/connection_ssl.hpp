@@ -3,7 +3,10 @@
 #pragma once
 #include "connection_abstract.hpp"
 
+#include <array>
+#include <cstdint>
 #include <memory>
+#include <optional>
 
 #include <iso15118/config.hpp>
 #include <iso15118/io/poll_manager.hpp>
@@ -23,6 +26,8 @@ public:
     ReadResult read(uint8_t* buf, size_t len) final;
 
     void close() final;
+
+    std::optional<sha512_hash_t> get_vehicle_cert_hash() const final;
 
     ~ConnectionSSL();
 
