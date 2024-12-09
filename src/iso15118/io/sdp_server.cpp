@@ -17,7 +17,8 @@
 
 // FIXME(Sl): Not sure with define
 /* link-local multicast address ff02::1 aka ip6-allnodes */
-#define IN6ADDR_ALLNODES {0xff, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01}
+#define IN6ADDR_ALLNODES                                                                                               \
+    { 0xff, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01 }
 
 namespace iso15118 {
 
@@ -72,7 +73,7 @@ SdpServer::SdpServer(std::string interface_name) {
     }
 
     // Join multicast group
-    struct ipv6_mreq mreq{};
+    struct ipv6_mreq mreq {};
     mreq.ipv6mr_multiaddr = IN6ADDR_ALLNODES;
     mreq.ipv6mr_interface = if_nametoindex(interface_name.c_str());
 
