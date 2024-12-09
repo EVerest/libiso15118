@@ -3,6 +3,7 @@
 #include <iso15118/io/connection_ssl.hpp>
 
 #include <cassert>
+#include <cinttypes>
 #include <cstring>
 #include <filesystem>
 
@@ -148,6 +149,9 @@ ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& inte
         log_and_throw(msg.c_str());
     }
 
+    end_point.port = 50000;
+    memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
+
     const auto address_name = sockaddr_in6_to_name(address);
 
     if (not address_name) {
@@ -156,8 +160,7 @@ ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& inte
         log_and_throw(msg.c_str());
     }
 
-    end_point.port = 50000;
-    memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
+    logf_info("Start TLS server [%s]:%" PRIu16, address_name.get(), end_point.port);
 
     //
     // mbedtls specifica
