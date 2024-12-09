@@ -135,6 +135,10 @@ ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& inte
         log_and_throw(msg.c_str());
     }
 
+    // Todo(sl): Define constexpr -> 50000 is fixed?
+    end_point.port = 50000;
+    memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
+
     const auto address_name = sockaddr_in6_to_name(address);
 
     if (not address_name) {
@@ -143,11 +147,7 @@ ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& inte
         log_and_throw(msg.c_str());
     }
 
-    logf_info("Incoming connection from [%s]:%" PRIu16, address_name.get(), ntohs(address.sin6_port));
-
-    // Todo(sl): Define constexpr -> 50000 is fixed?
-    end_point.port = 50000;
-    memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
+    logf_info("Start TLS server [%s]:%" PRIu16, address_name.get(), end_point.port);
 
     ssl->fd = socket(AF_INET6, SOCK_STREAM, 0);
     if (ssl->fd == -1) {

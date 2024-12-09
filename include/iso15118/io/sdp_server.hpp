@@ -28,7 +28,7 @@ private:
 
 class SdpServer {
 public:
-    explicit SdpServer(std::string interface_name);
+    explicit SdpServer(const std::string& interface_name);
     ~SdpServer();
     PeerRequestContext get_peer_request();
     void send_response(const PeerRequestContext&, const Ipv6EndPoint&);

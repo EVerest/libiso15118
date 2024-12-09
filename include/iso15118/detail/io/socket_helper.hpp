@@ -9,7 +9,7 @@
 
 namespace iso15118::io {
 
-bool check_and_udapte_interface(std::string& interface_name);
+bool check_and_update_interface(std::string& interface_name);
 
 bool get_first_sockaddr_in6_for_interface(const std::string& interface_name, sockaddr_in6& address);
 

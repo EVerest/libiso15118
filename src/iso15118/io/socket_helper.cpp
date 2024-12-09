@@ -17,7 +17,7 @@ namespace iso15118::io {
 namespace {
 
 auto choose_first_ipv6_interface() {
-    std::string interface_name{""};
+    std::string interface_name{};
     struct ifaddrs* if_list_head;
     const auto get_if_addrs_result = getifaddrs(&if_list_head);
 
@@ -46,7 +46,7 @@ auto choose_first_ipv6_interface() {
 
 } // namespace
 
-bool check_and_udapte_interface(std::string& interface_name) {
+bool check_and_update_interface(std::string& interface_name) {
 
     if (interface_name == "auto") {
         logf_info("Search for the first available ipv6 interface");

@@ -38,7 +38,7 @@ static void log_peer_hostname(const struct sockaddr_in6& address) {
 
 namespace io {
 
-SdpServer::SdpServer(std::string interface_name) {
+SdpServer::SdpServer(const std::string& interface_name) {
     fd = socket(AF_INET6, SOCK_DGRAM, 0);
 
     if (fd == -1) {

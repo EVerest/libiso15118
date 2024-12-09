@@ -21,7 +21,7 @@ TbdController::TbdController(TbdConfig config_, session::feedback::Callbacks cal
     evse_setup(std::move(setup_)),
     interface_name(config.interface_name) {
 
-    const auto result_interface_check = io::check_and_udapte_interface(interface_name);
+    const auto result_interface_check = io::check_and_update_interface(interface_name);
     if (result_interface_check) {
         logf_info("Using ethernet interface: %s", interface_name.c_str());
     } else {
