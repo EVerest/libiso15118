@@ -84,7 +84,7 @@ void ServiceSelection::enter() {
 FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorType& sa, FsmEvent ev) {
 
     if (ev != FsmEvent::V2GTP_MESSAGE) {
-        return sa.PASS_ON;
+        return {};
     }
 
     const auto variant = ctx.pull_request();
@@ -98,7 +98,7 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
 
         if (res.response_code >= dt::ResponseCode::FAILED) {
             ctx.session_stopped = true;
-            return sa.PASS_ON;
+            return {};
         }
 
         return sa.HANDLED_INTERNALLY;
@@ -109,7 +109,7 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
 
         if (res.response_code >= dt::ResponseCode::FAILED) {
             ctx.session_stopped = true;
-            return sa.PASS_ON;
+            return {};
         }
 
         return sa.create_simple<DC_ChargeParameterDiscovery>(ctx);
@@ -119,7 +119,7 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
         ctx.respond(res);
         ctx.session_stopped = true;
 
-        return sa.PASS_ON;
+        return {};
     } else {
         ctx.log("expected ServiceDetailReq! But code type id: %d", variant->get_type());
 
@@ -128,7 +128,7 @@ FsmSimpleState::HandleEventReturnType ServiceSelection::handle_event(AllocatorTy
         send_sequence_error(req_type, ctx);
 
         ctx.session_stopped = true;
-        return sa.PASS_ON;
+        return {};
     }
 }
 

@@ -33,33 +33,33 @@ handle_request(const message_20::SupportedAppProtocolRequest& req) {
 }
 
 void SupportedAppProtocol::enter() {
-    ctx.log.enter_state("SupportedAppProtocol");
+    m_ctx.log.enter_state("SupportedAppProtocol");
 }
 
-FsmSimpleState::HandleEventReturnType SupportedAppProtocol::handle_event(AllocatorType& sa, FsmEvent ev) {
-    if (ev != FsmEvent::V2GTP_MESSAGE) {
-        return sa.PASS_ON;
+Result SupportedAppProtocol::feed(Event ev) {
+    if (ev != Event::V2GTP_MESSAGE) {
+        return {};
     }
 
-    auto variant = ctx.pull_request();
+    auto variant = m_ctx.pull_request();
 
     if (const auto req = variant->get_if<message_20::SupportedAppProtocolRequest>()) {
 
         const auto [res, selected_protocol] = handle_request(*req);
 
         if (selected_protocol.has_value()) {
-            ctx.feedback.selected_protocol(*selected_protocol);
+            m_ctx.feedback.selected_protocol(*selected_protocol);
         }
 
-        ctx.respond(res);
+        m_ctx.respond(res);
 
-        return sa.create_simple<SessionSetup>(ctx);
+        return m_ctx.create_state<SessionSetup>();
 
     } else {
-        ctx.log("expected SupportedAppProtocolReq! But code type id: %d", variant->get_type());
+        m_ctx.log("expected SupportedAppProtocolReq! But code type id: %d", variant->get_type());
 
-        ctx.session_stopped = true;
-        return sa.PASS_ON;
+        m_ctx.session_stopped = true;
+        return {};
     }
 }
 

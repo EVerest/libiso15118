@@ -2,7 +2,7 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include "../fsm.hpp"
+#include "../states.hpp"
 
 #include <cstdint>
 #include <optional>

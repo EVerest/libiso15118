@@ -2,16 +2,20 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include "../fsm.hpp"
+#include "../states.hpp"
 
 namespace iso15118::d20::state {
 
-struct SupportedAppProtocol : public FsmSimpleState {
-    using FsmSimpleState::FsmSimpleState;
+struct SupportedAppProtocol : public StateBase {
+public:
+    SupportedAppProtocol(Context& ctx) : StateBase(StateID::SupportedAppProtocol), m_ctx(ctx) {};
 
     void enter() final;
 
-    HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+    Result feed(Event) final;
+
+private:
+    Context& m_ctx;
 };
 
 } // namespace iso15118::d20::state

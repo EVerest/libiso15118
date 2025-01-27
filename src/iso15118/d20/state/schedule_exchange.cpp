@@ -119,7 +119,7 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
     }
 
     if (ev != FsmEvent::V2GTP_MESSAGE) {
-        return sa.PASS_ON;
+        return {};
     }
 
     const auto variant = ctx.pull_request();
@@ -141,7 +141,7 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
 
         if (res.response_code >= dt::ResponseCode::FAILED) {
             ctx.session_stopped = true;
-            return sa.PASS_ON;
+            return {};
         }
 
         if (res.processing == dt::Processing::Ongoing) {
@@ -155,7 +155,7 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
         ctx.respond(res);
         ctx.session_stopped = true;
 
-        return sa.PASS_ON;
+        return {};
     } else {
         ctx.log("expected ScheduleExchangeReq! But code type id: %d", variant->get_type());
 
@@ -164,7 +164,7 @@ FsmSimpleState::HandleEventReturnType ScheduleExchange::handle_event(AllocatorTy
         send_sequence_error(req_type, ctx);
 
         ctx.session_stopped = true;
-        return sa.PASS_ON;
+        return {};
     }
 }
 

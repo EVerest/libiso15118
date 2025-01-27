@@ -94,7 +94,7 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
     }
 
     if (ev != FsmEvent::V2GTP_MESSAGE) {
-        return sa.PASS_ON;
+        return {};
     }
 
     const auto variant = ctx.pull_request();
@@ -106,7 +106,7 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
 
         if (res.response_code >= dt::ResponseCode::FAILED) {
             ctx.session_stopped = true;
-            return sa.PASS_ON;
+            return {};
         }
 
         if (authorization_status == AuthStatus::Accepted) {
@@ -120,7 +120,7 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
         ctx.respond(res);
 
         ctx.session_stopped = true;
-        return sa.PASS_ON;
+        return {};
     } else {
         ctx.log("expected AuthorizationReq! But code type id: %d", variant->get_type());
 
@@ -129,7 +129,7 @@ FsmSimpleState::HandleEventReturnType Authorization::handle_event(AllocatorType&
         send_sequence_error(req_type, ctx);
 
         ctx.session_stopped = true;
-        return sa.PASS_ON;
+        return {};
     }
 }
 

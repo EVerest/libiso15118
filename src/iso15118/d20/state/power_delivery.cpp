@@ -51,7 +51,7 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
     }
 
     if (ev != FsmEvent::V2GTP_MESSAGE) {
-        return sa.PASS_ON;
+        return {};
     }
 
     const auto variant = ctx.pull_request();
@@ -65,7 +65,7 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
 
         if (res.response_code >= dt::ResponseCode::FAILED) {
             ctx.session_stopped = true;
-            return sa.PASS_ON;
+            return {};
         }
 
         return sa.HANDLED_INTERNALLY;
@@ -80,7 +80,7 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
 
         if (res.response_code >= dt::ResponseCode::FAILED) {
             ctx.session_stopped = true;
-            return sa.PASS_ON;
+            return {};
         }
 
         return sa.create_simple<DC_ChargeLoop>(ctx);
@@ -92,7 +92,7 @@ FsmSimpleState::HandleEventReturnType PowerDelivery::handle_event(AllocatorType&
         send_sequence_error(req_type, ctx);
 
         ctx.session_stopped = true;
-        return sa.PASS_ON;
+        return {};
     }
 }
 
