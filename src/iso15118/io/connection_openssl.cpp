@@ -92,7 +92,7 @@ static SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
 
     // INFO: the password callback uses a non-const argument
     if (ssl_config.private_key_password.has_value()) {
-        // Lifetime of the password is important because useing a callback we'll require a valid ref
+        // Lifetime of the password is important because using a callback we'll require a valid ref
         SSL_CTX_set_default_passwd_cb_userdata(
             ctx, &const_cast<config::SSLConfig&>(ssl_config).private_key_password.value());
         SSL_CTX_set_default_passwd_cb(ctx, private_key_callback);
