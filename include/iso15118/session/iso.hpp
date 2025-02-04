@@ -10,7 +10,7 @@
 #include <iso15118/d20/config.hpp>
 #include <iso15118/d20/context.hpp>
 #include <iso15118/d20/control_event_queue.hpp>
-#include <iso15118/fsm.hpp>
+#include <iso15118/detail/fsm/fsm.hpp>
 #include <iso15118/d20/states.hpp>
 
 #include <iso15118/io/connection_abstract.hpp>
