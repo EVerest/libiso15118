@@ -37,6 +37,7 @@ public:
 namespace iso15118::io {
 
 static constexpr auto DEFAULT_SOCKET_BACKLOG = 4;
+static constexpr auto TLS_PORT = 50000;
 
 static int ex_data_idx;
 
@@ -145,8 +146,7 @@ ConnectionSSL::ConnectionSSL(PollManager& poll_manager_, const std::string& inte
         log_and_throw(msg.c_str());
     }
 
-    // Todo(sl): Define constexpr -> 50000 is fixed?
-    end_point.port = 50000;
+    end_point.port = TLS_PORT;
     memcpy(&end_point.address, &address.sin6_addr, sizeof(address.sin6_addr));
 
     const auto address_name = sockaddr_in6_to_name(address);
