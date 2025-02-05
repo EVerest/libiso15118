@@ -6,12 +6,13 @@
 
 namespace iso15118::d20::state {
 
-struct ServiceSelection : public FsmSimpleState {
-    using FsmSimpleState::FsmSimpleState;
+struct ServiceSelection : public StateBase {
+    ServiceSelection(Context& ctx) : StateBase(ctx, StateID::ServiceSelection) {
+    }
 
     void enter() final;
 
-    HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+    Result feed(Event) final;
 };
 
 } // namespace iso15118::d20::state

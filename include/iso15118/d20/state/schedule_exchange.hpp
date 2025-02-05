@@ -10,13 +10,13 @@
 #include <iso15118/d20/dynamic_mode_parameters.hpp>
 
 namespace iso15118::d20::state {
-
-struct ScheduleExchange : public FsmSimpleState {
-    using FsmSimpleState::FsmSimpleState;
+struct ScheduleExchange : public StateBase {
+    ScheduleExchange(Context& ctx) : StateBase(ctx, StateID::ScheduleExchange) {
+    }
 
     void enter() final;
 
-    HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+    Result feed(Event) final;
 
 private:
     UpdateDynamicModeParameters dynamic_parameters;

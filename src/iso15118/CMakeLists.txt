@@ -32,17 +32,17 @@ target_sources(iso15118
         d20/state/supported_app_protocol.cpp
         d20/state/session_setup.cpp
         d20/state/authorization_setup.cpp
-        # d20/state/authorization.cpp
-        # d20/state/service_discovery.cpp
-        # d20/state/service_detail.cpp
-        # d20/state/service_selection.cpp
-        # d20/state/dc_charge_parameter_discovery.cpp
-        # d20/state/schedule_exchange.cpp
-        # d20/state/dc_cable_check.cpp
-        # d20/state/dc_pre_charge.cpp
-        # d20/state/power_delivery.cpp
-        # d20/state/dc_charge_loop.cpp
-        # d20/state/dc_welding_detection.cpp
+        d20/state/authorization.cpp
+        d20/state/service_discovery.cpp
+        d20/state/service_detail.cpp
+        d20/state/service_selection.cpp
+        d20/state/dc_charge_parameter_discovery.cpp
+        d20/state/schedule_exchange.cpp
+        d20/state/dc_cable_check.cpp
+        d20/state/dc_pre_charge.cpp
+        d20/state/power_delivery.cpp
+        d20/state/dc_charge_loop.cpp
+        d20/state/dc_welding_detection.cpp
         d20/state/session_stop.cpp
 
         message/variant.cpp

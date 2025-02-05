@@ -6,12 +6,13 @@
 
 namespace iso15118::d20::state {
 
-struct DC_ChargeParameterDiscovery : public FsmSimpleState {
-    using FsmSimpleState::FsmSimpleState;
+struct DC_ChargeParameterDiscovery : public StateBase {
+    DC_ChargeParameterDiscovery(Context& ctx) : StateBase(ctx, StateID::DC_ChargeParameterDiscovery) {
+    }
 
     void enter() final;
 
-    HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+    Result feed(Event) final;
 };
 
 } // namespace iso15118::d20::state

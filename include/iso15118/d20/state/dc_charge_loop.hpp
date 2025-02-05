@@ -11,12 +11,13 @@
 
 namespace iso15118::d20::state {
 
-struct DC_ChargeLoop : public FsmSimpleState {
-    using FsmSimpleState::FsmSimpleState;
+struct DC_ChargeLoop : public StateBase {
+    DC_ChargeLoop(Context& ctx) : StateBase(ctx, StateID::DC_ChargeLoop) {
+    }
 
     void enter() final;
 
-    HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+    Result feed(Event) final;
 
 private:
     float present_voltage{0};

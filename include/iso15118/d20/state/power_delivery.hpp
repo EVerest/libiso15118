@@ -5,13 +5,13 @@
 #include "../states.hpp"
 
 namespace iso15118::d20::state {
-
-struct PowerDelivery : public FsmSimpleState {
-    using FsmSimpleState::FsmSimpleState;
+struct PowerDelivery : public StateBase {
+    PowerDelivery(Context& ctx) : StateBase(ctx, StateID::PowerDelivery) {
+    }
 
     void enter() final;
 
-    HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+    Result feed(Event) final;
 
 private:
     float present_voltage{0};

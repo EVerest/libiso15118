@@ -7,14 +7,12 @@
 namespace iso15118::d20::state {
 
 struct AuthorizationSetup : public StateBase {
-    AuthorizationSetup(Context& ctx) : StateBase(StateID::AuthorizationSetup), m_ctx(ctx){};
+    AuthorizationSetup(Context& ctx) : StateBase(ctx, StateID::AuthorizationSetup) {
+    }
 
     void enter() final;
 
     Result feed(Event) final;
-
-private:
-    Context& m_ctx;
 };
 
 } // namespace iso15118::d20::state

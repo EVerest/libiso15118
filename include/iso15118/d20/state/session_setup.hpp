@@ -8,14 +8,14 @@
 namespace iso15118::d20::state {
 
 struct SessionSetup : public StateBase {
-    SessionSetup(Context& ctx) : StateBase(StateID::SessionSetup), m_ctx(ctx){};
+    SessionSetup(Context& ctx) : StateBase(ctx, StateID::SessionSetup) {
+    }
 
     void enter() final;
 
     Result feed(Event) final;
 
 private:
-    Context& m_ctx;
     std::string evse_id;
 };
 

@@ -6,12 +6,13 @@
 
 namespace iso15118::d20::state {
 
-struct DC_CableCheck : public FsmSimpleState {
-    using FsmSimpleState::FsmSimpleState;
+struct DC_CableCheck : public StateBase {
+    DC_CableCheck(Context& ctx) : StateBase(ctx, StateID::DC_CableCheck) {
+    }
 
     void enter() final;
 
-    HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+    Result feed(Event) final;
 
 private:
     bool cable_check_initiated{false};

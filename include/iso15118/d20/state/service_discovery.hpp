@@ -6,12 +6,14 @@
 
 namespace iso15118::d20::state {
 
-struct ServiceDiscovery : public FsmSimpleState {
-    using FsmSimpleState::FsmSimpleState;
+struct ServiceDiscovery : public StateBase {
+public:
+    ServiceDiscovery(Context& ctx) : StateBase(ctx, StateID::Authorization) {
+    }
 
     void enter() final;
 
-    HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+    Result feed(Event) final;
 };
 
 } // namespace iso15118::d20::state

@@ -21,6 +21,17 @@ enum class StateID {
     SupportedAppProtocol,
     SessionSetup,
     AuthorizationSetup,
+    Authorization,
+    ServiceDetail,
+    ServiceDiscovery,
+    ServiceSelection,
+    DC_ChargeParameterDiscovery,
+    DC_PreCharge,
+    DC_ChargeLoop,
+    DC_WeldingDetection,
+    DC_CableCheck,
+    PowerDelivery,
+    ScheduleExchange,
     SessionStop
 };
 
@@ -37,7 +48,7 @@ struct StateBase {
     using ContainerType = BasePointerType;
     using EventType = Event;
 
-    StateBase(StateID id) : m_id(id){};
+    StateBase(Context& ctx, StateID id) : m_ctx(ctx), m_id(id){};
 
     virtual ~StateBase() = default;
 
@@ -48,6 +59,10 @@ struct StateBase {
     virtual void enter(){};
     virtual Result feed(Event) = 0;
     virtual void leave(){};
+
+protected:
+    // TODO(ioan): any reason we didn't have a context ref in here?
+    Context& m_ctx;
 
 private:
     StateID m_id;

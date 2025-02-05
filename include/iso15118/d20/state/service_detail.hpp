@@ -6,12 +6,14 @@
 
 namespace iso15118::d20::state {
 
-struct ServiceDetail : public FsmSimpleState {
-    using FsmSimpleState::FsmSimpleState;
+struct ServiceDetail : public StateBase {
+public:
+    ServiceDetail(Context& ctx) : StateBase(ctx, StateID::ServiceDetail) {
+    }
 
     void enter() final;
 
-    HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+    Result feed(Event) final;
 };
 
 } // namespace iso15118::d20::state

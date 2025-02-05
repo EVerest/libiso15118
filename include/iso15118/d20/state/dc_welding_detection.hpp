@@ -6,12 +6,13 @@
 
 namespace iso15118::d20::state {
 
-struct DC_WeldingDetection : public FsmSimpleState {
-    using FsmSimpleState::FsmSimpleState;
+struct DC_WeldingDetection : public StateBase {
+    DC_WeldingDetection(Context& ctx) : StateBase(ctx, StateID::DC_WeldingDetection) {
+    }
 
     void enter() final;
 
-    HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+    Result feed(Event) final;
 
 private:
     float present_voltage{0};
