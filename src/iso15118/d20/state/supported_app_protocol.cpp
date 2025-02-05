@@ -13,7 +13,7 @@
 
 namespace iso15118::d20::state {
 
-static std::tuple<message_20::SupportedAppProtocolResponse, std::optional<std::string>>
+std::tuple<message_20::SupportedAppProtocolResponse, std::optional<std::string>>
 handle_request(const message_20::SupportedAppProtocolRequest& req) {
     message_20::SupportedAppProtocolResponse res;
     std::optional<std::string> selected_protocol{std::nullopt};
@@ -46,15 +46,16 @@ Result SupportedAppProtocol::feed(Event ev) {
     if (const auto req = variant->get_if<message_20::SupportedAppProtocolRequest>()) {
 
         const auto [res, selected_protocol] = handle_request(*req);
+        m_ctx.respond(res);
 
         if (selected_protocol.has_value()) {
             m_ctx.feedback.selected_protocol(*selected_protocol);
+            return m_ctx.create_state<SessionSetup>();
         }
 
-        m_ctx.respond(res);
-
-        return m_ctx.create_state<SessionSetup>();
-
+        m_ctx.log("unsupported app protocol: [%s]",
+                  req->app_protocol.size() ? req->app_protocol[0].protocol_namespace.c_str() : "unknown");
+        return {};
     } else {
         m_ctx.log("expected SupportedAppProtocolReq! But code type id: %d", variant->get_type());
 
