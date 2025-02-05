@@ -60,7 +60,7 @@ public:
     // FIXME (aw): bundle arguments
     Context(session::feedback::Callbacks, session::SessionLogger&, d20::SessionConfig,
             const std::optional<ControlEvent>&, MessageExchange&);
-    
+
     template <typename StateType, typename... Args> BasePointerType create_state(Args&&... args) {
         return std::make_unique<StateType>(*this, std::forward<Args>(args)...);
     }

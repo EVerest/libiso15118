@@ -12,8 +12,8 @@
 using namespace iso15118;
 
 namespace iso15118::d20::state {
-    extern std::tuple<message_20::SupportedAppProtocolResponse, std::optional<std::string>>
-    handle_request(const message_20::SupportedAppProtocolRequest& req);
+extern std::tuple<message_20::SupportedAppProtocolResponse, std::optional<std::string>>
+handle_request(const message_20::SupportedAppProtocolRequest& req);
 }
 
 SCENARIO("ISO15118-20 state transitions") {
@@ -45,7 +45,8 @@ SCENARIO("ISO15118-20 state transitions") {
     ap.version_number_minor = 11;
 
     const auto [res, selected_protocol] = iso15118::d20::state::handle_request(req);
-    REQUIRE(res.response_code == iso15118::message_20::SupportedAppProtocolResponse::ResponseCode::Failed_NoNegotiation);
+    REQUIRE(res.response_code ==
+            iso15118::message_20::SupportedAppProtocolResponse::ResponseCode::Failed_NoNegotiation);
     REQUIRE(selected_protocol.has_value() == false);
 
     state_helper.handle_request(io::v2gtp::PayloadType::SAP, req);
