@@ -14,13 +14,34 @@ namespace fsm::v2 {
 namespace detail {
 
 // detection idiom, see https://blog.tartanllama.xyz/detection-idiom/
-template <typename T, typename = void> struct output_type { using type = void; };
+template <typename T, typename = void> struct output_type {
+    using type = void;
+};
 
 template <typename T> struct output_type<T, std::void_t<decltype(std::declval<T>().output)>> {
     using type = decltype(std::declval<T>().output);
 };
 
 template <typename T> using output_type_t = typename output_type<T>::type;
+
+// clang-format off
+template <typename, typename = void> constexpr bool is_template_state_compliant = false;
+
+template <typename T>
+constexpr bool is_template_state_compliant<
+    T, std::void_t<
+           // Check for a 'ContainerType' used by the FSM/NestedFSM
+           typename T::ContainerType,
+           // Check for a 'EventType' used by the 'feed' function
+           typename T::EventType,
+           // Check for functions enter/feed/leave/get_id
+           decltype(std::declval<T>().enter()), decltype(std::declval<T>().feed(std::declval<typename T::EventType>())),
+           decltype(std::declval<T>().leave()), decltype(std::declval<T>().get_id()),
+           // TODO(ioan): also check for types of this members?
+           // Check that the return of 'feed' has the 'new_state' and 'unhandled' members
+           decltype(std::declval<T>().feed(std::declval<typename T::EventType>()).unhandled),
+           decltype(std::declval<T>().feed(std::declval<typename T::EventType>()).new_state)>> = true;
+// clang-format on
 
 struct FeedResult {
 
@@ -56,12 +77,20 @@ template <typename OutputType> struct FeedResult : public detail::FeedResult {
     OutputType output; // we're requiring this to be default constructible?
 };
 
-template <> struct FeedResult<void> : public detail::FeedResult { using detail::FeedResult::FeedResult; };
+template <> struct FeedResult<void> : public detail::FeedResult {
+    using detail::FeedResult::FeedResult; // inherit ctors
+};
 
 template <typename StateType> class FSM {
+    static_assert(detail::is_template_state_compliant<StateType>,
+                  "State must define a 'using EventType'! "
+                  "State must define a 'using ContainerType'! "
+                  "State must implement 'enter', 'feed', 'leave' functions! "
+                  "Return of 'feed' must have the 'unhandled' and 'new_state' members! ");
+
 public:
     using StateContainerType = typename StateType::ContainerType;
-    // using StateIDType = std::invoke_result_t<decltype(&StateType::get_id), StateType>;
+
     FSM(StateContainerType initial_state) : m_current_state(std::move(initial_state)) {
         m_current_state->enter();
     }
@@ -121,6 +150,12 @@ template <typename StateStackType> void unroll_child_states(StateStackType& stat
 } // namespace detail
 
 template <typename StateType> class NestedFSM {
+    static_assert(detail::is_template_state_compliant<StateType>,
+                  "State must define a 'using EventType'! "
+                  "State must define a 'using ContainerType'! "
+                  "State must implement 'enter', 'feed', 'leave' functions! "
+                  "Return of 'feed' must have the 'unhandled' and 'new_state' members! ");
+
 public:
     using StateContainerType = typename StateType::ContainerType;
 
