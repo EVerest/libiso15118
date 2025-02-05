@@ -8,7 +8,7 @@ namespace iso15118::d20::state {
 
 struct SupportedAppProtocol : public StateBase {
 public:
-    SupportedAppProtocol(Context& ctx) : StateBase(StateID::SupportedAppProtocol), m_ctx(ctx) {};
+    SupportedAppProtocol(Context& ctx) : StateBase(StateID::SupportedAppProtocol), m_ctx(ctx){};
 
     void enter() final;
 

@@ -8,7 +8,7 @@
 namespace iso15118::d20::state {
 
 struct SessionSetup : public StateBase {
-    SessionSetup(Context& ctx) : StateBase(StateID::SessionSetup), m_ctx(ctx) {};
+    SessionSetup(Context& ctx) : StateBase(StateID::SessionSetup), m_ctx(ctx){};
 
     void enter() final;
 

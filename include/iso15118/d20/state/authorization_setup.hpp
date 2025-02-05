@@ -7,7 +7,7 @@
 namespace iso15118::d20::state {
 
 struct AuthorizationSetup : public StateBase {
-    AuthorizationSetup(Context& ctx) : StateBase(StateID::AuthorizationSetup), m_ctx(ctx) {};
+    AuthorizationSetup(Context& ctx) : StateBase(StateID::AuthorizationSetup), m_ctx(ctx){};
 
     void enter() final;
 

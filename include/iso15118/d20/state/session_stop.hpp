@@ -7,11 +7,12 @@
 namespace iso15118::d20::state {
 
 struct SessionStop : public StateBase {
-    SessionStop(Context& ctx) : StateBase(StateID::SessionStop), m_ctx(ctx) {};
+    SessionStop(Context& ctx) : StateBase(StateID::SessionStop), m_ctx(ctx){};
 
     void enter() final;
 
     Result feed(Event) final;
+
 private:
     Context& m_ctx;
 };
