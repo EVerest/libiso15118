@@ -3,6 +3,7 @@
 #include <random>
 
 // #include <iso15118/d20/state/authorization.hpp>
+#include <iso15118/d20/state/authorization.hpp>
 #include <iso15118/d20/state/authorization_setup.hpp>
 
 #include <iso15118/detail/d20/context_helper.hpp>
@@ -81,8 +82,7 @@ Result AuthorizationSetup::feed(Event ev) {
         // Todo(sl): PnC is currently not supported
         m_ctx.feedback.signal(session::feedback::Signal::REQUIRE_AUTH_EIM);
 
-        // return m_ctx.create_state<Authorization>();
-        return {};
+        return m_ctx.create_state<Authorization>();
     } else if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {
         const auto res = handle_request(*req, m_ctx.session);
 
