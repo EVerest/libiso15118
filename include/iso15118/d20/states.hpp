@@ -61,7 +61,6 @@ struct StateBase {
     virtual void leave(){};
 
 protected:
-    // TODO(ioan): any reason we didn't have a context ref in here?
     Context& m_ctx;
 
 private:

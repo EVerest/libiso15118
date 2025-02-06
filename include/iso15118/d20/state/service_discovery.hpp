@@ -8,7 +8,7 @@ namespace iso15118::d20::state {
 
 struct ServiceDiscovery : public StateBase {
 public:
-    ServiceDiscovery(Context& ctx) : StateBase(ctx, StateID::Authorization) {
+    ServiceDiscovery(Context& ctx) : StateBase(ctx, StateID::ServiceDiscovery) {
     }
 
     void enter() final;

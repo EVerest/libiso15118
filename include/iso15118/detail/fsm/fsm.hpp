@@ -81,18 +81,24 @@ template <> struct FeedResult<void> : public detail::FeedResult {
     using detail::FeedResult::FeedResult; // inherit ctors
 };
 
-template <typename StateType> class FSM {
+template <typename StateType> class AbstractFSM {
     static_assert(detail::is_template_state_compliant<StateType>,
                   "State must define a 'using EventType'! "
                   "State must define a 'using ContainerType'! "
                   "State must implement 'enter', 'feed', 'leave' functions! "
                   "Return of 'feed' must have the 'unhandled' and 'new_state' members! ");
+};
 
+template <typename StateType> class FSM : public AbstractFSM<StateType> {
 public:
     using StateContainerType = typename StateType::ContainerType;
 
     FSM(StateContainerType initial_state) : m_current_state(std::move(initial_state)) {
         m_current_state->enter();
+    }
+
+    ~FSM() {
+        m_current_state->leave();
     }
 
     template <typename... Args> auto feed(Args&&... args) {
@@ -123,10 +129,6 @@ public:
         return m_current_state->get_id();
     }
 
-    ~FSM() {
-        m_current_state->leave();
-    }
-
 private:
     StateContainerType m_current_state;
 };
@@ -149,19 +151,22 @@ template <typename StateStackType> void unroll_child_states(StateStackType& stat
 
 } // namespace detail
 
-template <typename StateType> class NestedFSM {
-    static_assert(detail::is_template_state_compliant<StateType>,
-                  "State must define a 'using EventType'! "
-                  "State must define a 'using ContainerType'! "
-                  "State must implement 'enter', 'feed', 'leave' functions! "
-                  "Return of 'feed' must have the 'unhandled' and 'new_state' members! ");
-
+template <typename StateType> class NestedFSM : public AbstractFSM<StateType> {
 public:
     using StateContainerType = typename StateType::ContainerType;
 
     NestedFSM(StateContainerType initial_state) {
         m_state_stack.emplace_back(std::move(initial_state));
         detail::unroll_child_states(m_state_stack);
+    }
+
+    ~NestedFSM() {
+        // leave all the states in order
+        for (auto leaf = m_state_stack.rbegin(); leaf != m_state_stack.rend();) {
+            (*leaf)->leave();
+            leaf = std::next(leaf);
+            m_state_stack.pop_back();
+        }
     }
 
     template <typename... Args> auto feed(Args&&... args) {
@@ -220,15 +225,6 @@ public:
         }
 
         return current_ids;
-    }
-
-    ~NestedFSM() {
-        // leave all the states in order
-        for (auto leaf = m_state_stack.rbegin(); leaf != m_state_stack.rend();) {
-            (*leaf)->leave();
-            leaf = std::next(leaf);
-            m_state_stack.pop_back();
-        }
     }
 
 private:
