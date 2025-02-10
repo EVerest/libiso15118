@@ -224,26 +224,6 @@ struct ParkingParameterList {
     ParkingStatus parking_status;
 };
 
-using ParameterValue = std::variant<bool, int8_t, int16_t, int32_t, std::string, RationalNumber>;
-
-struct Parameter {
-    std::string name;
-    ParameterValue value;
-};
-
-struct ParameterSet {
-    uint16_t id;
-    std::vector<Parameter> parameters;
-
-    ParameterSet(uint16_t);
-    ParameterSet(uint16_t, const AcParameterList&);
-    ParameterSet(uint16_t, const AcBptParameterList&);
-    ParameterSet(uint16_t, const DcParameterList&);
-    ParameterSet(uint16_t, const DcBptParameterList&);
-    ParameterSet(uint16_t, const InternetParameterList&);
-    ParameterSet(uint16_t, const ParkingParameterList&);
-};
-
 struct Scheduled_CLReqControlMode {
     std::optional<RationalNumber> target_energy_request;
     std::optional<RationalNumber> max_energy_request;

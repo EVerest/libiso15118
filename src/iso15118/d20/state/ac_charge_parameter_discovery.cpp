@@ -10,11 +10,13 @@
 
 namespace iso15118::d20::state {
 
-using AC_ModeReq = message_20::AC_ChargeParameterDiscoveryRequest::AC_CPDReqEnergyTransferMode;
-using BPT_AC_ModeReq = message_20::AC_ChargeParameterDiscoveryRequest::BPT_AC_CPDReqEnergyTransferMode;
+namespace dt = message_20::datatypes;
 
-using AC_ModeRes = message_20::AC_ChargeParameterDiscoveryResponse::AC_CPDResEnergyTransferMode;
-using BPT_AC_ModeRes = message_20::AC_ChargeParameterDiscoveryResponse::BPT_AC_CPDResEnergyTransferMode;
+using AC_ModeReq = dt::AC_CPDReqEnergyTransferMode;
+using BPT_AC_ModeReq = dt::BPT_AC_CPDReqEnergyTransferMode;
+
+using AC_ModeRes = dt::AC_CPDResEnergyTransferMode;
+using BPT_AC_ModeRes = dt::BPT_AC_CPDResEnergyTransferMode;
 
 message_20::AC_ChargeParameterDiscoveryResponse
 handle_request(const message_20::AC_ChargeParameterDiscoveryRequest& req, const d20::Session& session,
@@ -23,73 +25,78 @@ handle_request(const message_20::AC_ChargeParameterDiscoveryRequest& req, const 
     message_20::AC_ChargeParameterDiscoveryResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
-        return response_with_code(res, message_20::ResponseCode::FAILED_UnknownSession);
+        return response_with_code(res, message_20::datatypes::ResponseCode::FAILED_UnknownSession);
     }
 
+    const auto selected_energy_service = session.get_selected_services().selected_energy_service;
+
     if (std::holds_alternative<AC_ModeReq>(req.transfer_mode)) {
-        if (session.get_selected_energy_service() != message_20::ServiceCategory::AC) {
-            return response_with_code(res, message_20::ResponseCode::FAILED_WrongChargeParameter);
+        if (selected_energy_service != message_20::datatypes::ServiceCategory::AC) {
+            return response_with_code(res, message_20::datatypes::ResponseCode::FAILED_WrongChargeParameter);
         }
 
         auto& mode = res.transfer_mode.emplace<AC_ModeRes>();
-        mode = config.evse_ac_parameter;
+        
+        // TODO(ioan): how to fix this missing params?
+        // mode = config.ac_parameter_list;
+        // convert(mode, dc_limits);
 
     } else if (std::holds_alternative<BPT_AC_ModeReq>(req.transfer_mode)) {
-        if (session.get_selected_energy_service() != message_20::ServiceCategory::AC_BPT) {
-            return response_with_code(res, message_20::ResponseCode::FAILED_WrongChargeParameter);
+        if (selected_energy_service != message_20::datatypes::ServiceCategory::AC_BPT) {
+            return response_with_code(res, message_20::datatypes::ResponseCode::FAILED_WrongChargeParameter);
         }
-
-        auto& mode = res.transfer_mode.emplace<BPT_AC_ModeRes>();
-        mode = config.evse_ac_bpt_parameter;
+        
+        // TODO(ioan): how to fix this missing params?
+        // auto& mode = res.transfer_mode.emplace<BPT_AC_ModeRes>();
+        // mode = config.evse_ac_bpt_parameter;
 
     } else {
-        return response_with_code(res, message_20::ResponseCode::FAILED_WrongChargeParameter);
+        return response_with_code(res, message_20::datatypes::ResponseCode::FAILED_WrongChargeParameter);
     }
 
-    return response_with_code(res, message_20::ResponseCode::OK);
+    return response_with_code(res, message_20::datatypes::ResponseCode::OK);
 }
 
 void AC_ChargeParameterDiscovery::enter() {
-    ctx.log.enter_state("AC_ChargeParameterDiscovery");
+    m_ctx.log.enter_state("AC_ChargeParameterDiscovery");
 }
 
-FsmSimpleState::HandleEventReturnType AC_ChargeParameterDiscovery::handle_event(AllocatorType& sa, FsmEvent ev) {
-
-    if (ev != FsmEvent::V2GTP_MESSAGE) {
-        return sa.PASS_ON;
+Result AC_ChargeParameterDiscovery::feed(Event ev) {
+    if (ev != Event::V2GTP_MESSAGE) {
+        return {};
     }
 
-    const auto variant = ctx.get_request();
+    const auto variant = m_ctx.pull_request();
 
     if (const auto req = variant->get_if<message_20::AC_ChargeParameterDiscoveryRequest>()) {
 
-        const auto res = handle_request(*req, ctx.session, ctx.config);
+        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config);
 
-        ctx.respond(res);
+        m_ctx.respond(res);
 
-        if (res.response_code >= message_20::ResponseCode::FAILED) {
-            ctx.session_stopped = true;
-            return sa.PASS_ON;
+        if (res.response_code >= message_20::datatypes::ResponseCode::FAILED) {
+            m_ctx.session_stopped = true;
+            return {};
         }
 
-        return sa.create_simple<ScheduleExchange>(ctx);
+        return m_ctx.create_state<ScheduleExchange>();
 
     } else if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {
-        const auto res = handle_request(*req, ctx.session);
+        const auto res = handle_request(*req, m_ctx.session);
 
-        ctx.respond(res);
-        ctx.session_stopped = true;
+        m_ctx.respond(res);
+        m_ctx.session_stopped = true;
 
-        return sa.PASS_ON;
+        return {};
     } else {
-        ctx.log("expected AC_ChargeParameterDiscovery! But code type id: %d", variant->get_type());
-        ctx.session_stopped = true;
+        m_ctx.log("expected AC_ChargeParameterDiscovery! But code type id: %d", variant->get_type());
+        m_ctx.session_stopped = true;
 
         // Sequence Error
         const message_20::Type req_type = variant->get_type();
-        send_sequence_error(req_type, ctx);
+        send_sequence_error(req_type, m_ctx);
 
-        return sa.PASS_ON;
+        return {};
     }
 }
 

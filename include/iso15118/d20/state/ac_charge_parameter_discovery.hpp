@@ -2,16 +2,16 @@
 // Copyright 2024 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include "../fsm.hpp"
+#include "../states.hpp"
 
 namespace iso15118::d20::state {
-
-struct AC_ChargeParameterDiscovery : public FsmSimpleState {
-    using FsmSimpleState::FsmSimpleState;
+struct AC_ChargeParameterDiscovery : public StateBase {
+    AC_ChargeParameterDiscovery(Context& ctx) : StateBase(ctx, StateID::AC_ChargeParameterDiscovery) {
+    }
 
     void enter() final;
 
-    HandleEventReturnType handle_event(AllocatorType&, FsmEvent) final;
+    Result feed(Event) final;
 };
 
 } // namespace iso15118::d20::state

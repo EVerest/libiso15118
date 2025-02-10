@@ -154,7 +154,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
         if (this->offered_services.internet_parameter_list.find(id) !=
             this->offered_services.internet_parameter_list.end()) {
             this->selected_vas_services.vas_services.push_back(dt::ServiceCategory::Internet);
-            auto& parameters = this->offered_services.internet_parameter_list.at(id);
+            const auto& parameters = this->offered_services.internet_parameter_list.at(id);
             this->selected_vas_services.internet_port = parameters.port;
             this->selected_vas_services.internet_protocol = parameters.protocol;
         }
@@ -165,7 +165,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
         if (this->offered_services.parking_parameter_list.find(id) !=
             this->offered_services.parking_parameter_list.end()) {
             this->selected_vas_services.vas_services.push_back(dt::ServiceCategory::ParkingStatus);
-            auto& parameters = this->offered_services.parking_parameter_list.at(id);
+            const auto& parameters = this->offered_services.parking_parameter_list.at(id);
             this->selected_vas_services.parking_intended_service = parameters.intended_service;
             this->selected_vas_services.parking_status = parameters.parking_status;
         }
