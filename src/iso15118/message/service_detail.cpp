@@ -172,7 +172,7 @@ template <> void convert(const ServiceDetailResponse& in, iso20_ServiceDetailRes
             CPP2CB_STRING(in_parameter.name, out_parameter.Name);
             std::visit(ParamterValueVisitor(out_parameter), in_parameter.value);
         }
-        out_paramater_set.Parameter.arrayLen = in_parameter_set.parameters.size();
+        out_paramater_set.Parameter.arrayLen = in_parameter_set.parameter.size();
     }
 
     out.ServiceParameterList.ParameterSet.arrayLen = in.service_parameter_list.size();

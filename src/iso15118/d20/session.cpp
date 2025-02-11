@@ -10,7 +10,7 @@ namespace iso15118::d20 {
 
 namespace dt = message_20::datatypes;
 
-Session::Session() {
+Session::Session() : selected_services(nullptr) {
     std::random_device rd;
     std::mt19937 generator(rd());
     std::uniform_int_distribution<uint8_t> distribution(0x00, 0xff);
@@ -20,7 +20,8 @@ Session::Session() {
     }
 }
 
-Session::Session(SelectedServiceParameters service_parameters_) : selected_services(service_parameters_) {
+Session::Session(SelectedServiceParameters& service_parameters_) :
+    selected_services(std::make_shared<SelectedServiceParameters>(service_parameters_)) {
     std::random_device rd;
     std::mt19937 generator(rd());
     std::uniform_int_distribution<uint8_t> distribution(0x00, 0xff);
@@ -100,7 +101,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
     case dt::ServiceCategory::AC:
         if (this->offered_services.ac_parameter_list.find(id) != this->offered_services.ac_parameter_list.end()) {
             const auto& parameters = this->offered_services.ac_parameter_list.at(id);
-            this->selected_services = AcSelectedServiceParameters(
+            this->selected_services = std::make_unique<AcSelectedServiceParameters>(
                 message_20::datatypes::ServiceCategory::AC, parameters.control_mode, parameters.connector,
                 parameters.evse_nominal_voltage, parameters.mobility_needs_mode, parameters.pricing);
         } else {
@@ -112,7 +113,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
         if (this->offered_services.ac_bpt_parameter_list.find(id) !=
             this->offered_services.ac_bpt_parameter_list.end()) {
             const auto& parameters = this->offered_services.ac_bpt_parameter_list.at(id);
-            this->selected_services = AcBptSelectedServiceParameters(
+            this->selected_services = std::make_unique<AcBptSelectedServiceParameters>(
                 message_20::datatypes::ServiceCategory::AC_BPT, parameters.control_mode, parameters.connector,
                 parameters.evse_nominal_voltage, parameters.mobility_needs_mode, parameters.pricing,
                 parameters.bpt_channel, parameters.generator_mode, parameters.grid_code_detection_methode);
@@ -125,9 +126,9 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
 
         if (this->offered_services.dc_parameter_list.find(id) != this->offered_services.dc_parameter_list.end()) {
             const auto& parameters = this->offered_services.dc_parameter_list.at(id);
-            this->selected_services =
-                DcSelectedServiceParameters(dt::ServiceCategory::DC, parameters.control_mode,
-                                            parameters.connector, parameters.mobility_needs_mode, parameters.pricing);
+            this->selected_services = std::make_unique<DcSelectedServiceParameters>(
+                dt::ServiceCategory::DC, parameters.connector, parameters.control_mode, parameters.mobility_needs_mode,
+                parameters.pricing);
         } else {
             // Todo(sl): Should be not the case -> Raise Error?
         }
@@ -137,8 +138,8 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
         if (this->offered_services.dc_bpt_parameter_list.find(id) !=
             this->offered_services.dc_bpt_parameter_list.end()) {
             const auto& parameters = this->offered_services.dc_bpt_parameter_list.at(id);
-            this->selected_services = DcBptDcSelectedServiceParameters(
-                dt::ServiceCategory::DC_BPT, parameters.control_mode, parameters.connector,
+            this->selected_services = std::make_unique<DcBptDcSelectedServiceParameters>(
+                dt::ServiceCategory::DC_BPT, parameters.connector, parameters.control_mode,
                 parameters.mobility_needs_mode, parameters.pricing, parameters.bpt_channel, parameters.generator_mode);
 
             logf_info("Selected DC_BPT service parameters: control mode: %s, mobility needs mode: %s",

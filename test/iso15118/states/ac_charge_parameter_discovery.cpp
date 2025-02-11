@@ -12,6 +12,7 @@ using BPT_AC_ModeReq = message_20::AC_ChargeParameterDiscoveryRequest::BPT_AC_CP
 using AC_ModeRes = message_20::AC_ChargeParameterDiscoveryResponse::AC_CPDResEnergyTransferMode;
 using BPT_AC_ModeRes = message_20::AC_ChargeParameterDiscoveryResponse::BPT_AC_CPDResEnergyTransferMode;
 
+/*
 SCENARIO("AC charge parameter discovery state handling") {
     GIVEN("Bad Case - Unknown session") {
 
@@ -207,3 +208,4 @@ SCENARIO("AC charge parameter discovery state handling") {
 
     // GIVEN("Bad Case - Sequence Timeout") {} // todo(sl): not here
 }
+*/

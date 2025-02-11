@@ -14,6 +14,9 @@ using BPT_DC_ModeReq = message_20::datatypes::BPT_DC_CPDReqEnergyTransferMode;
 using DC_ModeRes = message_20::datatypes::DC_CPDResEnergyTransferMode;
 using BPT_DC_ModeRes = message_20::datatypes::BPT_DC_CPDResEnergyTransferMode;
 
+using DcServiceParameters = d20::DcSelectedServiceParameters;
+using DcBptServiceParameters = d20::DcBptDcSelectedServiceParameters;
+
 SCENARIO("DC charge parameter discovery state handling") {
 
     const auto evse_id = std::string("everest se");
@@ -275,10 +278,10 @@ SCENARIO("DC charge parameter discovery state handling") {
     }
 
     GIVEN("Bad Case: Provided DC charge limits but the ev wants bpt charge parameter - FAILED") {
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
-            dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
-            dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
-            dt::GeneratorMode::GridFollowing);
+        DcBptServiceParameters service_parameters =
+            DcBptServiceParameters(dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
+                                   dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing,
+                                   dt::BptChannel::Unified, dt::GeneratorMode::GridFollowing);
 
         d20::Session session = d20::Session(service_parameters);
 

@@ -5,6 +5,7 @@
 #include <array>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <variant>
 #include <vector>
 
@@ -12,96 +13,91 @@
 
 namespace iso15118::d20 {
 
+namespace dt = message_20::datatypes;
+
 struct OfferedServices {
+    std::vector<dt::Authorization> auth_services;
+    std::vector<dt::ServiceCategory> energy_services;
+    std::vector<dt::ServiceCategory> vas_services;
 
-    std::vector<message_20::datatypes::Authorization> auth_services;
-    std::vector<message_20::datatypes::ServiceCategory> energy_services;
-    std::vector<message_20::datatypes::ServiceCategory> vas_services;
-
-    std::map<uint8_t, message_20::datatypes::AcParameterList> ac_parameter_list;
-    std::map<uint8_t, message_20::datatypes::AcBptParameterList> ac_bpt_parameter_list;
-    std::map<uint8_t, message_20::datatypes::DcParameterList> dc_parameter_list;
-    std::map<uint8_t, message_20::datatypes::DcBptParameterList> dc_bpt_parameter_list;
-    std::map<uint8_t, message_20::datatypes::InternetParameterList> internet_parameter_list;
-    std::map<uint8_t, message_20::datatypes::ParkingParameterList> parking_parameter_list;
+    std::map<uint8_t, dt::AcParameterList> ac_parameter_list;
+    std::map<uint8_t, dt::AcBptParameterList> ac_bpt_parameter_list;
+    std::map<uint8_t, dt::DcParameterList> dc_parameter_list;
+    std::map<uint8_t, dt::DcBptParameterList> dc_bpt_parameter_list;
+    std::map<uint8_t, dt::InternetParameterList> internet_parameter_list;
+    std::map<uint8_t, dt::ParkingParameterList> parking_parameter_list;
 };
 
 struct SelectedServiceParameters {
-    message_20::datatypes::ServiceCategory selected_energy_service;
-    message_20::datatypes::ControlMode selected_control_mode;
+    dt::ServiceCategory selected_energy_service;
+    dt::ControlMode selected_control_mode;
+    dt::MobilityNeedsMode selected_mobility_needs_mode;
+
+    SelectedServiceParameters() {
+    }
+
+    SelectedServiceParameters(dt::ServiceCategory selected_energy_service_, dt::ControlMode selected_control_mode_,
+                              dt::MobilityNeedsMode selected_mobility_needs_mode_) :
+        selected_energy_service(selected_energy_service_),
+        selected_control_mode(selected_control_mode_),
+        selected_mobility_needs_mode(selected_mobility_needs_mode_) {
+    }
 };
 
 struct AcSelectedServiceParameters : SelectedServiceParameters {
-    message_20::datatypes::AcConnector selected_conntector;
+    dt::AcConnector selected_conntector;
     uint32_t evse_nominal_voltage;
-    message_20::datatypes::MobilityNeedsMode selected_mobility_needs_mode;
-    message_20::datatypes::Pricing selected_pricing;
+    dt::Pricing selected_pricing;
 
     AcSelectedServiceParameters() = default;
-    AcSelectedServiceParameters(message_20::datatypes::ServiceCategory energy_service_, message_20::datatypes::ControlMode control_mode_,
-                                message_20::datatypes::AcConnector connector_, uint32_t voltage_,
-                                message_20::datatypes::MobilityNeedsMode mobility_, message_20::datatypes::Pricing pricing_) :
+    AcSelectedServiceParameters(dt::ServiceCategory energy_service_, dt::ControlMode control_mode_,
+                                dt::AcConnector connector_, uint32_t voltage_, dt::MobilityNeedsMode mobility_,
+                                dt::Pricing pricing_) :
+        SelectedServiceParameters(energy_service_, control_mode_, mobility_),
         selected_conntector(connector_),
         evse_nominal_voltage(voltage_),
-        selected_mobility_needs_mode(mobility_),
-        selected_pricing(pricing_) {
-        selected_energy_service = energy_service_;
-        selected_control_mode = control_mode_;
-    };
+        selected_pricing(pricing_){};
 };
 
 struct AcBptSelectedServiceParameters : AcSelectedServiceParameters {
-    message_20::datatypes::BptChannel selected_bpt_channel;
-    message_20::datatypes::GeneratorMode selected_generator_mode;
-    message_20::datatypes::GridCodeIslandingDetectionMethode selected_grid_code_methode;
+    dt::BptChannel selected_bpt_channel;
+    dt::GeneratorMode selected_generator_mode;
+    dt::GridCodeIslandingDetectionMethode selected_grid_code_methode;
 
-    AcBptSelectedServiceParameters(message_20::datatypes::ServiceCategory energy_service_, message_20::datatypes::ControlMode control_mode_,
-                                   message_20::datatypes::AcConnector connector_, uint32_t voltage_,
-                                   message_20::datatypes::MobilityNeedsMode mobility_, message_20::datatypes::Pricing pricing_,
-                                   message_20::datatypes::BptChannel channel_, message_20::datatypes::GeneratorMode generator_mode_,
-                                   message_20::datatypes::GridCodeIslandingDetectionMethode grid_detect_method_) :
+    AcBptSelectedServiceParameters(dt::ServiceCategory energy_service_, dt::ControlMode control_mode_,
+                                   dt::AcConnector connector_, uint32_t voltage_, dt::MobilityNeedsMode mobility_,
+                                   dt::Pricing pricing_, dt::BptChannel channel_, dt::GeneratorMode generator_mode_,
+                                   dt::GridCodeIslandingDetectionMethode grid_detect_method_) :
+        AcSelectedServiceParameters(energy_service_, control_mode_, connector_, voltage_, mobility_, pricing_),
         selected_bpt_channel(channel_),
         selected_generator_mode(generator_mode_),
-        selected_grid_code_methode(grid_detect_method_) {
-        selected_energy_service = energy_service_;
-        selected_control_mode = control_mode_;
-        selected_conntector = connector_;
-        evse_nominal_voltage = voltage_;
-        selected_mobility_needs_mode = mobility_;
-        selected_pricing = pricing_;
-    };
+        selected_grid_code_methode(grid_detect_method_){};
 };
 
 struct DcSelectedServiceParameters : SelectedServiceParameters {
-    message_20::datatypes::DcConnector selected_connector;
-    message_20::datatypes::MobilityNeedsMode selected_mobility_needs_mode;
-    message_20::datatypes::Pricing selected_pricing;
+    dt::DcConnector selected_connector;
+    dt::Pricing selected_pricing;
 
     DcSelectedServiceParameters() = default;
-    DcSelectedServiceParameters(message_20::datatypes::ServiceCategory energy_service_, message_20::datatypes::ControlMode control_mode_,
-                                message_20::datatypes::DcConnector connector_, message_20::datatypes::MobilityNeedsMode mobility_,
-                                message_20::datatypes::Pricing pricing_) :
-        selected_mobility_needs_mode(mobility_), selected_pricing(pricing_), selected_connector(connector_) {
-        selected_energy_service = energy_service_;
-        selected_control_mode = control_mode_;
-    };
+    DcSelectedServiceParameters(dt::ServiceCategory energy_service_, dt::DcConnector connector_,
+                                dt::ControlMode control_mode_, dt::MobilityNeedsMode mobility_, dt::Pricing pricing_) :
+        SelectedServiceParameters(energy_service_, control_mode_, mobility_),
+        selected_connector(connector_),
+        selected_pricing(pricing_){
+
+        };
 };
 
 struct DcBptDcSelectedServiceParameters : DcSelectedServiceParameters {
-    message_20::datatypes::BptChannel selected_bpt_channel;
-    message_20::datatypes::GeneratorMode selected_generator_mode;
+    dt::BptChannel selected_bpt_channel;
+    dt::GeneratorMode selected_generator_mode;
 
-    DcBptDcSelectedServiceParameters(message_20::datatypes::ServiceCategory energy_service_, message_20::datatypes::ControlMode control_mode_,
-                                     message_20::datatypes::DcConnector dc_connector_, message_20::datatypes::MobilityNeedsMode mobility_,
-                                     message_20::datatypes::Pricing pricing_, message_20::datatypes::BptChannel channel_,
-                                     message_20::datatypes::GeneratorMode generator_) :
-        selected_bpt_channel(channel_), selected_generator_mode(generator_) {
-        selected_energy_service = energy_service_;
-        selected_control_mode = control_mode_;
-        selected_connector = dc_connector_;
-        selected_mobility_needs_mode = mobility_;
-        selected_pricing = pricing_;
-    };
+    DcBptDcSelectedServiceParameters(dt::ServiceCategory energy_service_, dt::DcConnector dc_connector_,
+                                     dt::ControlMode control_mode_, dt::MobilityNeedsMode mobility_,
+                                     dt::Pricing pricing_, dt::BptChannel channel_, dt::GeneratorMode generator_) :
+        DcSelectedServiceParameters(energy_service_, dc_connector_, control_mode_, mobility_, pricing_),
+        selected_bpt_channel(channel_),
+        selected_generator_mode(generator_){};
 };
 
 // Todo(sl): missing services
@@ -110,13 +106,13 @@ struct DcBptDcSelectedServiceParameters : DcSelectedServiceParameters {
 // DC_ACDP_BPT -> ControlMode, MobilityNeedsMode, BPTChannel
 
 struct SelectedVasParameter {
-    std::vector<message_20::datatypes::ServiceCategory> vas_services;
+    std::vector<dt::ServiceCategory> vas_services;
 
-    message_20::datatypes::Protocol internet_protocol;
-    message_20::datatypes::Port internet_port;
+    dt::Protocol internet_protocol;
+    dt::Port internet_port;
 
-    message_20::datatypes::IntendedService parking_intended_service;
-    message_20::datatypes::ParkingStatus parking_status;
+    dt::IntendedService parking_intended_service;
+    dt::ParkingStatus parking_status;
 };
 
 class Session {
@@ -126,19 +122,19 @@ class Session {
 
 public:
     Session();
-    Session(SelectedServiceParameters);
+    Session(SelectedServiceParameters&);
     Session(OfferedServices);
 
     std::array<uint8_t, ID_LENGTH> get_id() const {
         return id;
     }
 
-    bool find_parameter_set_id(const message_20::datatypes::ServiceCategory service, int16_t id);
+    bool find_parameter_set_id(const dt::ServiceCategory service, int16_t id);
 
-    void selected_service_parameters(const message_20::datatypes::ServiceCategory service, const uint16_t id);
+    void selected_service_parameters(const dt::ServiceCategory service, const uint16_t id);
 
     auto get_selected_services() const& {
-        return selected_services;
+        return *selected_services;
     }
 
     ~Session();
@@ -151,7 +147,7 @@ private:
     // NOTE (aw): could be const
     std::array<uint8_t, ID_LENGTH> id{};
 
-    SelectedServiceParameters selected_services;
+    std::shared_ptr<SelectedServiceParameters> selected_services;
     SelectedVasParameter selected_vas_services;
 };
 

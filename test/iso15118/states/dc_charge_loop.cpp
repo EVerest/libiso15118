@@ -22,6 +22,9 @@ using Scheduled_BPT_DC_Res = message_20::datatypes::BPT_Scheduled_DC_CLResContro
 using Dynamic_DC_Res = message_20::datatypes::Dynamic_DC_CLResControlMode;
 using Dynamic_BPT_DC_Res = message_20::datatypes::BPT_Dynamic_DC_CLResControlMode;
 
+using DcServiceParameters = d20::DcSelectedServiceParameters;
+using DcBptServiceParameters = d20::DcBptDcSelectedServiceParameters;
+
 SCENARIO("DC charge loop state handling") {
 
     const auto evse_id = std::string("everest se");
@@ -79,10 +82,10 @@ SCENARIO("DC charge loop state handling") {
 
     GIVEN("Bad case - false energy mode") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
-            dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
-            dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
-            dt::GeneratorMode::GridFollowing);
+        DcBptServiceParameters service_parameters =
+            DcBptServiceParameters(dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
+                                   dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing,
+                                   dt::BptChannel::Unified, dt::GeneratorMode::GridFollowing);
 
         d20::Session session = d20::Session(service_parameters);
 
@@ -113,9 +116,9 @@ SCENARIO("DC charge loop state handling") {
 
     GIVEN("Bad case - false control mode") {
 
-        d20::SelectedServiceParameters service_parameters =
-            d20::SelectedServiceParameters(dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
-                                           dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
+        DcServiceParameters service_parameters =
+            DcServiceParameters(dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
+                                dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
         d20::Session session = d20::Session(service_parameters);
 
@@ -146,9 +149,9 @@ SCENARIO("DC charge loop state handling") {
 
     GIVEN("Good case - DC scheduled mode") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
-            dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
-            dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
+        DcServiceParameters service_parameters =
+            DcServiceParameters(dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
+                                dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
         d20::Session session = d20::Session(service_parameters);
 
@@ -188,9 +191,9 @@ SCENARIO("DC charge loop state handling") {
 
     GIVEN("Good case - DC_BPT scheduled mode") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
-            dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
-            dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
+        DcServiceParameters service_parameters =
+            DcServiceParameters(dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
+                                dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
         d20::Session session = d20::Session(service_parameters);
 
@@ -236,9 +239,9 @@ SCENARIO("DC charge loop state handling") {
     }
 
     GIVEN("Good case - DC dynamic mode") {
-        d20::SelectedServiceParameters service_parameters =
-            d20::SelectedServiceParameters(dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
-                                           dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
+        DcServiceParameters service_parameters =
+            DcServiceParameters(dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
+                                dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
         d20::Session session = d20::Session(service_parameters);
 
@@ -281,9 +284,9 @@ SCENARIO("DC charge loop state handling") {
 
     GIVEN("Good case - DC_BPT dynamic mode") {
 
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
-            dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
-            dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
+        DcServiceParameters service_parameters =
+            DcServiceParameters(dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
+                                dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
         d20::Session session = d20::Session(service_parameters);
 
@@ -331,9 +334,9 @@ SCENARIO("DC charge loop state handling") {
     }
 
     GIVEN("Good case - DC dynamic mode, mobility_needs_mode = 2") {
-        d20::SelectedServiceParameters service_parameters =
-            d20::SelectedServiceParameters(dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
-                                           dt::MobilityNeedsMode::ProvidedBySecc, dt::Pricing::NoPricing);
+        DcServiceParameters service_parameters =
+            DcServiceParameters(dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
+                                dt::MobilityNeedsMode::ProvidedBySecc, dt::Pricing::NoPricing);
 
         d20::Session session = d20::Session(service_parameters);
 
@@ -381,9 +384,9 @@ SCENARIO("DC charge loop state handling") {
     }
 
     GIVEN("Good case - DC_BPT dynamic mode, mobility_needs_mode = 2") {
-        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
-            dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
-            dt::MobilityNeedsMode::ProvidedBySecc, dt::Pricing::NoPricing);
+        DcServiceParameters service_parameters =
+            DcServiceParameters(dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
+                                dt::MobilityNeedsMode::ProvidedBySecc, dt::Pricing::NoPricing);
 
         d20::Session session = d20::Session(service_parameters);
 

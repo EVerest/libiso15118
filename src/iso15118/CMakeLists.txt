@@ -46,7 +46,6 @@ target_sources(iso15118
         d20/state/dc_welding_detection.cpp
         d20/state/session_stop.cpp
         
-        message/common.cpp
         message/variant.cpp
         message/supported_app_protocol.cpp
         message/session_setup.cpp

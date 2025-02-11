@@ -130,7 +130,7 @@ SessionConfig::SessionConfig(EvseSetupConfig config) :
     }
 
     ac_parameter_list = get_default_ac_parameter_list(supported_control_mobility_modes);
-    ac_bpt_parameter_list = get_default_ac_bpt_parameter_list(supported_control_mobility_modes); 
+    ac_bpt_parameter_list = get_default_ac_bpt_parameter_list(supported_control_mobility_modes);
 
     dc_parameter_list = get_default_dc_parameter_list(supported_control_mobility_modes);
     dc_bpt_parameter_list = get_default_dc_bpt_parameter_list(supported_control_mobility_modes);

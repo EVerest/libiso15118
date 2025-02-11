@@ -20,7 +20,7 @@ using BPT_AC_ModeRes = dt::BPT_AC_CPDResEnergyTransferMode;
 
 message_20::AC_ChargeParameterDiscoveryResponse
 handle_request(const message_20::AC_ChargeParameterDiscoveryRequest& req, const d20::Session& session,
-               const d20::SessionConfig& config) {
+               [[maybe_unused]] const d20::SessionConfig& config) {
 
     message_20::AC_ChargeParameterDiscoveryResponse res;
 
@@ -35,8 +35,8 @@ handle_request(const message_20::AC_ChargeParameterDiscoveryRequest& req, const 
             return response_with_code(res, message_20::datatypes::ResponseCode::FAILED_WrongChargeParameter);
         }
 
-        auto& mode = res.transfer_mode.emplace<AC_ModeRes>();
-        
+        // auto& mode = res.transfer_mode.emplace<AC_ModeRes>();
+
         // TODO(ioan): how to fix this missing params?
         // mode = config.ac_parameter_list;
         // convert(mode, dc_limits);
@@ -45,7 +45,7 @@ handle_request(const message_20::AC_ChargeParameterDiscoveryRequest& req, const 
         if (selected_energy_service != message_20::datatypes::ServiceCategory::AC_BPT) {
             return response_with_code(res, message_20::datatypes::ResponseCode::FAILED_WrongChargeParameter);
         }
-        
+
         // TODO(ioan): how to fix this missing params?
         // auto& mode = res.transfer_mode.emplace<BPT_AC_ModeRes>();
         // mode = config.evse_ac_bpt_parameter;
