@@ -42,8 +42,9 @@ target_sources(iso15118
         d20/state/dc_cable_check.cpp
         d20/state/dc_pre_charge.cpp
         d20/state/power_delivery.cpp
-        d20/state/dc_charge_loop.cpp
+        d20/state/dc_charge_loop.cpp        
         d20/state/dc_welding_detection.cpp
+        d20/state/ac_charge_loop.cpp
         d20/state/session_stop.cpp
         
         message/variant.cpp

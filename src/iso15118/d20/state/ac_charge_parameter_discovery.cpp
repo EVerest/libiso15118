@@ -18,9 +18,52 @@ using BPT_AC_ModeReq = dt::BPT_AC_CPDReqEnergyTransferMode;
 using AC_ModeRes = dt::AC_CPDResEnergyTransferMode;
 using BPT_AC_ModeRes = dt::BPT_AC_CPDResEnergyTransferMode;
 
+template <typename In, typename Out> void convert(Out& out, const In& in);
+
+template <> void convert(AC_ModeRes& out, const d20::AcTransferLimits& in) {
+    out.min_charge_power = in.charge_power.min;
+    out.max_charge_power = in.charge_power.max;
+
+    if (in.charge_power_L2.has_value()) {
+        out.min_charge_power_L2 = in.charge_power_L2.value().min;
+        out.max_charge_power_L2 = in.charge_power_L2.value().max;
+    }
+
+    if (in.charge_power_L3.has_value()) {
+        out.min_charge_power_L3 = in.charge_power_L3.value().min;
+        out.max_charge_power_L3 = in.charge_power_L3.value().max;
+    }
+
+    out.nominal_frequency = in.nominal_frequency;
+    out.max_power_asymmetry = in.max_power_asymmetry;
+    out.power_ramp_limitation = in.power_ramp_limitation;
+    out.present_active_power = in.present_active_power;
+    out.present_active_power_L2 = in.present_active_power_L2;
+    out.present_active_power_L3 = in.present_active_power_L3;
+}
+
+template <> void convert(BPT_AC_ModeRes& out, const d20::AcTransferLimits& in) {
+    convert(static_cast<AC_ModeRes&>(out), in);
+
+    if (in.discharge_power.has_value()) {
+        out.min_discharge_power = in.discharge_power.value().min;
+        out.max_discharge_power = in.discharge_power.value().max;
+    }
+
+    if (in.discharge_power_L2.has_value()) {
+        out.min_discharge_power_L2 = in.discharge_power_L2.value().min;
+        out.max_discharge_power_L2 = in.discharge_power_L2.value().max;
+    }
+
+    if (in.discharge_power_L3.has_value()) {
+        out.min_discharge_power_L3 = in.discharge_power_L3.value().min;
+        out.max_discharge_power_L3 = in.discharge_power_L3.value().max;
+    }
+}
+
 message_20::AC_ChargeParameterDiscoveryResponse
 handle_request(const message_20::AC_ChargeParameterDiscoveryRequest& req, const d20::Session& session,
-               [[maybe_unused]] const d20::SessionConfig& config) {
+               const d20::SessionConfig& config) {
 
     message_20::AC_ChargeParameterDiscoveryResponse res;
 
@@ -35,20 +78,16 @@ handle_request(const message_20::AC_ChargeParameterDiscoveryRequest& req, const 
             return response_with_code(res, message_20::datatypes::ResponseCode::FAILED_WrongChargeParameter);
         }
 
-        // auto& mode = res.transfer_mode.emplace<AC_ModeRes>();
-
-        // TODO(ioan): how to fix this missing params?
-        // mode = config.ac_parameter_list;
-        // convert(mode, dc_limits);
+        auto& mode = res.transfer_mode.emplace<AC_ModeRes>();
+        convert(mode, config.ac_limits);
 
     } else if (std::holds_alternative<BPT_AC_ModeReq>(req.transfer_mode)) {
         if (selected_energy_service != message_20::datatypes::ServiceCategory::AC_BPT) {
             return response_with_code(res, message_20::datatypes::ResponseCode::FAILED_WrongChargeParameter);
         }
 
-        // TODO(ioan): how to fix this missing params?
-        // auto& mode = res.transfer_mode.emplace<BPT_AC_ModeRes>();
-        // mode = config.evse_ac_bpt_parameter;
+        auto& mode = res.transfer_mode.emplace<BPT_AC_ModeRes>();
+        convert(mode, config.ac_limits);
 
     } else {
         return response_with_code(res, message_20::datatypes::ResponseCode::FAILED_WrongChargeParameter);

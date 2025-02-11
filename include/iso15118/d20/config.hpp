@@ -45,6 +45,7 @@ struct SessionConfig {
     std::vector<message_20::datatypes::ParkingParameterList> parking_parameter_list;
 
     DcTransferLimits dc_limits;
+    AcTransferLimits ac_limits;
 
     std::vector<ControlMobilityNeedsModes> supported_control_mobility_modes;
 };

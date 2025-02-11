@@ -160,14 +160,10 @@ SCENARIO("AC charge parameter discovery state handling") {
         float nominal_frequency = 50.0f;
         float power_ramp_limitation = 2.0f;
 
-        /*
-        // TODO(ioan): see what this was replaced with
-
-        config.evse_ac_parameter.max_charge_power = dt::from_float(max_charge_power);
-        config.evse_ac_parameter.min_charge_power = dt::from_float(min_charge_power);
-        config.evse_ac_parameter.nominal_frequency = dt::from_float(nominal_frequency);
-        config.evse_ac_parameter.power_ramp_limitation = dt::from_float(power_ramp_limitation);
-        */
+        config.ac_limits.charge_power.max = dt::from_float(max_charge_power);
+        config.ac_limits.charge_power.min = dt::from_float(min_charge_power);
+        config.ac_limits.nominal_frequency = dt::from_float(nominal_frequency);
+        config.ac_limits.power_ramp_limitation = dt::from_float(power_ramp_limitation);
 
         message_20::AC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -222,15 +218,15 @@ SCENARIO("AC charge parameter discovery state handling") {
         float max_discharge_power = 6000.0f;
         float min_discharge_power = 3000.0f;
 
-        /* TODO(ioan): see what this was replace with
+        config.ac_limits.charge_power.max = dt::from_float(max_charge_power);
+        config.ac_limits.charge_power.min = dt::from_float(min_charge_power);
+        config.ac_limits.nominal_frequency = dt::from_float(nominal_frequency);
+        config.ac_limits.power_ramp_limitation = dt::from_float(power_ramp_limitation);
 
-        config.evse_ac_bpt_parameter.max_charge_power = dt::from_float(max_charge_power);
-        config.evse_ac_bpt_parameter.min_charge_power = dt::from_float(min_charge_power);
-        config.evse_ac_bpt_parameter.nominal_frequency = dt::from_float(nominal_frequency);
-        config.evse_ac_bpt_parameter.power_ramp_limitation = dt::from_float(power_ramp_limitation);
-        config.evse_ac_bpt_parameter.max_discharge_power = dt::from_float(max_discharge_power);
-        config.evse_ac_bpt_parameter.min_discharge_power = dt::from_float(min_discharge_power);
-        */
+        d20::Limit<dt::RationalNumber> discharge_power;
+        discharge_power.max = dt::from_float(max_discharge_power);
+        discharge_power.min = dt::from_float(min_discharge_power);
+        config.ac_limits.discharge_power = discharge_power;
 
         message_20::AC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
