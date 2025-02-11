@@ -71,7 +71,7 @@ SCENARIO("DC charge parameter discovery state handling") {
 
     GIVEN("Bad Case: e.g. dc transfer mod instead of dc_bpt transfer mod - FAILED_WrongChargeParameter") {
 
-        d20::DcBptDcSelectedServiceParameters service_parameters = d20::DcBptDcSelectedServiceParameters(
+        d20::SelectedServiceParameters service_parameters = d20::DcBptDcSelectedServiceParameters(
             dt::ServiceCategory::DC_BPT, dt::DcConnector::Extended, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
             dt::GeneratorMode::GridFollowing);

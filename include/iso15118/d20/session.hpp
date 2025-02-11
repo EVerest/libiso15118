@@ -147,6 +147,8 @@ private:
     // NOTE (aw): could be const
     std::array<uint8_t, ID_LENGTH> id{};
 
+    // TODO(ioan, sl): see if we could switch this to
+    // a 'std::variant', inheritance seems a bad idea here
     std::shared_ptr<SelectedServiceParameters> selected_services;
     SelectedVasParameter selected_vas_services;
 };

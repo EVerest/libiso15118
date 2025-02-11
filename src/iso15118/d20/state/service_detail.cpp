@@ -52,16 +52,14 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
         res.service = dt::ServiceCategory::AC;
         for (auto& parameter_set : config.ac_parameter_list) {
             session.offered_services.ac_parameter_list[id] = parameter_set;
-            // TODO(ioan): conversion from service_detail.cpp is missing
-            // res.service_parameter_list.push_back(dt::ParameterSet(id++, parameter_set));
+            res.service_parameter_list.push_back(dt::ParameterSet(id++, parameter_set));
         }
         break;
     case dt::ServiceCategory::AC_BPT:
         res.service = dt::ServiceCategory::AC_BPT;
         for (auto& parameter_set : config.ac_bpt_parameter_list) {
             session.offered_services.ac_bpt_parameter_list[id] = parameter_set;
-            // TODO(ioan): conversion from service_detail.cpp is missing
-            // res.service_parameter_list.push_back(dt::ParameterSet(id++, parameter_set));
+            res.service_parameter_list.push_back(dt::ParameterSet(id++, parameter_set));
         }
         break;
     case dt::ServiceCategory::DC:
