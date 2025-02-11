@@ -101,7 +101,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
     case dt::ServiceCategory::AC:
         if (this->offered_services.ac_parameter_list.find(id) != this->offered_services.ac_parameter_list.end()) {
             const auto& parameters = this->offered_services.ac_parameter_list.at(id);
-            this->selected_services = std::make_unique<AcSelectedServiceParameters>(
+            this->selected_services = std::make_shared<AcSelectedServiceParameters>(
                 message_20::datatypes::ServiceCategory::AC, parameters.control_mode, parameters.connector,
                 parameters.evse_nominal_voltage, parameters.mobility_needs_mode, parameters.pricing);
         } else {
@@ -113,7 +113,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
         if (this->offered_services.ac_bpt_parameter_list.find(id) !=
             this->offered_services.ac_bpt_parameter_list.end()) {
             const auto& parameters = this->offered_services.ac_bpt_parameter_list.at(id);
-            this->selected_services = std::make_unique<AcBptSelectedServiceParameters>(
+            this->selected_services = std::make_shared<AcBptSelectedServiceParameters>(
                 message_20::datatypes::ServiceCategory::AC_BPT, parameters.control_mode, parameters.connector,
                 parameters.evse_nominal_voltage, parameters.mobility_needs_mode, parameters.pricing,
                 parameters.bpt_channel, parameters.generator_mode, parameters.grid_code_detection_methode);
@@ -126,7 +126,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
 
         if (this->offered_services.dc_parameter_list.find(id) != this->offered_services.dc_parameter_list.end()) {
             const auto& parameters = this->offered_services.dc_parameter_list.at(id);
-            this->selected_services = std::make_unique<DcSelectedServiceParameters>(
+            this->selected_services = std::make_shared<DcSelectedServiceParameters>(
                 dt::ServiceCategory::DC, parameters.connector, parameters.control_mode, parameters.mobility_needs_mode,
                 parameters.pricing);
         } else {
@@ -138,7 +138,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
         if (this->offered_services.dc_bpt_parameter_list.find(id) !=
             this->offered_services.dc_bpt_parameter_list.end()) {
             const auto& parameters = this->offered_services.dc_bpt_parameter_list.at(id);
-            this->selected_services = std::make_unique<DcBptDcSelectedServiceParameters>(
+            this->selected_services = std::make_shared<DcBptDcSelectedServiceParameters>(
                 dt::ServiceCategory::DC_BPT, parameters.connector, parameters.control_mode,
                 parameters.mobility_needs_mode, parameters.pricing, parameters.bpt_channel, parameters.generator_mode);
 
