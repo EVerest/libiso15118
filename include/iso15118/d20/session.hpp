@@ -122,7 +122,7 @@ class Session {
 
 public:
     Session();
-    Session(SelectedServiceParameters&);
+    Session(const SelectedServiceParameters&);
     Session(OfferedServices);
 
     std::array<uint8_t, ID_LENGTH> get_id() const {

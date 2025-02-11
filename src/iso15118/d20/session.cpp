@@ -20,7 +20,7 @@ Session::Session() : selected_services(nullptr) {
     }
 }
 
-Session::Session(SelectedServiceParameters& service_parameters_) :
+Session::Session(const SelectedServiceParameters& service_parameters_) :
     selected_services(std::make_shared<SelectedServiceParameters>(service_parameters_)) {
     std::random_device rd;
     std::mt19937 generator(rd());
