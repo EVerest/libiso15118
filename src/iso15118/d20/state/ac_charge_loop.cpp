@@ -180,6 +180,11 @@ Result AC_ChargeLoop::feed(Event ev) {
 
         return {};
     } else if (const auto req = variant->get_if<message_20::AC_ChargeLoopRequest>()) {
+        if (first_entry_in_charge_loop) {
+            m_ctx.feedback.signal(session::feedback::Signal::CHARGE_LOOP_STARTED);
+            first_entry_in_charge_loop = false;
+        }
+
         // TODO(ioan, sl): see what is required here
         const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config.ac_limits, stop, target_frequency);
 
@@ -188,6 +193,12 @@ Result AC_ChargeLoop::feed(Event ev) {
         if (res.response_code >= dt::ResponseCode::FAILED) {
             m_ctx.session_stopped = true;
             return {};
+        }
+
+        m_ctx.feedback.ac_charge_loop_req(req->control_mode);
+        m_ctx.feedback.ac_charge_loop_req(req->meter_info_requested);
+        if (req->display_parameters) {
+            m_ctx.feedback.ac_charge_loop_req(*req->display_parameters);
         }
 
         return {};

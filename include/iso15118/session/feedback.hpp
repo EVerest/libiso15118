@@ -8,6 +8,7 @@
 #include <string>
 #include <variant>
 
+#include <iso15118/message/ac_charge_loop.hpp>
 #include <iso15118/message/dc_charge_loop.hpp>
 #include <iso15118/message/type.hpp>
 
@@ -39,14 +40,22 @@ using DcReqControlMode = std::variant<
     message_20::datatypes::Scheduled_DC_CLReqControlMode, message_20::datatypes::BPT_Scheduled_DC_CLReqControlMode,
     message_20::datatypes::Dynamic_DC_CLReqControlMode, message_20::datatypes::BPT_Dynamic_DC_CLReqControlMode>;
 
+using AcReqControlMode = std::variant<
+    message_20::datatypes::Scheduled_AC_CLReqControlMode, message_20::datatypes::BPT_Scheduled_AC_CLReqControlMode,
+    message_20::datatypes::Dynamic_AC_CLReqControlMode, message_20::datatypes::BPT_Dynamic_AC_CLReqControlMode>;
+
 using DcChargeLoopReq =
     std::variant<DcReqControlMode, message_20::datatypes::DisplayParameters, PresentVoltage, MeterInfoRequested>;
+
+using AcChargeLoopReq =
+    std::variant<AcReqControlMode, message_20::datatypes::DisplayParameters, PresentVoltage, MeterInfoRequested>;
 
 struct Callbacks {
     std::function<void(Signal)> signal;
     std::function<void(float)> dc_pre_charge_target_voltage;
     std::function<void(const DcChargeLoopReq&)> dc_charge_loop_req;
     std::function<void(const DcMaximumLimits&)> dc_max_limits;
+    std::function<void(const AcChargeLoopReq&)> ac_charge_loop_req;
     std::function<void(const message_20::Type&)> v2g_message;
     std::function<void(const std::string&)> evccid;
     std::function<void(const std::string&)> selected_protocol;
@@ -62,6 +71,7 @@ public:
     void dc_pre_charge_target_voltage(float) const;
     void dc_charge_loop_req(const feedback::DcChargeLoopReq&) const;
     void dc_max_limits(const feedback::DcMaximumLimits&) const;
+    void ac_charge_loop_req(const feedback::AcChargeLoopReq&) const;
     void v2g_message(const message_20::Type&) const;
     void evcc_id(const std::string&) const;
     void selected_protocol(const std::string&) const;

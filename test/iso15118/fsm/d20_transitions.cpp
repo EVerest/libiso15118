@@ -20,11 +20,12 @@ SCENARIO("ISO15118-20 state transitions") {
     const auto cert_install{false};
     const std::vector<message_20::datatypes::Authorization> auth_services = {message_20::datatypes::Authorization::EIM};
     const d20::DcTransferLimits dc_limits;
+    const d20::AcTransferLimits ac_limits;
     const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
         {message_20::datatypes::ControlMode::Scheduled, message_20::datatypes::MobilityNeedsMode::ProvidedByEvcc}};
 
-    const d20::EvseSetupConfig evse_setup{evse_id,   supported_energy_services, auth_services, cert_install,
-                                          dc_limits, control_mobility_modes};
+    const d20::EvseSetupConfig evse_setup{evse_id,   supported_energy_services, auth_services, cert_install, dc_limits,
+                                          ac_limits, control_mobility_modes};
 
     auto state_helper = FsmStateHelper(d20::SessionConfig(evse_setup));
     auto ctx = state_helper.get_context();

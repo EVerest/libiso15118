@@ -16,6 +16,8 @@ struct AC_ChargeLoop : public StateBase {
 private:
     float target_frequency{0};
     bool stop{false};
+
+    bool first_entry_in_charge_loop{false};
 };
 
 } // namespace iso15118::d20::state
