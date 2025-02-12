@@ -22,6 +22,7 @@ struct EvseSetupConfig {
     std::vector<message_20::datatypes::Authorization> authorization_services;
     bool enable_certificate_install_service;
     d20::DcTransferLimits dc_limits;
+    d20::AcTransferLimits ac_limits;
     std::vector<ControlMobilityNeedsModes> control_mobility_modes;
 };
 
