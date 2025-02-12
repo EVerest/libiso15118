@@ -12,6 +12,10 @@ struct AC_ChargeLoop : public StateBase {
     void enter() final;
 
     Result feed(Event) final;
+
+private:
+    float target_frequency{0};
+    bool stop{false};
 };
 
 } // namespace iso15118::d20::state
