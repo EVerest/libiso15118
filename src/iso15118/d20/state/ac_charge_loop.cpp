@@ -174,7 +174,7 @@ Result AC_ChargeLoop::feed(Event ev) {
         // TODO(ioan, sl): see what is required here
         if (req->charge_progress == dt::Progress::Stop) {
             m_ctx.feedback.signal(session::feedback::Signal::CHARGE_LOOP_FINISHED);
-            m_ctx.feedback.signal(session::feedback::Signal::DC_OPEN_CONTACTOR);
+            m_ctx.feedback.signal(session::feedback::Signal::AC_OPEN_CONTACTOR);
             return m_ctx.create_state<SessionStop>();
         }
 
