@@ -171,7 +171,7 @@ Result AC_ChargeLoop::feed(Event ev) {
             return {};
         }
 
-        // TODO(ioan, sl): see what is required here
+        // V2G20-1623 -> state machine direct transition (skipped PowerDelivery)
         if (req->charge_progress == dt::Progress::Stop) {
             m_ctx.feedback.signal(session::feedback::Signal::CHARGE_LOOP_FINISHED);
             m_ctx.feedback.signal(session::feedback::Signal::AC_OPEN_CONTACTOR);

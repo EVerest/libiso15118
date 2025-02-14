@@ -93,6 +93,15 @@ void TbdController::update_dc_limits(const d20::DcTransferLimits& limits) {
     }
 }
 
+void TbdController::update_ac_limits(const d20::AcTransferLimits& limits) {
+
+    evse_setup.ac_limits = limits;
+
+    if (session) {
+        session->push_control_event(limits);
+    }
+}
+
 void TbdController::handle_sdp_server_input() {
     auto request = sdp_server->get_peer_request();
 

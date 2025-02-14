@@ -88,6 +88,8 @@ Result PowerDelivery::feed(Event ev) {
 
         if (selected_energy_service == dt::ServiceCategory::AC ||
             selected_energy_service == dt::ServiceCategory::AC_BPT) {
+            // Close the AC contactor so that charging can start
+            m_ctx.feedback.signal(session::feedback::Signal::AC_CLOSE_CONTACTOR);
             return m_ctx.create_state<AC_ChargeLoop>();
         } else if (selected_energy_service == dt::ServiceCategory::DC ||
                    selected_energy_service == dt::ServiceCategory::DC_BPT) {
