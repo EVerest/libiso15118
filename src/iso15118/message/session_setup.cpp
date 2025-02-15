@@ -13,10 +13,17 @@ namespace iso15118::message_20 {
 
 //
 // conversions
+// RBL Added conversions for both directions, since EV side is the mirror of the EVSE side
 //
 template <> void convert(const struct iso20_SessionSetupReqType& in, SessionSetupRequest& out) {
     convert(in.Header, out.header);
     out.evccid = CB2CPP_STRING(in.EVCCID);
+}
+
+//Add the conversion for the response from the EVCC
+template <> void convert(const struct iso20_SessionSetupResType& in, SessionSetupResponse& out) {
+    convert(in.Header, out.header);
+    out.evseid = CB2CPP_STRING(in.EVSEID);
 }
 
 template <> void convert(const SessionSetupResponse& in, iso20_SessionSetupResType& out) {
@@ -29,8 +36,22 @@ template <> void convert(const SessionSetupResponse& in, iso20_SessionSetupResTy
     convert(in.header, out.Header);
 }
 
+//Add conversion for the request to convert to exi
+template <> void convert(const SessionSetupRequest& in, iso20_SessionSetupReqType& out) {
+    init_iso20_SessionSetupReqType(&out);
+
+    CPP2CB_STRING(in.evccid, out.EVCCID);
+
+    convert(in.header, out.Header);
+}
+
 template <> void insert_type(VariantAccess& va, const struct iso20_SessionSetupReqType& in) {
     va.insert_type<SessionSetupRequest>(in);
+};
+
+//add the insert type for the incoming Response
+template <> void insert_type(VariantAccess& va, const struct iso20_SessionSetupResType& in) {
+    va.insert_type<SessionSetupResponse>(in);
 };
 
 template <> int serialize_to_exi(const SessionSetupResponse& in, exi_bitstream_t& out) {
@@ -43,7 +64,23 @@ template <> int serialize_to_exi(const SessionSetupResponse& in, exi_bitstream_t
     return encode_iso20_exiDocument(&out, &doc);
 }
 
+//request serialize
+template <> int serialize_to_exi(const SessionSetupRequest& in, exi_bitstream_t& out) {
+    iso20_exiDocument doc;
+    init_iso20_exiDocument(&doc);
+    CB_SET_USED(doc.SessionSetupReq);
+
+    convert(in, doc.SessionSetupReq);
+
+    return encode_iso20_exiDocument(&out, &doc);
+}
+
 template <> size_t serialize(const SessionSetupResponse& in, const io::StreamOutputView& out) {
+    return serialize_helper(in, out);
+}
+
+//Add the Request serialize
+template <> size_t serialize(const SessionSetupRequest& in, const io::StreamOutputView& out) {
     return serialize_helper(in, out);
 }
 
