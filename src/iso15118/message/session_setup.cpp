@@ -20,7 +20,7 @@ template <> void convert(const struct iso20_SessionSetupReqType& in, SessionSetu
     out.evccid = CB2CPP_STRING(in.EVCCID);
 }
 
-//Add the conversion for the response from the EVCC
+// Add the conversion for the response from the EVCC
 template <> void convert(const struct iso20_SessionSetupResType& in, SessionSetupResponse& out) {
     convert(in.Header, out.header);
     out.evseid = CB2CPP_STRING(in.EVSEID);
@@ -36,7 +36,7 @@ template <> void convert(const SessionSetupResponse& in, iso20_SessionSetupResTy
     convert(in.header, out.Header);
 }
 
-//Add conversion for the request to convert to exi
+// Add conversion for the request to convert to exi
 template <> void convert(const SessionSetupRequest& in, iso20_SessionSetupReqType& out) {
     init_iso20_SessionSetupReqType(&out);
 
@@ -49,7 +49,7 @@ template <> void insert_type(VariantAccess& va, const struct iso20_SessionSetupR
     va.insert_type<SessionSetupRequest>(in);
 };
 
-//add the insert type for the incoming Response
+// add the insert type for the incoming Response
 template <> void insert_type(VariantAccess& va, const struct iso20_SessionSetupResType& in) {
     va.insert_type<SessionSetupResponse>(in);
 };
@@ -64,7 +64,7 @@ template <> int serialize_to_exi(const SessionSetupResponse& in, exi_bitstream_t
     return encode_iso20_exiDocument(&out, &doc);
 }
 
-//request serialize
+// request serialize
 template <> int serialize_to_exi(const SessionSetupRequest& in, exi_bitstream_t& out) {
     iso20_exiDocument doc;
     init_iso20_exiDocument(&doc);
@@ -79,7 +79,7 @@ template <> size_t serialize(const SessionSetupResponse& in, const io::StreamOut
     return serialize_helper(in, out);
 }
 
-//Add the Request serialize
+// Add the Request serialize
 template <> size_t serialize(const SessionSetupRequest& in, const io::StreamOutputView& out) {
     return serialize_helper(in, out);
 }
