@@ -170,6 +170,8 @@ int handle_certificate_cb(SSL* ssl, void* arg) {
             X509_NAME_oneline(sk_X509_NAME_value(names, i), name, sizeof(name));
             logf_info("Name: %s", name);
         }
+
+        // TODO(sl): What to do with the CA Names? Check if the charger has the secc_leaf from this CA Name?
     }
 
     return 1;

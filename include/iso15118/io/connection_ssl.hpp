@@ -26,7 +26,7 @@ public:
 
     void close() final;
 
-    std::optional<sha512_hash_t> get_vehicle_cert_hash() const;
+    std::optional<sha512_hash_t> get_vehicle_cert_hash() const final;
 
     ~ConnectionSSL();
 
