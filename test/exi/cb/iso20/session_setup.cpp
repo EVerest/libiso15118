@@ -9,7 +9,6 @@
 
 using namespace iso15118;
 
-
 SCENARIO("Se/Deserialize session setup messages") {
 
     GIVEN("Deserialize session_setup_req") {
