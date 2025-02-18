@@ -84,6 +84,7 @@ class Session {
 
 public:
     Session();
+    Session(const std::array<uint8_t, ID_LENGTH>& old_session_id);
     Session(SelectedServiceParameters);
     Session(OfferedServices);
 
