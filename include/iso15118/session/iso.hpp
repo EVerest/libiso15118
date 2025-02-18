@@ -31,14 +31,18 @@ struct SessionState {
 
 class Session {
 public:
-    Session(std::unique_ptr<io::IConnection>, d20::SessionConfig, const session::feedback::Callbacks&);
+    Session(std::unique_ptr<io::IConnection>, d20::SessionConfig, const session::feedback::Callbacks&,
+            std::optional<d20::PauseContext>&);
     ~Session();
 
     TimePoint const& poll();
     void push_control_event(const d20::ControlEvent&);
 
     bool is_finished() const {
-        return ctx.session_stopped;
+        if (ctx.session_stopped or ctx.session_paused) {
+            return true;
+        }
+        return false;
     }
 
 private:

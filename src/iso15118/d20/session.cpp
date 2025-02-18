@@ -43,6 +43,8 @@ Session::Session() {
     }
 }
 
+Session::Session(const std::array<uint8_t, ID_LENGTH>& old_session_id) : id(old_session_id){};
+
 Session::Session(SelectedServiceParameters service_parameters_) : selected_services(service_parameters_) {
     std::random_device rd;
     std::mt19937 generator(rd());
