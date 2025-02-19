@@ -37,4 +37,8 @@ void Feedback::selected_protocol(const std::string& selected_protocol) const {
     call_if_available(callbacks.selected_protocol, selected_protocol);
 }
 
+void Feedback::notify_ev_charging_needs(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
+                                  const dt::MobilityNeedsMode&) const {
+}
+
 } // namespace iso15118::session

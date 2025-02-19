@@ -13,6 +13,8 @@
 
 namespace iso15118::session {
 
+namespace dt = message_20::datatypes;
+
 namespace feedback {
 
 enum class Signal {
@@ -51,6 +53,10 @@ struct Callbacks {
     std::function<void(const message_20::Type&)> v2g_message;
     std::function<void(const std::string&)> evccid;
     std::function<void(const std::string&)> selected_protocol;
+
+    std::function<void(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
+                       const dt::MobilityNeedsMode&)>
+        notify_ev_charging_needs;
 };
 
 } // namespace feedback
@@ -66,6 +72,9 @@ public:
     void v2g_message(const message_20::Type&) const;
     void evcc_id(const std::string&) const;
     void selected_protocol(const std::string&) const;
+
+    void notify_ev_charging_needs(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
+                                  const dt::MobilityNeedsMode&) const;
 
 private:
     feedback::Callbacks callbacks;
