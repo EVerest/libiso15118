@@ -143,10 +143,13 @@ Result ScheduleExchange::feed(Event ev) {
             ac_connector = std::get<dt::AcConnector>(selected_services.selected_connector);
         }
 
+        // TODO(ioan): prepare for AC transfer limits
+        session::feedback::TransferLimits limits = m_ctx.session_config.dc_limits;
+
         // Send the charging feedback
         this->m_ctx.feedback.notify_ev_charging_needs(selected_energy_service, ac_connector,
                                                       selected_services.selected_control_mode,
-                                                      selected_services.selected_mobility_needs_mode);
+                                                      selected_services.selected_mobility_needs_mode, limits);
 
         const auto res = handle_request(*req, m_ctx.session, max_charge_power, dynamic_parameters);
 

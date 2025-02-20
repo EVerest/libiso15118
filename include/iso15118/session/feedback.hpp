@@ -8,6 +8,7 @@
 #include <string>
 #include <variant>
 
+#include <iso15118/d20/limits.hpp>
 #include <iso15118/message/dc_charge_loop.hpp>
 #include <iso15118/message/type.hpp>
 
@@ -45,6 +46,8 @@ using DcReqControlMode = std::variant<
 using DcChargeLoopReq =
     std::variant<DcReqControlMode, message_20::datatypes::DisplayParameters, PresentVoltage, MeterInfoRequested>;
 
+using TransferLimits = std::variant<d20::DcTransferLimits>;
+
 struct Callbacks {
     std::function<void(Signal)> signal;
     std::function<void(float)> dc_pre_charge_target_voltage;
@@ -55,7 +58,7 @@ struct Callbacks {
     std::function<void(const std::string&)> selected_protocol;
 
     std::function<void(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
-                       const dt::MobilityNeedsMode&)>
+                       const dt::MobilityNeedsMode&, const TransferLimits&)>
         notify_ev_charging_needs;
 };
 
@@ -74,7 +77,7 @@ public:
     void selected_protocol(const std::string&) const;
 
     void notify_ev_charging_needs(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
-                                  const dt::MobilityNeedsMode&) const;
+                                  const dt::MobilityNeedsMode&, const feedback::TransferLimits&) const;
 
 private:
     feedback::Callbacks callbacks;
