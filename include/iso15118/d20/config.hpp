@@ -25,6 +25,7 @@ struct EvseSetupConfig {
     std::vector<ControlMobilityNeedsModes> control_mobility_modes;
 };
 
+// This should only have EVSE information
 struct SessionConfig {
     explicit SessionConfig(EvseSetupConfig);
 
@@ -41,8 +42,9 @@ struct SessionConfig {
 
     std::vector<message_20::datatypes::InternetParameterList> internet_parameter_list;
     std::vector<message_20::datatypes::ParkingParameterList> parking_parameter_list;
-
-    DcTransferLimits dc_limits;
+    
+    // I have a deja vu with this DC limits, shouldn't they be called dc_evse_limits?
+    DcTransferLimits dc_limits;    
 
     std::vector<ControlMobilityNeedsModes> supported_control_mobility_modes;
 };

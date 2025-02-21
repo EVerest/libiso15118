@@ -144,12 +144,17 @@ Result ScheduleExchange::feed(Event ev) {
         }
 
         // TODO(ioan): prepare for AC transfer limits
-        session::feedback::TransferLimits limits = m_ctx.session_config.dc_limits;
+        const session::feedback::EVSE_TransferLimits& evse_limits = m_ctx.session_config.dc_limits;
+        const session::feedback::EV_TransferLimits& ev_limits = m_ctx.session_ev_info.ev_transfer_limits;
+
+        // TODO: send and transform        
+        const session::feedback::EV_SEControlMode control_mode = req->control_mode;
 
         // Send the charging feedback
         this->m_ctx.feedback.notify_ev_charging_needs(selected_energy_service, ac_connector,
                                                       selected_services.selected_control_mode,
-                                                      selected_services.selected_mobility_needs_mode, limits);
+                                                      selected_services.selected_mobility_needs_mode, 
+                                                      evse_limits, ev_limits);
 
         const auto res = handle_request(*req, m_ctx.session, max_charge_power, dynamic_parameters);
 

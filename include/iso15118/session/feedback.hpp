@@ -9,7 +9,9 @@
 #include <variant>
 
 #include <iso15118/d20/limits.hpp>
+#include <iso15118/message/schedule_exchange.hpp>
 #include <iso15118/message/dc_charge_loop.hpp>
+#include <iso15118/message/dc_charge_parameter_discovery.hpp>
 #include <iso15118/message/type.hpp>
 
 namespace iso15118::session {
@@ -37,16 +39,23 @@ struct DcMaximumLimits {
     float power{NAN};
 };
 
-using PresentVoltage = message_20::datatypes::RationalNumber;
+using PresentVoltage = dt::RationalNumber;
 using MeterInfoRequested = bool;
 using DcReqControlMode = std::variant<
-    message_20::datatypes::Scheduled_DC_CLReqControlMode, message_20::datatypes::BPT_Scheduled_DC_CLReqControlMode,
-    message_20::datatypes::Dynamic_DC_CLReqControlMode, message_20::datatypes::BPT_Dynamic_DC_CLReqControlMode>;
+    dt::Scheduled_DC_CLReqControlMode, dt::BPT_Scheduled_DC_CLReqControlMode,
+    dt::Dynamic_DC_CLReqControlMode, dt::BPT_Dynamic_DC_CLReqControlMode>;
 
 using DcChargeLoopReq =
-    std::variant<DcReqControlMode, message_20::datatypes::DisplayParameters, PresentVoltage, MeterInfoRequested>;
+    std::variant<DcReqControlMode, dt::DisplayParameters, PresentVoltage, MeterInfoRequested>;
 
-using TransferLimits = std::variant<d20::DcTransferLimits>;
+// TODO(ioan): preparation for AC limits
+using EVSE_TransferLimits =
+    std::variant<d20::DcTransferLimits>;
+
+using EV_TransferLimits =
+    std::variant<dt::DC_CPDReqEnergyTransferMode, dt::BPT_DC_CPDReqEnergyTransferMode>;
+using EV_SEControlMode =
+    std::variant<dt::Dynamic_SEReqControlMode, dt::Scheduled_SEReqControlMode>;
 
 struct Callbacks {
     std::function<void(Signal)> signal;
@@ -58,7 +67,7 @@ struct Callbacks {
     std::function<void(const std::string&)> selected_protocol;
 
     std::function<void(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
-                       const dt::MobilityNeedsMode&, const TransferLimits&)>
+                       const dt::MobilityNeedsMode&, const EVSE_TransferLimits&, const EV_TransferLimits&)>
         notify_ev_charging_needs;
 };
 
@@ -77,7 +86,8 @@ public:
     void selected_protocol(const std::string&) const;
 
     void notify_ev_charging_needs(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
-                                  const dt::MobilityNeedsMode&, const feedback::TransferLimits&) const;
+                                  const dt::MobilityNeedsMode&, const feedback::EVSE_TransferLimits&, 
+                                  const feedback::EV_TransferLimits&) const;
 
 private:
     feedback::Callbacks callbacks;
