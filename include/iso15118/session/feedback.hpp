@@ -9,9 +9,9 @@
 #include <variant>
 
 #include <iso15118/d20/limits.hpp>
-#include <iso15118/message/schedule_exchange.hpp>
 #include <iso15118/message/dc_charge_loop.hpp>
 #include <iso15118/message/dc_charge_parameter_discovery.hpp>
+#include <iso15118/message/schedule_exchange.hpp>
 #include <iso15118/message/type.hpp>
 
 namespace iso15118::session {
@@ -41,21 +41,16 @@ struct DcMaximumLimits {
 
 using PresentVoltage = dt::RationalNumber;
 using MeterInfoRequested = bool;
-using DcReqControlMode = std::variant<
-    dt::Scheduled_DC_CLReqControlMode, dt::BPT_Scheduled_DC_CLReqControlMode,
-    dt::Dynamic_DC_CLReqControlMode, dt::BPT_Dynamic_DC_CLReqControlMode>;
+using DcReqControlMode = std::variant<dt::Scheduled_DC_CLReqControlMode, dt::BPT_Scheduled_DC_CLReqControlMode,
+                                      dt::Dynamic_DC_CLReqControlMode, dt::BPT_Dynamic_DC_CLReqControlMode>;
 
-using DcChargeLoopReq =
-    std::variant<DcReqControlMode, dt::DisplayParameters, PresentVoltage, MeterInfoRequested>;
+using DcChargeLoopReq = std::variant<DcReqControlMode, dt::DisplayParameters, PresentVoltage, MeterInfoRequested>;
 
 // TODO(ioan): preparation for AC limits
-using EVSE_TransferLimits =
-    std::variant<d20::DcTransferLimits>;
+using EVSE_TransferLimits = std::variant<d20::DcTransferLimits>;
 
-using EV_TransferLimits =
-    std::variant<dt::DC_CPDReqEnergyTransferMode, dt::BPT_DC_CPDReqEnergyTransferMode>;
-using EV_SEControlMode =
-    std::variant<dt::Dynamic_SEReqControlMode, dt::Scheduled_SEReqControlMode>;
+using EV_TransferLimits = std::variant<dt::DC_CPDReqEnergyTransferMode, dt::BPT_DC_CPDReqEnergyTransferMode>;
+using EV_SEControlMode = std::variant<dt::Dynamic_SEReqControlMode, dt::Scheduled_SEReqControlMode>;
 
 struct Callbacks {
     std::function<void(Signal)> signal;
@@ -86,7 +81,7 @@ public:
     void selected_protocol(const std::string&) const;
 
     void notify_ev_charging_needs(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
-                                  const dt::MobilityNeedsMode&, const feedback::EVSE_TransferLimits&, 
+                                  const dt::MobilityNeedsMode&, const feedback::EVSE_TransferLimits&,
                                   const feedback::EV_TransferLimits&) const;
 
 private:

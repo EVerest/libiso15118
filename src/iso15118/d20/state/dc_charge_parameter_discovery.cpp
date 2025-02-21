@@ -76,7 +76,7 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
         }
 
         // Extract info from the EV
-        out_ev_session_info.ev_transfer_limits.emplace<BPT_DC_ModeReq>(std::get<BPT_DC_ModeReq>(req.transfer_mode));        
+        out_ev_session_info.ev_transfer_limits.emplace<BPT_DC_ModeReq>(std::get<BPT_DC_ModeReq>(req.transfer_mode));
 
         auto& mode = res.transfer_mode.emplace<BPT_DC_ModeRes>();
         convert(mode, dc_limits);
@@ -119,7 +119,7 @@ Result DC_ChargeParameterDiscovery::feed(Event ev) {
             logf_info("Max charge current %fA", dt::from_RationalNumber(mode->max_charge_current));
             logf_info("Max discharge current %fA", dt::from_RationalNumber(mode->max_discharge_current));
         }
-        
+
         const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config.dc_limits, m_ctx.session_ev_info);
 
         m_ctx.respond(res);
