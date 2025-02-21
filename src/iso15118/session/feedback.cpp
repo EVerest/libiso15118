@@ -40,9 +40,10 @@ void Feedback::selected_protocol(const std::string& selected_protocol) const {
 void Feedback::notify_ev_charging_needs(const dt::ServiceCategory& service_category,
                                         const dt::AcConnector& ac_connector, const dt::ControlMode& control_mode,
                                         const dt::MobilityNeedsMode& mobility_needs_mode,
-                                        const feedback::TransferLimits& limits) const {
+                                        const feedback::EVSE_TransferLimits& evse_limits,
+                                        const feedback::EV_TransferLimits& ev_limits) const {
     call_if_available(callbacks.notify_ev_charging_needs, service_category, ac_connector, control_mode,
-                      mobility_needs_mode, limits);
+                      mobility_needs_mode, evse_limits, ev_limits);
 }
 
 } // namespace iso15118::session

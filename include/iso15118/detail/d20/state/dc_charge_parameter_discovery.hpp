@@ -5,12 +5,13 @@
 #include <iso15118/d20/config.hpp>
 #include <iso15118/d20/limits.hpp>
 #include <iso15118/d20/session.hpp>
+#include <iso15118/d20/ev_session_info.hpp>
 #include <iso15118/message/dc_charge_parameter_discovery.hpp>
 
 namespace iso15118::d20::state {
 
 message_20::DC_ChargeParameterDiscoveryResponse
 handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const d20::Session& session,
-               const d20::DcTransferLimits& dc_limits);
+               const d20::DcTransferLimits& dc_limits, d20::EVSessionInfo& out_ev_session_info);
 
 } // namespace iso15118::d20::state
