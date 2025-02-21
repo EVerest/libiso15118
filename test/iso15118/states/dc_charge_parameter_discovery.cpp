@@ -2,8 +2,8 @@
 // Copyright 2023 Pionix GmbH and Contributors to EVerest
 #include <catch2/catch_test_macros.hpp>
 
-#include <iso15118/detail/d20/state/dc_charge_parameter_discovery.hpp>
 #include <iso15118/d20/ev_session_info.hpp>
+#include <iso15118/detail/d20/state/dc_charge_parameter_discovery.hpp>
 
 using namespace iso15118;
 
