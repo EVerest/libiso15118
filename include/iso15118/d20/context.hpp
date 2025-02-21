@@ -14,8 +14,8 @@
 
 #include "config.hpp"
 #include "control_event.hpp"
-#include "session.hpp"
 #include "ev_session_info.hpp"
+#include "session.hpp"
 
 namespace iso15118::d20 {
 
