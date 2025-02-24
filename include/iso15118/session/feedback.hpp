@@ -62,7 +62,8 @@ struct Callbacks {
     std::function<void(const std::string&)> selected_protocol;
 
     std::function<void(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
-                       const dt::MobilityNeedsMode&, const EVSE_TransferLimits&, const EV_TransferLimits&)>
+                       const dt::MobilityNeedsMode&, const EVSE_TransferLimits&, const EV_TransferLimits&,
+                       const EV_SEControlMode&)>
         notify_ev_charging_needs;
 };
 
@@ -82,7 +83,7 @@ public:
 
     void notify_ev_charging_needs(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
                                   const dt::MobilityNeedsMode&, const feedback::EVSE_TransferLimits&,
-                                  const feedback::EV_TransferLimits&) const;
+                                  const feedback::EV_TransferLimits&, const feedback::EV_SEControlMode&) const;
 
 private:
     feedback::Callbacks callbacks;

@@ -153,7 +153,7 @@ Result ScheduleExchange::feed(Event ev) {
         // Send the charging feedback
         this->m_ctx.feedback.notify_ev_charging_needs(
             selected_energy_service, ac_connector, selected_services.selected_control_mode,
-            selected_services.selected_mobility_needs_mode, evse_limits, ev_limits);
+            selected_services.selected_mobility_needs_mode, evse_limits, ev_limits, control_mode);
 
         const auto res = handle_request(*req, m_ctx.session, max_charge_power, dynamic_parameters);
 
