@@ -17,6 +17,7 @@ template <> void convert(const struct iso20_ServiceSelectionReqType& in, Service
     out.selected_energy_transfer_service.parameter_set_id = in.SelectedEnergyTransferService.ParameterSetID;
 
     if (in.SelectedVASList_isUsed == true) {
+        out.selected_vas_list.emplace(datatypes::SelectedServiceList({}));
         out.selected_vas_list.value().reserve(in.SelectedVASList.SelectedService.arrayLen);
         auto& vas_list_out = *out.selected_vas_list;
 
