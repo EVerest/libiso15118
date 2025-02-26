@@ -33,7 +33,7 @@ SCENARIO("Se/Deserialize authorization setup messages") {
 
     GIVEN("Serialize authorization_setup_req") {
 
-        const auto header = message_20::Header{{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 1739635913};
+        const auto header = message_20::Header{{0xF2, 0x19, 0x15, 0xB9, 0xDD, 0xDC, 0x12, 0xD1}, 1691411798};
 
         const auto res = message_20::AuthorizationSetupRequest{header};
 
@@ -88,9 +88,8 @@ SCENARIO("Se/Deserialize authorization setup messages") {
         }
     }
     GIVEN("Deserialize authorization_setup_res") {
-        uint8_t doc_raw[] = {0x80, 0x90, 0x4,  0x17, 0x7d, 0xc,  0x4a, 0x6e, 0x3d, 0xc8, 0x8,  0x8c,
-                             0x9f, 0x9c, 0x2b, 0xd0, 0x62, 0x4,  0x4,  0x51, 0x11, 0x4a, 0x94, 0x13,
-                             0x96, 0xa,  0x91, 0x4c, 0x4c, 0x8c, 0xcd, 0xd,  0x4a, 0x8c, 0x40};
+        uint8_t doc_raw[] = {0x80, 0x0c, 0x04, 0x79, 0x0c, 0x8a, 0xdc, 0xee, 0xee, 0x09,
+            0x68, 0x8d, 0x6c, 0xac, 0x3a, 0x60, 0x62, 0x00, 0x05, 0x00};
 
         const io::StreamInputView stream_view{doc_raw, sizeof(doc_raw)};
 
@@ -102,8 +101,8 @@ SCENARIO("Se/Deserialize authorization setup messages") {
             const auto& msg = variant.get<message_20::AuthorizationSetupResponse>();
             const auto& header = msg.header;
 
-            REQUIRE(header.session_id == std::array<uint8_t, 8>{0x2E, 0xFA, 0x18, 0x94, 0xDC, 0x7B, 0x90, 0x11});
-            REQUIRE(header.timestamp == 1739635913);
+            REQUIRE(header.session_id == std::array<uint8_t, 8>{0xF2, 0x19, 0x15, 0xB9, 0xDD, 0xDC, 0x12, 0xD1});
+            REQUIRE(header.timestamp == 1691411798);
             REQUIRE(msg.response_code == message_20::datatypes::ResponseCode::OK);
             REQUIRE(msg.authorization_services.size() == 1);
             REQUIRE(msg.authorization_services[0] == message_20::datatypes::Authorization::EIM);
@@ -127,14 +126,14 @@ SCENARIO("Se/Deserialize authorization setup messages") {
             const auto& msg = variant.get<message_20::AuthorizationSetupResponse>();
             const auto& header = msg.header;
 
-            REQUIRE(header.session_id == std::array<uint8_t, 8>{0x2E, 0xFA, 0x18, 0x94, 0xDC, 0x7B, 0x90, 0x11});
-            REQUIRE(header.timestamp == 1739635913);
+            REQUIRE(header.session_id == std::array<uint8_t, 8>{0xF2, 0x19, 0x15, 0xB9, 0xDD, 0xDC, 0x12, 0xD1});
+            REQUIRE(header.timestamp == 1691411798);
             REQUIRE(msg.response_code == message_20::datatypes::ResponseCode::OK);
             REQUIRE(msg.authorization_services.size() == 2);
             REQUIRE(msg.authorization_services[0] == message_20::datatypes::Authorization::EIM);
             REQUIRE(msg.authorization_services[1] == message_20::datatypes::Authorization::PnC);
             REQUIRE(msg.certificate_installation_service == true);
-            REQUIRE(std::holds_alternative<message_20::datatypes::EIM_ASResAuthorizationMode>(msg.authorization_mode));
+            REQUIRE(std::holds_alternative<message_20::datatypes::PnC_ASResAuthorizationMode>(msg.authorization_mode));
         }
     }
 }
