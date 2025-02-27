@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
 
     parse_options(argc, argv);
 
-    io::set_logging_callback([](LogLevel level, std::string message) {
+    io::set_logging_callback([](LogLevel level, const std::string& message) {
         std::cout << "log(" << static_cast<int>(level) << "): " << message << std::endl;
     });
 

@@ -63,34 +63,6 @@ constexpr auto TLS_PORT = 50000;
 int ssl_keylog_server_index{-1};
 int ssl_keylog_file_index{-1};
 
-std::vector<uint16_t> extract_supported_versions(const uint8_t* data, std::size_t remaining) {
-    uint8_t length_supported_versions = *(data++);
-    remaining -= 1;
-
-    if (length_supported_versions != remaining) {
-        logf_error("length_supported_versions is not remaining");
-        return {};
-    }
-
-    if (length_supported_versions % 2 != 0) {
-        logf_error("length_supported_versions is not diveded by 2");
-        return {};
-    }
-
-    // First Byte: length
-    // Byte 2+3 -> First Version (03, 04)
-    // Byte 4+5 -> Second Version (03, 03)
-    // ....
-
-    std::vector<uint16_t> tls_versions{};
-    for (auto i = 0; i < length_supported_versions; i += 2) {
-        const uint8_t first_byte = *(data++);
-        const uint8_t second_byte = *(data++);
-        tls_versions.push_back(first_byte << 8 | second_byte);
-    }
-    return tls_versions;
-}
-
 std::string convert_ssl_tls_versions_to_string(uint16_t version) {
     switch (version) {
     case SSL3_VERSION:
@@ -108,54 +80,76 @@ std::string convert_ssl_tls_versions_to_string(uint16_t version) {
     }
 }
 
-int client_hello_cb(SSL* ssl, int* alert, void* object) {
+// The use of X509_NAME_oneline() function is strongly discouraged and could be deprecated in a future release. This is
+// the reason for this wrapper.
+auto x509_name_oneline(const X509_NAME* a, char* buf, int size) {
+    return X509_NAME_oneline(a, buf, size);
+}
 
-    // To shut up the compiler...
-    (void)alert;
-    (void)object;
-
-    int* extensions{nullptr};
-    std::size_t length{0};
-    if (SSL_client_hello_get1_extensions_present(ssl, &extensions, &length) == 1) {
-        for (std::size_t i = 0; i < length; i++) {
-            if (extensions[i] == TLSEXT_TYPE_supported_versions) {
-                const unsigned char* data;
-                std::size_t datalen{0};
-
-                // NOTE(SL): I found no get or callback function for the supported_versions extension, so I wrote
-                // my own parser
-                if (SSL_client_hello_get0_ext(ssl, TLSEXT_TYPE_supported_versions, &data, &datalen)) {
-                    const auto tls_versions = extract_supported_versions(data, datalen);
-
-                    for (auto tls_version : tls_versions) {
-                        logf_debug("Client supported tls version: %s",
-                                   convert_ssl_tls_versions_to_string(tls_version).c_str());
-                    }
-
-                    const auto tls_1_3_found =
-                        std::any_of(tls_versions.begin(), tls_versions.end(),
-                                    [](std::uint16_t version) { return version == TLS1_3_VERSION; });
-                    if (tls_1_3_found) {
-                        logf_info("Client supports TLS1.3: Change verify mode to SSL_VERIFY_PEER and "
-                                  "SSL_VERIFY_FAIL_IF_NO_PEER_CERT");
-                        int mode = SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT;
-                        SSL_set_verify(ssl, mode, nullptr);
-                    }
-                }
-            } else if (extensions[i] == TLSEXT_TYPE_certificate_authorities) {
-                logf_info("Extension certificate_authorities found!");
-                // TODO(SL): Setting var for handle_certificate_cb
-            }
-        }
-        OPENSSL_free(extensions);
+// I found no get or callback function for the supported_versions extension, so I wrote my own parser.
+bool is_tls_1_3(const uint8_t* data, std::size_t remaining) {
+    if (data == nullptr) {
+        return false;
     }
+
+    uint8_t length_supported_versions = *(data++);
+    remaining -= 1;
+
+    if (length_supported_versions != remaining) {
+        logf_error("length_supported_versions is not remaining");
+        return false;
+    }
+
+    if (length_supported_versions % 2 != 0) {
+        logf_error("length_supported_versions is not divisible by 2");
+        return false;
+    }
+
+    // First Byte: length
+    // Byte 2+3 -> First Version (03, 04)
+    // Byte 4+5 -> Second Version (03, 03)
+    // ....
+
+    std::vector<uint16_t> tls_versions{};
+    for (auto i = 0; i < length_supported_versions; i += 2) {
+        const uint8_t first_byte = *(data++);
+        const uint8_t second_byte = *(data++);
+        tls_versions.push_back(first_byte << 8 | second_byte);
+    }
+
+    for (auto tls_version : tls_versions) {
+        logf_debug("Client supported tls version: %s", convert_ssl_tls_versions_to_string(tls_version).c_str());
+    }
+
+    return std::any_of(tls_versions.begin(), tls_versions.end(),
+                       [](std::uint16_t version) { return version == TLS1_3_VERSION; });
+}
+
+int client_hello_cb(SSL* ssl, int* /* alert */, void* /* object */) {
+
+    const unsigned char* data;
+    std::size_t datalen{0};
+
+    if (SSL_client_hello_get0_ext(ssl, TLSEXT_TYPE_supported_versions, &data, &datalen)) {
+        const auto tls_1_3_found = is_tls_1_3(data, datalen);
+
+        if (tls_1_3_found) {
+            logf_info("Client supports TLS1.3: Change verify mode to SSL_VERIFY_PEER and "
+                      "SSL_VERIFY_FAIL_IF_NO_PEER_CERT");
+            int mode = SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT;
+            SSL_set_verify(ssl, mode, nullptr);
+        }
+    }
+
+    if (SSL_client_hello_get0_ext(ssl, TLSEXT_TYPE_certificate_authorities, &data, &datalen)) {
+        logf_info("Extension certificate_authorities found!");
+        // TODO(SL): Setting var for handle_certificate_cb
+    }
+
     return SSL_CLIENT_HELLO_SUCCESS;
 }
 
-int handle_certificate_cb(SSL* ssl, void* arg) {
-
-    // To shut up the compiler...
-    (void)arg;
+int handle_certificate_cb(SSL* ssl, void* /* arg */) {
 
     // TODO(sl): Check only after names if the extension is there
     const STACK_OF(X509_NAME)* names = SSL_get0_peer_CA_list(ssl);
@@ -167,7 +161,7 @@ int handle_certificate_cb(SSL* ssl, void* arg) {
 
         for (auto i = 0; i < sk_X509_NAME_num(names); i++) {
             char name[256]{};
-            X509_NAME_oneline(sk_X509_NAME_value(names, i), name, sizeof(name));
+            x509_name_oneline(sk_X509_NAME_value(names, i), name, sizeof(name));
             logf_info("Name: %s", name);
         }
     }
@@ -279,8 +273,8 @@ SSL_CTX* init_ssl(const config::SSLConfig& ssl_config) {
     // SSL_CTX_set_cert_cb(ctx, &handle_certificate_cb, nullptr);
 
     if (ssl_config.enable_tls_key_logging) {
-        ssl_keylog_file_index = SSL_CTX_get_ex_new_index(0, std::string("").data(), nullptr, nullptr, nullptr);
-        ssl_keylog_server_index = SSL_get_ex_new_index(0, std::string("").data(), nullptr, nullptr, nullptr);
+        ssl_keylog_file_index = SSL_CTX_get_ex_new_index(0, nullptr, nullptr, nullptr, nullptr);
+        ssl_keylog_server_index = SSL_get_ex_new_index(0, nullptr, nullptr, nullptr, nullptr);
 
         if (ssl_keylog_file_index == -1 or ssl_keylog_server_index == -1) {
             auto error_msg = std::string("_get_ex_new_index failed: ssl_keylog_file_index: ");
@@ -479,17 +473,17 @@ void ConnectionSSL::handle_data() {
 
             const auto peer = SSL_get0_peer_certificate(ssl_ptr);
 
-            if (SSL_get_verify_mode(ssl_ptr) > SSL_VERIFY_NONE and peer) {
+            if (SSL_get_verify_mode(ssl_ptr) != SSL_VERIFY_NONE and peer) {
 
                 const auto verify_result = SSL_get_verify_result(ssl_ptr);
                 if (verify_result == X509_V_OK) {
                     logf_info("Verify certificate result is okay");
-
-                    char name[256]{};
-                    X509_NAME_oneline(X509_get_subject_name(peer), name, sizeof(name));
+                    constexpr auto name_length = 256;
+                    char name[name_length]{};
+                    x509_name_oneline(X509_get_subject_name(peer), name, sizeof(name));
                     logf_debug("Peer subject name: %s", name);
-                    memset(name, 0x00, sizeof(name));
-                    X509_NAME_oneline(X509_get_issuer_name(peer), name, sizeof(name));
+                    name[0] = '\0';
+                    x509_name_oneline(X509_get_issuer_name(peer), name, sizeof(name));
                     logf_debug("Peer issuer name: %s", name);
 
                     unsigned int length = 0;
