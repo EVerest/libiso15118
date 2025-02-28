@@ -28,7 +28,7 @@ template <> void convert(const struct iso20_AuthorizationSetupResType& in, Autho
     out.certificate_installation_service = in.CertificateInstallationService;
 
     if (in.EIM_ASResAuthorizationMode_isUsed) {
-        out.authorization_mode.emplace<datatypes::EIM_ASResAuthorizationMode>();
+        out.authorization_mode = datatypes::EIM_ASResAuthorizationMode{};
     } else if (in.PnC_ASResAuthorizationMode_isUsed) {
         auto& pnc_out = out.authorization_mode.emplace<datatypes::PnC_ASResAuthorizationMode>();
         CB2CPP_BYTES(in.PnC_ASResAuthorizationMode.GenChallenge, pnc_out.gen_challenge);

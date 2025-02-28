@@ -133,7 +133,11 @@ SCENARIO("Se/Deserialize authorization setup messages") {
             REQUIRE(msg.authorization_services[0] == message_20::datatypes::Authorization::EIM);
             REQUIRE(msg.authorization_services[1] == message_20::datatypes::Authorization::PnC);
             REQUIRE(msg.certificate_installation_service == true);
-            REQUIRE(std::holds_alternative<message_20::datatypes::PnC_ASResAuthorizationMode>(msg.authorization_mode));
+            const message_20::datatypes::GenChallenge exp_gen_challenge = {1, 2,  3,  4,  5,  6,  7,  8,
+                                                                           9, 10, 11, 12, 13, 14, 15, 16};
+            const auto& pnc_auth_mode =
+                std::get<message_20::datatypes::PnC_ASResAuthorizationMode>(msg.authorization_mode);
+            REQUIRE(pnc_auth_mode.gen_challenge == exp_gen_challenge);
         }
     }
 }
