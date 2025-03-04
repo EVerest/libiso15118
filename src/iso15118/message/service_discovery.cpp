@@ -20,6 +20,47 @@ template <> void convert(const struct iso20_ServiceDiscoveryReqType& in, Service
     }
 }
 
+template <> void convert(const struct iso20_ServiceDiscoveryResType& in, ServiceDiscoveryResponse& out) {
+
+    cb_convert_enum(in.ResponseCode, out.response_code);
+
+    out.service_renegotiation_supported = in.ServiceRenegotiationSupported;
+
+    // remove the default AC service
+    out.energy_transfer_service_list.clear();
+
+    for (auto const& service : in.EnergyTransferServiceList.Service.array) {
+        auto& out_service = out.energy_transfer_service_list.emplace_back();
+        cb_convert_enum(service.ServiceID, out_service.service_id);
+        out_service.free_service = service.FreeService;
+    }
+    out.energy_transfer_service_list.resize(in.EnergyTransferServiceList.Service.arrayLen);
+
+    if (in.VASList_isUsed) {
+
+        for (auto const& service : in.VASList.Service.array) {
+            auto& out_service = out.vas_list->emplace_back();
+            cb_convert_enum(service.ServiceID, out_service.service_id);
+            out_service.free_service = service.FreeService;
+        }
+        out.vas_list->resize(in.VASList.Service.arrayLen);
+    }
+
+    convert(in.Header, out.header);
+}
+
+template <> void convert(const ServiceDiscoveryRequest& in, iso20_ServiceDiscoveryReqType& out) {
+    init_iso20_ServiceDiscoveryReqType(&out);
+
+    if (in.supported_service_ids) {
+        auto& out_service_ids = out.SupportedServiceIDs.ServiceID.array;
+        std::copy(in.supported_service_ids.value().begin(), in.supported_service_ids.value().end(), out_service_ids);
+        out.SupportedServiceIDs.ServiceID.arrayLen = in.supported_service_ids.value().size();
+        CB_SET_USED(out.SupportedServiceIDs);
+    }
+    convert(in.header, out.Header);
+}
+
 template <> void convert(const ServiceDiscoveryResponse& in, iso20_ServiceDiscoveryResType& out) {
     init_iso20_ServiceDiscoveryResType(&out);
 
@@ -52,6 +93,10 @@ template <> void insert_type(VariantAccess& va, const struct iso20_ServiceDiscov
     va.insert_type<ServiceDiscoveryRequest>(in);
 };
 
+template <> void insert_type(VariantAccess& va, const struct iso20_ServiceDiscoveryResType& in) {
+    va.insert_type<ServiceDiscoveryResponse>(in);
+};
+
 template <> int serialize_to_exi(const ServiceDiscoveryResponse& in, exi_bitstream_t& out) {
     iso20_exiDocument doc;
     init_iso20_exiDocument(&doc);
@@ -63,7 +108,22 @@ template <> int serialize_to_exi(const ServiceDiscoveryResponse& in, exi_bitstre
     return encode_iso20_exiDocument(&out, &doc);
 }
 
+template <> int serialize_to_exi(const ServiceDiscoveryRequest& in, exi_bitstream_t& out) {
+    iso20_exiDocument doc;
+    init_iso20_exiDocument(&doc);
+
+    CB_SET_USED(doc.ServiceDiscoveryReq);
+
+    convert(in, doc.ServiceDiscoveryReq);
+
+    return encode_iso20_exiDocument(&out, &doc);
+}
+
 template <> size_t serialize(const ServiceDiscoveryResponse& in, const io::StreamOutputView& out) {
+    return serialize_helper(in, out);
+}
+
+template <> size_t serialize(const ServiceDiscoveryRequest& in, const io::StreamOutputView& out) {
     return serialize_helper(in, out);
 }
 
