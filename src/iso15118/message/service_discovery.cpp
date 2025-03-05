@@ -28,22 +28,26 @@ template <> void convert(const struct iso20_ServiceDiscoveryResType& in, Service
 
     // remove the default AC service
     out.energy_transfer_service_list.clear();
+    out.energy_transfer_service_list.reserve(in.EnergyTransferServiceList.Service.arrayLen);
 
-    for (auto const& service : in.EnergyTransferServiceList.Service.array) {
+    for (auto i = 0; i < in.EnergyTransferServiceList.Service.arrayLen; i++) {
+        auto const& service = in.EnergyTransferServiceList.Service.array[i];
         auto& out_service = out.energy_transfer_service_list.emplace_back();
         cb_convert_enum(service.ServiceID, out_service.service_id);
         out_service.free_service = service.FreeService;
     }
-    out.energy_transfer_service_list.resize(in.EnergyTransferServiceList.Service.arrayLen);
 
     if (in.VASList_isUsed) {
 
-        for (auto const& service : in.VASList.Service.array) {
+        out.vas_list.emplace();
+        out.vas_list->reserve(in.VASList.Service.arrayLen);
+
+        for (auto i = 0; i < in.VASList.Service.arrayLen; i++) {
+            auto const& service = in.VASList.Service.array[i];
             auto& out_service = out.vas_list->emplace_back();
             cb_convert_enum(service.ServiceID, out_service.service_id);
             out_service.free_service = service.FreeService;
         }
-        out.vas_list->resize(in.VASList.Service.arrayLen);
     }
 
     convert(in.Header, out.header);
@@ -54,8 +58,9 @@ template <> void convert(const ServiceDiscoveryRequest& in, iso20_ServiceDiscove
 
     if (in.supported_service_ids) {
         auto& out_service_ids = out.SupportedServiceIDs.ServiceID.array;
-        std::copy(in.supported_service_ids.value().begin(), in.supported_service_ids.value().end(), out_service_ids);
-        out.SupportedServiceIDs.ServiceID.arrayLen = in.supported_service_ids.value().size();
+        const auto& supported_service_ids = in.supported_service_ids.value();
+        std::copy(supported_service_ids.begin(), supported_service_ids.end(), out_service_ids);
+        out.SupportedServiceIDs.ServiceID.arrayLen = supported_service_ids.size();
         CB_SET_USED(out.SupportedServiceIDs);
     }
     convert(in.header, out.Header);
