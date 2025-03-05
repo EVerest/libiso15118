@@ -59,6 +59,7 @@ namespace {
 
 constexpr auto DEFAULT_SOCKET_BACKLOG = 4;
 constexpr auto TLS_PORT = 50000;
+constexpr auto NAME_LENGTH = 256;
 
 int ssl_keylog_server_index{-1};
 int ssl_keylog_file_index{-1};
@@ -110,19 +111,22 @@ bool is_tls_1_3(const uint8_t* data, std::size_t remaining) {
     // Byte 4+5 -> Second Version (03, 03)
     // ....
 
-    std::vector<uint16_t> tls_versions{};
+    bool result{false};
+
     for (auto i = 0; i < length_supported_versions; i += 2) {
         const uint8_t first_byte = *(data++);
         const uint8_t second_byte = *(data++);
-        tls_versions.push_back(first_byte << 8 | second_byte);
-    }
 
-    for (auto tls_version : tls_versions) {
+        const auto tls_version = first_byte << 8 | second_byte;
+
+        if (tls_version == TLS1_3_VERSION) {
+            result = true;
+        }
+
         logf_debug("Client supported tls version: %s", convert_ssl_tls_versions_to_string(tls_version).c_str());
     }
 
-    return std::any_of(tls_versions.begin(), tls_versions.end(),
-                       [](std::uint16_t version) { return version == TLS1_3_VERSION; });
+    return result;
 }
 
 int client_hello_cb(SSL* ssl, int* /* alert */, void* /* object */) {
@@ -160,7 +164,7 @@ int handle_certificate_cb(SSL* ssl, void* /* arg */) {
         logf_info("Found certificate CA names!");
 
         for (auto i = 0; i < sk_X509_NAME_num(names); i++) {
-            char name[256]{};
+            char name[NAME_LENGTH]{};
             x509_name_oneline(sk_X509_NAME_value(names, i), name, sizeof(name));
             logf_info("Name: %s", name);
         }
@@ -478,8 +482,7 @@ void ConnectionSSL::handle_data() {
                 const auto verify_result = SSL_get_verify_result(ssl_ptr);
                 if (verify_result == X509_V_OK) {
                     logf_info("Verify certificate result is okay");
-                    constexpr auto name_length = 256;
-                    char name[name_length]{};
+                    char name[NAME_LENGTH]{};
                     x509_name_oneline(X509_get_subject_name(peer), name, sizeof(name));
                     logf_debug("Peer subject name: %s", name);
                     name[0] = '\0';
