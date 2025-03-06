@@ -31,7 +31,7 @@ template <> void convert(const struct iso20_ServiceDiscoveryResType& in, Service
     out.energy_transfer_service_list.reserve(in.EnergyTransferServiceList.Service.arrayLen);
 
     for (auto i = 0; i < in.EnergyTransferServiceList.Service.arrayLen; i++) {
-        auto const& service = in.EnergyTransferServiceList.Service.array[i];
+        const auto& service = in.EnergyTransferServiceList.Service.array[i];
         auto& out_service = out.energy_transfer_service_list.emplace_back();
         cb_convert_enum(service.ServiceID, out_service.service_id);
         out_service.free_service = service.FreeService;
@@ -43,7 +43,7 @@ template <> void convert(const struct iso20_ServiceDiscoveryResType& in, Service
         out.vas_list->reserve(in.VASList.Service.arrayLen);
 
         for (auto i = 0; i < in.VASList.Service.arrayLen; i++) {
-            auto const& service = in.VASList.Service.array[i];
+            const auto& service = in.VASList.Service.array[i];
             auto& out_service = out.vas_list->emplace_back();
             cb_convert_enum(service.ServiceID, out_service.service_id);
             out_service.free_service = service.FreeService;
@@ -73,7 +73,7 @@ template <> void convert(const ServiceDiscoveryResponse& in, iso20_ServiceDiscov
     out.ServiceRenegotiationSupported = in.service_renegotiation_supported;
 
     uint8_t index = 0;
-    for (auto const& service : in.energy_transfer_service_list) {
+    for (const auto& service : in.energy_transfer_service_list) {
         auto& out_service = out.EnergyTransferServiceList.Service.array[index++];
         cb_convert_enum(service.service_id, out_service.ServiceID);
         out_service.FreeService = service.free_service;
@@ -82,7 +82,7 @@ template <> void convert(const ServiceDiscoveryResponse& in, iso20_ServiceDiscov
 
     if (in.vas_list) {
         index = 0;
-        for (auto const& service : *in.vas_list) {
+        for (const auto& service : *in.vas_list) {
             auto& out_service = out.VASList.Service.array[index++];
             cb_convert_enum(service.service_id, out_service.ServiceID);
             out_service.FreeService = service.free_service;
