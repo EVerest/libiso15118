@@ -99,14 +99,15 @@ Result SessionSetup::feed(Event ev) {
             m_ctx.session = Session();
             new_session = true;
         } else {
+            const auto& pause_ctx = m_ctx.pause_ctx.value();
             const auto new_vehicle_cert_session_hash =
                 calculate_new_cert_session_id_hash(vehicle_cert_hash.value(), req->header.session_id);
-            const auto& previous_hash = m_ctx.pause_ctx.value().vehicle_cert_session_id_hash;
-            if (previous_hash == new_vehicle_cert_session_hash) {
+
+            if (pause_ctx.vehicle_cert_session_id_hash == new_vehicle_cert_session_hash) {
                 logf_info("Old session resumed with session_id: %s",
                           session_id_to_string(req->header.session_id).c_str());
                 m_ctx.session_resumed = true;
-                m_ctx.session = Session(m_ctx.pause_ctx.value().old_session_id);
+                m_ctx.session = Session(pause_ctx);
             } else {
                 m_ctx.session = Session();
                 new_session = true;
@@ -129,21 +130,21 @@ Result SessionSetup::feed(Event ev) {
 
         m_ctx.respond(res);
 
-        if (new_session) {
-            return m_ctx.create_state<AuthorizationSetup>();
-        }
-
-        const auto& pause_selected_energy_service = m_ctx.pause_ctx.value().selected_energy_service;
-        if (pause_selected_energy_service == message_20::datatypes::ServiceCategory::AC or
-            pause_selected_energy_service == message_20::datatypes::ServiceCategory::AC_BPT) {
-            // TODO(sl): Missing AC charge parameter discovery state
+        if (not new_session) {
+            const auto& pause_selected_energy_service = m_ctx.session.get_selected_services().selected_energy_service;
+            if (pause_selected_energy_service == message_20::datatypes::ServiceCategory::AC or
+                pause_selected_energy_service == message_20::datatypes::ServiceCategory::AC_BPT) {
+                // TODO(sl): Missing AC charge parameter discovery state
+                return {};
+            } else if (pause_selected_energy_service == message_20::datatypes::ServiceCategory::DC or
+                       pause_selected_energy_service == message_20::datatypes::ServiceCategory::DC_BPT) {
+                return m_ctx.create_state<DC_ChargeParameterDiscovery>();
+            }
+            // TODO(sl): Error handling
             return {};
-        } else if (pause_selected_energy_service == message_20::datatypes::ServiceCategory::DC or
-                   pause_selected_energy_service == message_20::datatypes::ServiceCategory::DC_BPT) {
-            return m_ctx.create_state<DC_ChargeParameterDiscovery>();
         }
-        // TODO(sl): Error handling
-        return {};
+        return m_ctx.create_state<AuthorizationSetup>();
+
     } else {
         m_ctx.log("expected SessionSetupReq! But code type id: %d", variant->get_type());
 
