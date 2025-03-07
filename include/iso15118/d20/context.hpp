@@ -7,7 +7,6 @@
 #include <string>
 #include <tuple>
 
-#include <iso15118/detail/io/sha_hash.hpp>
 #include <iso15118/message/payload_type.hpp>
 #include <iso15118/message/variant.hpp>
 #include <iso15118/session/feedback.hpp>
@@ -19,13 +18,6 @@
 #include "session.hpp"
 
 namespace iso15118::d20 {
-
-// TODO(SL): How to handle d2 pause? Move Struct to a seperate header file?
-struct PauseContext {
-    io::sha512_hash_t vehicle_cert_session_id_hash{};
-    message_20::datatypes::ServiceCategory selected_energy_service{};
-    std::array<uint8_t, 8> old_session_id{};
-};
 
 // forward declare
 class ControlEventQueue;

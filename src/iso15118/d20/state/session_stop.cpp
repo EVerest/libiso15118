@@ -56,11 +56,11 @@ Result SessionStop::feed(Event ev) {
         if (req->charging_session == message_20::datatypes::ChargingSession::Pause) {
             m_ctx.session_paused = true;
             if (not m_ctx.pause_ctx.has_value()) {
-                logf_error("EV wants to pause the session but pause_ctx has no value");
+                logf_error("Pause the session but pause_ctx has no value");
                 return {};
             }
-            m_ctx.pause_ctx->selected_energy_service = m_ctx.session.get_selected_services().selected_energy_service;
-        } else if (req->charging_session == message_20::datatypes::ChargingSession::Pause) {
+            m_ctx.pause_ctx->selected_service_parameters = m_ctx.session.get_selected_services();
+        } else if (req->charging_session == message_20::datatypes::ChargingSession::Terminate) {
             m_ctx.session_stopped = true;
             m_ctx.pause_ctx.reset();
         }
