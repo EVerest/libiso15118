@@ -43,7 +43,8 @@ Session::Session() {
     }
 }
 
-Session::Session(const std::array<uint8_t, ID_LENGTH>& old_session_id) : id(old_session_id){};
+Session::Session(const PauseContext& pause_ctx) :
+    id(pause_ctx.old_session_id), selected_services(pause_ctx.selected_service_parameters) {};
 
 Session::Session(SelectedServiceParameters service_parameters_) : selected_services(service_parameters_) {
     std::random_device rd;

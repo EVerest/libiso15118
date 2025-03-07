@@ -12,15 +12,18 @@
 using namespace iso15118;
 
 SCENARIO("ISO15118-20 session setup state transitions") {
+
+    namespace dt = message_20::datatypes;
+
     // Move to helper function?
     const auto evse_id = std::string("everest se");
-    const std::vector<message_20::datatypes::ServiceCategory> supported_energy_services = {
-        message_20::datatypes::ServiceCategory::DC};
+    const std::vector<dt::ServiceCategory> supported_energy_services = {
+        dt::ServiceCategory::DC};
     const auto cert_install{false};
-    const std::vector<message_20::datatypes::Authorization> auth_services = {message_20::datatypes::Authorization::EIM};
+    const std::vector<dt::Authorization> auth_services = {dt::Authorization::EIM};
     const d20::DcTransferLimits dc_limits;
     const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
-        {message_20::datatypes::ControlMode::Scheduled, message_20::datatypes::MobilityNeedsMode::ProvidedByEvcc}};
+        {dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
 
     const d20::EvseSetupConfig evse_setup{evse_id,   supported_energy_services, auth_services, cert_install,
                                           dc_limits, control_mobility_modes};
@@ -33,7 +36,9 @@ SCENARIO("ISO15118-20 session setup state transitions") {
     const auto session_id = std::array<uint8_t, 8>{0x10, 0x34, 0xAB, 0x7A, 0x01, 0xF3, 0x95, 0x02};
 
     auto& pause = pause_ctx.emplace();
-    pause.selected_energy_service = message_20::datatypes::ServiceCategory::DC;
+    pause.selected_service_parameters =
+        d20::SelectedServiceParameters(dt::ServiceCategory::DC, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
+                                       dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
     pause.vehicle_cert_session_id_hash = {0x58, 0xD6, 0x9A, 0x86, 0xF5, 0xCF, 0x86, 0xC0, 0x2F, 0x06, 0x1A, 0xAC, 0x9B,
                                           0x26, 0x83, 0x0F, 0xB1, 0x66, 0xCC, 0x4E, 0xC8, 0x75, 0x68, 0xA2, 0xF2, 0x3D,
                                           0x11, 0xC7, 0x61, 0x64, 0x18, 0x34, 0x56, 0x7A, 0x34, 0x30, 0x0C, 0x7E, 0x9A,
