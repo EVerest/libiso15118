@@ -115,6 +115,7 @@ enum class ChargingSession {
 
 enum class AcConnector {
     SinglePhase = 1,
+    // TODO(ioan): two phase missing?
     ThreePhase = 3,
 };
 enum class DcConnector {
