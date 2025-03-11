@@ -161,7 +161,6 @@ template <> void convert(const struct iso20_ServiceDetailResType& in, ServiceDet
 template <> void convert(const ServiceDetailRequest& in, iso20_ServiceDetailReqType& out) {
     init_iso20_ServiceDetailReqType(&out);
 
-    // RDB TODO Handle the various options in the request
     cb_convert_enum(in.service, out.ServiceID);
 
     convert(in.header, out.Header);
@@ -261,7 +260,6 @@ template <> size_t serialize(const ServiceDetailResponse& in, const io::StreamOu
     return serialize_helper(in, out);
 }
 
-// RDB output the request
 template <> size_t serialize(const ServiceDetailRequest& in, const io::StreamOutputView& out) {
     return serialize_helper(in, out);
 }
