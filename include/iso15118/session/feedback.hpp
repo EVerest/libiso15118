@@ -47,10 +47,10 @@ using DcReqControlMode = std::variant<dt::Scheduled_DC_CLReqControlMode, dt::BPT
 using DcChargeLoopReq = std::variant<DcReqControlMode, dt::DisplayParameters, PresentVoltage, MeterInfoRequested>;
 
 // TODO(ioan): preparation for AC limits
-using EVSE_TransferLimits = std::variant<d20::DcTransferLimits>;
+using EvseTransferLimits = std::variant<d20::DcTransferLimits>;
 
-using EV_TransferLimits = std::variant<dt::DC_CPDReqEnergyTransferMode, dt::BPT_DC_CPDReqEnergyTransferMode>;
-using EV_SEControlMode = std::variant<dt::Dynamic_SEReqControlMode, dt::Scheduled_SEReqControlMode>;
+using EvTransferLimits = std::variant<dt::DC_CPDReqEnergyTransferMode, dt::BPT_DC_CPDReqEnergyTransferMode>;
+using EvSEControlMode = std::variant<dt::Dynamic_SEReqControlMode, dt::Scheduled_SEReqControlMode>;
 
 struct Callbacks {
     std::function<void(Signal)> signal;
@@ -61,9 +61,9 @@ struct Callbacks {
     std::function<void(const std::string&)> evccid;
     std::function<void(const std::string&)> selected_protocol;
 
-    std::function<void(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
-                       const dt::MobilityNeedsMode&, const EVSE_TransferLimits&, const EV_TransferLimits&,
-                       const EV_SEControlMode&)>
+    std::function<void(const dt::ServiceCategory&, const std::optional<dt::AcConnector>&, const dt::ControlMode&,
+                       const dt::MobilityNeedsMode&, const EvseTransferLimits&, const EvTransferLimits&,
+                       const EvSEControlMode&)>
         notify_ev_charging_needs;
 };
 
@@ -81,9 +81,9 @@ public:
     void evcc_id(const std::string&) const;
     void selected_protocol(const std::string&) const;
 
-    void notify_ev_charging_needs(const dt::ServiceCategory&, const dt::AcConnector&, const dt::ControlMode&,
-                                  const dt::MobilityNeedsMode&, const feedback::EVSE_TransferLimits&,
-                                  const feedback::EV_TransferLimits&, const feedback::EV_SEControlMode&) const;
+    void notify_ev_charging_needs(const dt::ServiceCategory&, const std::optional<dt::AcConnector>&, const dt::ControlMode&,
+                                  const dt::MobilityNeedsMode&, const feedback::EvseTransferLimits&,
+                                  const feedback::EvTransferLimits&, const feedback::EvSEControlMode&) const;
 
 private:
     feedback::Callbacks callbacks;
