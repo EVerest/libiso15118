@@ -44,8 +44,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        d20::EVSessionInfo out_info;
-        const auto res = d20::state::handle_request(req, d20::Session(), evse_setup.dc_limits, out_info);
+        const auto res = d20::state::handle_request(req, d20::Session(), evse_setup.dc_limits);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == dt::ResponseCode::FAILED_UnknownSession);
@@ -89,8 +88,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        d20::EVSessionInfo out_info;
-        const auto res = d20::state::handle_request(req, session, evse_setup.dc_limits, out_info);
+        const auto res = d20::state::handle_request(req, session, evse_setup.dc_limits);
 
         THEN("ResponseCode: FAILED_WrongChargeParameter, mandatory fields should be set") {
             REQUIRE(res.response_code == dt::ResponseCode::FAILED_WrongChargeParameter);
@@ -110,8 +108,6 @@ SCENARIO("DC charge parameter discovery state handling") {
             REQUIRE(transfer_mode.min_voltage.value == 0);
             REQUIRE(transfer_mode.min_voltage.exponent == 0);
             REQUIRE(transfer_mode.power_ramp_limit.has_value() == false);
-
-            REQUIRE(std::holds_alternative<DC_ModeReq>(out_info.ev_transfer_limits));
         }
     }
 
@@ -139,8 +135,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        d20::EVSessionInfo out_info;
-        const auto res = d20::state::handle_request(req, session, evse_setup.dc_limits, out_info);
+        const auto res = d20::state::handle_request(req, session, evse_setup.dc_limits);
 
         THEN("ResponseCode: FAILED_WrongChargeParameter, mandatory fields should be set") {
             REQUIRE(res.response_code == dt::ResponseCode::FAILED_WrongChargeParameter);
@@ -190,8 +185,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        d20::EVSessionInfo out_info;
-        const auto res = d20::state::handle_request(req, session, dc_limits, out_info);
+        const auto res = d20::state::handle_request(req, session, dc_limits);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
@@ -250,8 +244,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        d20::EVSessionInfo out_info;
-        const auto res = d20::state::handle_request(req, session, dc_limits, out_info);
+        const auto res = d20::state::handle_request(req, session, dc_limits);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
@@ -279,8 +272,6 @@ SCENARIO("DC charge parameter discovery state handling") {
             REQUIRE(transfer_mode.max_discharge_current.exponent == 0);
             REQUIRE(transfer_mode.min_discharge_current.value == 0);
             REQUIRE(transfer_mode.min_discharge_current.exponent == 0);
-
-            REQUIRE(std::holds_alternative<BPT_DC_ModeReq>(out_info.ev_transfer_limits));
         }
     }
 
@@ -313,8 +304,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        d20::EVSessionInfo out_info{};
-        const auto res = d20::state::handle_request(req, session, dc_limits, out_info);
+        const auto res = d20::state::handle_request(req, session, dc_limits);
 
         THEN("ResponseCode: FAILED, mandatory fields should be set") {
             REQUIRE(res.response_code == dt::ResponseCode::FAILED);
@@ -334,8 +324,6 @@ SCENARIO("DC charge parameter discovery state handling") {
             REQUIRE(transfer_mode.min_voltage.value == 0);
             REQUIRE(transfer_mode.min_voltage.exponent == 0);
             REQUIRE(transfer_mode.power_ramp_limit.has_value() == false);
-
-            REQUIRE(std::holds_alternative<DC_ModeReq>(out_info.ev_transfer_limits));
         }
     }
 

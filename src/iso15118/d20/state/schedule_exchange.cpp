@@ -144,11 +144,11 @@ Result ScheduleExchange::feed(Event ev) {
         }
 
         // TODO(ioan): prepare for AC transfer limits
-        const session::feedback::EVSE_TransferLimits& evse_limits = m_ctx.session_config.dc_limits;
-        const session::feedback::EV_TransferLimits& ev_limits = m_ctx.session_ev_info.ev_transfer_limits;
+        const session::feedback::EvseTransferLimits& evse_limits = m_ctx.session_config.dc_limits;
+        const session::feedback::EvTransferLimits& ev_limits = m_ctx.session_ev_info.ev_transfer_limits;
 
         // TODO: send and transform
-        const session::feedback::EV_SEControlMode control_mode = req->control_mode;
+        const session::feedback::EvSEControlMode control_mode = req->control_mode;
 
         // Send the charging feedback
         this->m_ctx.feedback.notify_ev_charging_needs(
