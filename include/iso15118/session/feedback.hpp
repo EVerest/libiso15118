@@ -81,9 +81,10 @@ public:
     void evcc_id(const std::string&) const;
     void selected_protocol(const std::string&) const;
 
-    void notify_ev_charging_needs(const dt::ServiceCategory&, const std::optional<dt::AcConnector>&, const dt::ControlMode&,
-                                  const dt::MobilityNeedsMode&, const feedback::EvseTransferLimits&,
-                                  const feedback::EvTransferLimits&, const feedback::EvSEControlMode&) const;
+    void notify_ev_charging_needs(const dt::ServiceCategory&, const std::optional<dt::AcConnector>&,
+                                  const dt::ControlMode&, const dt::MobilityNeedsMode&,
+                                  const feedback::EvseTransferLimits&, const feedback::EvTransferLimits&,
+                                  const feedback::EvSEControlMode&) const;
 
 private:
     feedback::Callbacks callbacks;

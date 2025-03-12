@@ -12,6 +12,6 @@ namespace iso15118::d20::state {
 
 message_20::DC_ChargeParameterDiscoveryResponse
 handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const d20::Session& session,
-               const d20::DcTransferLimits& dc_limits, d20::EVSessionInfo& out_ev_session_info);
+               const d20::DcTransferLimits& dc_limit);
 
 } // namespace iso15118::d20::state

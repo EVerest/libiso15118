@@ -44,7 +44,7 @@ template <> void convert(BPT_DC_ModeRes& out, const d20::DcTransferLimits& in) {
 
 message_20::DC_ChargeParameterDiscoveryResponse
 handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const d20::Session& session,
-               const d20::DcTransferLimits& dc_limits, EVSessionInfo& out_ev_session_info) {
+               const d20::DcTransferLimits& dc_limits) {
 
     message_20::DC_ChargeParameterDiscoveryResponse res;
 
@@ -59,9 +59,6 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
             return response_with_code(res, dt::ResponseCode::FAILED_WrongChargeParameter);
         }
 
-        // Extract info from the EV
-        out_ev_session_info.ev_transfer_limits.emplace<DC_ModeReq>(std::get<DC_ModeReq>(req.transfer_mode));
-
         auto& mode = res.transfer_mode.emplace<DC_ModeRes>();
         convert(mode, dc_limits);
 
@@ -74,9 +71,6 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
             logf_error("Transfer mode is BPT, but only dc limits without discharge limits are provided!");
             return response_with_code(res, dt::ResponseCode::FAILED);
         }
-
-        // Extract info from the EV
-        out_ev_session_info.ev_transfer_limits.emplace<BPT_DC_ModeReq>(std::get<BPT_DC_ModeReq>(req.transfer_mode));
 
         auto& mode = res.transfer_mode.emplace<BPT_DC_ModeRes>();
         convert(mode, dc_limits);
@@ -111,6 +105,9 @@ Result DC_ChargeParameterDiscovery::feed(Event ev) {
             dc_max_limits.power = dt::from_RationalNumber(mode->max_charge_power);
 
             logf_info("Max charge current %fA", dt::from_RationalNumber(mode->max_charge_current));
+
+            // Set EV transfer limits
+            m_ctx.session_ev_info.ev_transfer_limits.emplace<DC_ModeReq>(*mode);
         } else if (const auto* mode = std::get_if<BPT_DC_ModeReq>(&req->transfer_mode)) {
             dc_max_limits.current = dt::from_RationalNumber(mode->max_charge_current);
             dc_max_limits.voltage = dt::from_RationalNumber(mode->max_voltage);
@@ -118,9 +115,12 @@ Result DC_ChargeParameterDiscovery::feed(Event ev) {
 
             logf_info("Max charge current %fA", dt::from_RationalNumber(mode->max_charge_current));
             logf_info("Max discharge current %fA", dt::from_RationalNumber(mode->max_discharge_current));
+
+            // Set EV transfer limits
+            m_ctx.session_ev_info.ev_transfer_limits.emplace<BPT_DC_ModeReq>(*mode);
         }
 
-        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config.dc_limits, m_ctx.session_ev_info);
+        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config.dc_limits);
 
         m_ctx.respond(res);
 
