@@ -138,7 +138,7 @@ Result ScheduleExchange::feed(Event ev) {
 
         // We will pass the raw data to the listener, the
         // listener will construct the full required type
-        dt::AcConnector ac_connector = dt::AcConnector::SinglePhase;
+        std::optional<dt::AcConnector> ac_connector{};
         if (std::holds_alternative<dt::AcConnector>(selected_services.selected_connector)) {
             ac_connector = std::get<dt::AcConnector>(selected_services.selected_connector);
         }
