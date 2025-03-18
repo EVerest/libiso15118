@@ -12,7 +12,7 @@
 #include <iso15118/detail/d20/context_helper.hpp>
 #include <iso15118/detail/d20/state/session_setup.hpp>
 #include <iso15118/detail/helper.hpp>
-#include <iso15118/detail/io/sha_hash.hpp>
+#include <iso15118/io/sha_hash.hpp>
 
 namespace iso15118::d20::state {
 
