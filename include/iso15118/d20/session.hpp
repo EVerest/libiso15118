@@ -9,7 +9,7 @@
 #include <variant>
 #include <vector>
 
-#include <iso15118/detail/io/sha_hash.hpp>
+#include <iso15118/io/sha_hash.hpp>
 #include <iso15118/message/common_types.hpp>
 
 namespace iso15118::d20 {
