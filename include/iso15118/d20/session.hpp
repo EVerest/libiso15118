@@ -59,6 +59,7 @@ struct SelectedVasParameter {
 };
 
 // TODO(SL): How to handle d2 pause? Move Struct to a seperate header file?
+// TODO(SL): Missing handling scheduletuple in schedule mode [V2G20-1058]
 struct PauseContext {
     io::sha512_hash_t vehicle_cert_session_id_hash{};
     std::array<uint8_t, 8> old_session_id{};
