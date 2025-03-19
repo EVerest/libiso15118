@@ -39,10 +39,7 @@ public:
     void push_control_event(const d20::ControlEvent&);
 
     bool is_finished() const {
-        if (ctx.session_stopped or ctx.session_paused) {
-            return true;
-        }
-        return false;
+        return (ctx.session_stopped or ctx.session_paused);
     }
 
 private:
