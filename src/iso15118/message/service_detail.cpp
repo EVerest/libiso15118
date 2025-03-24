@@ -134,7 +134,7 @@ template <> void convert(const struct iso20_ServiceDetailResType& in, ServiceDet
             const auto& in_parameter = in_parameter_set.Parameter.array[t];
             datatypes::Parameter out_parameter;
 
-            out_parameter.name = std::string(in_parameter.Name.characters, in_parameter.Name.charactersLen);
+            out_parameter.name = CB2CPP_STRING(in_parameter.Name);
             if (in_parameter.boolValue_isUsed) {
                 out_parameter.value = in_parameter.boolValue;
             } else if (in_parameter.byteValue_isUsed) {
@@ -145,7 +145,7 @@ template <> void convert(const struct iso20_ServiceDetailResType& in, ServiceDet
                 out_parameter.value = in_parameter.intValue;
             } else if (in_parameter.finiteString_isUsed) {
                 out_parameter.value =
-                    std::string(in_parameter.finiteString.characters, in_parameter.finiteString.charactersLen);
+                    CB2CPP_STRING(in_parameter.finiteString);
             } else if (in_parameter.rationalNumber_isUsed) {
                 out_parameter.value =
                     datatypes::RationalNumber{in_parameter.rationalNumber.Value, in_parameter.rationalNumber.Exponent};
