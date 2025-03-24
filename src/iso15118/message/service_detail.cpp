@@ -144,8 +144,7 @@ template <> void convert(const struct iso20_ServiceDetailResType& in, ServiceDet
             } else if (in_parameter.intValue_isUsed) {
                 out_parameter.value = in_parameter.intValue;
             } else if (in_parameter.finiteString_isUsed) {
-                out_parameter.value =
-                    CB2CPP_STRING(in_parameter.finiteString);
+                out_parameter.value = CB2CPP_STRING(in_parameter.finiteString);
             } else if (in_parameter.rationalNumber_isUsed) {
                 out_parameter.value =
                     datatypes::RationalNumber{in_parameter.rationalNumber.Value, in_parameter.rationalNumber.Exponent};
