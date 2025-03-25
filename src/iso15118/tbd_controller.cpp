@@ -93,6 +93,12 @@ void TbdController::update_dc_limits(const d20::DcTransferLimits& limits) {
     }
 }
 
+void TbdController::update_energy_modes(const std::vector<message_20::datatypes::ServiceCategory>& modes) {
+    evse_setup.supported_energy_services = modes;
+
+    // TODO: push to control event
+}
+
 void TbdController::handle_sdp_server_input() {
     auto request = sdp_server->get_peer_request();
 
