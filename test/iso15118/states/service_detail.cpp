@@ -448,7 +448,7 @@ SCENARIO("Service detail state handling") {
         }
     }
 
-    // GIVEN("Bad Case - sequence error") {} // todo(sl): not here
+    // GIVEN("Bad Case - sequence error") {} // TODO(sl): not here
 
     // GIVEN("Performance Timeout") {} // TODO(sl): not here
 

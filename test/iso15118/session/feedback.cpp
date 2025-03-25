@@ -229,6 +229,8 @@ SCENARIO("Feedback Tests") {
         }
     }
 
+    // TODO(SL): Missing tests for notify_ev_charging_needs, selected_service_parameters
+
     struct SupportedAppProtocol {
         std::string protocol_namespace;
         uint32_t version_number_major;
