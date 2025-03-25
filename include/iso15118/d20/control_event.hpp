@@ -10,6 +10,9 @@
 #include <iso15118/d20/limits.hpp>
 
 namespace iso15118::d20 {
+
+namespace dt = message_20::datatypes;
+
 class CableCheckFinished {
 public:
     explicit CableCheckFinished(bool success_) : success(success_) {
@@ -67,7 +70,9 @@ private:
     bool pause;
 };
 
+using EnergyServices = std::vector<dt::ServiceCategory>;
+
 using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse, StopCharging,
-                                  PauseCharging, DcTransferLimits, UpdateDynamicModeParameters>;
+                                  PauseCharging, DcTransferLimits, UpdateDynamicModeParameters, EnergyServices>;
 
 } // namespace iso15118::d20
