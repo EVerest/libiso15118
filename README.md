@@ -23,7 +23,7 @@ The following table shows the current support for the listed EVSE ISO15118-20 fe
 | Scheduled Mode                     | :heavy_check_mark: |
 | Dynamic Mode (+ MobilityNeedsMode) | :heavy_check_mark: |
 | Private Env                        |                    |
-| Pause/Resume                       | :heavy_check_mark: |
+| Pause/Resume                       | :heavy_check_mark: (dynamic mode) |
 | Standby                            |                    |
 | Schedule Renegotation              |                    |
 | Smart Charging                     |                    |
