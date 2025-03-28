@@ -17,8 +17,7 @@ SCENARIO("ISO15118-20 session setup state transitions") {
 
     // Move to helper function?
     const auto evse_id = std::string("everest se");
-    const std::vector<dt::ServiceCategory> supported_energy_services = {
-        dt::ServiceCategory::DC};
+    const std::vector<dt::ServiceCategory> supported_energy_services = {dt::ServiceCategory::DC};
     const auto cert_install{false};
     const std::vector<dt::Authorization> auth_services = {dt::Authorization::EIM};
     const d20::DcTransferLimits dc_limits;
