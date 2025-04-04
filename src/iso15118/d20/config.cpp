@@ -72,7 +72,8 @@ SessionConfig::SessionConfig(EvseSetupConfig config) :
     authorization_services(std::move(config.authorization_services)),
     supported_energy_transfer_services(std::move(config.supported_energy_services)),
     dc_limits(std::move(config.dc_limits)),
-    supported_control_mobility_modes(std::move(config.control_mobility_modes)) {
+    supported_control_mobility_modes(std::move(config.control_mobility_modes)),
+    custom_protocol(std::move(config.custom_protocol)) {
 
     const auto is_bpt_service = [](dt::ServiceCategory service) { return service == dt::ServiceCategory::DC_BPT; };
     const auto dc_bpt_found = std::any_of(supported_energy_transfer_services.begin(),
