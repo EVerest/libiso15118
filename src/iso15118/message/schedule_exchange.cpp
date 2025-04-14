@@ -122,6 +122,8 @@ template <> void convert(const struct iso20_PriceLevelScheduleType& in, datatype
     out.time_anchor = in.TimeAnchor;
     out.price_schedule_id = in.PriceScheduleID;
     out.number_of_price_levels = in.NumberOfPriceLevels;
+    CB2CPP_STRING_IF_USED(in.Id, out.id);
+    CB2CPP_STRING_IF_USED(in.PriceScheduleDescription, out.price_schedule_description);
     out.price_level_schedule_entries.reserve(in.PriceLevelScheduleEntries.PriceLevelScheduleEntry.arrayLen);
     for (auto i = 0; i < in.PriceLevelScheduleEntries.PriceLevelScheduleEntry.arrayLen; ++i) {
         const auto& entry_in = in.PriceLevelScheduleEntries.PriceLevelScheduleEntry.array[i];
@@ -166,13 +168,9 @@ template <> void convert(const struct iso20_OverstayRuleType& in, datatypes::Ove
 
 template <> void convert(const struct iso20_AbsolutePriceScheduleType& in, datatypes::AbsolutePriceSchedule& out) {
     out.time_anchor = in.TimeAnchor;
-    if (in.Id_isUsed) {
-        out.id = CB2CPP_STRING(in.Id);
-    }
+    CB2CPP_STRING_IF_USED(in.Id, out.id);
     out.price_schedule_id = in.PriceScheduleID;
-    if (in.PriceScheduleDescription_isUsed) {
-        out.price_schedule_description = CB2CPP_STRING(in.PriceScheduleDescription);
-    }
+    CB2CPP_STRING_IF_USED(in.PriceScheduleDescription, out.price_schedule_description);
     out.currency = CB2CPP_STRING(in.Currency);
     out.language = CB2CPP_STRING(in.Language);
     out.price_algorithm = CB2CPP_STRING(in.PriceAlgorithm);
@@ -226,24 +224,13 @@ template <> void convert(const struct iso20_AbsolutePriceScheduleType& in, datat
 
 template <> void convert(const struct iso20_PowerScheduleType& in, datatypes::PowerSchedule& out) {
     out.time_anchor = in.TimeAnchor;
-    if (in.AvailableEnergy_isUsed) {
-        CB2CPP_CONVERT_IF_USED(in.AvailableEnergy, out.available_energy);
-    }
-    if (in.PowerTolerance_isUsed) {
-        CB2CPP_CONVERT_IF_USED(in.PowerTolerance, out.power_tolerance);
-    }
+    CB2CPP_CONVERT_IF_USED(in.AvailableEnergy, out.available_energy);
+    CB2CPP_CONVERT_IF_USED(in.PowerTolerance, out.power_tolerance);
     out.entries.reserve(in.PowerScheduleEntries.PowerScheduleEntry.arrayLen);
     for (auto i = 0; i < in.PowerScheduleEntries.PowerScheduleEntry.arrayLen; ++i) {
         const auto& entry_in = in.PowerScheduleEntries.PowerScheduleEntry.array[i];
         auto& entry_out = out.entries.emplace_back();
-        entry_out.duration = entry_in.Duration;
-        convert(entry_in.Power, entry_out.power);
-        if (entry_in.Power_L2_isUsed) {
-            CB2CPP_CONVERT_IF_USED(entry_in.Power_L2, entry_out.power_l2);
-        }
-        if (entry_in.Power_L3_isUsed) {
-            CB2CPP_CONVERT_IF_USED(entry_in.Power_L3, entry_out.power_l3);
-        }
+        convert(entry_in, entry_out);
     }
 }
 
@@ -254,9 +241,10 @@ template <> void convert(const struct iso20_ChargingScheduleType& in, datatypes:
     } else if (in.PriceLevelSchedule_isUsed) {
         auto& out_price_level_schedule = out.price_schedule.emplace<datatypes::PriceLevelSchedule>();
         convert(in.PriceLevelSchedule, out_price_level_schedule);
+    } else {
+        out.price_schedule.emplace<std::monostate>();
     }
     convert(in.PowerSchedule, out.power_schedule);
-    out.power_schedule.time_anchor = in.PowerSchedule.TimeAnchor;
 }
 
 template <> void convert(const struct iso20_ScheduleTupleType& in, datatypes::ScheduleTuple& out) {
@@ -290,6 +278,8 @@ void convert(const struct iso20_Dynamic_SEResControlModeType& in, datatypes::Dyn
     } else if (in.PriceLevelSchedule_isUsed) {
         auto& out_price_level_schedule = out.price_schedule.emplace<datatypes::PriceLevelSchedule>();
         convert(in.PriceLevelSchedule, out_price_level_schedule);
+    } else {
+        out.price_schedule.emplace<std::monostate>();
     }
 }
 
@@ -297,12 +287,7 @@ template <> void convert(const struct iso20_ScheduleExchangeResType& in, Schedul
     convert(in.Header, out.header);
     cb_convert_enum(in.ResponseCode, out.response_code);
     cb_convert_enum(in.EVSEProcessing, out.processing);
-
-    if (in.GoToPause_isUsed) {
-        out.go_to_pause = in.GoToPause;
-    } else {
-        out.go_to_pause = false;
-    }
+    CB2CPP_ASSIGN_IF_USED(in.GoToPause, out.go_to_pause);
 
     if (in.Dynamic_SEResControlMode_isUsed) {
         auto& mode_out = out.control_mode.emplace<datatypes::Dynamic_SEResControlMode>();
@@ -641,8 +626,8 @@ template <> void convert(const datatypes::EVEnergyOffer& in, struct iso20_EVEner
     convert(in.absolute_price_schedule, out.EVAbsolutePriceSchedule);
 }
 
-struct ModeResponseVisitor2 {
-    ModeResponseVisitor2(iso20_ScheduleExchangeReqType& req_) : req(req_){};
+struct ModeRequestVisitor {
+    ModeRequestVisitor(iso20_ScheduleExchangeReqType& req_) : req(req_){};
     void operator()(const datatypes::Dynamic_SEReqControlMode& in) {
         init_iso20_Dynamic_SEReqControlModeType(&req.Dynamic_SEReqControlMode);
         CB_SET_USED(req.Dynamic_SEReqControlMode);
@@ -682,7 +667,7 @@ template <> void convert(const ScheduleExchangeRequest& in, iso20_ScheduleExchan
 
     out.MaximumSupportingPoints = in.max_supporting_points;
 
-    std::visit(ModeResponseVisitor2(out), in.control_mode);
+    std::visit(ModeRequestVisitor(out), in.control_mode);
 
     convert(in.header, out.Header);
 }
