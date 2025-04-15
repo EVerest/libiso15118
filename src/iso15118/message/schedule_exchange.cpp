@@ -145,9 +145,7 @@ template <> void convert(const struct iso20_PriceRuleType& in, datatypes::PriceR
 
 template <> void convert(const struct iso20_TaxRuleType& in, datatypes::TaxRule& out) {
     out.tax_rule_id = in.TaxRuleID;
-    if (in.TaxRuleName_isUsed) {
-        out.tax_rule_name = CB2CPP_STRING(in.TaxRuleName);
-    }
+    CB2CPP_STRING_IF_USED(in.TaxRuleName, out.tax_rule_name);
     convert(in.TaxRate, out.tax_rate);
     CB2CPP_ASSIGN_IF_USED(in.TaxIncludedInPrice, out.tax_included_in_price);
     out.applies_to_energy_fee = in.AppliesToEnergyFee;
@@ -158,9 +156,7 @@ template <> void convert(const struct iso20_TaxRuleType& in, datatypes::TaxRule&
 
 template <> void convert(const struct iso20_OverstayRuleType& in, datatypes::OverstayRule& out) {
     out.start_time = in.StartTime;
-    if (in.OverstayRuleDescription_isUsed) {
-        out.overstay_rule_description = CB2CPP_STRING(in.OverstayRuleDescription);
-    }
+    CB2CPP_STRING_IF_USED(in.OverstayRuleDescription, out.overstay_rule_description);
     convert(in.OverstayFee, out.overstay_fee);
     out.overstay_fee_period = in.OverstayFeePeriod;
     convert(in.OverstayFee, out.overstay_fee);
