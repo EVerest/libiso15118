@@ -77,11 +77,14 @@ void convert(const struct iso20_dc_DC_ChargeParameterDiscoveryResType& in, DC_Ch
 
     cb_convert_enum(in.ResponseCode, out.response_code);
 
-    auto& out_mode = std::get<DC_ModeRes>(out.transfer_mode);
-    convert(in.DC_CPDResEnergyTransferMode, out_mode);
-    if (in.BPT_DC_CPDResEnergyTransferMode_isUsed) {
-        auto& out_bpt_mode = std::get<BPT_DC_ModeRes>(out.transfer_mode);
-        convert(in.BPT_DC_CPDResEnergyTransferMode, out_bpt_mode);
+    if (in.DC_CPDResEnergyTransferMode_isUsed) {
+        auto& mode_out = out.transfer_mode.emplace<DC_ModeRes>();
+        convert(in.DC_CPDResEnergyTransferMode, mode_out);
+    } else if (in.BPT_DC_CPDResEnergyTransferMode_isUsed) {
+        auto& mode_out = out.transfer_mode.emplace<BPT_DC_ModeRes>();
+        convert(in.BPT_DC_CPDResEnergyTransferMode, mode_out);
+    } else {
+        // FIXME (SL): fail, should not happen!
     }
     convert(in.Header, out.header);
 }
