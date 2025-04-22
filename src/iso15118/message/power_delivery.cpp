@@ -159,7 +159,6 @@ template <> void convert(const PowerDeliveryRequest& in, iso20_PowerDeliveryReqT
     convert(in.header, out.Header);
 }
 
-
 template <> void insert_type(VariantAccess& va, const struct iso20_PowerDeliveryReqType& in) {
     va.insert_type<PowerDeliveryRequest>(in);
 };
@@ -179,6 +178,5 @@ template <> size_t serialize(const PowerDeliveryRequest& in, const io::StreamOut
     return serialize_helper(in, out);
 }
 // End conversion for serializing a PowerDeliveryRequest (EVside)
-
 
 } // namespace iso15118::message_20
