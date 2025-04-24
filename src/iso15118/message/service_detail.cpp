@@ -91,7 +91,7 @@ ParameterSet::ParameterSet(uint16_t _id, const DcBptParameterList& list) {
 
 ParameterSet::ParameterSet(uint16_t _id, const McsParameterList& list) {
     id = _id;
-    //Connector
+    // Connector
     auto& connector = parameter.emplace_back();
     connector.name = "Connector";
     connector.value = static_cast<int32_t>(list.connector);

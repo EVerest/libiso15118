@@ -127,9 +127,9 @@ SCENARIO("Schedule Exchange state handling") {
     }
 
     GIVEN("Good case - MCS Dynamic Mode") {
-        d20::SelectedServiceParameters service_parameters =
-            d20::SelectedServiceParameters(dt::ServiceCategory::MCS, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
-                                           dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
+        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+            dt::ServiceCategory::MCS, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
+            dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
         auto session = d20::Session(service_parameters);
 
