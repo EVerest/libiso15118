@@ -576,9 +576,9 @@ SCENARIO("DC charge loop state handling") {
     }
 
     GIVEN("Good case - MCS dynamic mode") {
-        d20::SelectedServiceParameters service_parameters =
-            d20::SelectedServiceParameters(dt::ServiceCategory::MCS, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
-                                           dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
+        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+            dt::ServiceCategory::MCS, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
+            dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing);
 
         d20::Session session = d20::Session(service_parameters);
 
@@ -671,9 +671,9 @@ SCENARIO("DC charge loop state handling") {
     }
 
     GIVEN("Good case - MCS dynamic mode, mobility_needs_mode = 2") {
-        d20::SelectedServiceParameters service_parameters =
-            d20::SelectedServiceParameters(dt::ServiceCategory::MCS, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
-                                           dt::MobilityNeedsMode::ProvidedBySecc, dt::Pricing::NoPricing);
+        d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
+            dt::ServiceCategory::MCS, dt::DcConnector::Extended, dt::ControlMode::Dynamic,
+            dt::MobilityNeedsMode::ProvidedBySecc, dt::Pricing::NoPricing);
 
         d20::Session session = d20::Session(service_parameters);
 
