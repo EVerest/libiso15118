@@ -11,6 +11,7 @@
 
 namespace iso15118::message_20 {
 
+// Begin DC_ChargeLoopRequest Deserialization (EVSEside)
 template <> void convert(const struct iso20_dc_DisplayParametersType& in, datatypes::DisplayParameters& out) {
     CB2CPP_ASSIGN_IF_USED(in.PresentSOC, out.present_soc);
     CB2CPP_ASSIGN_IF_USED(in.MinimumSOC, out.min_soc);
@@ -114,10 +115,84 @@ template <> void convert(const struct iso20_dc_DC_ChargeLoopReqType& in, DC_Char
         assert(false);
     }
 }
+// End DC_ChargeLoopRequest Deserialization (EVSEside)
 
-template <> void insert_type(VariantAccess& va, const struct iso20_dc_DC_ChargeLoopReqType& in) {
-    va.insert_type<DC_ChargeLoopRequest>(in);
+// Begin DC_ChargeLoopResponse Deserialization (EVside)
+template <typename InType> void convert(const InType& in, datatypes::Scheduled_DC_CLResControlMode& out) {
+
+    CB2CPP_CONVERT_IF_USED(in.EVSEMaximumChargePower, out.max_charge_power);
+    CB2CPP_CONVERT_IF_USED(in.EVSEMinimumChargePower, out.min_charge_power);
+    CB2CPP_CONVERT_IF_USED(in.EVSEMaximumChargeCurrent, out.max_charge_current);
+    CB2CPP_CONVERT_IF_USED(in.EVSEMaximumVoltage, out.max_voltage);
 }
+
+template <>
+void convert(const struct iso20_dc_BPT_Scheduled_DC_CLResControlModeType& in,
+             datatypes::BPT_Scheduled_DC_CLResControlMode& out) {
+    convert(in, static_cast<datatypes::Scheduled_DC_CLResControlMode&>(out));
+    CB2CPP_CONVERT_IF_USED(in.EVSEMaximumDischargePower, out.max_discharge_power);
+    CB2CPP_CONVERT_IF_USED(in.EVSEMinimumDischargePower, out.min_discharge_power);
+    CB2CPP_CONVERT_IF_USED(in.EVSEMaximumDischargeCurrent, out.max_discharge_current);
+    CB2CPP_CONVERT_IF_USED(in.EVSEMinimumVoltage, out.min_voltage);
+}
+
+// FIXME (rb): this should go to common.cpp
+template <typename InType> void convert(const InType& in, datatypes::Dynamic_CLResControlMode& out) {
+    CB2CPP_ASSIGN_IF_USED(in.DepartureTime, out.departure_time);
+    CB2CPP_ASSIGN_IF_USED(in.MinimumSOC, out.minimum_soc);
+    CB2CPP_ASSIGN_IF_USED(in.TargetSOC, out.target_soc);
+    CB2CPP_ASSIGN_IF_USED(in.AckMaxDelay, out.ack_max_delay);
+}
+
+template <typename InType> void convert(const InType& in, datatypes::Dynamic_DC_CLResControlMode& out) {
+    static_assert(std::is_same_v<InType, iso20_dc_Dynamic_DC_CLResControlModeType> or
+                  std::is_same_v<InType, iso20_dc_BPT_Dynamic_DC_CLResControlModeType>);
+    convert(in, static_cast<datatypes::Dynamic_CLResControlMode&>(out));
+    convert(in.EVSEMaximumChargePower, out.max_charge_power);
+    convert(in.EVSEMinimumChargePower, out.min_charge_power);
+    convert(in.EVSEMaximumChargeCurrent, out.max_charge_current);
+    convert(in.EVSEMaximumVoltage, out.max_voltage);
+}
+
+template <>
+void convert(const struct iso20_dc_BPT_Dynamic_DC_CLResControlModeType& in,
+             datatypes::BPT_Dynamic_DC_CLResControlMode& out) {
+    convert(in, static_cast<datatypes::Dynamic_DC_CLResControlMode&>(out));
+    convert(in.EVSEMaximumDischargePower, out.max_discharge_power);
+    convert(in.EVSEMinimumDischargePower, out.min_discharge_power);
+    convert(in.EVSEMaximumDischargeCurrent, out.max_discharge_current);
+    convert(in.EVSEMinimumVoltage, out.min_voltage);
+}
+
+template <> void convert(const struct iso20_dc_DC_ChargeLoopResType& in, DC_ChargeLoopResponse& out) {
+    cb_convert_enum(in.ResponseCode, out.response_code);
+    convert(in.EVSEPresentVoltage, out.present_voltage);
+    convert(in.EVSEPresentCurrent, out.present_current);
+    out.current_limit_achieved = in.EVSECurrentLimitAchieved;
+    out.power_limit_achieved = in.EVSEPowerLimitAchieved;
+    out.voltage_limit_achieved = in.EVSEVoltageLimitAchieved;
+    convert(in.Header, out.header);
+    if (in.Scheduled_DC_CLResControlMode_isUsed) {
+        convert(in.Scheduled_DC_CLResControlMode, out.control_mode.emplace<datatypes::Scheduled_DC_CLResControlMode>());
+    } else if (in.BPT_Scheduled_DC_CLResControlMode_isUsed) {
+        convert(in.BPT_Scheduled_DC_CLResControlMode,
+                out.control_mode.emplace<datatypes::BPT_Scheduled_DC_CLResControlMode>());
+    } else if (in.Dynamic_DC_CLResControlMode_isUsed) {
+        convert(in.Dynamic_DC_CLResControlMode, out.control_mode.emplace<datatypes::Dynamic_DC_CLResControlMode>());
+    } else if (in.BPT_Dynamic_DC_CLResControlMode_isUsed) {
+        convert(in.BPT_Dynamic_DC_CLResControlMode,
+                out.control_mode.emplace<datatypes::BPT_Dynamic_DC_CLResControlMode>());
+    } else {
+        // should not happen
+        assert(false);
+    }
+}
+// End DC_ChargeLoopResponse Deserialization (EVside)
+
+// Begin DC_ChargeLoopResponse Serialization (EVSEside)
+template <> void insert_type(VariantAccess& va, const struct iso20_dc_DC_ChargeLoopResType& in) {
+    va.insert_type<DC_ChargeLoopResponse>(in);
+};
 
 template <> void convert(const datatypes::DetailedCost& in, struct iso20_dc_DetailedCostType& out) {
     init_iso20_dc_DetailedCostType(&out);
@@ -149,14 +224,14 @@ template <> void convert(const datatypes::Receipt& in, struct iso20_dc_ReceiptTy
     out.TaxCosts.arrayLen = in.tax_costs.size();
 }
 
-template <typename cb_Type> void convert(const datatypes::Scheduled_DC_CLResControlMode& in, cb_Type& out) {
+template <typename InType> void convert(const datatypes::Scheduled_DC_CLResControlMode& in, InType& out) {
     CPP2CB_CONVERT_IF_USED(in.max_charge_power, out.EVSEMaximumChargePower);
     CPP2CB_CONVERT_IF_USED(in.min_charge_power, out.EVSEMinimumChargePower);
     CPP2CB_CONVERT_IF_USED(in.max_charge_current, out.EVSEMaximumChargeCurrent);
     CPP2CB_CONVERT_IF_USED(in.max_voltage, out.EVSEMaximumVoltage);
 }
 
-template <typename cb_Type> void convert(const datatypes::Dynamic_CLResControlMode& in, cb_Type& out) {
+template <typename InType> void convert(const datatypes::Dynamic_CLResControlMode& in, InType& out) {
     CPP2CB_ASSIGN_IF_USED(in.departure_time, out.DepartureTime);
     CPP2CB_ASSIGN_IF_USED(in.minimum_soc, out.MinimumSOC);
     CPP2CB_ASSIGN_IF_USED(in.target_soc, out.TargetSOC);
@@ -174,7 +249,7 @@ void convert(const datatypes::BPT_Scheduled_DC_CLResControlMode& in,
     CPP2CB_CONVERT_IF_USED(in.min_voltage, out.EVSEMinimumVoltage);
 }
 
-template <typename cb_Type> void convert(const datatypes::Dynamic_DC_CLResControlMode& in, cb_Type& out) {
+template <typename InType> void convert(const datatypes::Dynamic_DC_CLResControlMode& in, InType& out) {
     convert(static_cast<const datatypes::Dynamic_CLResControlMode&>(in), out);
 
     convert(in.max_charge_power, out.EVSEMaximumChargePower);
@@ -263,5 +338,130 @@ template <> int serialize_to_exi(const DC_ChargeLoopResponse& in, exi_bitstream_
 template <> size_t serialize(const DC_ChargeLoopResponse& in, const io::StreamOutputView& out) {
     return serialize_helper(in, out);
 }
+// End DC_ChargeLoopResponse Serialization (EVSEside)
+
+// Begin DC_ChargeLoopRequest Serialization (EVside)
+template <> void insert_type(VariantAccess& va, const struct iso20_dc_DC_ChargeLoopReqType& in) {
+    va.insert_type<DC_ChargeLoopRequest>(in);
+}
+
+template <> void convert(const datatypes::DisplayParameters& in, struct iso20_dc_DisplayParametersType& out) {
+    init_iso20_dc_DisplayParametersType(&out);
+    CPP2CB_ASSIGN_IF_USED(in.present_soc, out.PresentSOC);
+    CPP2CB_ASSIGN_IF_USED(in.min_soc, out.MinimumSOC);
+    CPP2CB_ASSIGN_IF_USED(in.target_soc, out.TargetSOC);
+    CPP2CB_ASSIGN_IF_USED(in.max_soc, out.MaximumSOC);
+    CPP2CB_ASSIGN_IF_USED(in.remaining_time_to_min_soc, out.RemainingTimeToMinimumSOC);
+    CPP2CB_ASSIGN_IF_USED(in.remaining_time_to_target_soc, out.RemainingTimeToTargetSOC);
+    CPP2CB_ASSIGN_IF_USED(in.remaining_time_to_max_soc, out.RemainingTimeToMaximumSOC);
+    CPP2CB_ASSIGN_IF_USED(in.charging_complete, out.ChargingComplete);
+    CPP2CB_CONVERT_IF_USED(in.battery_energy_capacity, out.BatteryEnergyCapacity);
+    CPP2CB_ASSIGN_IF_USED(in.inlet_hot, out.InletHot);
+}
+
+template <typename InType> void convert(const datatypes::Scheduled_DC_CLReqControlMode& in, InType& out) {
+
+    CPP2CB_CONVERT_IF_USED(in.max_charge_current, out.EVMaximumChargeCurrent);
+    CPP2CB_CONVERT_IF_USED(in.max_charge_power, out.EVMaximumChargePower);
+    CPP2CB_CONVERT_IF_USED(in.min_charge_power, out.EVMinimumChargePower);
+    CPP2CB_CONVERT_IF_USED(in.min_charge_power, out.EVMinimumChargePower);
+    convert(in.target_current, out.EVTargetCurrent);
+    convert(in.target_voltage, out.EVTargetVoltage);
+    CPP2CB_CONVERT_IF_USED(in.max_voltage, out.EVMaximumVoltage);
+    CPP2CB_CONVERT_IF_USED(in.min_voltage, out.EVMinimumVoltage);
+    CPP2CB_CONVERT_IF_USED(in.target_energy_request, out.EVTargetEnergyRequest);
+    CPP2CB_CONVERT_IF_USED(in.max_energy_request, out.EVMaximumEnergyRequest);
+    CPP2CB_CONVERT_IF_USED(in.min_energy_request, out.EVMinimumEnergyRequest);
+}
+template <>
+void convert(const datatypes::BPT_Scheduled_DC_CLReqControlMode& in,
+             struct iso20_dc_BPT_Scheduled_DC_CLReqControlModeType& out) {
+    convert(static_cast<const datatypes::Scheduled_DC_CLReqControlMode&>(in), out);
+    CPP2CB_CONVERT_IF_USED(in.max_discharge_power, out.EVMaximumDischargePower);
+    CPP2CB_CONVERT_IF_USED(in.min_discharge_power, out.EVMinimumDischargePower);
+    CPP2CB_CONVERT_IF_USED(in.max_discharge_current, out.EVMaximumDischargeCurrent);
+}
+template <typename InType> void convert(const datatypes::Dynamic_DC_CLReqControlMode& in, InType& out) {
+    convert(in.max_charge_power, out.EVMaximumChargePower);
+    convert(in.min_charge_power, out.EVMinimumChargePower);
+    convert(in.max_charge_current, out.EVMaximumChargeCurrent);
+    convert(in.max_voltage, out.EVMaximumVoltage);
+    convert(in.min_voltage, out.EVMinimumVoltage);
+    convert(in.target_energy_request, out.EVTargetEnergyRequest);
+    convert(in.max_energy_request, out.EVMaximumEnergyRequest);
+    convert(in.min_energy_request, out.EVMinimumEnergyRequest);
+}
+template <>
+void convert(const datatypes::BPT_Dynamic_DC_CLReqControlMode& in,
+             struct iso20_dc_BPT_Dynamic_DC_CLReqControlModeType& out) {
+    convert(static_cast<const datatypes::Dynamic_DC_CLReqControlMode&>(in), out);
+    convert(in.max_discharge_power, out.EVMaximumDischargePower);
+    convert(in.min_discharge_power, out.EVMinimumDischargePower);
+    convert(in.max_discharge_current, out.EVMaximumDischargeCurrent);
+}
+
+struct ControlModeVisitor2 {
+    using ScheduledCM = datatypes::Scheduled_DC_CLReqControlMode;
+    using BPT_ScheduledCM = datatypes::BPT_Scheduled_DC_CLReqControlMode;
+    using DynamicCM = datatypes::Dynamic_DC_CLReqControlMode;
+    using BPT_DynamicCM = datatypes::BPT_Dynamic_DC_CLReqControlMode;
+
+    ControlModeVisitor2(iso20_dc_DC_ChargeLoopReqType& req_) : req(req_){};
+    void operator()(const ScheduledCM& in) {
+        auto& out = req.Scheduled_DC_CLReqControlMode;
+        init_iso20_dc_Scheduled_DC_CLReqControlModeType(&out);
+        convert(in, out);
+        CB_SET_USED(req.Scheduled_DC_CLReqControlMode);
+    }
+    void operator()(const BPT_ScheduledCM& in) {
+        auto& out = req.BPT_Scheduled_DC_CLReqControlMode;
+        init_iso20_dc_BPT_Scheduled_DC_CLReqControlModeType(&out);
+        convert(in, out);
+        CB_SET_USED(req.BPT_Scheduled_DC_CLReqControlMode);
+    }
+    void operator()(const DynamicCM& in) {
+        auto& out = req.Dynamic_DC_CLReqControlMode;
+        init_iso20_dc_Dynamic_DC_CLReqControlModeType(&out);
+        convert(in, out);
+        CB_SET_USED(req.Dynamic_DC_CLReqControlMode);
+    }
+    void operator()(const BPT_DynamicCM& in) {
+        auto& out = req.BPT_Dynamic_DC_CLReqControlMode;
+        init_iso20_dc_BPT_Dynamic_DC_CLReqControlModeType(&out);
+        convert(in, out);
+        CB_SET_USED(req.BPT_Dynamic_DC_CLReqControlMode);
+    }
+
+private:
+    iso20_dc_DC_ChargeLoopReqType& req;
+};
+
+template <> void convert(const DC_ChargeLoopRequest& in, iso20_dc_DC_ChargeLoopReqType& out) {
+    init_iso20_dc_DC_ChargeLoopReqType(&out);
+
+    // RDB TODO Handle the various options in the request
+    out.MeterInfoRequested = in.meter_info_requested;
+    convert(in.present_voltage, out.EVPresentVoltage);
+    CPP2CB_CONVERT_IF_USED(in.display_parameters, out.DisplayParameters);
+    std::visit(ControlModeVisitor2{out}, in.control_mode);
+    convert(in.header, out.Header);
+}
+
+template <> int serialize_to_exi(const DC_ChargeLoopRequest& in, exi_bitstream_t& out) {
+    iso20_dc_exiDocument doc;
+    init_iso20_dc_exiDocument(&doc);
+
+    CB_SET_USED(doc.DC_ChargeLoopReq);
+
+    convert(in, doc.DC_ChargeLoopReq);
+
+    return encode_iso20_dc_exiDocument(&out, &doc);
+}
+
+template <> size_t serialize(const DC_ChargeLoopRequest& in, const io::StreamOutputView& out) {
+    return serialize_helper(in, out);
+}
+
+// End DC_ChargeLoopRequest Serialization (EVside)
 
 } // namespace iso15118::message_20
