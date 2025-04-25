@@ -400,13 +400,13 @@ void convert(const datatypes::BPT_Dynamic_DC_CLReqControlMode& in,
     convert(in.max_discharge_current, out.EVMaximumDischargeCurrent);
 }
 
-struct ControlModeVisitor2 {
+struct RequestControlModeVisitor {
     using ScheduledCM = datatypes::Scheduled_DC_CLReqControlMode;
     using BPT_ScheduledCM = datatypes::BPT_Scheduled_DC_CLReqControlMode;
     using DynamicCM = datatypes::Dynamic_DC_CLReqControlMode;
     using BPT_DynamicCM = datatypes::BPT_Dynamic_DC_CLReqControlMode;
 
-    ControlModeVisitor2(iso20_dc_DC_ChargeLoopReqType& req_) : req(req_){};
+    RequestControlModeVisitor(iso20_dc_DC_ChargeLoopReqType& req_) : req(req_){};
     void operator()(const ScheduledCM& in) {
         auto& out = req.Scheduled_DC_CLReqControlMode;
         init_iso20_dc_Scheduled_DC_CLReqControlModeType(&out);
@@ -443,7 +443,7 @@ template <> void convert(const DC_ChargeLoopRequest& in, iso20_dc_DC_ChargeLoopR
     out.MeterInfoRequested = in.meter_info_requested;
     convert(in.present_voltage, out.EVPresentVoltage);
     CPP2CB_CONVERT_IF_USED(in.display_parameters, out.DisplayParameters);
-    std::visit(ControlModeVisitor2{out}, in.control_mode);
+    std::visit(RequestControlModeVisitor{out}, in.control_mode);
     convert(in.header, out.Header);
 }
 
@@ -460,7 +460,7 @@ template <> int serialize_to_exi(const DC_ChargeLoopRequest& in, exi_bitstream_t
 
 template <> size_t serialize(const DC_ChargeLoopRequest& in, const io::StreamOutputView& out) {
     return serialize_helper(in, out);
-}
+ }
 
 // End DC_ChargeLoopRequest Serialization (EVside)
 
