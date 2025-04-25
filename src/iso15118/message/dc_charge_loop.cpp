@@ -460,7 +460,7 @@ template <> int serialize_to_exi(const DC_ChargeLoopRequest& in, exi_bitstream_t
 
 template <> size_t serialize(const DC_ChargeLoopRequest& in, const io::StreamOutputView& out) {
     return serialize_helper(in, out);
- }
+}
 
 // End DC_ChargeLoopRequest Serialization (EVside)
 
