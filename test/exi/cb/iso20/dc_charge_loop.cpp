@@ -182,6 +182,11 @@ SCENARIO("Se/Deserialize dc charge loop messages") {
             REQUIRE(dt::from_RationalNumber(msg.present_current) == 1);
             REQUIRE(dt::from_RationalNumber(msg.present_voltage) == 400);
             REQUIRE(std::holds_alternative<message_20::datatypes::Scheduled_DC_CLResControlMode>(msg.control_mode));
+            const auto& control_mode = std::get<message_20::datatypes::Scheduled_DC_CLResControlMode>(msg.control_mode);
+            REQUIRE(control_mode.max_charge_current.has_value() == false);
+            REQUIRE(control_mode.max_charge_power.has_value() == false);
+            REQUIRE(control_mode.max_voltage.has_value() == false);
+            REQUIRE(control_mode.min_charge_power.has_value() == false);
         }
     }
 }

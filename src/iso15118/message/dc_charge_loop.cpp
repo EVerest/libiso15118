@@ -6,6 +6,9 @@
 
 #include <iso15118/detail/variant_access.hpp>
 
+#include <cbv2g/iso_20/iso20_CommonMessages_Decoder.h>
+#include <cbv2g/iso_20/iso20_CommonMessages_Encoder.h>
+
 #include <cbv2g/iso_20/iso20_DC_Decoder.h>
 #include <cbv2g/iso_20/iso20_DC_Encoder.h>
 
@@ -164,6 +167,33 @@ void convert(const struct iso20_dc_BPT_Dynamic_DC_CLResControlModeType& in,
     convert(in.EVSEMinimumVoltage, out.min_voltage);
 }
 
+template <> void convert(const struct iso20_dc_DetailedCostType& in, datatypes::DetailedCost& out) {
+    convert(in.Amount, out.amount);
+    convert(in.CostPerUnit, out.cost_per_unit);
+}
+
+template <> void convert(const struct iso20_dc_DetailedTaxType& in, datatypes::DetailedTax& out) {
+    out.tax_rule_id = in.TaxRuleID;
+    convert(in.Amount, out.amount);
+}
+
+template <> void convert(const struct iso20_dc_ReceiptType& in, datatypes::Receipt& out) {
+    out.time_anchor = in.TimeAnchor;
+    CB2CPP_CONVERT_IF_USED(in.EnergyCosts, out.energy_costs);
+    CB2CPP_CONVERT_IF_USED(in.OccupancyCosts, out.occupancy_costs);
+    CB2CPP_CONVERT_IF_USED(in.AdditionalServicesCosts, out.additional_service_costs);
+    CB2CPP_CONVERT_IF_USED(in.OverstayCosts, out.overstay_costs);
+
+    // todo (rb): TaxCosts should be optional as far as I can tell.
+    if (sizeof(in.TaxCosts.array) < out.tax_costs.size()) {
+        throw std::runtime_error("tax costs array is too large");
+    }
+    for (std::size_t i = 0; i < in.TaxCosts.arrayLen; ++i) {
+        convert(in.TaxCosts.array[i], out.tax_costs[i]);
+    }
+    out.tax_costs.resize(in.TaxCosts.arrayLen);
+}
+
 template <> void convert(const struct iso20_dc_DC_ChargeLoopResType& in, DC_ChargeLoopResponse& out) {
     cb_convert_enum(in.ResponseCode, out.response_code);
     convert(in.EVSEPresentVoltage, out.present_voltage);
@@ -171,6 +201,9 @@ template <> void convert(const struct iso20_dc_DC_ChargeLoopResType& in, DC_Char
     out.current_limit_achieved = in.EVSECurrentLimitAchieved;
     out.power_limit_achieved = in.EVSEPowerLimitAchieved;
     out.voltage_limit_achieved = in.EVSEVoltageLimitAchieved;
+    CB2CPP_CONVERT_IF_USED(in.EVSEStatus, out.status);
+    CB2CPP_CONVERT_IF_USED(in.MeterInfo, out.meter_info);
+    CB2CPP_CONVERT_IF_USED(in.Receipt, out.receipt);
     convert(in.Header, out.header);
     if (in.Scheduled_DC_CLResControlMode_isUsed) {
         convert(in.Scheduled_DC_CLResControlMode, out.control_mode.emplace<datatypes::Scheduled_DC_CLResControlMode>());
@@ -211,7 +244,7 @@ template <> void convert(const datatypes::Receipt& in, struct iso20_dc_ReceiptTy
 
     out.TimeAnchor = in.time_anchor;
     CPP2CB_CONVERT_IF_USED(in.energy_costs, out.EnergyCosts);
-    CPP2CB_CONVERT_IF_USED(in.occupany_costs, out.OccupancyCosts);
+    CPP2CB_CONVERT_IF_USED(in.occupancy_costs, out.OccupancyCosts);
     CPP2CB_CONVERT_IF_USED(in.additional_service_costs, out.AdditionalServicesCosts);
     CPP2CB_CONVERT_IF_USED(in.overstay_costs, out.OverstayCosts);
 
@@ -224,14 +257,14 @@ template <> void convert(const datatypes::Receipt& in, struct iso20_dc_ReceiptTy
     out.TaxCosts.arrayLen = in.tax_costs.size();
 }
 
-template <typename InType> void convert(const datatypes::Scheduled_DC_CLResControlMode& in, InType& out) {
+template <typename OutType> void convert(const datatypes::Scheduled_DC_CLResControlMode& in, OutType& out) {
     CPP2CB_CONVERT_IF_USED(in.max_charge_power, out.EVSEMaximumChargePower);
     CPP2CB_CONVERT_IF_USED(in.min_charge_power, out.EVSEMinimumChargePower);
     CPP2CB_CONVERT_IF_USED(in.max_charge_current, out.EVSEMaximumChargeCurrent);
     CPP2CB_CONVERT_IF_USED(in.max_voltage, out.EVSEMaximumVoltage);
 }
 
-template <typename InType> void convert(const datatypes::Dynamic_CLResControlMode& in, InType& out) {
+template <typename OutType> void convert(const datatypes::Dynamic_CLResControlMode& in, OutType& out) {
     CPP2CB_ASSIGN_IF_USED(in.departure_time, out.DepartureTime);
     CPP2CB_ASSIGN_IF_USED(in.minimum_soc, out.MinimumSOC);
     CPP2CB_ASSIGN_IF_USED(in.target_soc, out.TargetSOC);
@@ -249,7 +282,7 @@ void convert(const datatypes::BPT_Scheduled_DC_CLResControlMode& in,
     CPP2CB_CONVERT_IF_USED(in.min_voltage, out.EVSEMinimumVoltage);
 }
 
-template <typename InType> void convert(const datatypes::Dynamic_DC_CLResControlMode& in, InType& out) {
+template <typename OutType> void convert(const datatypes::Dynamic_DC_CLResControlMode& in, OutType& out) {
     convert(static_cast<const datatypes::Dynamic_CLResControlMode&>(in), out);
 
     convert(in.max_charge_power, out.EVSEMaximumChargePower);
@@ -359,20 +392,25 @@ template <> void convert(const datatypes::DisplayParameters& in, struct iso20_dc
     CPP2CB_ASSIGN_IF_USED(in.inlet_hot, out.InletHot);
 }
 
-template <typename InType> void convert(const datatypes::Scheduled_DC_CLReqControlMode& in, InType& out) {
+template <typename OutType> void convert(const datatypes::Scheduled_CLReqControlMode& in, OutType& out) {
+    CPP2CB_CONVERT_IF_USED(in.target_energy_request, out.EVTargetEnergyRequest);
+    CPP2CB_CONVERT_IF_USED(in.max_energy_request, out.EVMaximumEnergyRequest);
+    CPP2CB_CONVERT_IF_USED(in.min_energy_request, out.EVMinimumEnergyRequest);
+}
 
+template <typename OutType> void convert(const datatypes::Scheduled_DC_CLReqControlMode& in, OutType& out) {
+    static_assert(std::is_same_v<OutType, iso20_dc_Scheduled_DC_CLReqControlModeType> or
+                  std::is_same_v<OutType, iso20_dc_BPT_Scheduled_DC_CLReqControlModeType>);
+    convert(static_cast<const datatypes::Scheduled_CLReqControlMode&>(in), out);
     CPP2CB_CONVERT_IF_USED(in.max_charge_current, out.EVMaximumChargeCurrent);
     CPP2CB_CONVERT_IF_USED(in.max_charge_power, out.EVMaximumChargePower);
-    CPP2CB_CONVERT_IF_USED(in.min_charge_power, out.EVMinimumChargePower);
     CPP2CB_CONVERT_IF_USED(in.min_charge_power, out.EVMinimumChargePower);
     convert(in.target_current, out.EVTargetCurrent);
     convert(in.target_voltage, out.EVTargetVoltage);
     CPP2CB_CONVERT_IF_USED(in.max_voltage, out.EVMaximumVoltage);
     CPP2CB_CONVERT_IF_USED(in.min_voltage, out.EVMinimumVoltage);
-    CPP2CB_CONVERT_IF_USED(in.target_energy_request, out.EVTargetEnergyRequest);
-    CPP2CB_CONVERT_IF_USED(in.max_energy_request, out.EVMaximumEnergyRequest);
-    CPP2CB_CONVERT_IF_USED(in.min_energy_request, out.EVMinimumEnergyRequest);
 }
+
 template <>
 void convert(const datatypes::BPT_Scheduled_DC_CLReqControlMode& in,
              struct iso20_dc_BPT_Scheduled_DC_CLReqControlModeType& out) {
@@ -381,16 +419,25 @@ void convert(const datatypes::BPT_Scheduled_DC_CLReqControlMode& in,
     CPP2CB_CONVERT_IF_USED(in.min_discharge_power, out.EVMinimumDischargePower);
     CPP2CB_CONVERT_IF_USED(in.max_discharge_current, out.EVMaximumDischargeCurrent);
 }
-template <typename InType> void convert(const datatypes::Dynamic_DC_CLReqControlMode& in, InType& out) {
+
+template <typename OutType> void convert(const datatypes::Dynamic_CLReqControlMode& in, OutType& out) {
+    convert(in.target_energy_request, out.EVTargetEnergyRequest);
+    convert(in.max_energy_request, out.EVMaximumEnergyRequest);
+    convert(in.min_energy_request, out.EVMinimumEnergyRequest);
+    CPP2CB_ASSIGN_IF_USED(in.departure_time, out.DepartureTime);
+}
+
+template <typename OutType> void convert(const datatypes::Dynamic_DC_CLReqControlMode& in, OutType& out) {
+    static_assert(std::is_same_v<OutType, iso20_dc_Dynamic_DC_CLReqControlModeType> or
+                  std::is_same_v<OutType, iso20_dc_BPT_Dynamic_DC_CLReqControlModeType>);
+    convert(static_cast<const datatypes::Dynamic_CLReqControlMode&>(in), out);
     convert(in.max_charge_power, out.EVMaximumChargePower);
     convert(in.min_charge_power, out.EVMinimumChargePower);
     convert(in.max_charge_current, out.EVMaximumChargeCurrent);
     convert(in.max_voltage, out.EVMaximumVoltage);
     convert(in.min_voltage, out.EVMinimumVoltage);
-    convert(in.target_energy_request, out.EVTargetEnergyRequest);
-    convert(in.max_energy_request, out.EVMaximumEnergyRequest);
-    convert(in.min_energy_request, out.EVMinimumEnergyRequest);
 }
+
 template <>
 void convert(const datatypes::BPT_Dynamic_DC_CLReqControlMode& in,
              struct iso20_dc_BPT_Dynamic_DC_CLReqControlModeType& out) {
@@ -398,6 +445,8 @@ void convert(const datatypes::BPT_Dynamic_DC_CLReqControlMode& in,
     convert(in.max_discharge_power, out.EVMaximumDischargePower);
     convert(in.min_discharge_power, out.EVMinimumDischargePower);
     convert(in.max_discharge_current, out.EVMaximumDischargeCurrent);
+    CPP2CB_CONVERT_IF_USED(in.max_v2x_energy_request, out.EVMaximumV2XEnergyRequest);
+    CPP2CB_CONVERT_IF_USED(in.min_v2x_energy_request, out.EVMinimumV2XEnergyRequest);
 }
 
 struct RequestControlModeVisitor {
@@ -439,7 +488,6 @@ private:
 template <> void convert(const DC_ChargeLoopRequest& in, iso20_dc_DC_ChargeLoopReqType& out) {
     init_iso20_dc_DC_ChargeLoopReqType(&out);
 
-    // RDB TODO Handle the various options in the request
     out.MeterInfoRequested = in.meter_info_requested;
     convert(in.present_voltage, out.EVPresentVoltage);
     CPP2CB_CONVERT_IF_USED(in.display_parameters, out.DisplayParameters);
