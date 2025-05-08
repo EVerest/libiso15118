@@ -35,16 +35,15 @@ bool session_is_zero(const message_20::datatypes::SessionId& session_id) {
 io::sha512_hash_t calculate_new_cert_session_id_hash(const io::sha512_hash_t& vehicle_cert_hash,
                                                      const message_20::datatypes::SessionId& session_id) {
     io::sha512_hash_t session_id_vehicle_hash{};
-    std::array<std::uint8_t, 64 + 8> concated_session_id_vehicle{};
+    std::array<std::uint8_t, 64 + 8> concatenated_session_id_vehicle{};
 
-    std::copy(session_id.begin(), session_id.end(), concated_session_id_vehicle.begin());
+    std::copy(session_id.begin(), session_id.end(), concatenated_session_id_vehicle.begin());
     std::copy(vehicle_cert_hash.begin(), vehicle_cert_hash.end(),
-              concated_session_id_vehicle.begin() + session_id.size());
+              concatenated_session_id_vehicle.begin() + session_id.size());
 
     unsigned int digestlen{0};
 
-    // Note(SL): Move to helper file?
-    const auto result = EVP_Digest(concated_session_id_vehicle.data(), concated_session_id_vehicle.size(),
+    const auto result = EVP_Digest(concatenated_session_id_vehicle.data(), concatenated_session_id_vehicle.size(),
                                    session_id_vehicle_hash.data(), &digestlen, EVP_sha512(), nullptr);
     if (not result) {
         logf_error("X509_digest failed");

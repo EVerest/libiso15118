@@ -56,15 +56,15 @@ private:
 
 class PauseCharging {
 public:
-    explicit PauseCharging(bool stop_) : stop(stop_) {
+    explicit PauseCharging(bool pause_) : pause(pause_) {
     }
 
     operator bool() const {
-        return stop;
+        return pause;
     }
 
 private:
-    bool stop;
+    bool pause;
 };
 
 using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse, StopCharging,

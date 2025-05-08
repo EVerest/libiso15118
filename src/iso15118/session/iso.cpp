@@ -229,7 +229,7 @@ void Session::handle_connection_event(io::ConnectionEvent event) {
     case Event::OPEN:
         assert(state.connected);
         if (const auto new_vehicle_cert_hash = connection->get_vehicle_cert_hash()) {
-            logf_info("Vehicle Cert is avaible");
+            logf_info("Vehicle Cert is available");
             ctx.set_new_vehicle_cert_hash(new_vehicle_cert_hash);
         }
         // NOTE (aw): for now, we don't really need this information ...
