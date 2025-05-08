@@ -105,7 +105,6 @@ Result SessionSetup::feed(Event ev) {
             if (pause_ctx.vehicle_cert_session_id_hash == new_vehicle_cert_session_hash) {
                 logf_info("Old session resumed with session_id: %s",
                           session_id_to_string(req->header.session_id).c_str());
-                m_ctx.session_resumed = true;
                 m_ctx.session = Session(pause_ctx);
             } else {
                 m_ctx.session = Session();

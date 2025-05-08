@@ -112,7 +112,6 @@ public:
 
     bool session_stopped{false};
     bool session_paused{false};
-    bool session_resumed{false};
 
 private:
     const std::optional<ControlEvent>& current_control_event;
