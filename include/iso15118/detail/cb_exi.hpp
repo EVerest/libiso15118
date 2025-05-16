@@ -69,7 +69,7 @@
 
 #define CB2CPP_BYTES_IF_USED(in, out)                                                                                  \
     if (in##_isUsed) {                                                                                                 \
-        CB2CPP_BYTES(in, out);                                                                                         \
+        CB2CPP_BYTES(in, out.emplace());                                                                                         \
     }
 
 template <typename T1, typename T2> void cb_convert_enum(const T1& in, T2& out) {

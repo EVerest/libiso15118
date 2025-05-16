@@ -118,7 +118,7 @@ void convert_meterinfo_inverse(const cb_MeterInfoType& in, datatypes::MeterInfo&
     CB2CPP_ASSIGN_IF_USED(in.BPT_DischargedEnergyReadingWh, out.bpt_discharged_energy_reading_wh);
     CB2CPP_ASSIGN_IF_USED(in.BPT_InductiveEnergyReadingVARh, out.bpt_inductive_energy_reading_varh);
     CB2CPP_ASSIGN_IF_USED(in.CapacitiveEnergyReadingVARh, out.capacitive_energy_reading_varh);
-    CB2CPP_BYTES_IF_USED(in.MeterSignature, out.meter_signature.value());
+    CB2CPP_BYTES_IF_USED(in.MeterSignature, out.meter_signature);
     CB2CPP_ASSIGN_IF_USED(in.MeterStatus, out.meter_status);
     CB2CPP_ASSIGN_IF_USED(in.MeterTimestamp, out.meter_timestamp);
 }
