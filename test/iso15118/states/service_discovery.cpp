@@ -73,7 +73,7 @@ SCENARIO("Service discovery state handling") {
 
         const auto res = d20::state::handle_request(req, session, supported_energy_transfer_services, {});
 
-        THEN("ResponseCode: OK, energy_transfer_service_list: DC & DC_WPT, vaslist: empty") {
+        THEN("ResponseCode: OK, energy_transfer_service_list: MCS & MCS_BPT, vaslist: empty") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
             REQUIRE(res.service_renegotiation_supported == false);
             REQUIRE(res.energy_transfer_service_list.size() == 2);
