@@ -33,6 +33,8 @@ template <> void convert(const SessionStopRequest& in, iso20_SessionStopReqType&
     init_iso20_SessionStopReqType(&out);
 
     cb_convert_enum(in.charging_session, out.ChargingSession);
+    CPP2CB_STRING_IF_USED(in.ev_termination_code, out.EVTerminationCode);
+    CPP2CB_STRING_IF_USED(in.ev_termination_explanation, out.EVTerminationExplanation);
 
     convert(in.header, out.Header);
 }
