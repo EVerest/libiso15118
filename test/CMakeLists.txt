@@ -24,5 +24,5 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
         EXECUTABLE ctest
     )
 else()
-    message(WARNING "Code coverage is disabled when building with clang")
+    message(WARNING "Code coverage is disabled when not building with gcc")
 endif()
