@@ -78,6 +78,8 @@ static void handle_main(VariantAccess& va) {
         insert_type(va, doc.PowerDeliveryRes);
     } else if (doc.SessionStopReq_isUsed) {
         insert_type(va, doc.SessionStopReq);
+    } else if (doc.SessionStopRes_isUsed) {
+        insert_type(va, doc.SessionStopRes);
     } else {
         va.error = "chosen message type unhandled";
     }
@@ -107,8 +109,12 @@ static void handle_dc(VariantAccess& va) {
         insert_type(va, doc.DC_PreChargeRes);
     } else if (doc.DC_ChargeLoopReq_isUsed) {
         insert_type(va, doc.DC_ChargeLoopReq);
+    } else if (doc.DC_ChargeLoopRes_isUsed) {
+        insert_type(va, doc.DC_ChargeLoopRes);
     } else if (doc.DC_WeldingDetectionReq_isUsed) {
         insert_type(va, doc.DC_WeldingDetectionReq);
+    } else if (doc.DC_WeldingDetectionRes_isUsed) {
+        insert_type(va, doc.DC_WeldingDetectionRes);
     } else {
         va.error = "chosen message type unhandled";
     }
