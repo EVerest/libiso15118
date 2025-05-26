@@ -8,6 +8,7 @@
 #include <string>
 #include <tuple>
 
+#include <iso15118/d20/timeout.hpp>
 #include <iso15118/message/payload_type.hpp>
 #include <iso15118/message/variant.hpp>
 #include <iso15118/session/feedback.hpp>
@@ -76,7 +77,7 @@ class Context {
 public:
     // FIXME (aw): bundle arguments
     Context(session::feedback::Callbacks, session::SessionLogger&, d20::SessionConfig, std::optional<PauseContext>&,
-            const std::optional<ControlEvent>&, MessageExchange&);
+            const std::optional<ControlEvent>&, MessageExchange&, Timeouts&);
 
     template <typename StateType, typename... Args> BasePointerType create_state(Args&&... args) {
         return std::make_unique<StateType>(*this, std::forward<Args>(args)...);
@@ -117,6 +118,21 @@ public:
         return vehicle_cert_hash;
     }
 
+    void start_timeout(d20::TimeoutType type, uint32_t time_ms) {
+        timeouts.start_timeout(type, time_ms);
+    }
+
+    void stop_timeout(d20::TimeoutType type) {
+        timeouts.stop_timeout(type);
+    }
+
+    d20::TimeoutType const* get_active_timeout() {
+        if (not current_timeout.has_value()) {
+            return nullptr;
+        }
+        return &current_timeout.value();
+    }
+
     const session::Feedback feedback;
 
     session::SessionLogger& log;
@@ -134,11 +150,15 @@ public:
     bool session_stopped{false};
     bool session_paused{false};
 
+    std::optional<TimeoutType> current_timeout; // TODO(SL): Set this to private
+
 private:
     const std::optional<ControlEvent>& current_control_event;
     MessageExchange& message_exchange;
 
     std::optional<io::sha512_hash_t> vehicle_cert_hash{std::nullopt};
+
+    Timeouts& timeouts;
 };
 
 } // namespace iso15118::d20
