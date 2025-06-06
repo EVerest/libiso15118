@@ -3,6 +3,7 @@
 #include <ctime>
 
 #include <iso15118/d20/state/dc_cable_check.hpp>
+#include <iso15118/d20/state/power_delivery.hpp>
 #include <iso15118/d20/state/schedule_exchange.hpp>
 
 #include <iso15118/detail/d20/context_helper.hpp>
@@ -59,12 +60,17 @@ namespace dt = message_20::datatypes;
 
 message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleExchangeRequest& req,
                                                     const d20::Session& session, const dt::RationalNumber& max_power,
-                                                    const UpdateDynamicModeParameters& dynamic_parameters) {
+                                                    const UpdateDynamicModeParameters& dynamic_parameters,
+                                                    bool timeout_reached) {
 
     message_20::ScheduleExchangeResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
+    }
+
+    if (timeout_reached) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
     }
 
     const auto selected_services = session.get_selected_services();
@@ -118,6 +124,14 @@ Result ScheduleExchange::feed(Event ev) {
         return {};
     }
 
+    if (ev == Event::TIMEOUT) {
+        const auto timeout = m_ctx.get_active_timeout();
+        if (timeout and *timeout == d20::TimeoutType::ONGOING) {
+            timeout_ongoing_reached = true;
+        }
+        return {};
+    }
+
     if (ev != Event::V2GTP_MESSAGE) {
         return {};
     }
@@ -125,6 +139,12 @@ Result ScheduleExchange::feed(Event ev) {
     const auto variant = m_ctx.pull_request();
 
     if (const auto req = variant->get_if<message_20::ScheduleExchangeRequest>()) {
+
+        if (first_req_msg) {
+            // TODO(SL): For ExternalPayment the timeout should at least 3 mins?
+            m_ctx.start_timeout(d20::TimeoutType::ONGOING, 55000); // TODO(sl): Adding const
+            first_req_msg = false;
+        }
 
         dt::RationalNumber max_charge_power = {0, 0};
 
@@ -138,15 +158,20 @@ Result ScheduleExchange::feed(Event ev) {
             max_charge_power = m_ctx.session_config.dc_limits.charge_limits.power.max;
         }
 
-        // We will pass the raw data to the listener, the
-        // listener will construct the full required type
         std::optional<dt::AcConnector> ac_connector{};
         if (std::holds_alternative<dt::AcConnector>(selected_services.selected_connector)) {
             ac_connector = std::get<dt::AcConnector>(selected_services.selected_connector);
         }
 
-        // TODO(ioan): prepare for AC transfer limits
-        const session::feedback::EvseTransferLimits& evse_limits = m_ctx.session_config.dc_limits;
+        session::feedback::EvseTransferLimits evse_limits;
+        if (selected_energy_service == dt::ServiceCategory::AC ||
+            selected_energy_service == dt::ServiceCategory::AC_BPT) {
+            evse_limits = m_ctx.session_config.ac_limits;
+        } else if (selected_energy_service == dt::ServiceCategory::DC ||
+                   selected_energy_service == dt::ServiceCategory::DC_BPT) {
+            evse_limits = m_ctx.session_config.dc_limits;
+        }
+
         const session::feedback::EvTransferLimits& ev_limits = m_ctx.session_ev_info.ev_transfer_limits;
 
         const auto& control_mode = req->control_mode;
@@ -156,7 +181,8 @@ Result ScheduleExchange::feed(Event ev) {
             selected_energy_service, ac_connector, selected_services.selected_control_mode,
             selected_services.selected_mobility_needs_mode, evse_limits, ev_limits, control_mode);
 
-        const auto res = handle_request(*req, m_ctx.session, max_charge_power, dynamic_parameters);
+        const auto res =
+            handle_request(*req, m_ctx.session, max_charge_power, dynamic_parameters, timeout_ongoing_reached);
 
         m_ctx.respond(res);
 
@@ -169,7 +195,22 @@ Result ScheduleExchange::feed(Event ev) {
             return {};
         }
 
-        return m_ctx.create_state<DC_CableCheck>();
+        m_ctx.stop_timeout(d20::TimeoutType::ONGOING);
+
+        if (selected_energy_service == dt::ServiceCategory::AC ||
+            selected_energy_service == dt::ServiceCategory::AC_BPT) {
+            // For AC move directly to power delivery
+            return m_ctx.create_state<PowerDelivery>();
+        } else if (selected_energy_service == dt::ServiceCategory::DC ||
+                   selected_energy_service == dt::ServiceCategory::DC_BPT) {
+            return m_ctx.create_state<DC_CableCheck>();
+        } else {
+            m_ctx.log("expected selected_energy_service AC, AC_BPT, DC, DC_BPT! But code type id: %d",
+                      static_cast<int>(selected_energy_service));
+
+            m_ctx.session_stopped = true;
+            return {};
+        }
     } else if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {
         const auto res = handle_request(*req, m_ctx.session);
 
