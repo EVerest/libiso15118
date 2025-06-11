@@ -86,7 +86,7 @@ void set_dynamic_parameters_in_res(T& res_mode, const UpdateDynamicModeParameter
 
 message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoopRequest& req,
                                                  const d20::Session& session, const float present_voltage,
-                                                 const float present_current, const bool stop,
+                                                 const float present_current, const bool stop, const bool pause,
                                                  const DcTransferLimits& dc_limits,
                                                  const UpdateDynamicModeParameters& dynamic_parameters) {
 
@@ -105,7 +105,9 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
 
         // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
         // the charger should terminate the session
-        if (selected_control_mode != dt::ControlMode::Scheduled or selected_energy_service != dt::ServiceCategory::DC) {
+        if (selected_control_mode != dt::ControlMode::Scheduled or
+            not(selected_energy_service == dt::ServiceCategory::DC or
+                selected_energy_service == dt::ServiceCategory::MCS)) {
             return response_with_code(res, dt::ResponseCode::FAILED);
         }
 
@@ -117,7 +119,8 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
         // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
         // the charger should terminate the session
         if (selected_control_mode != dt::ControlMode::Scheduled or
-            selected_energy_service != dt::ServiceCategory::DC_BPT) {
+            not(selected_energy_service == dt::ServiceCategory::DC_BPT or
+                selected_energy_service == dt::ServiceCategory::MCS_BPT)) {
             return response_with_code(res, dt::ResponseCode::FAILED);
         }
 
@@ -133,7 +136,9 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
 
         // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
         // the charger should terminate the session
-        if (selected_control_mode != dt::ControlMode::Dynamic or selected_energy_service != dt::ServiceCategory::DC) {
+        if (selected_control_mode != dt::ControlMode::Dynamic or
+            not(selected_energy_service == dt::ServiceCategory::DC or
+                selected_energy_service == dt::ServiceCategory::MCS)) {
             return response_with_code(res, dt::ResponseCode::FAILED);
         }
 
@@ -149,7 +154,8 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
         // If the ev sends a false control mode or a false energy service other than the previous selected ones, then
         // the charger should terminate the session
         if (selected_control_mode != dt::ControlMode::Dynamic or
-            selected_energy_service != dt::ServiceCategory::DC_BPT) {
+            not(selected_energy_service == dt::ServiceCategory::DC_BPT or
+                selected_energy_service == dt::ServiceCategory::MCS_BPT)) {
             return response_with_code(res, dt::ResponseCode::FAILED);
         }
 
@@ -175,6 +181,12 @@ message_20::DC_ChargeLoopResponse handle_request(const message_20::DC_ChargeLoop
         res.status = {0, dt::EvseNotification::Terminate};
     }
 
+    if (pause) {
+        const uint16_t notification_max_delay =
+            (selected_control_mode == dt::ControlMode::Dynamic) ? 60 : 0; // [V2G20-1850]
+        res.status = {notification_max_delay, dt::EvseNotification::Pause};
+    }
+
     return response_with_code(res, dt::ResponseCode::OK);
 }
 
@@ -191,6 +203,8 @@ Result DC_ChargeLoop::feed(Event ev) {
             present_current = control_data->current;
         } else if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
             stop = *control_data;
+        } else if (const auto* control_data = m_ctx.get_control_event<PauseCharging>()) {
+            pause = *control_data;
         } else if (const auto* control_data = m_ctx.get_control_event<UpdateDynamicModeParameters>()) {
             dynamic_parameters = *control_data;
         }
@@ -219,6 +233,7 @@ Result DC_ChargeLoop::feed(Event ev) {
         first_entry_in_charge_loop = true;
 
         // Todo(sl): React properly to Start, Stop, Standby and ScheduleRenegotiation
+        // TODO(Sl): How to check if the EV wants do a pause in dynamic mode (This should not happen)
         if (req->charge_progress == dt::Progress::Stop) {
             m_ctx.feedback.signal(session::feedback::Signal::CHARGE_LOOP_FINISHED);
             m_ctx.feedback.signal(session::feedback::Signal::DC_OPEN_CONTACTOR);
@@ -232,7 +247,7 @@ Result DC_ChargeLoop::feed(Event ev) {
             first_entry_in_charge_loop = false;
         }
 
-        const auto res = handle_request(*req, m_ctx.session, present_voltage, present_current, stop,
+        const auto res = handle_request(*req, m_ctx.session, present_voltage, present_current, stop, pause,
                                         m_ctx.session_config.dc_limits, dynamic_parameters);
 
         m_ctx.respond(res);

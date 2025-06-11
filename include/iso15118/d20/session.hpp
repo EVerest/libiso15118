@@ -9,6 +9,7 @@
 #include <variant>
 #include <vector>
 
+#include <iso15118/io/sha_hash.hpp>
 #include <iso15118/message/common_types.hpp>
 
 namespace iso15118::d20 {
@@ -23,6 +24,8 @@ struct OfferedServices {
 
     std::map<uint8_t, dt::DcParameterList> dc_parameter_list;
     std::map<uint8_t, dt::DcBptParameterList> dc_bpt_parameter_list;
+    std::map<uint8_t, dt::McsParameterList> mcs_parameter_list;
+    std::map<uint8_t, dt::McsBptParameterList> mcs_bpt_parameter_list;
     std::map<uint8_t, dt::InternetParameterList> internet_parameter_list;
     std::map<uint8_t, dt::ParkingParameterList> parking_parameter_list;
 };
@@ -31,7 +34,7 @@ struct SelectedServiceParameters {
 
     dt::ServiceCategory selected_energy_service;
 
-    std::variant<dt::AcConnector, dt::DcConnector> selected_connector;
+    std::variant<dt::AcConnector, dt::DcConnector, dt::McsConnector> selected_connector;
     dt::ControlMode selected_control_mode;
     dt::MobilityNeedsMode selected_mobility_needs_mode;
     dt::Pricing selected_pricing;
@@ -43,6 +46,11 @@ struct SelectedServiceParameters {
     SelectedServiceParameters(dt::ServiceCategory energy_service_, dt::DcConnector dc_connector_,
                               dt::ControlMode control_mode_, dt::MobilityNeedsMode mobility_, dt::Pricing pricing_);
     SelectedServiceParameters(dt::ServiceCategory energy_service_, dt::DcConnector dc_connector_,
+                              dt::ControlMode control_mode_, dt::MobilityNeedsMode mobility_, dt::Pricing pricing_,
+                              dt::BptChannel channel_, dt::GeneratorMode generator_);
+    SelectedServiceParameters(dt::ServiceCategory energy_service_, dt::McsConnector mcs_connector_,
+                              dt::ControlMode control_mode_, dt::MobilityNeedsMode mobility_, dt::Pricing pricing_);
+    SelectedServiceParameters(dt::ServiceCategory energy_service_, dt::McsConnector mcs_connector_,
                               dt::ControlMode control_mode_, dt::MobilityNeedsMode mobility_, dt::Pricing pricing_,
                               dt::BptChannel channel_, dt::GeneratorMode generator_);
 };
@@ -57,13 +65,22 @@ struct SelectedVasParameter {
     dt::ParkingStatus parking_status;
 };
 
+// TODO(SL): How to handle d2 pause? Move Struct to a seperate header file?
+// TODO(SL): Missing handling scheduletuple in schedule mode [V2G20-1058]
+struct PauseContext {
+    io::sha512_hash_t vehicle_cert_session_id_hash{};
+    std::array<uint8_t, 8> old_session_id{};
+    SelectedServiceParameters selected_service_parameters{};
+};
+
 class Session {
 
-    // todo(sl): move to a common defs file
+    // TODO(sl): move to a common defs file
     static constexpr auto ID_LENGTH = 8;
 
 public:
     Session();
+    Session(const PauseContext& pause_ctx);
     Session(SelectedServiceParameters);
     Session(OfferedServices);
 

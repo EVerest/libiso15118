@@ -20,9 +20,8 @@ template <> void convert(const struct iso20_AuthorizationSetupResType& in, Autho
 
     out.authorization_services.resize(in.AuthorizationServices.arrayLen);
 
-    uint8_t element = 0;
-    for (auto const& service : in.AuthorizationServices.array) {
-        cb_convert_enum(service, out.authorization_services[element++]);
+    for (uint8_t element = 0; element < in.AuthorizationServices.arrayLen; element++) {
+        cb_convert_enum(in.AuthorizationServices.array[element], out.authorization_services.at(element));
     }
 
     out.certificate_installation_service = in.CertificateInstallationService;
@@ -33,7 +32,7 @@ template <> void convert(const struct iso20_AuthorizationSetupResType& in, Autho
         auto& pnc_out = out.authorization_mode.emplace<datatypes::PnC_ASResAuthorizationMode>();
         CB2CPP_BYTES(in.PnC_ASResAuthorizationMode.GenChallenge, pnc_out.gen_challenge);
 
-        // todo(sl): supported_providers missing
+        // TODO(sl): supported_providers missing
     }
 
     convert(in.Header, out.header);
@@ -55,7 +54,7 @@ struct AuthorizationModeVisitor {
         CB_SET_USED(out.PnC_ASResAuthorizationMode);
         init_iso20_PnC_ASResAuthorizationModeType(&out.PnC_ASResAuthorizationMode);
         CPP2CB_BYTES(in.gen_challenge, out.PnC_ASResAuthorizationMode.GenChallenge);
-        // todo(sl): supported_providers missing
+        // TODO(sl): supported_providers missing
     }
 
 private:

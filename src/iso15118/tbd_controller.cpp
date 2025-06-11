@@ -39,7 +39,8 @@ void TbdController::loop() {
 
     if (not config.enable_sdp_server) {
         auto connection = std::make_unique<io::ConnectionPlain>(poll_manager, interface_name);
-        session = std::make_unique<Session>(std::move(connection), d20::SessionConfig(evse_setup), callbacks);
+        session =
+            std::make_unique<Session>(std::move(connection), d20::SessionConfig(evse_setup), callbacks, pause_ctx);
     }
 
     auto next_event = get_current_time_point();
@@ -58,8 +59,8 @@ void TbdController::loop() {
 
                 if (not config.enable_sdp_server) {
                     auto connection = std::make_unique<io::ConnectionPlain>(poll_manager, interface_name);
-                    session =
-                        std::make_unique<Session>(std::move(connection), d20::SessionConfig(evse_setup), callbacks);
+                    session = std::make_unique<Session>(std::move(connection), d20::SessionConfig(evse_setup),
+                                                        callbacks, pause_ctx);
                 }
             }
         }
@@ -93,6 +94,14 @@ void TbdController::update_dc_limits(const d20::DcTransferLimits& limits) {
     }
 }
 
+void TbdController::update_energy_modes(const std::vector<message_20::datatypes::ServiceCategory>& modes) {
+    evse_setup.supported_energy_services = modes;
+
+    if (session) {
+        session->push_control_event(modes);
+    }
+}
+
 void TbdController::handle_sdp_server_input() {
     auto request = sdp_server->get_peer_request();
 
@@ -122,7 +131,7 @@ void TbdController::handle_sdp_server_input() {
 
     const auto ipv6_endpoint = connection->get_public_endpoint();
 
-    session = std::make_unique<Session>(std::move(connection), d20::SessionConfig(evse_setup), callbacks);
+    session = std::make_unique<Session>(std::move(connection), d20::SessionConfig(evse_setup), callbacks, pause_ctx);
 
     sdp_server->send_response(request, ipv6_endpoint);
 }
