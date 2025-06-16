@@ -22,10 +22,16 @@ handle_request(const message_20::SupportedAppProtocolRequest& req) {
         if (protocol.protocol_namespace.compare("urn:iso:std:iso:15118:-20:DC") == 0) {
             res.schema_id = protocol.schema_id;
             selected_protocol = "ISO15118-20:DC";
-            return {response_with_code(
-                        res, message_20::SupportedAppProtocolResponse::ResponseCode::OK_SuccessfulNegotiation),
-                    selected_protocol};
         }
+
+        if (protocol.protocol_namespace.compare("urn:iso:std:iso:15118:-20:AC") == 0) {
+            res.schema_id = protocol.schema_id;
+            selected_protocol = "ISO15118-20:AC";
+        }
+
+        return {
+            response_with_code(res, message_20::SupportedAppProtocolResponse::ResponseCode::OK_SuccessfulNegotiation),
+            selected_protocol};
     }
 
     return {response_with_code(res, message_20::SupportedAppProtocolResponse::ResponseCode::Failed_NoNegotiation),
