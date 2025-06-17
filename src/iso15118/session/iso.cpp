@@ -194,14 +194,17 @@ TimePoint const& Session::poll() {
         // FIXME (aw): this event loop only acts on new packets, seems to be enough for now ...
         log_packet_from_car(packet, log);
 
-        // Stop Sequence Timeout
-        timeouts.stop_timeout(d20::TimeoutType::SEQUENCE);
-
         message_exchange.set_request(make_variant_from_packet(packet));
 
         packet = {}; // reset the packet
 
         const auto request_msg_type = ctx.peek_request_type();
+
+        // There is no sequence timer before SupportedAppProtocol
+        if (request_msg_type != message_20::Type::SupportedAppProtocolReq) {
+            timeouts.stop_timeout(d20::TimeoutType::SEQUENCE);
+        }
+
         ctx.feedback.v2g_message(request_msg_type);
 
         [[maybe_unused]] const auto res = fsm.feed(d20::Event::V2GTP_MESSAGE);
@@ -230,8 +233,8 @@ TimePoint const& Session::poll() {
         std::this_thread::sleep_for(std::chrono::seconds(5));
         connection->close();
 
-        const auto signal = (ctx.session_paused) ? session::feedback::Signal::DLINK_PAUSE
-                                                     : session::feedback::Signal::DLINK_TERMINATE;
+        const auto signal =
+            (ctx.session_paused) ? session::feedback::Signal::DLINK_PAUSE : session::feedback::Signal::DLINK_TERMINATE;
         ctx.feedback.signal(signal);
     }
 
