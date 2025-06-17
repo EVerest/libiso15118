@@ -65,11 +65,11 @@ message_20::AuthorizationResponse handle_request(const message_20::Authorization
         break;
 
     case dt::Authorization::PnC:
-        // todo(SL): Handle PnC
+        // TODO(SL): Handle PnC
         break;
 
     default:
-        // todo(SL): Fill
+        // TODO(SL): Fill
         break;
     }
 
