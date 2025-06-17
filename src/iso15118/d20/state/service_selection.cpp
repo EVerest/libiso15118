@@ -16,12 +16,16 @@ namespace iso15118::d20::state {
 namespace dt = message_20::datatypes;
 
 message_20::ServiceSelectionResponse handle_request(const message_20::ServiceSelectionRequest& req,
-                                                    d20::Session& session) {
+                                                    d20::Session& session, const bool stop) {
 
     message_20::ServiceSelectionResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
+    }
+
+    if (stop) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
     }
 
     bool energy_service_found = false;
@@ -83,6 +87,16 @@ void ServiceSelection::enter() {
 
 Result ServiceSelection::feed(Event ev) {
 
+    if (ev == Event::CONTROL_MESSAGE) {
+        if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
+            stop = *control_data;
+        }
+
+        // Ignore control message
+        return {};
+
+    }
+
     if (ev != Event::V2GTP_MESSAGE) {
         return {};
     }
@@ -92,7 +106,7 @@ Result ServiceSelection::feed(Event ev) {
     if (const auto req = variant->get_if<message_20::ServiceDetailRequest>()) {
         logf_info("Requested info about ServiceID: %d", req->service);
 
-        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config);
+        const auto res = handle_request(*req, m_ctx.session, stop, m_ctx.session_config);
 
         m_ctx.respond(res);
 
@@ -103,7 +117,7 @@ Result ServiceSelection::feed(Event ev) {
 
         return {};
     } else if (const auto req = variant->get_if<message_20::ServiceSelectionRequest>()) {
-        const auto res = handle_request(*req, m_ctx.session);
+        const auto res = handle_request(*req, m_ctx.session, stop);
 
         if (res.response_code == message_20::datatypes::ResponseCode::OK) {
             const auto selected_services = m_ctx.session.get_selected_services();

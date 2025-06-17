@@ -13,13 +13,17 @@ namespace iso15118::d20::state {
 
 namespace dt = message_20::datatypes;
 
-message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetailRequest& req, d20::Session& session,
-                                                 const d20::SessionConfig& config) {
+message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetailRequest& req, d20::Session& session, 
+                                                 const bool stop, const d20::SessionConfig& config) {
 
     message_20::ServiceDetailResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
+    }
+
+    if (stop) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
     }
 
     bool service_found = false;
@@ -118,6 +122,14 @@ void ServiceDetail::enter() {
 
 Result ServiceDetail::feed(Event ev) {
 
+    if (ev == Event::CONTROL_MESSAGE) {
+        if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
+            stop = *control_data;
+        }
+        // Ignore control message
+        return {};
+    }
+
     if (ev != Event::V2GTP_MESSAGE) {
         return {};
     }
@@ -127,7 +139,7 @@ Result ServiceDetail::feed(Event ev) {
     if (const auto req = variant->get_if<message_20::ServiceDetailRequest>()) {
         logf_info("Requested info about ServiceID: %d", req->service);
 
-        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config);
+        const auto res = handle_request(*req, m_ctx.session, stop, m_ctx.session_config);
 
         m_ctx.respond(res);
 

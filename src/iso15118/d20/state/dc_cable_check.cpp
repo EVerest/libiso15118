@@ -13,12 +13,17 @@ namespace iso15118::d20::state {
 namespace dt = message_20::datatypes;
 
 message_20::DC_CableCheckResponse handle_request(const message_20::DC_CableCheckRequest& req,
-                                                 const d20::Session& session, bool cable_check_done) {
+                                                 const d20::Session& session, const bool stop, 
+                                                 bool cable_check_done) {
 
     message_20::DC_CableCheckResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
+    }
+
+    if (stop) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
     }
 
     if (not cable_check_done) {
@@ -37,6 +42,11 @@ void DC_CableCheck::enter() {
 Result DC_CableCheck::feed(Event ev) {
 
     if (ev == Event::CONTROL_MESSAGE) {
+        if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
+            m_ctx.log.enter_state("StopCharging");
+            stop = *control_data;
+        }
+
         const auto control_data = m_ctx.get_control_event<CableCheckFinished>();
         if (not control_data) {
             // Ignore control message
@@ -45,6 +55,7 @@ Result DC_CableCheck::feed(Event ev) {
 
         cable_check_done = *control_data;
 
+        // Ignore control message
         return {};
     }
 
@@ -60,7 +71,7 @@ Result DC_CableCheck::feed(Event ev) {
             cable_check_initiated = true;
         }
 
-        const auto res = handle_request(*req, m_ctx.session, cable_check_done);
+        const auto res = handle_request(*req, m_ctx.session, stop, cable_check_done);
 
         m_ctx.respond(res);
 

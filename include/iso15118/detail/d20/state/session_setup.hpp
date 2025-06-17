@@ -8,5 +8,5 @@
 namespace iso15118::d20::state {
 
 message_20::SessionSetupResponse handle_request(const message_20::SessionSetupRequest& req, const d20::Session& session,
-                                                const std::string& evse_id, bool new_session);
+                                                const std::string& evse_id, const bool stop, bool new_session);
 } // namespace iso15118::d20::state

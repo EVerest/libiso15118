@@ -17,6 +17,7 @@ struct DC_PreCharge : public StateBase {
 private:
     bool pre_charge_initiated{false};
     float present_voltage{0};
+    bool stop{false};
 };
 
 } // namespace iso15118::d20::state

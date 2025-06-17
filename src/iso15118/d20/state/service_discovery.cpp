@@ -22,12 +22,17 @@ static bool find_service_id(const std::vector<uint16_t>& req_service_ids, const 
 message_20::ServiceDiscoveryResponse handle_request(const message_20::ServiceDiscoveryRequest& req,
                                                     d20::Session& session,
                                                     const std::vector<dt::ServiceCategory>& energy_services,
+                                                    const bool stop,
                                                     const std::vector<dt::ServiceCategory>& vas_services) {
 
     message_20::ServiceDiscoveryResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
+    }
+
+    if (stop) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
     }
 
     // Service renegotiation is not yet supported
@@ -85,6 +90,16 @@ void ServiceDiscovery::enter() {
 }
 
 Result ServiceDiscovery::feed(Event ev) {
+
+    if (ev == Event::CONTROL_MESSAGE) {
+        if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
+            stop = *control_data;
+        }
+
+        // Ignore control message
+        return {};
+    }
+
     if (ev != Event::V2GTP_MESSAGE) {
         return {};
     }
@@ -99,7 +114,7 @@ Result ServiceDiscovery::feed(Event ev) {
             }
         }
 
-        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config.supported_energy_transfer_services,
+        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config.supported_energy_transfer_services, stop,
                                         m_ctx.session_config.supported_vas_services);
 
         m_ctx.respond(res);

@@ -14,12 +14,16 @@ namespace iso15118::d20::state {
 namespace dt = message_20::datatypes;
 
 message_20::PowerDeliveryResponse handle_request(const message_20::PowerDeliveryRequest& req,
-                                                 const d20::Session& session) {
+                                                 const bool stop, const d20::Session& session) {
 
     message_20::PowerDeliveryResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
+    }
+
+    if (stop) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
     }
 
     // TODO(sl): Check Req PowerProfile & ChannelSelection
@@ -39,6 +43,11 @@ void PowerDelivery::enter() {
 Result PowerDelivery::feed(Event ev) {
 
     if (ev == Event::CONTROL_MESSAGE) {
+        if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
+            m_ctx.log.enter_state("StopCharging");
+            stop = *control_data;
+        }
+
         const auto control_data = m_ctx.get_control_event<PresentVoltageCurrent>();
         if (not control_data) {
             // Ignore control message
@@ -47,6 +56,7 @@ Result PowerDelivery::feed(Event ev) {
 
         present_voltage = control_data->voltage;
 
+        // Ignore control message
         return {};
     }
 
@@ -57,7 +67,7 @@ Result PowerDelivery::feed(Event ev) {
     const auto variant = m_ctx.pull_request();
 
     if (const auto req = variant->get_if<message_20::DC_PreChargeRequest>()) {
-        const auto res = handle_request(*req, m_ctx.session, present_voltage);
+        const auto res = handle_request(*req, m_ctx.session, stop, present_voltage);
 
         m_ctx.feedback.dc_pre_charge_target_voltage(dt::from_RationalNumber(req->target_voltage));
 
@@ -74,7 +84,7 @@ Result PowerDelivery::feed(Event ev) {
             m_ctx.feedback.signal(session::feedback::Signal::SETUP_FINISHED);
         }
 
-        const auto& res = handle_request(*req, m_ctx.session);
+        const auto& res = handle_request(*req, stop, m_ctx.session);
 
         m_ctx.respond(res);
 

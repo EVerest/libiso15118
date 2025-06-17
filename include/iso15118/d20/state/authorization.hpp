@@ -16,6 +16,7 @@ public:
 
 private:
     message_20::datatypes::AuthStatus authorization_status{message_20::datatypes::AuthStatus::Pending};
+    bool stop{false};
 };
 
 } // namespace iso15118::d20::state

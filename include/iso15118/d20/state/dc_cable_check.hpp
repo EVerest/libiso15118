@@ -17,6 +17,7 @@ struct DC_CableCheck : public StateBase {
 private:
     bool cable_check_initiated{false};
     bool cable_check_done{false};
+    bool stop{false};
 };
 
 } // namespace iso15118::d20::state

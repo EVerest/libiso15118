@@ -58,10 +58,14 @@ namespace dt = message_20::datatypes;
 
 message_20::SessionSetupResponse handle_request([[maybe_unused]] const message_20::SessionSetupRequest& req,
                                                 const d20::Session& session, const std::string& evse_id,
-                                                bool new_session) {
+                                                const bool stop, bool new_session) {
 
     message_20::SessionSetupResponse res;
     setup_header(res.header, session);
+
+    if (stop) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
+    }
 
     res.evseid = evse_id;
 
@@ -77,6 +81,15 @@ void SessionSetup::enter() {
 }
 
 Result SessionSetup::feed(Event ev) {
+
+    if (ev == Event::CONTROL_MESSAGE) {
+        if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
+            stop = *control_data;
+        }
+
+        // Ignore control message
+        return {};
+    }
 
     if (ev != Event::V2GTP_MESSAGE) {
         return {};
@@ -124,7 +137,7 @@ Result SessionSetup::feed(Event ev) {
 
         evse_id = m_ctx.session_config.evse_id;
 
-        const auto res = handle_request(*req, m_ctx.session, evse_id, new_session);
+        const auto res = handle_request(*req, m_ctx.session, evse_id, stop, new_session);
 
         m_ctx.respond(res);
 

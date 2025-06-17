@@ -17,6 +17,7 @@ struct SessionSetup : public StateBase {
 
 private:
     std::string evse_id;
+    bool stop{false};
 };
 
 } // namespace iso15118::d20::state

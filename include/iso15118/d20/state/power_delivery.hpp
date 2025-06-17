@@ -15,6 +15,7 @@ struct PowerDelivery : public StateBase {
 
 private:
     float present_voltage{0};
+    bool stop{false};
 };
 
 } // namespace iso15118::d20::state

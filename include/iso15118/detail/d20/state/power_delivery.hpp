@@ -7,7 +7,7 @@
 
 namespace iso15118::d20::state {
 
-message_20::PowerDeliveryResponse handle_request(const message_20::PowerDeliveryRequest& req,
+message_20::PowerDeliveryResponse handle_request(const message_20::PowerDeliveryRequest& req, const bool stop,
                                                  const d20::Session& session);
 
 } // namespace iso15118::d20::state

@@ -44,12 +44,16 @@ template <> void convert(BPT_DC_ModeRes& out, const d20::DcTransferLimits& in) {
 
 message_20::DC_ChargeParameterDiscoveryResponse
 handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const d20::Session& session,
-               const d20::DcTransferLimits& dc_limits) {
+               const bool stop, const d20::DcTransferLimits& dc_limits) {
 
     message_20::DC_ChargeParameterDiscoveryResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
+    }
+
+    if (stop) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
     }
 
     const auto selected_energy_service = session.get_selected_services().selected_energy_service;
@@ -91,6 +95,16 @@ void DC_ChargeParameterDiscovery::enter() {
 
 Result DC_ChargeParameterDiscovery::feed(Event ev) {
 
+    if (ev == Event::CONTROL_MESSAGE) {
+        if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
+            m_ctx.log.enter_state("StopCharging");
+            stop = *control_data;
+        }
+
+        // Ignore control message
+        return {};
+    }
+
     if (ev != Event::V2GTP_MESSAGE) {
         return {};
     }
@@ -122,7 +136,7 @@ Result DC_ChargeParameterDiscovery::feed(Event ev) {
             m_ctx.session_ev_info.ev_transfer_limits.emplace<BPT_DC_ModeReq>(*mode);
         }
 
-        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config.dc_limits);
+        const auto res = handle_request(*req, m_ctx.session, stop, m_ctx.session_config.dc_limits);
 
         m_ctx.respond(res);
 

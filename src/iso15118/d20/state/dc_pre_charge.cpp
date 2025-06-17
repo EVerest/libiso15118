@@ -13,12 +13,16 @@ namespace iso15118::d20::state {
 namespace dt = message_20::datatypes;
 
 message_20::DC_PreChargeResponse handle_request(const message_20::DC_PreChargeRequest& req, const d20::Session& session,
-                                                const float present_voltage) {
+                                                const bool stop, const float present_voltage) {
 
     message_20::DC_PreChargeResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
+    }
+
+    if (stop) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
     }
 
     res.present_voltage = dt::from_float(present_voltage);
@@ -33,6 +37,11 @@ void DC_PreCharge::enter() {
 Result DC_PreCharge::feed(Event ev) {
 
     if (ev == Event::CONTROL_MESSAGE) {
+        if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
+            m_ctx.log.enter_state("StopCharging");
+            stop = *control_data;
+        }
+
         const auto control_data = m_ctx.get_control_event<PresentVoltageCurrent>();
         if (not control_data) {
             // Ignore control message
@@ -41,6 +50,7 @@ Result DC_PreCharge::feed(Event ev) {
 
         present_voltage = control_data->voltage;
 
+        // Ignore control message
         return {};
     }
 
@@ -55,7 +65,7 @@ Result DC_PreCharge::feed(Event ev) {
             m_ctx.feedback.signal(session::feedback::Signal::PRE_CHARGE_STARTED);
             pre_charge_initiated = true;
         }
-        const auto res = handle_request(*req, m_ctx.session, present_voltage);
+        const auto res = handle_request(*req, m_ctx.session, stop, present_voltage);
 
         m_ctx.feedback.dc_pre_charge_target_voltage(message_20::datatypes::from_RationalNumber(req->target_voltage));
 

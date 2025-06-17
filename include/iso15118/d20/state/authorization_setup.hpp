@@ -13,6 +13,9 @@ struct AuthorizationSetup : public StateBase {
     void enter() final;
 
     Result feed(Event) final;
+
+private:
+    bool stop{false};
 };
 
 } // namespace iso15118::d20::state

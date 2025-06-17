@@ -23,13 +23,17 @@ static bool find_auth_service_in_offered_services(const dt::Authorization& req_s
 }
 
 message_20::AuthorizationResponse handle_request(const message_20::AuthorizationRequest& req,
-                                                 const d20::Session& session,
+                                                 const d20::Session& session, const bool stop,
                                                  const dt::AuthStatus& authorization_status) {
 
     message_20::AuthorizationResponse res = message_20::AuthorizationResponse();
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
+    }
+
+    if (stop) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
     }
 
     // [V2G20-2209] Check if authorization service was offered in authorization_setup res
@@ -77,20 +81,25 @@ void Authorization::enter() {
 
 Result Authorization::feed(Event ev) {
     if (ev == Event::CONTROL_MESSAGE) {
-        const auto control_data = m_ctx.get_control_event<AuthorizationResponse>();
+        if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
+            m_ctx.log.enter_state("StopCharging");
+            stop = *control_data;
+        }
 
+        const auto control_data = m_ctx.get_control_event<AuthorizationResponse>();
         if (not control_data) {
             // Ignore control message
             return {};
         }
-
         if (*control_data) {
             authorization_status = AuthStatus::Accepted;
         } else {
             authorization_status = AuthStatus::Rejected;
         }
 
+        // Ignore control message
         return {};
+
     }
 
     if (ev != Event::V2GTP_MESSAGE) {
@@ -100,7 +109,7 @@ Result Authorization::feed(Event ev) {
     const auto variant = m_ctx.pull_request();
 
     if (const auto req = variant->get_if<message_20::AuthorizationRequest>()) {
-        const auto res = handle_request(*req, m_ctx.session, authorization_status);
+        const auto res = handle_request(*req, m_ctx.session, stop, authorization_status);
 
         m_ctx.respond(res);
 

@@ -16,13 +16,17 @@ namespace iso15118::d20::state {
 namespace dt = message_20::datatypes;
 
 message_20::AuthorizationSetupResponse handle_request(const message_20::AuthorizationSetupRequest& req,
-                                                      d20::Session& session, bool cert_install_service,
+                                                      d20::Session& session, bool cert_install_service, const bool stop,
                                                       const std::vector<dt::Authorization>& authorization_services) {
 
     auto res = message_20::AuthorizationSetupResponse(); // default mandatory values [V2G20-736]
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
+    }
+
+    if (stop) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
     }
 
     res.certificate_installation_service = cert_install_service;
@@ -59,6 +63,16 @@ void AuthorizationSetup::enter() {
 
 Result AuthorizationSetup::feed(Event ev) {
 
+    if (ev == Event::CONTROL_MESSAGE) {
+        if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
+            m_ctx.log.enter_state("StopCharging");
+            stop = *control_data;
+        }
+
+        // Ignore control message
+        return {};
+    }
+
     if (ev != Event::V2GTP_MESSAGE) {
         return {};
     }
@@ -67,7 +81,7 @@ Result AuthorizationSetup::feed(Event ev) {
 
     if (const auto req = variant->get_if<message_20::AuthorizationSetupRequest>()) {
         const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config.cert_install_service,
-                                        m_ctx.session_config.authorization_services);
+                                        stop, m_ctx.session_config.authorization_services);
 
         logf_info("Timestamp: %d", req->header.timestamp);
 

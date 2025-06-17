@@ -20,6 +20,7 @@ struct ScheduleExchange : public StateBase {
 
 private:
     UpdateDynamicModeParameters dynamic_parameters;
+    bool stop{false};
 };
 
 } // namespace iso15118::d20::state

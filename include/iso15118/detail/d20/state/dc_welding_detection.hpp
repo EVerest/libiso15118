@@ -8,6 +8,7 @@
 namespace iso15118::d20::state {
 
 message_20::DC_WeldingDetectionResponse handle_request(const message_20::DC_WeldingDetectionRequest& req,
-                                                       const d20::Session& session, const float present_voltage);
+                                                       const d20::Session& session, const bool stop, 
+                                                       const float present_voltage);
 
 } // namespace iso15118::d20::state

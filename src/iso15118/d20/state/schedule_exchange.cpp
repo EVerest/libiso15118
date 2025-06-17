@@ -58,13 +58,18 @@ void set_dynamic_parameters_in_res(DynamicResControlMode& res_mode, const Update
 namespace dt = message_20::datatypes;
 
 message_20::ScheduleExchangeResponse handle_request(const message_20::ScheduleExchangeRequest& req,
-                                                    const d20::Session& session, const dt::RationalNumber& max_power,
+                                                    const d20::Session& session, const dt::RationalNumber& max_power, 
+                                                    const bool stop,
                                                     const UpdateDynamicModeParameters& dynamic_parameters) {
 
     message_20::ScheduleExchangeResponse res;
 
     if (validate_and_setup_header(res.header, session, req.header.session_id) == false) {
         return response_with_code(res, dt::ResponseCode::FAILED_UnknownSession);
+    }
+
+    if (stop) {
+        return response_with_code(res, dt::ResponseCode::FAILED);
     }
 
     const auto selected_services = session.get_selected_services();
@@ -108,11 +113,17 @@ void ScheduleExchange::enter() {
 Result ScheduleExchange::feed(Event ev) {
 
     if (ev == Event::CONTROL_MESSAGE) {
+        if (const auto* control_data = m_ctx.get_control_event<StopCharging>()) {
+            stop = *control_data;
+        }
 
         // TODO(sl): Not sure if the data comes here just in time?
-        if (const auto* control_data = m_ctx.get_control_event<UpdateDynamicModeParameters>()) {
-            dynamic_parameters = *control_data;
+        const auto control_data = m_ctx.get_control_event<UpdateDynamicModeParameters>();
+        if (not control_data) {
+            // Ignore control message
+            return {};
         }
+        dynamic_parameters = *control_data;
 
         // Ignore control message
         return {};
@@ -156,7 +167,7 @@ Result ScheduleExchange::feed(Event ev) {
             selected_energy_service, ac_connector, selected_services.selected_control_mode,
             selected_services.selected_mobility_needs_mode, evse_limits, ev_limits, control_mode);
 
-        const auto res = handle_request(*req, m_ctx.session, max_charge_power, dynamic_parameters);
+        const auto res = handle_request(*req, m_ctx.session, max_charge_power, stop, dynamic_parameters);
 
         m_ctx.respond(res);
 
