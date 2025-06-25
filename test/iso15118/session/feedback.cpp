@@ -255,7 +255,7 @@ SCENARIO("Feedback Tests") {
     // TODO(SL): Missing tests for notify_ev_charging_needs, selected_service_parameters
     GIVEN("Test ev_information") {
         iso15118::d20::EVInformation expected{
-            std::vector<iso15118::message_20::SupportedAppProtocol>{{"urn:iso:std:iso:15118:-20:DC", 1, 1, 1, 1}},
+            std::vector<iso15118::message_20::datatypes::SupportedAppProtocol>{{"urn:iso:std:iso:15118:-20:DC", 1, 1, 1, 1}},
             {"urn:iso:std:iso:15118:-20:DC", 1, 1, 1, 1},
             "54EA7E40B356",
             std::nullopt,
@@ -263,7 +263,7 @@ SCENARIO("Feedback Tests") {
             std::nullopt,
             std::nullopt};
         feedback.ev_information(
-            {std::vector<iso15118::message_20::SupportedAppProtocol>{{"urn:iso:std:iso:15118:-20:DC", 1, 1, 1, 1}},
+            {std::vector<iso15118::message_20::datatypes::SupportedAppProtocol>{{"urn:iso:std:iso:15118:-20:DC", 1, 1, 1, 1}},
              {"urn:iso:std:iso:15118:-20:DC", 1, 1, 1, 1},
              "54EA7E40B356",
              std::nullopt,

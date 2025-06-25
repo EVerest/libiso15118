@@ -12,6 +12,11 @@ target_sources(iso15118
         misc/helper.cpp
         misc/cb_exi.cpp
 
+        ev/d20/context.cpp
+        ev/d20/context_helper.cpp
+        ev/d20/state/session_setup.cpp
+        ev/d20/state/authorization_setup.cpp
+
         io/connection_plain.cpp
         io/logging.cpp
         io/poll_manager.cpp
