@@ -1,3 +1,4 @@
+add_subdirectory(ev)
 add_subdirectory(fsm)
 add_subdirectory(io)
 add_subdirectory(session)

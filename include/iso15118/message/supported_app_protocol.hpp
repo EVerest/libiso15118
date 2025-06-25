@@ -11,16 +11,20 @@
 
 namespace iso15118::message_20 {
 
-struct SupportedAppProtocolRequest {
-    struct SupportedAppProtocol {
-        std::string protocol_namespace;
-        uint32_t version_number_major;
-        uint32_t version_number_minor;
-        uint8_t schema_id;
-        uint8_t priority;
-    };
+namespace datatypes {
 
-    std::vector<SupportedAppProtocol> app_protocol;
+struct SupportedAppProtocol {
+    std::string protocol_namespace;
+    uint32_t version_number_major;
+    uint32_t version_number_minor;
+    uint8_t schema_id;
+    uint8_t priority;
+};
+
+} // namespace datatypes
+
+struct SupportedAppProtocolRequest {
+    std::vector<datatypes::SupportedAppProtocol> app_protocol;
 };
 
 struct SupportedAppProtocolResponse {
