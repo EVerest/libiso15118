@@ -13,10 +13,10 @@
 
 namespace iso15118::d20::state {
 
-std::tuple<message_20::SupportedAppProtocolResponse, std::optional<message_20::SupportedAppProtocol>>
+std::tuple<message_20::SupportedAppProtocolResponse, std::optional<message_20::datatypes::SupportedAppProtocol>>
 handle_request(const message_20::SupportedAppProtocolRequest& req) {
     message_20::SupportedAppProtocolResponse res;
-    std::optional<message_20::SupportedAppProtocol> selected_protocol{std::nullopt};
+    std::optional<message_20::datatypes::SupportedAppProtocol> selected_protocol{std::nullopt};
 
     for (const auto& protocol : req.app_protocol) {
         if (protocol.protocol_namespace.compare("urn:iso:std:iso:15118:-20:DC") == 0) {
