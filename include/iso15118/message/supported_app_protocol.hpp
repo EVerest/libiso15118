@@ -20,7 +20,7 @@ struct SupportedAppProtocol {
 
     bool operator==(const iso15118::message_20::SupportedAppProtocol& other) const {
         return this->protocol_namespace == other.protocol_namespace and this->priority == other.priority and
-               this->schema_id and other.schema_id and this->version_number_major == other.version_number_major and
+               this->schema_id == other.schema_id and this->version_number_major == other.version_number_major and
                this->version_number_minor == other.version_number_minor;
     }
 };
