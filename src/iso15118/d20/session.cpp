@@ -117,22 +117,32 @@ bool Session::find_parameter_set_id(const dt::ServiceCategory service, int16_t i
             return true;
         }
         break;
-    case dt::ServiceCategory::Internet:
+    default:
+        // Todo(sl): logf AC, WPT, ACDP is not supported
+        break;
+    }
+
+    return false;
+}
+
+bool Session::find_parameter_set_id(const uint16_t vas_service, int16_t id) {
+    if (vas_service == message_20::to_underlying_value(dt::ServiceCategory::Internet)) {
         if (this->offered_services.internet_parameter_list.find(id) !=
             this->offered_services.internet_parameter_list.end()) {
             return true;
         }
-        break;
-
-    case dt::ServiceCategory::ParkingStatus:
+    } else if (vas_service == message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)) {
         if (this->offered_services.parking_parameter_list.find(id) !=
             this->offered_services.parking_parameter_list.end()) {
             return true;
         }
-
-    default:
-        // Todo(sl): logf AC, WPT, ACDP is not supported
-        break;
+    } else {
+        logf_info("Find parameter_set_id from service: %u", vas_service);
+        for (auto& offered_vas_service : offered_services.custom_vas_list) {
+            if (offered_vas_service == id) {
+                return true;
+            }
+        }
     }
 
     return false;
@@ -204,8 +214,15 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
         }
         break;
 
-    case dt::ServiceCategory::Internet:
+    default:
+        // Todo(sl): logf AC, WPT, ACDP is not supported
+        break;
+    }
+}
 
+void Session::selected_service_parameters(const uint16_t vas_service, const uint16_t id) {
+
+    if (vas_service == message_20::to_underlying_value(dt::ServiceCategory::Internet)) {
         if (this->offered_services.internet_parameter_list.find(id) !=
             this->offered_services.internet_parameter_list.end()) {
             this->selected_vas_services.vas_services.push_back(dt::ServiceCategory::Internet);
@@ -213,10 +230,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
             this->selected_vas_services.internet_port = parameters.port;
             this->selected_vas_services.internet_protocol = parameters.protocol;
         }
-        break;
-
-    case dt::ServiceCategory::ParkingStatus:
-
+    } else if (vas_service == message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)) {
         if (this->offered_services.parking_parameter_list.find(id) !=
             this->offered_services.parking_parameter_list.end()) {
             this->selected_vas_services.vas_services.push_back(dt::ServiceCategory::ParkingStatus);
@@ -224,11 +238,8 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
             this->selected_vas_services.parking_intended_service = parameters.intended_service;
             this->selected_vas_services.parking_status = parameters.parking_status;
         }
-        break;
-
-    default:
-        // Todo(sl): logf AC, WPT, ACDP is not supported
-        break;
+    } else {
+        logf_info("Right now not selecting anything for custom vas service");
     }
 }
 

@@ -20,7 +20,7 @@ struct OfferedServices {
 
     std::vector<dt::Authorization> auth_services;
     std::vector<dt::ServiceCategory> energy_services;
-    std::vector<dt::ServiceCategory> vas_services;
+    std::vector<uint16_t> vas_services;
 
     std::map<uint8_t, dt::DcParameterList> dc_parameter_list;
     std::map<uint8_t, dt::DcBptParameterList> dc_bpt_parameter_list;
@@ -28,6 +28,7 @@ struct OfferedServices {
     std::map<uint8_t, dt::McsBptParameterList> mcs_bpt_parameter_list;
     std::map<uint8_t, dt::InternetParameterList> internet_parameter_list;
     std::map<uint8_t, dt::ParkingParameterList> parking_parameter_list;
+    std::vector<uint16_t> custom_vas_list; 
 };
 
 struct SelectedServiceParameters {
@@ -89,8 +90,10 @@ public:
     }
 
     bool find_parameter_set_id(const dt::ServiceCategory service, int16_t id);
+    bool find_parameter_set_id(const uint16_t vas_service, int16_t id);
 
     void selected_service_parameters(const dt::ServiceCategory service, const uint16_t id);
+    void selected_service_parameters(const uint16_t vas_service, const uint16_t id);
 
     auto get_selected_services() const& {
         return selected_services;

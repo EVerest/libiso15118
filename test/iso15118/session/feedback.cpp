@@ -16,6 +16,8 @@ struct FeedbackResults {
     iso15118::message_20::Type v2g_message;
     std::string evcc_id;
     std::string selected_protocol;
+    uint16_t id;
+    dt::VasSelectedServiceList selected_vas;
 };
 
 SCENARIO("Feedback Tests") {
@@ -39,6 +41,16 @@ SCENARIO("Feedback Tests") {
     callbacks.evccid = [&feedback_results](const std::string& evcc_id_) { feedback_results.evcc_id = evcc_id_; };
     callbacks.selected_protocol = [&feedback_results](const std::string& protocol) {
         feedback_results.selected_protocol = protocol;
+    };
+    callbacks.get_vas_parameters = [&feedback_results](uint16_t id) {
+        feedback_results.id = id;
+
+        auto service_parameter_list = dt::ServiceParameterList{};
+        service_parameter_list.push_back(dt::ParameterSet());
+        return std::make_optional(service_parameter_list);
+    };
+    callbacks.selected_vas_services = [&feedback_results](dt::VasSelectedServiceList selected_vas_) {
+        feedback_results.selected_vas = selected_vas_;
     };
 
     const auto feedback = Feedback(callbacks);
@@ -225,4 +237,31 @@ SCENARIO("Feedback Tests") {
     }
 
     // TODO(SL): Missing tests for notify_ev_charging_needs, selected_service_parameters
+
+    GIVEN("Test get_vas_parameters") {
+        uint16_t expected{3};
+        const auto result = feedback.get_vas_parameters(3);
+
+        THEN("get_vas_parameters should be like expected") {
+            REQUIRE(result.has_value());
+
+            REQUIRE(result.value().at(0).id == 0);
+            REQUIRE(result.value().at(0).parameter.at(0).name == "Connector");
+            REQUIRE(*std::get_if<int32_t>(&result.value().at(0).parameter.at(0).value) == 1);
+
+            REQUIRE(feedback_results.id == expected);
+        }
+    }
+
+    GIVEN("Test selected_vas_services") {
+        const dt::VasSelectedServiceList expected{{34000, 0}, {5462, 5}};
+        feedback.selected_vas_services(dt::VasSelectedServiceList{{34000, 0}, {5462, 5}});
+
+        THEN("meter_info_requested should be like expected") {
+            REQUIRE(feedback_results.selected_vas.at(0).service_id == expected.at(0).service_id);
+            REQUIRE(feedback_results.selected_vas.at(0).parameter_set_id == expected.at(0).parameter_set_id);
+            REQUIRE(feedback_results.selected_vas.at(1).service_id == expected.at(1).service_id);
+            REQUIRE(feedback_results.selected_vas.at(1).parameter_set_id == expected.at(1).parameter_set_id);
+        }
+    }
 }

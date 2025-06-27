@@ -13,6 +13,8 @@
 #include <iso15118/message/dc_charge_loop.hpp>
 #include <iso15118/message/dc_charge_parameter_discovery.hpp>
 #include <iso15118/message/schedule_exchange.hpp>
+#include <iso15118/message/service_selection.hpp>
+#include <iso15118/message/service_detail.hpp>
 #include <iso15118/message/type.hpp>
 
 namespace iso15118::session {
@@ -67,6 +69,8 @@ struct Callbacks {
                        const EvSEControlMode&)>
         notify_ev_charging_needs;
     std::function<void(const d20::SelectedServiceParameters&)> selected_service_parameters;
+    std::function<std::optional<dt::ServiceParameterList>(uint16_t)> get_vas_parameters;
+    std::function<void(const dt::VasSelectedServiceList&)> selected_vas_services;
 };
 
 } // namespace feedback
@@ -88,6 +92,8 @@ public:
                                   const feedback::EvseTransferLimits&, const feedback::EvTransferLimits&,
                                   const feedback::EvSEControlMode&) const;
     void selected_service_parameters(const d20::SelectedServiceParameters&) const;
+    std::optional<dt::ServiceParameterList> get_vas_parameters(uint16_t) const;
+    void selected_vas_services(const dt::VasSelectedServiceList&) const;
 
 private:
     feedback::Callbacks callbacks;

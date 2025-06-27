@@ -52,4 +52,19 @@ void Feedback::selected_service_parameters(const d20::SelectedServiceParameters&
     call_if_available(callbacks.selected_service_parameters, services);
 }
 
+
+std::optional<dt::ServiceParameterList> Feedback::get_vas_parameters(uint16_t vas_id) const {
+    
+    // TODO(SL): Adding std::future (wait_for)
+    
+    if (not callbacks.get_vas_parameters) {
+        return std::nullopt;
+    }
+    return std::invoke(callbacks.get_vas_parameters, vas_id);
+}
+
+void Feedback::selected_vas_services(const dt::VasSelectedServiceList& vas_services) const {
+    call_if_available(callbacks.selected_vas_services, vas_services);
+}
+
 } // namespace iso15118::session

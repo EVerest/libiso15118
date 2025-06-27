@@ -13,6 +13,14 @@
 
 namespace iso15118::d20::state {
 
+namespace {
+
+bool find_service_vas(const std::vector<uint16_t>& req_service_ids, const uint16_t service) {
+    return std::find(req_service_ids.begin(), req_service_ids.end(), service) == req_service_ids.end();
+}
+
+} // namespace
+
 namespace dt = message_20::datatypes;
 
 message_20::ServiceSelectionResponse handle_request(const message_20::ServiceSelectionRequest& req,
@@ -92,7 +100,22 @@ Result ServiceSelection::feed(Event ev) {
     if (const auto req = variant->get_if<message_20::ServiceDetailRequest>()) {
         logf_info("Requested info about ServiceID: %d", req->service);
 
-        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config);
+        using Service = dt::ServiceCategory;
+        const std::vector<uint16_t> energy_services{
+            message_20::to_underlying_value(Service::AC),         message_20::to_underlying_value(Service::DC),
+            message_20::to_underlying_value(Service::WPT),        message_20::to_underlying_value(Service::DC_ACDP),
+            message_20::to_underlying_value(Service::AC_BPT),     message_20::to_underlying_value(Service::DC_BPT),
+            message_20::to_underlying_value(Service::DC_ACDP_BPT)};
+
+        std::optional<dt::ServiceParameterList> custom_vas_parameters{std::nullopt};
+
+        if (find_service_vas(energy_services, req->service)) {
+            logf_info("Getting vas (id: %u) parameters", req->service);
+            logf_info("Caution: This feedback call can block the entire state machine");
+            custom_vas_parameters = m_ctx.feedback.get_vas_parameters(req->service);
+        }
+
+        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config, custom_vas_parameters);
 
         m_ctx.respond(res);
 
@@ -115,6 +138,10 @@ Result ServiceSelection::feed(Event ev) {
         if (res.response_code >= dt::ResponseCode::FAILED) {
             m_ctx.session_stopped = true;
             return {};
+        }
+
+        if (req->selected_vas_list.has_value()) {
+            m_ctx.feedback.selected_vas_services(req->selected_vas_list.value());
         }
 
         return m_ctx.create_state<DC_ChargeParameterDiscovery>();
