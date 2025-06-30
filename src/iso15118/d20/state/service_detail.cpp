@@ -156,7 +156,6 @@ Result ServiceDetail::feed(Event ev) {
 
         if (find_service_vas(energy_services, req->service)) {
             logf_info("Getting custom vas (id: %u) parameters", req->service);
-            logf_info("Caution: This feedback call can block the entire state machine");
             custom_vas_parameters = m_ctx.feedback.get_vas_parameters(req->service);
 
             // Check if Internet or ParkingStatus service is in custom_vas_parameters
