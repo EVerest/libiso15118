@@ -29,10 +29,10 @@ SCENARIO("ISO15118-20 EV session setup state transitions") {
             REQUIRE(result.transitioned() == true);
             REQUIRE(fsm.get_current_state_id() == ev::d20::StateID::AuthorizationSetup);
 
-            const auto req = check_msg_result<message_20::SessionSetupRequest>(result.output);
-            REQUIRE(req.has_value());
+            const auto response_message = ctx.get_request<message_20::SessionSetupRequest>();
+            REQUIRE(response_message.has_value());
 
-            const auto& session_setup_req = req.value();
+            const auto& session_setup_req = response_message.value();
             REQUIRE(session_setup_req.header.session_id == std::array<uint8_t, 8>{0, 0, 0, 0, 0, 0, 0, 0});
             // TODO(SL): Missing check for evcc_id
         }

@@ -11,37 +11,14 @@
 
 using namespace iso15118;
 
-template <typename Msg> std::optional<Msg> check_msg_result(std::optional<ev::d20::MsgResult> result) {
-
-    if (not result.has_value()) {
-        return std::nullopt;
-    }
-
-    const auto& msg_result = result.value();
-
-    if (msg_result.type != message_20::TypeTrait<Msg>::type or not msg_result.output_message.has_value()) {
-        return std::nullopt;
-    }
-
-    Msg req{};
-
-    try {
-        req = std::any_cast<Msg>(msg_result.output_message);
-    } catch (const std::bad_any_cast& ex) {
-        return std::nullopt;
-    }
-
-    return req;
-}
-
 class FsmStateHelper {
 public:
     FsmStateHelper() : ctx(msg_exch) {};
 
     ev::d20::Context& get_context();
 
-    template <typename RequestType> void handle_response(const RequestType& request) {
-        msg_exch.set_request(std::make_unique<message_20::Variant>(request));
+    template <typename ResponseType> void handle_response(const ResponseType& response) {
+        msg_exch.set_response(std::make_unique<message_20::Variant>(response));
     }
 
 private:
