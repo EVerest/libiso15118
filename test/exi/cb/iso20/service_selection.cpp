@@ -60,7 +60,8 @@ SCENARIO("Se/Deserialize service_selection messages") {
             REQUIRE(msg.selected_vas_list.has_value() == true);
             const auto& selected_vas_list = msg.selected_vas_list.value();
             REQUIRE(selected_vas_list.size() == 1);
-            REQUIRE(selected_vas_list.at(0).service_id == message_20::to_underlying_value(dt::ServiceCategory::Internet));
+            REQUIRE(selected_vas_list.at(0).service_id ==
+                    message_20::to_underlying_value(dt::ServiceCategory::Internet));
             REQUIRE(selected_vas_list.at(0).parameter_set_id == 2);
         }
     }

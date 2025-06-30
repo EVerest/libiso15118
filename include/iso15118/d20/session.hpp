@@ -28,7 +28,7 @@ struct OfferedServices {
     std::map<uint8_t, dt::McsBptParameterList> mcs_bpt_parameter_list;
     std::map<uint8_t, dt::InternetParameterList> internet_parameter_list;
     std::map<uint8_t, dt::ParkingParameterList> parking_parameter_list;
-    std::vector<uint16_t> custom_vas_list; 
+    std::vector<uint16_t> custom_vas_list;
 };
 
 struct SelectedServiceParameters {

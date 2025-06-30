@@ -25,8 +25,9 @@ SCENARIO("DC charge parameter discovery state handling") {
     const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
         {dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
 
-    const d20::EvseSetupConfig evse_setup{evse_id,   supported_energy_services, auth_services, vas_services, cert_install,
-                                          dc_limits, control_mobility_modes};
+    const d20::EvseSetupConfig evse_setup{
+        evse_id,   supported_energy_services, auth_services, vas_services, cert_install,
+        dc_limits, control_mobility_modes};
 
     GIVEN("Bad Case - Unknown session") {
 

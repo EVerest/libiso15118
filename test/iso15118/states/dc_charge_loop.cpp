@@ -46,8 +46,9 @@ SCENARIO("DC charge loop state handling") {
         {dt::ControlMode::Dynamic, dt::MobilityNeedsMode::ProvidedByEvcc},
         {dt::ControlMode::Dynamic, dt::MobilityNeedsMode::ProvidedBySecc}};
 
-    const d20::EvseSetupConfig evse_setup{evse_id,   supported_energy_services, auth_services, vas_services, cert_install,
-                                          dc_limits, control_mobility_modes};
+    const d20::EvseSetupConfig evse_setup{
+        evse_id,   supported_energy_services, auth_services, vas_services, cert_install,
+        dc_limits, control_mobility_modes};
 
     GIVEN("Bad case - Unknown session") {
 

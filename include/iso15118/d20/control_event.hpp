@@ -73,7 +73,8 @@ using EnergyServices = std::vector<message_20::datatypes::ServiceCategory>;
 // TODO(SL): Define this globally for message and states
 using SupportedVASs = std::vector<uint16_t>;
 
-using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse, StopCharging,
-                                  PauseCharging, DcTransferLimits, UpdateDynamicModeParameters, EnergyServices, SupportedVASs>;
+using ControlEvent =
+    std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse, StopCharging, PauseCharging,
+                 DcTransferLimits, UpdateDynamicModeParameters, EnergyServices, SupportedVASs>;
 
 } // namespace iso15118::d20

@@ -19,8 +19,9 @@ SCENARIO("Service detail state handling") {
     const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
         {dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
 
-    const d20::EvseSetupConfig evse_setup{evse_id,   supported_energy_services, auth_services, vas_services, cert_install,
-                                          dc_limits, control_mobility_modes};
+    const d20::EvseSetupConfig evse_setup{
+        evse_id,   supported_energy_services, auth_services, vas_services, cert_install,
+        dc_limits, control_mobility_modes};
 
     GIVEN("Bad Case - Unknown session") {
 
@@ -338,7 +339,7 @@ SCENARIO("Service detail state handling") {
         }
     }
 
-    GIVEN("Good Case - Custom VAS service"){
+    GIVEN("Good Case - Custom VAS service") {
         d20::Session session = d20::Session();
         session.offered_services.energy_services = {dt::ServiceCategory::DC};
         session.offered_services.vas_services = {4599};

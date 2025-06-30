@@ -41,6 +41,7 @@ public:
     void update_energy_modes(const std::vector<message_20::datatypes::ServiceCategory>&);
 
     void add_supported_vas_services(const std::vector<uint16_t>& vas_services);
+
 private:
     io::PollManager poll_manager;
     std::unique_ptr<io::SdpServer> sdp_server;

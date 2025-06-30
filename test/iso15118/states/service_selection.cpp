@@ -235,7 +235,8 @@ SCENARIO("Service selection state handling") {
             dt::Pricing::NoPricing,
         };
 
-        session.offered_services.vas_services = {message_20::to_underlying_value(dt::ServiceCategory::Internet), message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)};
+        session.offered_services.vas_services = {message_20::to_underlying_value(dt::ServiceCategory::Internet),
+                                                 message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)};
         session.offered_services.internet_parameter_list[0] = {
             dt::Protocol::Http,
             dt::Port::Port80,
@@ -252,7 +253,8 @@ SCENARIO("Service selection state handling") {
         req.selected_energy_transfer_service.service_id = dt::ServiceCategory::DC;
         req.selected_energy_transfer_service.parameter_set_id = 0;
 
-        req.selected_vas_list = {{message_20::to_underlying_value(dt::ServiceCategory::Internet), 0}, {message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus), 0}};
+        req.selected_vas_list = {{message_20::to_underlying_value(dt::ServiceCategory::Internet), 0},
+                                 {message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus), 0}};
 
         const auto res = d20::state::handle_request(req, session);
 
