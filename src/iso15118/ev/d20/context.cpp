@@ -6,43 +6,43 @@
 
 namespace iso15118::ev::d20 {
 
-MessageExchange::MessageExchange(io::StreamOutputView output_) : response(std::move(output_)) {
+MessageExchange::MessageExchange(io::StreamOutputView output_) : request(std::move(output_)) {
 }
 
-void MessageExchange::set_request(std::unique_ptr<message_20::Variant> new_request) {
-    if (request) {
+void MessageExchange::set_response(std::unique_ptr<message_20::Variant> new_request) {
+    if (response) {
         // FIXME (aw): we might want to have a stack here?
         throw std::runtime_error("Previous V2G message has not been handled yet");
     }
 
-    request = std::move(new_request);
+    response = std::move(new_request);
 }
 
-std::unique_ptr<message_20::Variant> MessageExchange::pull_request() {
-    if (not request) {
+std::unique_ptr<message_20::Variant> MessageExchange::pull_response() {
+    if (not response) {
         throw std::runtime_error("Tried to access V2G message, but there is none");
     }
 
-    return std::move(request);
+    return std::move(response);
 }
 
-message_20::Type MessageExchange::peek_request_type() const {
-    if (not request) {
+message_20::Type MessageExchange::peek_response_type() const {
+    if (not response) {
         logf_warning("Tried to access V2G message, but there is none");
         return message_20::Type::None;
     }
-    return request->get_type();
+    return response->get_type();
 }
 
 Context::Context(MessageExchange& message_exchange_) : message_exchange(message_exchange_) {
 }
 
-std::unique_ptr<message_20::Variant> Context::pull_request() {
-    return message_exchange.pull_request();
+std::unique_ptr<message_20::Variant> Context::pull_response() {
+    return message_exchange.pull_response();
 }
 
-message_20::Type Context::peek_request_type() const {
-    return message_exchange.peek_request_type();
+message_20::Type Context::peek_response_type() const {
+    return message_exchange.peek_response_type();
 }
 
 } // namespace iso15118::ev::d20

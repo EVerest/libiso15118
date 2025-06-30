@@ -2,11 +2,7 @@
 // Copyright 2025 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include <any>
-#include <optional>
-
 #include "context.hpp"
-#include <iso15118/message/type.hpp>
 
 namespace iso15118::ev::d20 {
 
@@ -21,11 +17,6 @@ enum class Event {
 
     // internal events
     FAILED,
-};
-
-struct MsgResult {
-    message_20::Type type{message_20::Type::None};
-    std::any output_message;
 };
 
 enum class StateID {
@@ -50,13 +41,11 @@ enum class StateID {
 
 struct Result {
     constexpr Result() = default;
-    Result(BasePointerType result_state, std::optional<MsgResult> output_) :
-        unhandled(false), new_state(std::move(result_state)), output(std::move(output_)) {
+    Result(BasePointerType result_state) : unhandled(false), new_state(std::move(result_state)) {
     }
 
     bool unhandled{true};
     BasePointerType new_state{nullptr};
-    std::optional<MsgResult> output{std::nullopt};
 };
 
 struct StateBase {
