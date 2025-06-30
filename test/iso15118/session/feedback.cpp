@@ -51,7 +51,11 @@ SCENARIO("Feedback Tests") {
         feedback_results.id = id;
 
         auto service_parameter_list = dt::ServiceParameterList{};
-        service_parameter_list.push_back(dt::ParameterSet());
+        auto& parameter_set = service_parameter_list.emplace_back();
+        parameter_set.id = 0;
+        parameter_set.parameter.push_back({"Service1", 40});
+        parameter_set.parameter.push_back({"Service2", "house"});
+
         return std::make_optional(service_parameter_list);
     };
     callbacks.selected_vas_services = [&feedback_results](dt::VasSelectedServiceList selected_vas_) {
@@ -285,9 +289,20 @@ SCENARIO("Feedback Tests") {
         THEN("get_vas_parameters should be like expected") {
             REQUIRE(result.has_value());
 
-            REQUIRE(result.value().at(0).id == 0);
-            REQUIRE(result.value().at(0).parameter.at(0).name == "Connector");
-            REQUIRE(*std::get_if<int32_t>(&result.value().at(0).parameter.at(0).value) == 1);
+            const auto& vas = result.value();
+
+            REQUIRE(vas.size() == 1);
+            auto& parameters = vas[0];
+            REQUIRE(parameters.id == 0);
+            REQUIRE(parameters.parameter.size() == 2);
+
+            REQUIRE(parameters.parameter[0].name == "Service1");
+            REQUIRE(std::holds_alternative<int32_t>(parameters.parameter[0].value));
+            REQUIRE(std::get<int32_t>(parameters.parameter[0].value) == 40);
+
+            REQUIRE(parameters.parameter[1].name == "Service2");
+            REQUIRE(std::holds_alternative<std::string>(parameters.parameter[1].value));
+            REQUIRE(std::get<std::string>(parameters.parameter[1].value) == "house");
 
             REQUIRE(feedback_results.id == expected);
         }

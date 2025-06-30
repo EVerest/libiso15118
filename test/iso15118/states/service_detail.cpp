@@ -339,7 +339,42 @@ SCENARIO("Service detail state handling") {
     }
 
     GIVEN("Good Case - Custom VAS service"){
-    } // TODO(SL)
+        d20::Session session = d20::Session();
+        session.offered_services.energy_services = {dt::ServiceCategory::DC};
+        session.offered_services.vas_services = {4599};
+
+        auto session_config = d20::SessionConfig(evse_setup);
+
+        message_20::ServiceDetailRequest req;
+        req.header.session_id = session.get_id();
+        req.header.timestamp = 1691411798;
+        req.service = 4599;
+
+        auto custom_vas_parameters = dt::ServiceParameterList{};
+        auto& parameter_set = custom_vas_parameters.emplace_back();
+        parameter_set.id = 0;
+        parameter_set.parameter.push_back({"Service1", 40});
+        parameter_set.parameter.push_back({"Service2", "house"});
+
+        const auto res = d20::state::handle_request(req, session, session_config, custom_vas_parameters);
+
+        THEN("ResponseCode: OK") {
+            REQUIRE(res.response_code == dt::ResponseCode::OK);
+            REQUIRE(res.service == 4599);
+            REQUIRE(res.service_parameter_list.size() == 1);
+            auto& parameters = res.service_parameter_list[0];
+            REQUIRE(parameters.id == 0);
+            REQUIRE(parameters.parameter.size() == 2);
+
+            REQUIRE(parameters.parameter[0].name == "Service1");
+            REQUIRE(std::holds_alternative<int32_t>(parameters.parameter[0].value));
+            REQUIRE(std::get<int32_t>(parameters.parameter[0].value) == 40);
+
+            REQUIRE(parameters.parameter[1].name == "Service2");
+            REQUIRE(std::holds_alternative<std::string>(parameters.parameter[1].value));
+            REQUIRE(std::get<std::string>(parameters.parameter[1].value) == "house");
+        }
+    }
 
     GIVEN("Good Case - AC Service") {
     } // TODO(sl): later

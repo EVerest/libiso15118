@@ -21,7 +21,7 @@ struct ParameterSet {
     uint16_t id;
     std::vector<Parameter> parameter;
 
-    ParameterSet();
+    ParameterSet() = default;
     ParameterSet(uint16_t _id, const DcParameterList& list);
     ParameterSet(uint16_t _id, const DcBptParameterList& list);
     ParameterSet(uint16_t _id, const McsParameterList& list);

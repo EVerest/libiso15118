@@ -11,27 +11,6 @@
 namespace iso15118::message_20 {
 
 namespace datatypes {
-// default
-ParameterSet::ParameterSet() {
-    id = 0;
-    parameter.push_back({
-        "Connector",                            // name
-        static_cast<int32_t>(DcConnector::Core) // value
-    });
-    parameter.push_back({
-        "ControlMode",                               // name
-        static_cast<int32_t>(ControlMode::Scheduled) // value
-    });
-    parameter.push_back({
-        "MobilityNeedsMode",                                    // name
-        static_cast<int32_t>(MobilityNeedsMode::ProvidedByEvcc) // value
-    });
-    parameter.push_back({
-        "Pricing",                               // name
-        static_cast<int32_t>(Pricing::NoPricing) // value
-    });
-}
-
 ParameterSet::ParameterSet(uint16_t _id, const DcParameterList& list) {
     id = _id;
     // Connector
