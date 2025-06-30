@@ -4,8 +4,8 @@
 
 #include "helper.hpp"
 
-#include <iso15118/d20/state/service_selection.hpp>
 #include <iso15118/d20/state/service_detail.hpp>
+#include <iso15118/d20/state/service_selection.hpp>
 
 #include <iso15118/message/service_detail.hpp>
 
@@ -34,12 +34,25 @@ SCENARIO("ISO15118-20 session setup state transitions") {
 
     session::feedback::Callbacks callbacks{};
 
-    callbacks.get_vas_parameters = []([[maybe_unused]]uint16_t id) {
+    callbacks.get_vas_parameters = [](uint16_t id) {
         auto service_parameter_list = dt::ServiceParameterList{};
-        auto& parameter_set = service_parameter_list.emplace_back();
-        parameter_set.id = 0;
-        parameter_set.parameter.push_back({"Service1", 40});
-        parameter_set.parameter.push_back({"Service2", "house"});
+
+        if (id == 4599) {
+            auto& parameter_set = service_parameter_list.emplace_back();
+            parameter_set.id = 0;
+            parameter_set.parameter.push_back({"Service1", 40});
+            parameter_set.parameter.push_back({"Service2", "house"});
+        } else if (id == message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)) {
+            auto& parameter_set = service_parameter_list.emplace_back();
+            parameter_set.id = 0;
+            parameter_set.parameter.push_back({"IntendedService", 1});
+            parameter_set.parameter.push_back({"ParkingStatusType", 4});
+        } else if (id == message_20::to_underlying_value(dt::ServiceCategory::Internet)) {
+            auto& parameter_set = service_parameter_list.emplace_back();
+            parameter_set.id = 3;
+            parameter_set.parameter.push_back({"Protocol", "http"});
+            parameter_set.parameter.push_back({"Port", 80});
+        }
 
         return std::make_optional(service_parameter_list);
     };
@@ -48,8 +61,6 @@ SCENARIO("ISO15118-20 session setup state transitions") {
     auto ctx = state_helper.get_context();
     ctx.session = d20::Session();
 
-    ctx.session.offered_services.vas_services = {4599};
-
     GIVEN("Good case - Ev requests parameter from custom vas") {
         fsm::v2::FSM<d20::StateBase> fsm{ctx.create_state<d20::state::ServiceDetail>()};
 
@@ -57,6 +68,9 @@ SCENARIO("ISO15118-20 session setup state transitions") {
         const auto req = message_20::ServiceDetailRequest{header_req, 4599};
 
         state_helper.handle_request(req);
+
+        ctx.session.offered_services.vas_services = {4599};
+
         const auto result = fsm.feed(d20::Event::V2GTP_MESSAGE);
 
         THEN("Check state transition") {
@@ -85,4 +99,82 @@ SCENARIO("ISO15118-20 session setup state transitions") {
         }
     }
 
+    GIVEN("Good case - Ev requests parameter from parking vas") {
+        fsm::v2::FSM<d20::StateBase> fsm{ctx.create_state<d20::state::ServiceDetail>()};
+
+        const auto header_req = message_20::Header{ctx.session.get_id(), 1691411798};
+        const auto req = message_20::ServiceDetailRequest{
+            header_req, message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)};
+
+        state_helper.handle_request(req);
+
+        ctx.session.offered_services.vas_services = {
+            message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)};
+
+        const auto result = fsm.feed(d20::Event::V2GTP_MESSAGE);
+
+        THEN("Check state transition") {
+            REQUIRE(result.transitioned() == true);
+            REQUIRE(fsm.get_current_state_id() == d20::StateID::ServiceSelection);
+
+            const auto response_message = ctx.get_response<message_20::ServiceDetailResponse>();
+            REQUIRE(response_message.has_value());
+
+            const auto& service_detail_res = response_message.value();
+
+            REQUIRE(service_detail_res.response_code == dt::ResponseCode::OK);
+            REQUIRE(service_detail_res.service == message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus));
+            REQUIRE(service_detail_res.service_parameter_list.size() == 1);
+            auto& parameters = service_detail_res.service_parameter_list[0];
+            REQUIRE(parameters.id == 0);
+            REQUIRE(parameters.parameter.size() == 2);
+
+            REQUIRE(parameters.parameter[0].name == "IntendedService");
+            REQUIRE(std::holds_alternative<int32_t>(parameters.parameter[0].value));
+            REQUIRE(std::get<int32_t>(parameters.parameter[0].value) == 1);
+
+            REQUIRE(parameters.parameter[1].name == "ParkingStatusType");
+            REQUIRE(std::holds_alternative<int32_t>(parameters.parameter[1].value));
+            REQUIRE(std::get<int32_t>(parameters.parameter[1].value) == 4);
+        }
+    }
+
+    GIVEN("Good case - Ev requests parameter from internet vas") {
+        fsm::v2::FSM<d20::StateBase> fsm{ctx.create_state<d20::state::ServiceDetail>()};
+
+        const auto header_req = message_20::Header{ctx.session.get_id(), 1691411798};
+        const auto req = message_20::ServiceDetailRequest{
+            header_req, message_20::to_underlying_value(dt::ServiceCategory::Internet)};
+
+        state_helper.handle_request(req);
+
+        ctx.session.offered_services.vas_services = {message_20::to_underlying_value(dt::ServiceCategory::Internet)};
+
+        const auto result = fsm.feed(d20::Event::V2GTP_MESSAGE);
+
+        THEN("Check state transition") {
+            REQUIRE(result.transitioned() == true);
+            REQUIRE(fsm.get_current_state_id() == d20::StateID::ServiceSelection);
+
+            const auto response_message = ctx.get_response<message_20::ServiceDetailResponse>();
+            REQUIRE(response_message.has_value());
+
+            const auto& service_detail_res = response_message.value();
+
+            REQUIRE(service_detail_res.response_code == dt::ResponseCode::OK);
+            REQUIRE(service_detail_res.service == message_20::to_underlying_value(dt::ServiceCategory::Internet));
+            REQUIRE(service_detail_res.service_parameter_list.size() == 1);
+            auto& parameters = service_detail_res.service_parameter_list[0];
+            REQUIRE(parameters.id == 3);
+            REQUIRE(parameters.parameter.size() == 2);
+
+            REQUIRE(parameters.parameter[0].name == "Protocol");
+            REQUIRE(std::holds_alternative<std::string>(parameters.parameter[0].value));
+            REQUIRE(std::get<std::string>(parameters.parameter[0].value) == "http");
+
+            REQUIRE(parameters.parameter[1].name == "Port");
+            REQUIRE(std::holds_alternative<int32_t>(parameters.parameter[1].value));
+            REQUIRE(std::get<int32_t>(parameters.parameter[1].value) == 80);
+        }
+    }
 }

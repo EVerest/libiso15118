@@ -90,14 +90,14 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
             session.offered_services.mcs_parameter_list[id] = parameter_set;
             res.service_parameter_list.push_back(dt::ParameterSet(id++, parameter_set));
         }
-    } else if (req.service == message_20::to_underlying_value(dt::ServiceCategory::MCS_BPT)) {    
+    } else if (req.service == message_20::to_underlying_value(dt::ServiceCategory::MCS_BPT)) {
         res.service = message_20::to_underlying_value(dt::ServiceCategory::MCS_BPT);
         for (auto& parameter_set : config.mcs_bpt_parameter_list) {
             session.offered_services.mcs_bpt_parameter_list[id] = parameter_set;
             res.service_parameter_list.push_back(dt::ParameterSet(id++, parameter_set));
         }
     } else if (req.service == message_20::to_underlying_value(dt::ServiceCategory::Internet)) {
-        res.service =  message_20::to_underlying_value(dt::ServiceCategory::Internet);
+        res.service = message_20::to_underlying_value(dt::ServiceCategory::Internet);
 
         for (auto& parameter_set : config.internet_parameter_list) {
             // TODO(sl): Possibly refactor, define const
@@ -151,16 +151,51 @@ Result ServiceDetail::feed(Event ev) {
             message_20::to_underlying_value(Service::AC_BPT),     message_20::to_underlying_value(Service::DC_BPT),
             message_20::to_underlying_value(Service::DC_ACDP_BPT)};
 
-        // TODO(SL): How to handle Internet and ParkingStatus Service?
         std::optional<dt::ServiceParameterList> custom_vas_parameters{std::nullopt};
 
         if (find_service_vas(energy_services, req->service)) {
-            logf_info("Getting custom vas (id: %u) parameters", req->service);
+            logf_info("Getting vas (id: %u) parameters", req->service);
             custom_vas_parameters = m_ctx.feedback.get_vas_parameters(req->service);
 
-            // Check if Internet or ParkingStatus service is in custom_vas_parameters
+            if (req->service == message_20::to_underlying_value(dt::ServiceCategory::Internet)) {
+                m_ctx.session_config.internet_parameter_list.clear();
 
-            // If yes then
+                const auto& internet_parameters = custom_vas_parameters.value();
+
+                for (const auto& parameter_set : internet_parameters) {
+                    auto& internet_parameter_list = m_ctx.session_config.internet_parameter_list.emplace_back();
+                    if (parameter_set.id == 1) {
+                        internet_parameter_list.port = dt::Port::Port20;
+                        internet_parameter_list.protocol = dt::Protocol::Ftp;
+                    } else if (parameter_set.id == 2) {
+                        internet_parameter_list.port = dt::Port::Port21;
+                        internet_parameter_list.protocol = dt::Protocol::Ftp;
+                    } else if (parameter_set.id == 3) {
+                        internet_parameter_list.port = dt::Port::Port80;
+                        internet_parameter_list.protocol = dt::Protocol::Http;
+                    } else if (parameter_set.id == 4) {
+                        internet_parameter_list.port = dt::Port::Port443;
+                        internet_parameter_list.protocol = dt::Protocol::Https;
+                    }
+                }
+
+            } else if (req->service == message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)) {
+                m_ctx.session_config.parking_parameter_list.clear();
+
+                const auto& parking_parameters = custom_vas_parameters.value();
+
+                for (const auto& parameter_set : parking_parameters) {
+                    auto& parking_parameter_list = m_ctx.session_config.parking_parameter_list.emplace_back();
+                    for (const auto& parameter : parameter_set.parameter) {
+                        const auto value = std::get<int32_t>(parameter.value);
+                        if (parameter.name == "IntendedService") {
+                            parking_parameter_list.intended_service = static_cast<dt::IntendedService>(value);
+                        } else if (parameter.name == "ParkingStatusType") {
+                            parking_parameter_list.parking_status = static_cast<dt::ParkingStatus>(value);
+                        }
+                    }
+                }
+            }
         }
 
         const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config, custom_vas_parameters);
