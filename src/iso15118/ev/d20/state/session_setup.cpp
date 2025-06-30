@@ -42,7 +42,7 @@ Result SessionSetup::feed(Event ev) {
         return {};
     }
 
-    const auto variant = m_ctx.pull_request();
+    const auto variant = m_ctx.pull_response();
 
     if (const auto res = variant->get_if<message_20::SupportedAppProtocolResponse>()) {
 
@@ -66,12 +66,9 @@ Result SessionSetup::feed(Event ev) {
         setup_header(req.header, m_ctx.get_session());
         req.evccid = m_ctx.get_evcc_id();
 
-        // TODO(SL): 3. Sent req message and go to the next state
-        // m_ctx.request(req);
+        m_ctx.respond(req);
 
-        const auto req_type = message_20::TypeTrait<message_20::SessionSetupRequest>::type;
-
-        return {m_ctx.create_state<AuthorizationSetup>(), std::make_optional<MsgResult>({req_type, req})};
+        return {m_ctx.create_state<AuthorizationSetup>()};
     } else {
         logf_error("expected SupportedAppProtocol! But code type id: %d", variant->get_type());
         m_ctx.stop_session(true); // Tell stack to close the tcp/tls connection
