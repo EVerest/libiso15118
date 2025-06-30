@@ -56,6 +56,5 @@ SCENARIO("ISO15118-20 state transitions") {
 
     const auto& supported_app_res = response_message.value();
 
-    REQUIRE(supported_app_res.response_code ==
-            message_20::SupportedAppProtocolResponse::ResponseCode::Failed_NoNegotiation);
+    REQUIRE(supported_app_res.response_code == message_20::SupportedAppProtocolResponse::ResponseCode::Failed_NoNegotiation);
 }
