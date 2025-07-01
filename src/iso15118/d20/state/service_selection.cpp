@@ -15,8 +15,8 @@ namespace iso15118::d20::state {
 
 namespace {
 
-bool find_service_vas(const std::vector<uint16_t>& req_service_ids, const uint16_t service) {
-    return std::find(req_service_ids.begin(), req_service_ids.end(), service) == req_service_ids.end();
+bool find_energy_services(const std::vector<uint16_t>& services, const uint16_t service) {
+    return std::find(services.begin(), services.end(), service) != services.end();
 }
 
 } // namespace
@@ -63,7 +63,7 @@ message_20::ServiceSelectionResponse handle_request(const message_20::ServiceSel
         }
     }
 
-    if (not session.find_parameter_set_id(req.selected_energy_transfer_service.service_id,
+    if (not session.find_energy_parameter_set_id(req.selected_energy_transfer_service.service_id,
                                           req.selected_energy_transfer_service.parameter_set_id)) {
         return response_with_code(res, dt::ResponseCode::FAILED_ServiceSelectionInvalid);
     }
@@ -75,7 +75,7 @@ message_20::ServiceSelectionResponse handle_request(const message_20::ServiceSel
         auto& selected_vas_list = req.selected_vas_list.value();
 
         for (auto& vas_service : selected_vas_list) {
-            if (not session.find_parameter_set_id(vas_service.service_id, vas_service.parameter_set_id)) {
+            if (not session.find_vas_parameter_set_id(vas_service.service_id, vas_service.parameter_set_id)) {
                 return response_with_code(res, dt::ResponseCode::FAILED_ServiceSelectionInvalid);
             }
             session.selected_service_parameters(vas_service.service_id, vas_service.parameter_set_id);
@@ -109,10 +109,49 @@ Result ServiceSelection::feed(Event ev) {
 
         std::optional<dt::ServiceParameterList> custom_vas_parameters{std::nullopt};
 
-        if (find_service_vas(energy_services, req->service)) {
+        if (not find_energy_services(energy_services, req->service)) {
             logf_info("Getting vas (id: %u) parameters", req->service);
-            logf_info("Caution: This feedback call can block the entire state machine");
             custom_vas_parameters = m_ctx.feedback.get_vas_parameters(req->service);
+
+            if (req->service == message_20::to_underlying_value(dt::ServiceCategory::Internet)) {
+                m_ctx.session_config.internet_parameter_list.clear();
+
+                const auto& internet_parameters = custom_vas_parameters.value();
+
+                for (const auto& parameter_set : internet_parameters) {
+                    auto& internet_parameter_list = m_ctx.session_config.internet_parameter_list.emplace_back();
+                    if (parameter_set.id == 1) {
+                        internet_parameter_list.port = dt::Port::Port20;
+                        internet_parameter_list.protocol = dt::Protocol::Ftp;
+                    } else if (parameter_set.id == 2) {
+                        internet_parameter_list.port = dt::Port::Port21;
+                        internet_parameter_list.protocol = dt::Protocol::Ftp;
+                    } else if (parameter_set.id == 3) {
+                        internet_parameter_list.port = dt::Port::Port80;
+                        internet_parameter_list.protocol = dt::Protocol::Http;
+                    } else if (parameter_set.id == 4) {
+                        internet_parameter_list.port = dt::Port::Port443;
+                        internet_parameter_list.protocol = dt::Protocol::Https;
+                    }
+                }
+
+            } else if (req->service == message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)) {
+                m_ctx.session_config.parking_parameter_list.clear();
+
+                const auto& parking_parameters = custom_vas_parameters.value();
+
+                for (const auto& parameter_set : parking_parameters) {
+                    auto& parking_parameter_list = m_ctx.session_config.parking_parameter_list.emplace_back();
+                    for (const auto& parameter : parameter_set.parameter) {
+                        const auto value = std::get<int32_t>(parameter.value);
+                        if (parameter.name == "IntendedService") {
+                            parking_parameter_list.intended_service = static_cast<dt::IntendedService>(value);
+                        } else if (parameter.name == "ParkingStatusType") {
+                            parking_parameter_list.parking_status = static_cast<dt::ParkingStatus>(value);
+                        }
+                    }
+                }
+            }
         }
 
         const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config, custom_vas_parameters);

@@ -326,6 +326,37 @@ SCENARIO("Service selection state handling") {
         }
     }
 
+    GIVEN("Good case - DC & Custom VAS") {
+        d20::Session session = d20::Session();
+
+        session.offered_services.energy_services = {dt::ServiceCategory::DC};
+        session.offered_services.dc_parameter_list[0] = {
+            dt::DcConnector::Extended,
+            dt::ControlMode::Scheduled,
+            dt::MobilityNeedsMode::ProvidedByEvcc,
+            dt::Pricing::NoPricing,
+        };
+
+        session.offered_services.vas_services = {4599};
+        session.offered_services.custom_vas_list[4599] = {0, 2};
+
+        message_20::ServiceSelectionRequest req;
+        req.header.session_id = session.get_id();
+        req.header.timestamp = 1691411798;
+        req.selected_energy_transfer_service.service_id = dt::ServiceCategory::DC;
+        req.selected_energy_transfer_service.parameter_set_id = 0;
+
+        req.selected_vas_list = {
+            {4599, 0},
+        };
+
+        const auto res = d20::state::handle_request(req, session);
+
+        THEN("ResponseCode: OK") {
+            REQUIRE(res.response_code == dt::ResponseCode::OK);
+        }
+    }
+
     // GIVEN("Bad case - FAILED_NoServiceRenegotiationSupported") {} // todo(sl): pause/resume not supported yet
 
     // GIVEN("Bad Case - sequence error") {} // TODO(sl): not here

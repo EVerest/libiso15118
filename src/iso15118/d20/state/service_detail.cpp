@@ -16,8 +16,8 @@ namespace iso15118::d20::state {
 
 namespace {
 
-bool find_service_vas(const std::vector<uint16_t>& req_service_ids, const uint16_t service) {
-    return std::find(req_service_ids.begin(), req_service_ids.end(), service) == req_service_ids.end();
+bool find_energy_services(const std::vector<uint16_t>& services, const uint16_t service) {
+    return std::find(services.begin(), services.end(), service) != services.end();
 }
 
 } // namespace
@@ -59,14 +59,16 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
     if (custom_vas_parameters.has_value()) {
         logf_info("Sending custom vas parameters");
 
-        const auto& vas_services_ref = custom_vas_parameters.value();
+        const auto& vas_services = custom_vas_parameters.value();
 
-        for (auto& vas : vas_services_ref) {
-            session.offered_services.vas_services.push_back(vas.id);
+        std::vector<uint16_t> parameter_set_ids{}; 
+        for (auto& vas : vas_services) {
+            parameter_set_ids.push_back(vas.id);
         }
+        session.offered_services.custom_vas_list[req.service] = parameter_set_ids;
 
         res.service = req.service;
-        res.service_parameter_list = vas_services_ref;
+        res.service_parameter_list = vas_services;
         return response_with_code(res, dt::ResponseCode::OK);
     }
 
@@ -153,7 +155,7 @@ Result ServiceDetail::feed(Event ev) {
 
         std::optional<dt::ServiceParameterList> custom_vas_parameters{std::nullopt};
 
-        if (find_service_vas(energy_services, req->service)) {
+        if (not find_energy_services(energy_services, req->service)) {
             logf_info("Getting vas (id: %u) parameters", req->service);
             custom_vas_parameters = m_ctx.feedback.get_vas_parameters(req->service);
 

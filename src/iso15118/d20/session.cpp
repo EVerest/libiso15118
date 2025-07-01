@@ -67,7 +67,7 @@ Session::Session() {
 }
 
 Session::Session(const PauseContext& pause_ctx) :
-    id(pause_ctx.old_session_id), selected_services(pause_ctx.selected_service_parameters){};
+    id(pause_ctx.old_session_id), selected_services(pause_ctx.selected_service_parameters) {};
 
 Session::Session(SelectedServiceParameters service_parameters_) : selected_services(service_parameters_) {
     std::random_device rd;
@@ -90,7 +90,7 @@ Session::Session(OfferedServices services_) : offered_services(services_) {
 
 Session::~Session() = default;
 
-bool Session::find_parameter_set_id(const dt::ServiceCategory service, int16_t id) {
+bool Session::find_energy_parameter_set_id(const dt::ServiceCategory service, int16_t id) {
 
     switch (service) {
     case dt::ServiceCategory::DC:
@@ -117,15 +117,27 @@ bool Session::find_parameter_set_id(const dt::ServiceCategory service, int16_t i
             return true;
         }
         break;
+    case dt::ServiceCategory::AC:
+        [[fallthrough]];
+    case dt::ServiceCategory::WPT:
+        [[fallthrough]];
+    case dt::ServiceCategory::DC_ACDP:
+        [[fallthrough]];
+    case dt::ServiceCategory::AC_BPT:
+        [[fallthrough]];
+    case dt::ServiceCategory::DC_ACDP_BPT:
+        [[fallthrough]];
+    case dt::ServiceCategory::AC_DER:
+        [[fallthrough]];
     default:
-        // Todo(sl): logf AC, WPT, ACDP is not supported
+        logf_warning("Service %u is not supported yet", message_20::to_underlying_value(service));
         break;
     }
 
     return false;
 }
 
-bool Session::find_parameter_set_id(const uint16_t vas_service, int16_t id) {
+bool Session::find_vas_parameter_set_id(const uint16_t vas_service, int16_t id) {
     if (vas_service == message_20::to_underlying_value(dt::ServiceCategory::Internet)) {
         if (this->offered_services.internet_parameter_list.find(id) !=
             this->offered_services.internet_parameter_list.end()) {
@@ -138,9 +150,12 @@ bool Session::find_parameter_set_id(const uint16_t vas_service, int16_t id) {
         }
     } else {
         logf_info("Find parameter_set_id from service: %u", vas_service);
-        for (auto& offered_vas_service : offered_services.custom_vas_list) {
-            if (offered_vas_service == id) {
-                return true;
+        if (this->offered_services.custom_vas_list.find(vas_service) != this->offered_services.custom_vas_list.end()) {
+            const auto custom_vas_parameter_set_ids = this->offered_services.custom_vas_list.at(vas_service);
+            for (auto offered_id : custom_vas_parameter_set_ids) {
+                if (offered_id == id) {
+                    return true;
+                }
             }
         }
     }
@@ -152,7 +167,6 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
 
     switch (service) {
     case dt::ServiceCategory::DC:
-
         if (this->offered_services.dc_parameter_list.find(id) != this->offered_services.dc_parameter_list.end()) {
             auto& parameters = this->offered_services.dc_parameter_list.at(id);
             this->selected_services =
@@ -166,7 +180,6 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
             // Todo(sl): Should be not the case -> Raise Error?
         }
         break;
-
     case dt::ServiceCategory::DC_BPT:
         if (this->offered_services.dc_bpt_parameter_list.find(id) !=
             this->offered_services.dc_bpt_parameter_list.end()) {
@@ -182,7 +195,6 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
             // Todo(sl): Should be not the case -> Raise Error?
         }
         break;
-
     case dt::ServiceCategory::MCS:
         if (this->offered_services.mcs_parameter_list.find(id) != this->offered_services.mcs_parameter_list.end()) {
             auto& parameters = this->offered_services.mcs_parameter_list.at(id);
@@ -213,9 +225,20 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
             // Todo(sl): Should be not the case -> Raise Error?
         }
         break;
-
+    case dt::ServiceCategory::AC:
+        [[fallthrough]];
+    case dt::ServiceCategory::WPT:
+        [[fallthrough]];
+    case dt::ServiceCategory::DC_ACDP:
+        [[fallthrough]];
+    case dt::ServiceCategory::AC_BPT:
+        [[fallthrough]];
+    case dt::ServiceCategory::DC_ACDP_BPT:
+        [[fallthrough]];
+    case dt::ServiceCategory::AC_DER:
+        [[fallthrough]];
     default:
-        // Todo(sl): logf AC, WPT, ACDP is not supported
+        logf_warning("Service %u is not supported yet", message_20::to_underlying_value(service));
         break;
     }
 }

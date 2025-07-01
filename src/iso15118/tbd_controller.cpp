@@ -102,7 +102,7 @@ void TbdController::update_energy_modes(const std::vector<message_20::datatypes:
     }
 }
 
-void TbdController::add_supported_vas_services(const d20::SupportedVASs& vas_services) {
+void TbdController::update_supported_vas_services(const d20::SupportedVASs& vas_services) {
 
     evse_setup.supported_vas_services = vas_services;
 
