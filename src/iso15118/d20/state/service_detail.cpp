@@ -14,15 +14,50 @@
 
 namespace iso15118::d20::state {
 
+namespace dt = message_20::datatypes;
+
 namespace {
 
 bool find_energy_services(const std::vector<uint16_t>& services, const uint16_t service) {
     return std::find(services.begin(), services.end(), service) != services.end();
 }
 
-} // namespace
+void fill_internet_parameter_list(std::vector<dt::InternetParameterList>& internet_parameter_list,
+                                  const dt::ServiceParameterList& custom_vas_parameters) {
+    for (const auto& parameter_set : custom_vas_parameters) {
+        auto& internet_parameter = internet_parameter_list.emplace_back();
+        if (parameter_set.id == 1) {
+            internet_parameter.port = dt::Port::Port20;
+            internet_parameter.protocol = dt::Protocol::Ftp;
+        } else if (parameter_set.id == 2) {
+            internet_parameter.port = dt::Port::Port21;
+            internet_parameter.protocol = dt::Protocol::Ftp;
+        } else if (parameter_set.id == 3) {
+            internet_parameter.port = dt::Port::Port80;
+            internet_parameter.protocol = dt::Protocol::Http;
+        } else if (parameter_set.id == 4) {
+            internet_parameter.port = dt::Port::Port443;
+            internet_parameter.protocol = dt::Protocol::Https;
+        }
+    }
+}
 
-namespace dt = message_20::datatypes;
+void fill_parking_parameter_list(std::vector<message_20::datatypes::ParkingParameterList>& parking_parameter_list,
+                                 const dt::ServiceParameterList& custom_vas_parameters) {
+    for (const auto& parameter_set : custom_vas_parameters) {
+        auto& parking_parameter = parking_parameter_list.emplace_back();
+        for (const auto& parameter : parameter_set.parameter) {
+            const auto value = std::get<int32_t>(parameter.value);
+            if (parameter.name == "IntendedService") {
+                parking_parameter.intended_service = static_cast<dt::IntendedService>(value);
+            } else if (parameter.name == "ParkingStatusType") {
+                parking_parameter.parking_status = static_cast<dt::ParkingStatus>(value);
+            }
+        }
+    }
+}
+
+} // namespace
 
 message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetailRequest& req, d20::Session& session,
                                                  const d20::SessionConfig& config,
@@ -159,44 +194,20 @@ Result ServiceDetail::feed(Event ev) {
             logf_info("Getting vas (id: %u) parameters", req->service);
             custom_vas_parameters = m_ctx.feedback.get_vas_parameters(req->service);
 
-            if (req->service == message_20::to_underlying_value(dt::ServiceCategory::Internet)) {
+            if (custom_vas_parameters.has_value() and
+                req->service == message_20::to_underlying_value(dt::ServiceCategory::Internet)) {
                 m_ctx.session_config.internet_parameter_list.clear();
 
-                const auto& internet_parameters = custom_vas_parameters.value();
+                fill_internet_parameter_list(m_ctx.session_config.internet_parameter_list,
+                                             custom_vas_parameters.value());
+                custom_vas_parameters.reset();
 
-                for (const auto& parameter_set : internet_parameters) {
-                    auto& internet_parameter_list = m_ctx.session_config.internet_parameter_list.emplace_back();
-                    if (parameter_set.id == 1) {
-                        internet_parameter_list.port = dt::Port::Port20;
-                        internet_parameter_list.protocol = dt::Protocol::Ftp;
-                    } else if (parameter_set.id == 2) {
-                        internet_parameter_list.port = dt::Port::Port21;
-                        internet_parameter_list.protocol = dt::Protocol::Ftp;
-                    } else if (parameter_set.id == 3) {
-                        internet_parameter_list.port = dt::Port::Port80;
-                        internet_parameter_list.protocol = dt::Protocol::Http;
-                    } else if (parameter_set.id == 4) {
-                        internet_parameter_list.port = dt::Port::Port443;
-                        internet_parameter_list.protocol = dt::Protocol::Https;
-                    }
-                }
-
-            } else if (req->service == message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)) {
+            } else if (custom_vas_parameters.has_value() and
+                       req->service == message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)) {
                 m_ctx.session_config.parking_parameter_list.clear();
 
-                const auto& parking_parameters = custom_vas_parameters.value();
-
-                for (const auto& parameter_set : parking_parameters) {
-                    auto& parking_parameter_list = m_ctx.session_config.parking_parameter_list.emplace_back();
-                    for (const auto& parameter : parameter_set.parameter) {
-                        const auto value = std::get<int32_t>(parameter.value);
-                        if (parameter.name == "IntendedService") {
-                            parking_parameter_list.intended_service = static_cast<dt::IntendedService>(value);
-                        } else if (parameter.name == "ParkingStatusType") {
-                            parking_parameter_list.parking_status = static_cast<dt::ParkingStatus>(value);
-                        }
-                    }
-                }
+                fill_parking_parameter_list(m_ctx.session_config.parking_parameter_list, custom_vas_parameters.value());
+                custom_vas_parameters.reset();
             }
         }
 
