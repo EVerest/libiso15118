@@ -61,7 +61,7 @@ message_20::ServiceDetailResponse handle_request(const message_20::ServiceDetail
 
         const auto& vas_services = custom_vas_parameters.value();
 
-        std::vector<uint16_t> parameter_set_ids{}; 
+        std::vector<uint16_t> parameter_set_ids{};
         for (auto& vas : vas_services) {
             parameter_set_ids.push_back(vas.id);
         }
