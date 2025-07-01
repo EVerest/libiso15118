@@ -72,6 +72,8 @@ Result SupportedAppProtocol::feed(Event ev) {
 
                 if (protocol.protocol_namespace.compare(ISO20_DC_NAMESPACE) == 0) {
                     m_ctx.feedback.selected_protocol("ISO15118-20:DC");
+                } else if (protocol.protocol_namespace.compare(ISO20_AC_NAMESPACE) == 0) {
+                    m_ctx.feedback.selected_protocol("ISO15118-20:AC");
                 } else if (protocol.protocol_namespace.compare(m_ctx.session_config.custom_protocol.value_or("")) ==
                            0) {
                     m_ctx.feedback.selected_protocol(m_ctx.session_config.custom_protocol.value());
