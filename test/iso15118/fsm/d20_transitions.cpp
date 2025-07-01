@@ -109,7 +109,7 @@ SCENARIO("ISO15118-20 supported app protocol state transitions") {
 
         auto& ap_custom = req.app_protocol.emplace_back();
         ap_custom.priority = 1;
-        ap_custom.protocol_namespace = "urn:iso:std:iso:15118:-20:AABB";
+        ap_custom.protocol_namespace = "urn:iso:std:iso:15118:-20:AC";
         ap_custom.schema_id = 3;
         ap_custom.version_number_major = 1;
         ap_custom.version_number_minor = 0;
