@@ -58,7 +58,6 @@ void fill_parking_parameter_list(std::vector<message_20::datatypes::ParkingParam
 
 } // namespace
 
-
 message_20::ServiceSelectionResponse handle_request(const message_20::ServiceSelectionRequest& req,
                                                     d20::Session& session) {
 
