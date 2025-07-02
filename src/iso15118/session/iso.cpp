@@ -183,7 +183,7 @@ TimePoint const& Session::poll() {
                 ctx.session_stopped = true;
                 break;
             } else {
-                ctx.current_timeout = timeout;
+                ctx.set_active_timeout(timeout);
 
                 [[maybe_unused]] const auto res = fsm.feed(d20::Event::TIMEOUT);
                 timeouts.reset_timeout(timeout);

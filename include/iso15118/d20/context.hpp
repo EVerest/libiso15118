@@ -133,6 +133,10 @@ public:
         return &current_timeout.value();
     }
 
+    void set_active_timeout(TimeoutType timeout) {
+        current_timeout = timeout;
+    }
+
     const session::Feedback feedback;
 
     session::SessionLogger& log;
@@ -150,8 +154,6 @@ public:
     bool session_stopped{false};
     bool session_paused{false};
 
-    std::optional<TimeoutType> current_timeout; // TODO(SL): Set this to private
-
 private:
     const std::optional<ControlEvent>& current_control_event;
     MessageExchange& message_exchange;
@@ -159,6 +161,8 @@ private:
     std::optional<io::sha512_hash_t> vehicle_cert_hash{std::nullopt};
 
     Timeouts& timeouts;
+
+    std::optional<TimeoutType> current_timeout{std::nullopt};
 };
 
 } // namespace iso15118::d20
