@@ -26,6 +26,10 @@ constexpr uint8_t TIMEOUT_TYPE_SIZE = 4;
 static_assert(TIMEOUT_TYPE_SIZE == to_underlying_value(TimeoutType::CONTACTOR) + 1,
               "TIMEOUT_TYPE_SIZE should be in sync with the TimeoutType enum definition");
 
+constexpr auto TIMEOUT_ONGOING = 1000 * 55;
+constexpr auto TIMEOUT_SEQUENCE = 1000 * 60;
+constexpr auto TIMEOUT_EIM_ONGOING = 1000 * 60 * 3;
+
 class Timeouts {
 public:
     explicit Timeouts() = default;

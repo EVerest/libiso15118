@@ -140,7 +140,7 @@ Result ScheduleExchange::feed(Event ev) {
     if (const auto req = variant->get_if<message_20::ScheduleExchangeRequest>()) {
 
         if (first_req_msg) {
-            m_ctx.start_timeout(d20::TimeoutType::ONGOING, 55000); // TODO(sl): Adding const
+            m_ctx.start_timeout(d20::TimeoutType::ONGOING, TIMEOUT_ONGOING);
             first_req_msg = false;
         }
 

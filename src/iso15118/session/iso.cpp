@@ -219,7 +219,7 @@ TimePoint const& Session::poll() {
         const auto response_size = setup_response_header(response_buffer, payload_type, payload_size);
         connection->write(response_buffer, response_size);
 
-        timeouts.start_timeout(d20::TimeoutType::SEQUENCE, 60000); // TODO(SL): Adding SEQUENCE_TIMEOUT const
+        timeouts.start_timeout(d20::TimeoutType::SEQUENCE, d20::TIMEOUT_SEQUENCE);
 
         // FIXME (aw): this is hacky ...
         log.exi(static_cast<uint16_t>(payload_type), response_buffer + io::SdpPacket::V2GTP_HEADER_SIZE, payload_size,

@@ -9,25 +9,25 @@
 SCENARIO("Timeouts Tests") {
 
     GIVEN("Basic Timeout") {
-        auto timeout = iso15118::Timeout(200);
+        auto timeout = iso15118::Timeout(20);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         REQUIRE(timeout.is_reached() == false);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         REQUIRE(timeout.is_reached() == true);
     }
 
     GIVEN("Start Timeout and reset timeout after reaching it") {
         auto timeouts = iso15118::d20::Timeouts{};
 
-        timeouts.start_timeout(iso15118::d20::TimeoutType::CONTACTOR, 200);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        timeouts.start_timeout(iso15118::d20::TimeoutType::CONTACTOR, 20);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         auto timeout_reached = timeouts.check();
         REQUIRE(timeout_reached.has_value() == false);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         timeout_reached = timeouts.check();
         REQUIRE(timeout_reached.has_value() == true);
         auto& reached = timeout_reached.value();
@@ -42,12 +42,12 @@ SCENARIO("Timeouts Tests") {
     GIVEN("Start Timeout and stop timeout before reaching it") {
         auto timeouts = iso15118::d20::Timeouts{};
 
-        timeouts.start_timeout(iso15118::d20::TimeoutType::CONTACTOR, 200);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        timeouts.start_timeout(iso15118::d20::TimeoutType::CONTACTOR, 20);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         auto timeout_reached = timeouts.check();
         REQUIRE(timeout_reached.has_value() == false);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
         timeouts.stop_timeout(iso15118::d20::TimeoutType::CONTACTOR);
 
         timeout_reached = timeouts.check();

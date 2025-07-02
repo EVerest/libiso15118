@@ -115,8 +115,8 @@ Result Authorization::feed(Event ev) {
     if (const auto req = variant->get_if<message_20::AuthorizationRequest>()) {
 
         if (first_req_msg) {
-            // TODO(SL): For ExternalPayment the timeout should at least 3 mins?
-            m_ctx.start_timeout(d20::TimeoutType::ONGOING, 55000); // TODO(sl): Adding const
+            // TODO(SL): Check if ExternalPayment or Contract is active
+            m_ctx.start_timeout(d20::TimeoutType::ONGOING, TIMEOUT_EIM_ONGOING);
             first_req_msg = false;
         }
 
