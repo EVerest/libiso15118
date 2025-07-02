@@ -110,7 +110,8 @@ SessionConfig::SessionConfig(EvseSetupConfig config) :
     authorization_services(std::move(config.authorization_services)),
     supported_energy_transfer_services(std::move(config.supported_energy_services)),
     dc_limits(std::move(config.dc_limits)),
-    supported_control_mobility_modes(std::move(config.control_mobility_modes)) {
+    supported_control_mobility_modes(std::move(config.control_mobility_modes)),
+    custom_protocol(std::move(config.custom_protocol)) {
 
     // TODO(SL): How to handle this probaly
     const auto is_bpt_service = [](dt::ServiceCategory service) {
