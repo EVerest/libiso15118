@@ -6,6 +6,7 @@
 #include <optional>
 #include <variant>
 
+#include <iso15118/d20/ac_powers.hpp>
 #include <iso15118/d20/dynamic_mode_parameters.hpp>
 #include <iso15118/d20/limits.hpp>
 
@@ -69,7 +70,21 @@ private:
 
 using EnergyServices = std::vector<message_20::datatypes::ServiceCategory>;
 
+class ClosedContactor {
+public:
+    explicit ClosedContactor(bool closed_) : closed(closed_) {
+    }
+
+    operator bool() const {
+        return closed;
+    }
+
+private:
+    bool closed;
+};
+
 using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse, StopCharging,
-                                  PauseCharging, DcTransferLimits, UpdateDynamicModeParameters, EnergyServices>;
+                                  PauseCharging, DcTransferLimits, AcTransferLimits, UpdateDynamicModeParameters,
+                                  ClosedContactor, AcTargetPower, AcPresentPower, EnergyServices>;
 
 } // namespace iso15118::d20
