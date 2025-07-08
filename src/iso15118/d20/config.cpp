@@ -24,6 +24,45 @@ auto get_mobility_needs_mode(const ControlMobilityNeedsModes& mode) {
     return mode.mobility_mode;
 }
 
+auto get_default_ac_parameter_list(const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
+    using namespace dt;
+
+    std::vector<AcParameterList> param_list;
+
+    for (const auto& mode : control_mobility_modes) {
+        param_list.push_back({
+            AcConnector::SinglePhase,
+            mode.control_mode,
+            get_mobility_needs_mode(mode),
+            230, // TODO(SL): Getting voltage from EvseManager
+            Pricing::NoPricing,
+        });
+    }
+
+    return param_list;
+}
+
+auto get_default_ac_bpt_parameter_list(const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
+    using namespace dt;
+
+    std::vector<AcBptParameterList> param_list;
+
+    for (const auto& mode : control_mobility_modes) {
+        param_list.push_back({{
+                                  AcConnector::SinglePhase,
+                                  mode.control_mode,
+                                  get_mobility_needs_mode(mode),
+                                  230, // TODO(SL): Getting voltage from EvseManager
+                                  Pricing::NoPricing,
+                              },
+                              BptChannel::Unified,
+                              GeneratorMode::GridFollowing,
+                              GridCodeIslandingDetectionMethode::Passive});
+    }
+
+    return param_list;
+}
+
 auto get_default_dc_parameter_list(const std::vector<ControlMobilityNeedsModes>& control_mobility_modes) {
     using namespace dt;
 
@@ -111,6 +150,7 @@ SessionConfig::SessionConfig(EvseSetupConfig config) :
     supported_energy_transfer_services(std::move(config.supported_energy_services)),
     supported_vas_services(std::move(config.supported_vas_services)),
     dc_limits(std::move(config.dc_limits)),
+    ac_limits(std::move(config.ac_limits)),
     supported_control_mobility_modes(std::move(config.control_mobility_modes)),
     custom_protocol(std::move(config.custom_protocol)) {
 
@@ -130,6 +170,9 @@ SessionConfig::SessionConfig(EvseSetupConfig config) :
         logf_warning("No control modes were provided, set to scheduled mode");
         supported_control_mobility_modes = {{dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
     }
+
+    ac_parameter_list = get_default_ac_parameter_list(supported_control_mobility_modes);
+    ac_bpt_parameter_list = get_default_ac_bpt_parameter_list(supported_control_mobility_modes);
 
     dc_parameter_list = get_default_dc_parameter_list(supported_control_mobility_modes);
     dc_bpt_parameter_list = get_default_dc_bpt_parameter_list(supported_control_mobility_modes);
