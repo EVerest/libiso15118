@@ -232,6 +232,8 @@ template <> void convert(const struct iso20_ac_AC_ChargeLoopResType& in, AC_Char
     cb_convert_enum(in.ResponseCode, out.response_code);
     CB2CPP_CONVERT_IF_USED(in.MeterInfo, out.meter_info);
     CB2CPP_CONVERT_IF_USED(in.Receipt, out.receipt);
+    CB2CPP_CONVERT_IF_USED(in.EVSEStatus, out.status);
+    CB2CPP_CONVERT_IF_USED(in.EVSETargetFrequency, out.target_frequency);
 
     if (in.Scheduled_AC_CLResControlMode_isUsed) {
         convert(in.Scheduled_AC_CLResControlMode, out.control_mode.emplace<datatypes::Scheduled_AC_CLResControlMode>());
