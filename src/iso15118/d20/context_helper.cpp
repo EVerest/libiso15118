@@ -88,6 +88,9 @@ void send_sequence_error(const message_20::Type req_type, d20::Context& ctx) {
     } else if (req_type == message_20::Type::DC_ChargeLoopReq) {
         const auto res = handle_sequence_error<message_20::DC_ChargeLoopResponse>(ctx.session);
         ctx.respond(res);
+    } else if (req_type == message_20::Type::AC_ChargeLoopReq) {
+        const auto res = handle_sequence_error<message_20::AC_ChargeLoopResponse>(ctx.session);
+        ctx.respond(res);
     } else if (req_type == message_20::Type::DC_WeldingDetectionReq) {
         const auto res = handle_sequence_error<message_20::DC_WeldingDetectionResponse>(ctx.session);
         ctx.respond(res);

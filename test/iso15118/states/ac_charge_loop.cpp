@@ -76,7 +76,7 @@ SCENARIO("AC charge loop state handling") {
         d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
             dt::ServiceCategory::AC_BPT, dt::AcConnector::ThreePhase, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
-            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethode::Passive);
+            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethod::Passive);
 
         d20::Session session = d20::Session(service_parameters);
         message_20::AC_ChargeLoopRequest req;
@@ -172,7 +172,7 @@ SCENARIO("AC charge loop state handling") {
         d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
             dt::ServiceCategory::AC_BPT, dt::AcConnector::ThreePhase, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
-            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethode::Passive);
+            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethod::Passive);
 
         d20::Session session = d20::Session(service_parameters);
         message_20::AC_ChargeLoopRequest req;
@@ -251,7 +251,7 @@ SCENARIO("AC charge loop state handling") {
         d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
             dt::ServiceCategory::AC_BPT, dt::AcConnector::ThreePhase, dt::ControlMode::Dynamic,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
-            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethode::Passive);
+            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethod::Passive);
 
         d20::Session session = d20::Session(service_parameters);
         message_20::AC_ChargeLoopRequest req;
@@ -341,7 +341,7 @@ SCENARIO("AC charge loop state handling") {
         d20::SelectedServiceParameters service_parameters = d20::SelectedServiceParameters(
             dt::ServiceCategory::AC_BPT, dt::AcConnector::ThreePhase, dt::ControlMode::Dynamic,
             dt::MobilityNeedsMode::ProvidedBySecc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
-            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethode::Passive);
+            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethod::Passive);
 
         d20::Session session = d20::Session(service_parameters);
         message_20::AC_ChargeLoopRequest req;

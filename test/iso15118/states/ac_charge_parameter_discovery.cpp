@@ -60,7 +60,7 @@ SCENARIO("AC charge parameter discovery state handling") {
         const auto service_parameters = d20::SelectedServiceParameters(
             dt::ServiceCategory::AC_BPT, dt::AcConnector::ThreePhase, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
-            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethode::Passive);
+            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethod::Passive);
 
         const auto evse_id = std::string("everest se");
         const std::vector<dt::ServiceCategory> supported_energy_services = {dt::ServiceCategory::AC};
@@ -209,7 +209,7 @@ SCENARIO("AC charge parameter discovery state handling") {
         const auto service_parameters = d20::SelectedServiceParameters(
             dt::ServiceCategory::AC_BPT, dt::AcConnector::ThreePhase, dt::ControlMode::Scheduled,
             dt::MobilityNeedsMode::ProvidedByEvcc, dt::Pricing::NoPricing, dt::BptChannel::Unified,
-            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethode::Passive);
+            dt::GeneratorMode::GridFollowing, 230, dt::GridCodeIslandingDetectionMethod::Passive);
 
         auto session = d20::Session(service_parameters);
 

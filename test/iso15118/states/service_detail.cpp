@@ -444,7 +444,7 @@ SCENARIO("Service detail state handling") {
             },
             dt::BptChannel::Unified,
             dt::GeneratorMode::GridFollowing,
-            dt::GridCodeIslandingDetectionMethode::Passive,
+            dt::GridCodeIslandingDetectionMethod::Passive,
         }};
 
         message_20::ServiceDetailRequest req;
@@ -504,19 +504,19 @@ SCENARIO("Service detail state handling") {
 
         auto session_config = d20::SessionConfig(evse_setup);
         session_config.ac_parameter_list = {{
-                                        dt::AcConnector::ThreePhase,
-                                        dt::ControlMode::Scheduled,
-                                        dt::MobilityNeedsMode::ProvidedByEvcc,
-                                        230,
-                                        dt::Pricing::NoPricing,
-                                    },
-                                    {
-                                        dt::AcConnector::ThreePhase,
-                                        dt::ControlMode::Dynamic,
-                                        dt::MobilityNeedsMode::ProvidedBySecc,
-                                        230,
-                                        dt::Pricing::NoPricing,
-                                    }};
+                                                dt::AcConnector::ThreePhase,
+                                                dt::ControlMode::Scheduled,
+                                                dt::MobilityNeedsMode::ProvidedByEvcc,
+                                                230,
+                                                dt::Pricing::NoPricing,
+                                            },
+                                            {
+                                                dt::AcConnector::ThreePhase,
+                                                dt::ControlMode::Dynamic,
+                                                dt::MobilityNeedsMode::ProvidedBySecc,
+                                                230,
+                                                dt::Pricing::NoPricing,
+                                            }};
 
         message_20::ServiceDetailRequest req;
         req.header.session_id = session.get_id();

@@ -48,7 +48,7 @@ SelectedServiceParameters::SelectedServiceParameters(dt::ServiceCategory energy_
                                                      dt::ControlMode control_mode_, dt::MobilityNeedsMode mobility_,
                                                      dt::Pricing pricing_, dt::BptChannel channel_,
                                                      dt::GeneratorMode generator_, float nominal_voltage_,
-                                                     dt::GridCodeIslandingDetectionMethode grid_code_methode_) :
+                                                     dt::GridCodeIslandingDetectionMethod grid_code_method_) :
     selected_energy_service(energy_service_),
     selected_control_mode(control_mode_),
     selected_mobility_needs_mode(mobility_),
@@ -56,7 +56,7 @@ SelectedServiceParameters::SelectedServiceParameters(dt::ServiceCategory energy_
     selected_bpt_channel(channel_),
     selected_generator_mode(generator_),
     evse_nominal_voltage(nominal_voltage_),
-    selected_grid_code_methode(grid_code_methode_) {
+    selected_grid_code_method(grid_code_method_) {
     selected_connector.emplace<dt::AcConnector>(ac_connector_);
 };
 
@@ -222,7 +222,7 @@ void Session::selected_service_parameters(const dt::ServiceCategory service, con
             this->selected_services = SelectedServiceParameters(
                 dt::ServiceCategory::AC_BPT, parameters.connector, parameters.control_mode,
                 parameters.mobility_needs_mode, parameters.pricing, parameters.bpt_channel, parameters.generator_mode,
-                parameters.evse_nominal_voltage, parameters.grid_code_detection_methode);
+                parameters.evse_nominal_voltage, parameters.grid_code_detection_method);
         } else {
             // Todo(sl): Should be not the case -> Raise Error?
         }

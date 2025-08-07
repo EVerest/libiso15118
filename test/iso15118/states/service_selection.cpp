@@ -298,7 +298,7 @@ SCENARIO("Service selection state handling") {
                                                              },
                                                              dt::BptChannel::Unified,
                                                              dt::GeneratorMode::GridFollowing,
-                                                             dt::GridCodeIslandingDetectionMethode::Passive};
+                                                             dt::GridCodeIslandingDetectionMethod::Passive};
 
         message_20::ServiceSelectionRequest req;
         req.header.session_id = session.get_id();

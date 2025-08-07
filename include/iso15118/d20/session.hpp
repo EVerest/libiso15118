@@ -52,7 +52,7 @@ struct SelectedServiceParameters {
 
     // AC specific
     std::optional<float> evse_nominal_voltage;
-    std::optional<dt::GridCodeIslandingDetectionMethode> selected_grid_code_methode;
+    std::optional<dt::GridCodeIslandingDetectionMethod> selected_grid_code_method;
 
     SelectedServiceParameters() = default;
     SelectedServiceParameters(dt::ServiceCategory energy_service_, dt::DcConnector dc_connector_,
@@ -71,7 +71,7 @@ struct SelectedServiceParameters {
     SelectedServiceParameters(dt::ServiceCategory energy_service_, dt::AcConnector ac_connector_,
                               dt::ControlMode control_mode_, dt::MobilityNeedsMode mobility_, dt::Pricing pricing_,
                               dt::BptChannel channel_, dt::GeneratorMode generator_, float nominal_voltage_,
-                              dt::GridCodeIslandingDetectionMethode grid_code_methode_);
+                              dt::GridCodeIslandingDetectionMethod grid_code_method_);
 };
 
 // Todo(sl): missing services

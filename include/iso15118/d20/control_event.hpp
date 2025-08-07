@@ -87,9 +87,8 @@ private:
 // TODO(SL): Define this globally for message and states
 using SupportedVASs = std::vector<uint16_t>;
 
-using ControlEvent =
-    std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse, StopCharging, PauseCharging,
-                 DcTransferLimits, AcTransferLimits, UpdateDynamicModeParameters,
+using ControlEvent = std::variant<CableCheckFinished, PresentVoltageCurrent, AuthorizationResponse, StopCharging,
+                                  PauseCharging, DcTransferLimits, AcTransferLimits, UpdateDynamicModeParameters,
                                   ClosedContactor, AcTargetPower, AcPresentPower, EnergyServices, SupportedVASs>;
 
 } // namespace iso15118::d20

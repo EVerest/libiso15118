@@ -57,7 +57,7 @@ auto get_default_ac_bpt_parameter_list(const std::vector<ControlMobilityNeedsMod
                               },
                               BptChannel::Unified,
                               GeneratorMode::GridFollowing,
-                              GridCodeIslandingDetectionMethode::Passive});
+                              GridCodeIslandingDetectionMethod::Passive});
     }
 
     return param_list;

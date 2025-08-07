@@ -165,7 +165,7 @@ enum class GeneratorMode {
     GridForming = 2,
 };
 
-enum class GridCodeIslandingDetectionMethode {
+enum class GridCodeIslandingDetectionMethod {
     Active = 1,
     Passive = 2,
 };
@@ -216,7 +216,7 @@ struct AcParameterList {
 struct AcBptParameterList : AcParameterList {
     BptChannel bpt_channel;
     GeneratorMode generator_mode;
-    GridCodeIslandingDetectionMethode grid_code_detection_methode;
+    GridCodeIslandingDetectionMethod grid_code_detection_method;
 };
 
 struct DcParameterList {

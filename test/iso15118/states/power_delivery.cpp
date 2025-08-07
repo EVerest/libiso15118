@@ -72,7 +72,7 @@ SCENARIO("Power delivery state handling") {
 
         const auto res = d20::state::handle_request(req, session, true);
 
-        THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
+        THEN("ResponseCode: FAILED_ContactorError, mandatory fields should be set") {
             REQUIRE(res.response_code == dt::ResponseCode::FAILED_ContactorError);
             REQUIRE(res.status.has_value() == false);
         }
