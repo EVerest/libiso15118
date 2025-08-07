@@ -56,6 +56,13 @@ Result PowerDelivery::feed(Event ev) {
             present_voltage = control_data->voltage;
         } else if (const auto* control_data = m_ctx.get_control_event<ClosedContactor>()) {
             ac_connector_closed = control_data;
+
+            if (not ac_connector_closed) {
+                logf_warning("Got ClosedContactor event, but contactor is not closed. Waiting ucontactor is not "
+                             "closed. Waiting until the contactor is closed");
+                return {};
+            }
+
             m_ctx.stop_timeout(d20::TimeoutType::CONTACTOR);
 
             if (not previous_req.has_value()) {
