@@ -11,6 +11,31 @@
 #include <iso15118/detail/d20/state/service_discovery.hpp>
 #include <iso15118/detail/d20/state/session_stop.hpp>
 
+namespace {
+iso15118::message_20::datatypes::ServiceCategory
+convert_service_id_to_service_category(const std::uint16_t service_id) {
+    switch (service_id) {
+    case 1:
+        return iso15118::message_20::datatypes::ServiceCategory::AC;
+    case 2:
+        return iso15118::message_20::datatypes::ServiceCategory::DC;
+    case 3:
+        return iso15118::message_20::datatypes::ServiceCategory::WPT;
+    case 4:
+        return iso15118::message_20::datatypes::ServiceCategory::DC_ACDP;
+    case 5:
+        return iso15118::message_20::datatypes::ServiceCategory::AC_BPT;
+    case 6:
+        return iso15118::message_20::datatypes::ServiceCategory::DC_BPT;
+    case 7:
+        return iso15118::message_20::datatypes::ServiceCategory::DC_ACDP_BPT;
+    default:
+        // returning ParkingStatus as default to show nonsense
+        return iso15118::message_20::datatypes::ServiceCategory::ParkingStatus;
+    }
+}
+} // namespace
+
 namespace iso15118::d20::state {
 
 namespace dt = message_20::datatypes;
@@ -45,7 +70,6 @@ handle_request(const message_20::ServiceDiscoveryRequest& req, d20::Session& ses
         for (auto& energy_service : energy_services) {
             if (find_service_id(req.supported_service_ids.value(), message_20::to_underlying_value(energy_service))) {
                 energy_services_list.push_back({energy_service, false});
-                ev_energy_services.push_back(energy_service);
             }
         }
         for (auto& vas_service : vas_services) {
@@ -53,10 +77,16 @@ handle_request(const message_20::ServiceDiscoveryRequest& req, d20::Session& ses
                 vas_services_list.push_back({vas_service, false});
             }
         }
+        ev_energy_services.reserve(req.supported_service_ids->size());
+        for (auto service : req.supported_service_ids.value()) {
+            const auto energy_service = convert_service_id_to_service_category(service);
+            if (energy_service != message_20::datatypes::ServiceCategory::ParkingStatus) {
+                ev_energy_services.emplace_back(energy_service);
+            }
+        }
     } else {
         for (auto& energy_service : energy_services) {
             energy_services_list.push_back({energy_service, false});
-            ev_energy_services.push_back(energy_service);
         }
         for (auto& vas_service : vas_services) {
             vas_services_list.push_back({vas_service, false});
