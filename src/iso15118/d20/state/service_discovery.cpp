@@ -80,6 +80,7 @@ handle_request(const message_20::ServiceDiscoveryRequest& req, d20::Session& ses
         ev_energy_services.reserve(req.supported_service_ids->size());
         for (auto service : req.supported_service_ids.value()) {
             const auto energy_service = convert_service_id_to_service_category(service);
+            // ParkingStatus is used as a nonsense value
             if (energy_service != message_20::datatypes::ServiceCategory::ParkingStatus) {
                 ev_energy_services.emplace_back(energy_service);
             }
