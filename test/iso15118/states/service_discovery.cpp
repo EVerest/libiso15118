@@ -44,8 +44,10 @@ SCENARIO("Service discovery state handling") {
 
         std::vector<dt::ServiceCategory> supported_energy_transfer_services = {dt::ServiceCategory::AC,
                                                                                dt::ServiceCategory::AC_BPT};
+        std::vector<dt::ServiceCategory> ev_energy_services{};
 
-        const auto res = d20::state::handle_request(req, session, supported_energy_transfer_services, {});
+        const auto res =
+            d20::state::handle_request(req, session, supported_energy_transfer_services, {}, ev_energy_services);
 
         THEN("ResponseCode: OK, energy_transfer_service_list: AC & AC_WPT, vaslist: empty") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
