@@ -4,12 +4,11 @@
 
 #include <optional>
 
+#include <iso15118/detail/helper.hpp>
 #include <iso15118/ev/d20/state/authorization_setup.hpp>
+#include <iso15118/ev/detail/d20/context_helper.hpp>
 #include <iso15118/message/session_setup.hpp>
 #include <iso15118/message/supported_app_protocol.hpp>
-
-#include <iso15118/detail/helper.hpp>
-#include <iso15118/ev/detail/d20/context_helper.hpp>
 
 namespace iso15118::ev::d20::state {
 
@@ -52,8 +51,7 @@ Result SessionSetup::feed(Event ev) {
         }
 
         if (not res->schema_id.has_value()) {
-            logf_error(
-                "SupportedAppProtocolRes should have a SchemaId. This is here not the case! Abort the session.");
+            logf_error("SupportedAppProtocolRes should have a SchemaId. This is here not the case! Abort the session.");
             m_ctx.stop_session(true); // Tell stack to close the tcp/tls connection
             return {};
         }
