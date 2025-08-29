@@ -6,9 +6,9 @@
 
 namespace iso15118::ev::d20::state {
 
-struct SessionSetup : public StateBase {
+struct ScheduleExchange : public StateBase {
 public:
-    SessionSetup(Context& ctx) : StateBase(ctx, StateID::SessionSetup) {
+    ScheduleExchange(Context& ctx) : StateBase(ctx, StateID::ScheduleExchange) {
     }
 
     void enter() final;

@@ -6,9 +6,10 @@
 
 namespace iso15118::ev::d20::state {
 
-struct AuthorizationSetup : public StateBase{
+struct AuthorizationSetup : public StateBase {
 public:
-    AuthorizationSetup(Context& ctx) : StateBase(ctx, StateID::AuthorizationSetup) {}
+    AuthorizationSetup(Context& ctx) : StateBase(ctx, StateID::AuthorizationSetup) {
+    }
 
     void enter() final;
 
