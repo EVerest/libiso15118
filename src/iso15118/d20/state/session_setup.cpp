@@ -5,6 +5,7 @@
 #include <openssl/evp.h>
 #include <sstream>
 
+#include <iso15118/d20/state/ac_charge_parameter_discovery.hpp>
 #include <iso15118/d20/state/authorization_setup.hpp>
 #include <iso15118/d20/state/dc_charge_parameter_discovery.hpp>
 #include <iso15118/d20/state/session_setup.hpp>
@@ -136,10 +137,11 @@ Result SessionSetup::feed(Event ev) {
 
             if (selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::AC or
                 selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::AC_BPT) {
-                // TODO(sl): Missing AC charge parameter discovery state
-                return {};
+                return m_ctx.create_state<AC_ChargeParameterDiscovery>();
             } else if (selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::DC or
-                       selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::DC_BPT) {
+                       selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::DC_BPT or
+                       selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::MCS or
+                       selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::MCS_BPT) {
                 return m_ctx.create_state<DC_ChargeParameterDiscovery>();
             }
             // TODO(sl): Error handling
