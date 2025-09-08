@@ -197,19 +197,18 @@ Result ServiceSelection::feed(Event ev) {
 
         const auto selected_energy_service = m_ctx.session.get_selected_services().selected_energy_service;
 
-        if (selected_energy_service == dt::ServiceCategory::AC ||
-            selected_energy_service == dt::ServiceCategory::AC_BPT) {
+        if (m_ctx.session.is_ac_charger()) {
             return m_ctx.create_state<AC_ChargeParameterDiscovery>();
-        } else if (selected_energy_service == dt::ServiceCategory::DC ||
-                   selected_energy_service == dt::ServiceCategory::DC_BPT) {
-            return m_ctx.create_state<DC_ChargeParameterDiscovery>();
-        } else {
-            m_ctx.log("expected selected_energy_service AC, AC_BPT, DC, DC_BPT! But code type id: %d",
-                      static_cast<int>(selected_energy_service));
-
-            m_ctx.session_stopped = true;
-            return {};
         }
+        if (m_ctx.session.is_dc_charger()) {
+            return m_ctx.create_state<DC_ChargeParameterDiscovery>();
+        }
+        m_ctx.log("expected selected_energy_service AC, AC_BPT, DC, DC_BPT! But code type id: %d",
+                  static_cast<int>(selected_energy_service));
+
+        m_ctx.session_stopped = true;
+        return {};
+
     } else if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {
         const auto res = handle_request(*req, m_ctx.session);
 

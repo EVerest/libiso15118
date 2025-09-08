@@ -45,11 +45,6 @@ void PowerDelivery::enter() {
 Result PowerDelivery::feed(Event ev) {
 
     const auto selected_energy_service = m_ctx.session.get_selected_services().selected_energy_service;
-    const bool ac_charger =
-        selected_energy_service == dt::ServiceCategory::AC or selected_energy_service == dt::ServiceCategory::AC_BPT;
-    const bool dc_charger =
-        selected_energy_service == dt::ServiceCategory::DC or selected_energy_service == dt::ServiceCategory::DC_BPT;
-
     if (ev == Event::CONTROL_MESSAGE) {
 
         if (const auto* control_data = m_ctx.get_control_event<PresentVoltageCurrent>()) {
@@ -120,7 +115,8 @@ Result PowerDelivery::feed(Event ev) {
             m_ctx.feedback.signal(session::feedback::Signal::SETUP_FINISHED);
         }
 
-        if (ac_charger == true and ac_connector_closed == false and req->charge_progress == dt::Progress::Start) {
+        if (m_ctx.session.is_ac_charger() and ac_connector_closed == false and
+            req->charge_progress == dt::Progress::Start) {
             // Save req
             previous_req = *req;
             // Close the AC contactor so that charging can start
@@ -139,17 +135,18 @@ Result PowerDelivery::feed(Event ev) {
             return {};
         }
 
-        if (ac_charger) {
+        if (m_ctx.session.is_ac_charger()) {
             return m_ctx.create_state<AC_ChargeLoop>();
-        } else if (dc_charger) {
-            return m_ctx.create_state<DC_ChargeLoop>();
-        } else {
-            m_ctx.log("expected selected_energy_service AC, AC_BPT, DC, DC_BPT! But code type id: %d",
-                      static_cast<int>(selected_energy_service));
-
-            m_ctx.session_stopped = true;
-            return {};
         }
+        if (m_ctx.session.is_dc_charger()) {
+            return m_ctx.create_state<DC_ChargeLoop>();
+        }
+        m_ctx.log("expected selected_energy_service AC, AC_BPT, DC, DC_BPT! But code type id: %d",
+                  static_cast<int>(selected_energy_service));
+
+        m_ctx.session_stopped = true;
+        return {};
+
     } else {
         m_ctx.log("Expected DC_PreChargeReq or PowerDeliveryReq! But code type id: %d", variant->get_type());
 

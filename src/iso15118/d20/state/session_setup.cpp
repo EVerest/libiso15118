@@ -135,15 +135,13 @@ Result SessionSetup::feed(Event ev) {
             const auto& selected_services = m_ctx.session.get_selected_services();
             m_ctx.feedback.selected_service_parameters(selected_services);
 
-            if (selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::AC or
-                selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::AC_BPT) {
+            if (m_ctx.session.is_ac_charger()) {
                 return m_ctx.create_state<AC_ChargeParameterDiscovery>();
-            } else if (selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::DC or
-                       selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::DC_BPT or
-                       selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::MCS or
-                       selected_services.selected_energy_service == message_20::datatypes::ServiceCategory::MCS_BPT) {
+            }
+            if (m_ctx.session.is_dc_charger()) {
                 return m_ctx.create_state<DC_ChargeParameterDiscovery>();
             }
+
             // TODO(sl): Error handling
             return {};
         }

@@ -122,6 +122,18 @@ public:
         return selected_services;
     }
 
+    bool is_ac_charger() const {
+        return selected_services.selected_energy_service == dt::ServiceCategory::AC or
+               selected_services.selected_energy_service == dt::ServiceCategory::AC_BPT;
+    }
+
+    bool is_dc_charger() const {
+        return selected_services.selected_energy_service == dt::ServiceCategory::DC or
+               selected_services.selected_energy_service == dt::ServiceCategory::DC_BPT or
+               selected_services.selected_energy_service == dt::ServiceCategory::MCS or
+               selected_services.selected_energy_service == dt::ServiceCategory::MCS_BPT;
+    }
+
     ~Session();
 
     OfferedServices offered_services;
