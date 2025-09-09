@@ -123,6 +123,11 @@ void TbdController::update_ac_limits(const d20::AcTransferLimits& limits) {
 void TbdController::handle_sdp_server_input() {
     auto request = sdp_server->get_peer_request();
 
+    if (session) {
+        logf_warning("Ignoring sdp request message because a session is already created and running");
+        return;
+    }
+
     if (not request) {
         return;
     }
