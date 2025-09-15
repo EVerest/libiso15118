@@ -11,11 +11,16 @@ class Session {
 
 public:
     static constexpr auto ID_LENGTH = 8;
-    Session(std::array<uint8_t, ID_LENGTH> id_) : id(id_) {};
+    Session(std::array<uint8_t, ID_LENGTH> id_) : id(id_){};
     ~Session() = default;
 
     std::array<uint8_t, ID_LENGTH> get_id() const {
         return id;
+    }
+
+    // Sets the session ID, mostly for testing purposes
+    void set_id(const std::array<uint8_t, ID_LENGTH>& new_id) {
+        id = new_id;
     }
 
 private:
