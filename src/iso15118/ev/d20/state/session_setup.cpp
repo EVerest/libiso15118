@@ -2,21 +2,21 @@
 // Copyright 2025 Pionix GmbH, Roger Bedell, and Contributors to EVerest
 #include <algorithm>
 #include <iomanip>
-#include <openssl/evp.h>
-#include <sstream>
-#include <optional>
-#include <iso15118/ev/d20/state/session_setup.hpp>
+#include <iso15118/detail/helper.hpp>
+#include <iso15118/ev/d20/context.hpp>
 #include <iso15118/ev/d20/state/authorization_setup.hpp>
 #include <iso15118/ev/d20/state/dc_charge_parameter_discovery.hpp>
-#include <iso15118/ev/d20/context.hpp>
-#include <iso15118/message/session_setup.hpp>
-#include <iso15118/message/authorization_setup.hpp>
-#include <iso15118/detail/helper.hpp>
+#include <iso15118/ev/d20/state/session_setup.hpp>
 #include <iso15118/ev/detail/d20/context_helper.hpp>
+#include <iso15118/message/authorization_setup.hpp>
+#include <iso15118/message/session_setup.hpp>
+#include <openssl/evp.h>
+#include <optional>
+#include <sstream>
 
 namespace iso15118::ev::d20::state {
 
-    bool session_is_zero(const message_20::datatypes::SessionId& session_id) {
+bool session_is_zero(const message_20::datatypes::SessionId& session_id) {
     return std::all_of(session_id.begin(), session_id.end(), [](int i) { return i == 0; });
 }
 

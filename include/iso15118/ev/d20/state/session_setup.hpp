@@ -6,9 +6,10 @@
 
 namespace iso15118::ev::d20::state {
 
-struct SessionSetup : public StateBase{
+struct SessionSetup : public StateBase {
 public:
-    SessionSetup(Context& ctx) : StateBase(ctx, StateID::SessionSetup) {}
+    SessionSetup(Context& ctx) : StateBase(ctx, StateID::SessionSetup) {
+    }
 
     void enter() final;
 
