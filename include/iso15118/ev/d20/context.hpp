@@ -5,6 +5,8 @@
 #include <any>
 #include <memory>
 
+#include "evse_information.hpp"
+#include "evse_session_info.hpp"
 #include <iso15118/message/common_types.hpp>
 #include <iso15118/message/variant.hpp>
 
@@ -76,6 +78,26 @@ public:
         session_stopped = stop;
     }
 
+    bool is_session_stopped() {
+        return session_stopped;
+    }
+
+    void set_charger_cert_hash(std::optional<io::sha512_hash_t> hash) {
+        charger_cert_hash = hash;
+    }
+
+    auto get_charger_cert_hash() const {
+        return charger_cert_hash;
+    }
+
+    void set_charger_cert_session_hash(std::optional<io::sha512_hash_t> hash) {
+        charger_cert_session_hash = hash;
+    }
+
+    auto get_charger_cert_session_hash() const {
+        return charger_cert_session_hash;
+    }
+
     message_20::datatypes::Identifier get_evcc_id() {
         return evcc_id;
     }
@@ -83,6 +105,10 @@ public:
     Session& get_session() {
         return session;
     }
+
+    // Contains the EVSE received data
+    EVSESessionInfo session_evse_info;
+    EVSEInformation evse_info;
 
 private:
     MessageExchange& message_exchange;
@@ -93,6 +119,10 @@ private:
     Session session{std::array<uint8_t, Session::ID_LENGTH>{}};
 
     bool session_stopped{false};
+
+    std::optional<io::sha512_hash_t> charger_cert_hash{std::nullopt};
+
+    std::optional<io::sha512_hash_t> charger_cert_session_hash{std::nullopt};
 };
 
 } // namespace iso15118::ev::d20
