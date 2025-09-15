@@ -20,8 +20,9 @@ SCENARIO("Service discovery state handling") {
         session = d20::Session();
 
         std::vector<dt::ServiceCategory> energy_services = {dt::ServiceCategory::DC};
+        std::vector<dt::ServiceCategory> ev_energy_services{};
 
-        const auto res = d20::state::handle_request(req, session, energy_services, {});
+        const auto res = d20::state::handle_request(req, session, energy_services, {}, ev_energy_services);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == dt::ResponseCode::FAILED_UnknownSession);
@@ -33,7 +34,36 @@ SCENARIO("Service discovery state handling") {
         }
     }
 
-    GIVEN("Good Case - Setting services") {
+    GIVEN("Good Case - Setting ac services") {
+
+        d20::Session session = d20::Session();
+
+        message_20::ServiceDiscoveryRequest req;
+        req.header.session_id = session.get_id();
+        req.header.timestamp = 1691411798;
+
+        std::vector<dt::ServiceCategory> supported_energy_transfer_services = {dt::ServiceCategory::AC,
+                                                                               dt::ServiceCategory::AC_BPT};
+        std::vector<dt::ServiceCategory> ev_energy_services{};
+
+        const auto res =
+            d20::state::handle_request(req, session, supported_energy_transfer_services, {}, ev_energy_services);
+
+        THEN("ResponseCode: OK, energy_transfer_service_list: AC & AC_WPT, vaslist: empty") {
+            REQUIRE(res.response_code == dt::ResponseCode::OK);
+            REQUIRE(res.service_renegotiation_supported == false);
+            REQUIRE(res.energy_transfer_service_list.size() == 2);
+            REQUIRE(res.energy_transfer_service_list[0].free_service == false);
+            REQUIRE((res.energy_transfer_service_list[0].service_id == dt::ServiceCategory::AC ||
+                     res.energy_transfer_service_list[0].service_id == dt::ServiceCategory::AC_BPT));
+            REQUIRE(res.energy_transfer_service_list[1].free_service == false);
+            REQUIRE((res.energy_transfer_service_list[1].service_id == dt::ServiceCategory::AC ||
+                     res.energy_transfer_service_list[1].service_id == dt::ServiceCategory::AC_BPT));
+            REQUIRE(res.vas_list.has_value() == false);
+        }
+    }
+
+    GIVEN("Good Case - Setting dc services") {
 
         d20::Session session = d20::Session();
 
@@ -43,8 +73,10 @@ SCENARIO("Service discovery state handling") {
 
         std::vector<dt::ServiceCategory> supported_energy_transfer_services = {dt::ServiceCategory::DC,
                                                                                dt::ServiceCategory::DC_BPT};
+        std::vector<dt::ServiceCategory> ev_energy_services{};
 
-        const auto res = d20::state::handle_request(req, session, supported_energy_transfer_services, {});
+        const auto res =
+            d20::state::handle_request(req, session, supported_energy_transfer_services, {}, ev_energy_services);
 
         THEN("ResponseCode: OK, energy_transfer_service_list: DC & DC_WPT, vaslist: empty") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
@@ -70,8 +102,10 @@ SCENARIO("Service discovery state handling") {
 
         std::vector<dt::ServiceCategory> supported_energy_transfer_services = {dt::ServiceCategory::MCS,
                                                                                dt::ServiceCategory::MCS_BPT};
+        std::vector<dt::ServiceCategory> ev_energy_services{};
 
-        const auto res = d20::state::handle_request(req, session, supported_energy_transfer_services, {});
+        const auto res =
+            d20::state::handle_request(req, session, supported_energy_transfer_services, {}, ev_energy_services);
 
         THEN("ResponseCode: OK, energy_transfer_service_list: MCS & MCS_BPT, vaslist: empty") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
@@ -99,9 +133,10 @@ SCENARIO("Service discovery state handling") {
                                                                                dt::ServiceCategory::DC_BPT};
         std::vector<uint16_t> supported_vas_services = {
             message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)};
+        std::vector<dt::ServiceCategory> ev_energy_services{};
 
-        const auto res =
-            d20::state::handle_request(req, session, supported_energy_transfer_services, supported_vas_services);
+        const auto res = d20::state::handle_request(req, session, supported_energy_transfer_services,
+                                                    supported_vas_services, ev_energy_services);
 
         THEN("ResponseCode: OK, energy_transfer_service_list: DC & DC_BPT, vaslist: ParkingStatus") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
@@ -136,9 +171,10 @@ SCENARIO("Service discovery state handling") {
                                                                                dt::ServiceCategory::DC_BPT};
         std::vector<uint16_t> supported_vas_services = {
             message_20::to_underlying_value(dt::ServiceCategory::ParkingStatus)};
+        std::vector<dt::ServiceCategory> ev_energy_services{};
 
-        const auto res =
-            d20::state::handle_request(req, session, supported_energy_transfer_services, supported_vas_services);
+        const auto res = d20::state::handle_request(req, session, supported_energy_transfer_services,
+                                                    supported_vas_services, ev_energy_services);
 
         THEN("ResponseCode: OK, energy_transfer_service_list: DC, vaslist: empty") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
