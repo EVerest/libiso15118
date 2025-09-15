@@ -5,8 +5,8 @@
 #include "helper.hpp"
 
 #include <iso15118/ev/d20/state/session_setup.hpp>
-#include <iso15118/message/session_setup.hpp>
 #include <iso15118/message/authorization_setup.hpp>
+#include <iso15118/message/session_setup.hpp>
 #include <iso15118/message/type.hpp>
 
 using namespace iso15118;
