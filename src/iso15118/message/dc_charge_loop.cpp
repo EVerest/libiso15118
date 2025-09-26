@@ -287,7 +287,7 @@ template <typename OutType> void convert(const datatypes::Dynamic_DC_CLResContro
 
     convert(in.max_charge_power, out.EVSEMaximumChargePower);
     convert(in.min_charge_power, out.EVSEMinimumChargePower);
-    convert(in.max_charge_current, out.EVSEMaximumChargePower);
+    convert(in.max_charge_current, out.EVSEMaximumChargeCurrent);
     convert(in.max_voltage, out.EVSEMaximumVoltage);
 }
 
