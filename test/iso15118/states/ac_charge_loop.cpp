@@ -30,6 +30,7 @@ SCENARIO("AC charge loop state handling") {
     const std::vector<uint16_t> vas_services{};
 
     d20::DcTransferLimits dc_limits;
+    d20::DcTransferLimits powersupply_limits;
     d20::AcTransferLimits ac_limits;
     ac_limits.charge_power = {{22, 3}, {10, 0}};
     ac_limits.nominal_frequency = {50, 0};
@@ -45,7 +46,7 @@ SCENARIO("AC charge loop state handling") {
 
     const d20::EvseSetupConfig evse_setup{
         evse_id,   supported_energy_services, auth_services, vas_services, cert_install, dc_limits,
-        ac_limits, control_mobility_modes};
+        ac_limits, control_mobility_modes,    std::nullopt,  std::nullopt, std::nullopt, powersupply_limits};
 
     GIVEN("Bad case - Unknown session") {
         d20::Session session = d20::Session();

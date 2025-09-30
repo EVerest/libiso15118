@@ -39,6 +39,7 @@ struct EvseSetupConfig {
     std::optional<std::string> custom_protocol{std::nullopt};
     std::optional<AcSetupConfig> ac_setup_config{std::nullopt};
     std::optional<BptSetupConfig> bpt_setup_config{std::nullopt};
+    d20::DcTransferLimits powersupply_limits;
 };
 
 // This should only have EVSE information
@@ -66,6 +67,8 @@ struct SessionConfig {
 
     DcTransferLimits dc_limits;
     AcTransferLimits ac_limits;
+
+    DcTransferLimits powersupply_limits;
 
     std::vector<ControlMobilityNeedsModes> supported_control_mobility_modes;
 

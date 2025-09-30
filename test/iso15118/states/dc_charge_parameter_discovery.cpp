@@ -23,12 +23,13 @@ SCENARIO("DC charge parameter discovery state handling") {
     const std::vector<uint16_t> vas_services{};
     const d20::DcTransferLimits dc_limits;
     const d20::AcTransferLimits ac_limits;
+    const d20::DcTransferLimits powersupply_limits;
     const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
         {dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
 
     const d20::EvseSetupConfig evse_setup{
         evse_id,   supported_energy_services, auth_services, vas_services, cert_install, dc_limits,
-        ac_limits, control_mobility_modes};
+        ac_limits, control_mobility_modes,    std::nullopt,  std::nullopt, std::nullopt, powersupply_limits};
 
     GIVEN("Bad Case - Unknown session") {
 
@@ -46,7 +47,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto res = d20::state::handle_request(req, d20::Session(), evse_setup.dc_limits);
+        const auto res = d20::state::handle_request(req, d20::Session(), evse_setup.powersupply_limits);
 
         THEN("ResponseCode: FAILED_UnknownSession, mandatory fields should be set") {
             REQUIRE(res.response_code == dt::ResponseCode::FAILED_UnknownSession);
@@ -90,7 +91,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, evse_setup.dc_limits);
+        const auto res = d20::state::handle_request(req, session, evse_setup.powersupply_limits);
 
         THEN("ResponseCode: FAILED_WrongChargeParameter, mandatory fields should be set") {
             REQUIRE(res.response_code == dt::ResponseCode::FAILED_WrongChargeParameter);
@@ -137,7 +138,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, evse_setup.dc_limits);
+        const auto res = d20::state::handle_request(req, session, evse_setup.powersupply_limits);
 
         THEN("ResponseCode: FAILED_WrongChargeParameter, mandatory fields should be set") {
             REQUIRE(res.response_code == dt::ResponseCode::FAILED_WrongChargeParameter);
@@ -168,12 +169,12 @@ SCENARIO("DC charge parameter discovery state handling") {
 
         d20::Session session = d20::Session(service_parameters);
 
-        d20::DcTransferLimits dc_limits;
-        dc_limits.charge_limits.power.max = {22, 3};
-        dc_limits.charge_limits.current.max = {25, 0};
-        dc_limits.voltage.max = {900, 0};
+        d20::DcTransferLimits powersupply_limits;
+        powersupply_limits.charge_limits.power.max = {22, 3};
+        powersupply_limits.charge_limits.current.max = {25, 0};
+        powersupply_limits.voltage.max = {900, 0};
         dt::RationalNumber power_ramp_limit = {20, 0};
-        dc_limits.power_ramp_limit.emplace<>(power_ramp_limit);
+        powersupply_limits.power_ramp_limit.emplace<>(power_ramp_limit);
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -187,7 +188,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, dc_limits);
+        const auto res = d20::state::handle_request(req, session, powersupply_limits);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
@@ -221,12 +222,12 @@ SCENARIO("DC charge parameter discovery state handling") {
 
         d20::Session session = d20::Session(service_parameters);
 
-        d20::DcTransferLimits dc_limits;
-        dc_limits.charge_limits.power.max = {22, 3};
-        dc_limits.charge_limits.current.max = {25, 0};
-        dc_limits.voltage.max = {900, 0};
+        d20::DcTransferLimits powersupply_limits;
+        powersupply_limits.charge_limits.power.max = {22, 3};
+        powersupply_limits.charge_limits.current.max = {25, 0};
+        powersupply_limits.voltage.max = {900, 0};
 
-        auto& discharge_limits = dc_limits.discharge_limits.emplace();
+        auto& discharge_limits = powersupply_limits.discharge_limits.emplace();
         discharge_limits.power.max = {11, 3};
         discharge_limits.current.max = {25, 0};
 
@@ -246,7 +247,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, dc_limits);
+        const auto res = d20::state::handle_request(req, session, powersupply_limits);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
@@ -285,10 +286,10 @@ SCENARIO("DC charge parameter discovery state handling") {
 
         d20::Session session = d20::Session(service_parameters);
 
-        d20::DcTransferLimits dc_limits;
-        dc_limits.charge_limits.power.max = {22, 3};
-        dc_limits.charge_limits.current.max = {25, 0};
-        dc_limits.voltage.max = {900, 0};
+        d20::DcTransferLimits powersupply_limits;
+        powersupply_limits.charge_limits.power.max = {22, 3};
+        powersupply_limits.charge_limits.current.max = {25, 0};
+        powersupply_limits.voltage.max = {900, 0};
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -306,7 +307,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, dc_limits);
+        const auto res = d20::state::handle_request(req, session, powersupply_limits);
 
         THEN("ResponseCode: FAILED, mandatory fields should be set") {
             REQUIRE(res.response_code == dt::ResponseCode::FAILED);
@@ -340,12 +341,12 @@ SCENARIO("DC charge parameter discovery state handling") {
 
         d20::Session session = d20::Session(service_parameters);
 
-        d20::DcTransferLimits dc_limits;
-        dc_limits.charge_limits.power.max = {22, 3};
-        dc_limits.charge_limits.current.max = {25, 0};
-        dc_limits.voltage.max = {900, 0};
+        d20::DcTransferLimits powersupply_limits;
+        powersupply_limits.charge_limits.power.max = {22, 3};
+        powersupply_limits.charge_limits.current.max = {25, 0};
+        powersupply_limits.voltage.max = {900, 0};
         dt::RationalNumber power_ramp_limit = {20, 0};
-        dc_limits.power_ramp_limit.emplace<>(power_ramp_limit);
+        powersupply_limits.power_ramp_limit.emplace<>(power_ramp_limit);
 
         message_20::DC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -359,7 +360,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_voltage = {400, 0};
         req_out.min_voltage = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, dc_limits);
+        const auto res = d20::state::handle_request(req, session, powersupply_limits);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
@@ -393,12 +394,12 @@ SCENARIO("DC charge parameter discovery state handling") {
 
         d20::Session session = d20::Session(service_parameters);
 
-        d20::DcTransferLimits dc_limits;
-        dc_limits.charge_limits.power.max = {22, 3};
-        dc_limits.charge_limits.current.max = {25, 0};
-        dc_limits.voltage.max = {900, 0};
+        d20::DcTransferLimits powersupply_limits;
+        powersupply_limits.charge_limits.power.max = {22, 3};
+        powersupply_limits.charge_limits.current.max = {25, 0};
+        powersupply_limits.voltage.max = {900, 0};
 
-        auto& discharge_limits = dc_limits.discharge_limits.emplace();
+        auto& discharge_limits = powersupply_limits.discharge_limits.emplace();
         discharge_limits.power.max = {11, 3};
         discharge_limits.current.max = {25, 0};
 
@@ -418,7 +419,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         req_out.max_discharge_current = {25, 0};
         req_out.min_discharge_current = {0, 0};
 
-        const auto res = d20::state::handle_request(req, session, dc_limits);
+        const auto res = d20::state::handle_request(req, session, powersupply_limits);
 
         THEN("ResponseCode: OK") {
             REQUIRE(res.response_code == dt::ResponseCode::OK);
