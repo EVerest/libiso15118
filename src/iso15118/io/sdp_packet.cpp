@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2023 Pionix GmbH and Contributors to EVerest
+// Copyright 2023-2025 Pionix GmbH and Contributors to EVerest
 #include <iso15118/io/sdp_packet.hpp>
 
 #include <cstdio>
 #include <cstring>
+#include <limits>
 
 #include <endian.h>
 
@@ -53,6 +54,12 @@ void SdpPacket::parse_header() {
     uint32_t tmp;
     std::memcpy(&tmp, buffer + 4, sizeof(tmp));
 
+    // check if length would overflow
+    const auto len_in_buffer = be32toh(tmp);
+    if (len_in_buffer > std::numeric_limits<uint32_t>::max() - V2GTP_HEADER_SIZE) {
+        state = State::INVALID_HEADER;
+        return;
+    }
     // FIXME (aw): check for ill-formed header!
     length = be32toh(tmp) + V2GTP_HEADER_SIZE;
 
