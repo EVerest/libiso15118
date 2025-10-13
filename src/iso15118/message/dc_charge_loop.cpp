@@ -185,13 +185,13 @@ template <> void convert(const struct iso20_dc_ReceiptType& in, datatypes::Recei
     CB2CPP_CONVERT_IF_USED(in.OverstayCosts, out.overstay_costs);
 
     // todo (rb): TaxCosts should be optional as far as I can tell.
-    if (sizeof(in.TaxCosts.array) < out.tax_costs.size()) {
+    if (in.TaxCosts.arrayLen > 10) {
         throw std::runtime_error("tax costs array is too large");
     }
+    out.tax_costs.resize(in.TaxCosts.arrayLen);
     for (std::size_t i = 0; i < in.TaxCosts.arrayLen; ++i) {
         convert(in.TaxCosts.array[i], out.tax_costs[i]);
     }
-    out.tax_costs.resize(in.TaxCosts.arrayLen);
 }
 
 template <> void convert(const struct iso20_dc_DC_ChargeLoopResType& in, DC_ChargeLoopResponse& out) {
