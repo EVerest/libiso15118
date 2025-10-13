@@ -23,12 +23,13 @@ SCENARIO("ISO15118-20 session setup state transitions") {
     const std::vector<dt::Authorization> auth_services = {dt::Authorization::EIM};
     const d20::DcTransferLimits dc_limits;
     const d20::AcTransferLimits ac_limits;
+    const d20::DcTransferLimits powersupply_limits;
     const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
         {dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
 
     const d20::EvseSetupConfig evse_setup{
         evse_id,   supported_energy_services, auth_services, vas_services, cert_install, dc_limits,
-        ac_limits, control_mobility_modes};
+        ac_limits, control_mobility_modes,    std::nullopt,  std::nullopt, std::nullopt, powersupply_limits};
 
     std::optional<d20::PauseContext> pause_ctx{std::nullopt};
 

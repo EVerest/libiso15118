@@ -94,6 +94,10 @@ void TbdController::update_dc_limits(const d20::DcTransferLimits& limits) {
     }
 }
 
+void TbdController::update_powersupply_limits(const d20::DcTransferLimits& limits) {
+    evse_setup.powersupply_limits = limits;
+}
+
 void TbdController::update_energy_modes(const std::vector<message_20::datatypes::ServiceCategory>& modes) {
     evse_setup.supported_energy_services = modes;
 
