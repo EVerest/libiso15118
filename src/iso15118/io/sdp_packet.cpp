@@ -61,7 +61,7 @@ void SdpPacket::parse_header() {
         return;
     }
     // FIXME (aw): check for ill-formed header!
-    length = be32toh(tmp) + V2GTP_HEADER_SIZE;
+    length = len_in_buffer + V2GTP_HEADER_SIZE;
 
     if (length > sizeof(buffer)) {
         state = State::PAYLOAD_TO_LONG;
