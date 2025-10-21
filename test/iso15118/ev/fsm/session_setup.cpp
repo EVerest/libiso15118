@@ -6,6 +6,7 @@
 
 #include <iso15118/ev/d20/state/session_setup.hpp>
 #include <iso15118/message/authorization_setup.hpp>
+#include <iso15118/message/dc_charge_parameter_discovery.hpp>
 #include <iso15118/message/session_setup.hpp>
 #include <iso15118/message/type.hpp>
 

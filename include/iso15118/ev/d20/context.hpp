@@ -5,12 +5,11 @@
 #include <any>
 #include <memory>
 
-#include "evse_information.hpp"
-#include "evse_session_info.hpp"
 #include <iso15118/message/common_types.hpp>
 #include <iso15118/message/variant.hpp>
 
 #include <iso15118/ev/d20/session.hpp>
+#include <iso15118/io/sha_hash.hpp>
 
 namespace iso15118::ev::d20 {
 
@@ -105,10 +104,6 @@ public:
     Session& get_session() {
         return session;
     }
-
-    // Contains the EVSE received data
-    EVSESessionInfo session_evse_info;
-    EVSEInformation evse_info;
 
 private:
     MessageExchange& message_exchange;

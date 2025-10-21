@@ -8,13 +8,29 @@
 #include <iso15118/ev/d20/state/dc_charge_parameter_discovery.hpp>
 #include <iso15118/ev/d20/state/session_setup.hpp>
 #include <iso15118/ev/detail/d20/context_helper.hpp>
+#include <iso15118/io/sha_hash.hpp>
 #include <iso15118/message/authorization_setup.hpp>
+#include <iso15118/message/dc_charge_parameter_discovery.hpp>
 #include <iso15118/message/session_setup.hpp>
 #include <openssl/evp.h>
 #include <optional>
 #include <sstream>
 
 namespace iso15118::ev::d20::state {
+
+namespace {
+using ResponseCode = message_20::datatypes::ResponseCode;
+bool check_response_code(ResponseCode response_code) {
+    switch (response_code) {
+    case ResponseCode::OK_NewSessionEstablished:
+        return true;
+    case ResponseCode::OK_OldSessionJoined:
+        return true;
+        [[fallthrough]];
+    default:
+        return false;
+    }
+}
 
 bool session_is_zero(const message_20::datatypes::SessionId& session_id) {
     return std::all_of(session_id.begin(), session_id.end(), [](int i) { return i == 0; });
@@ -41,21 +57,6 @@ io::sha512_hash_t calculate_new_cert_session_id_hash(const io::sha512_hash_t& ch
     return session_id_charger_hash;
 }
 
-namespace {
-using ResponseCode = message_20::datatypes::ResponseCode;
-bool check_response_code(ResponseCode response_code) {
-    switch (response_code) {
-    case ResponseCode::OK:
-        return true;
-    case ResponseCode::OK_NewSessionEstablished:
-        return true;
-    case ResponseCode::OK_OldSessionJoined:
-        return true;
-        [[fallthrough]];
-    default:
-        return false;
-    }
-}
 } // namespace
 
 void SessionSetup::enter() {
@@ -77,12 +78,12 @@ Result SessionSetup::feed(Event ev) {
             return {};
         }
 
-        if (not(res->evseid.size() > 0)) {
+        if (res->evseid.size() <= 0) {
             logf_error("EVSEID is empty. Abort the session.");
             m_ctx.stop_session(true); // Tell stack to close the tcp/tls connection
             return {};
         } else {
-            m_ctx.evse_info.evse_id = res->evseid;
+            // m_ctx.evse_info.evse_id = res->evseid;
         }
 
         // TODO(RB): Check if the returned  sessionid is ok by checking against the sent one.
