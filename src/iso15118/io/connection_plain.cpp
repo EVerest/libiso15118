@@ -148,7 +148,7 @@ void ConnectionPlain::close() {
     const auto shutdown_result = shutdown(fd, SHUT_RDWR);
 
     if (shutdown_result == -1) {
-        log_and_throw("shutdown() failed");
+        logf_error("shutdown() failed");
     }
 
     // Waiting for client closing the connection
@@ -159,7 +159,7 @@ void ConnectionPlain::close() {
     const auto close_shutdown = ::close(fd);
 
     if (close_shutdown == -1) {
-        log_and_throw("close() failed");
+        logf_error("close() failed");
     }
 
     logf_info("TCP connection closed gracefully");

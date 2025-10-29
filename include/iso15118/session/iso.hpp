@@ -44,6 +44,8 @@ public:
         return (ctx.session_stopped or ctx.session_paused);
     }
 
+    void close();
+
 private:
     std::unique_ptr<io::IConnection> connection;
     session::SessionLogger log;

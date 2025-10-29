@@ -47,13 +47,26 @@ void TbdController::loop() {
 
     while (true) {
         const auto poll_timeout_ms = get_timeout_ms_until(next_event, POLL_MANAGER_TIMEOUT_MS);
-        poll_manager.poll(poll_timeout_ms);
+
+        try {
+            poll_manager.poll(poll_timeout_ms);
+        } catch (const std::runtime_error& e) {
+            logf_error("Shutdown loop() because of: %s", e.what());
+            break;
+        }
 
         next_event = offset_time_point_by_ms(get_current_time_point(), POLL_MANAGER_TIMEOUT_MS);
 
         if (session) {
-            const auto next_session_event = session->poll();
-            next_event = std::min(next_event, next_session_event);
+            try {
+                const auto next_session_event = session->poll();
+                next_event = std::min(next_event, next_session_event);
+            } catch (const std::runtime_error& e) {
+                logf_error("Shutting down session because of: %s", e.what());
+                logf_info("Restarting session ...");
+                session->close();
+            }
+
             if (session->is_finished()) {
                 session.reset();
 
@@ -149,12 +162,21 @@ void TbdController::handle_sdp_server_input() {
     }
 
     auto connection = [this](bool secure_connection) -> std::unique_ptr<io::IConnection> {
-        if (secure_connection) {
-            return std::make_unique<io::ConnectionSSL>(poll_manager, interface_name, config.ssl);
-        } else {
+        try {
+            if (secure_connection) {
+                return std::make_unique<io::ConnectionSSL>(poll_manager, interface_name, config.ssl);
+            }
             return std::make_unique<io::ConnectionPlain>(poll_manager, interface_name);
+        } catch (const std::runtime_error& e) {
+            logf_error("%s", e.what());
+            return nullptr;
         }
     }(request.security == io::v2gtp::Security::TLS);
+
+    if (not connection) {
+        logf_error("A TCP/TLS connection could not be established. Ignoring this SDP request for now");
+        return;
+    }
 
     const auto ipv6_endpoint = connection->get_public_endpoint();
 
