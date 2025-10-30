@@ -542,7 +542,7 @@ void ConnectionSSL::close() {
     if (ssl_close_result < 0) {
         const auto ssl_error = SSL_get_error(ssl_ptr, ssl_close_result);
         if ((ssl_error != SSL_ERROR_WANT_READ) and (ssl_error != SSL_ERROR_WANT_WRITE)) {
-            log_and_raise_openssl_error("Failed to SSL_shutdown(): " + std::to_string(ssl_error));
+            logf_error("%s", log_openssl_error("Failed to SSL_shutdown(): " + std::to_string(ssl_error)).c_str());
         }
     }
 
