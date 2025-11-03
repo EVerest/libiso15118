@@ -90,7 +90,10 @@ Result SessionSetup::feed(Event ev) {
         // If the sent one was 0, the new one should be non zero.
         const auto charger_cert_hash = m_ctx.get_charger_cert_hash();
 
-        if (session_is_zero(m_ctx.get_session().get_id())) {
+        // Handle new session establishment or session resumption by checking the response_code from the EVSE
+        if (res->response_code == message_20::datatypes::ResponseCode::OK_NewSessionEstablished) {
+            logf_info("New session established by EVSE.");
+
             if (session_is_zero(res->header.session_id)) {
                 logf_error("Returned SessionID is zero although a new session was requested. Abort the session.");
                 m_ctx.stop_session(true); // Tell stack to close the tcp/tls connection
@@ -109,12 +112,12 @@ Result SessionSetup::feed(Event ev) {
                     logf_warning("No charger certificate hash available although a new session was established.");
                 }
             }
-        } else {
-            // If the sent one was non 0, the returned one should be the same, so we are doing a resume. In order to
+        } else if (res->response_code == message_20::datatypes::ResponseCode::OK_OldSessionJoined) {
+            // If the sent SessionID was non 0, the returned one should be the same. In order to
             // proceed it needs to be verified that the pairing of charger and ev is the same as before by checking a
             // hash of the charger cert and the session id that was saved when the session was paused with the new hash
             // calculated from the returned session id and the charger cert hash. If they are not the same, this is an
-            // error, and the session must be shut down.
+            // error, and the session should be shut down.
             // Make sure we have a charger cert hash to check against
             if (not charger_cert_hash.has_value()) {
                 logf_error(
@@ -140,7 +143,7 @@ Result SessionSetup::feed(Event ev) {
         // what was already in progress in the context.
         if (session_resumed) {
             logf_info("Session is resumed, continuing with the existing context.");
-            // RDB TODO Go directly to either AC or DC ChargeParameterDiscovery
+            // TODO(RB) Go directly to either AC or DC ChargeParameterDiscovery
             message_20::DC_ChargeParameterDiscoveryRequest req;
             setup_header(req.header, m_ctx.get_session());
             m_ctx.respond(req);
