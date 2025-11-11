@@ -6,9 +6,9 @@
 
 namespace iso15118::ev::d20::state {
 
-struct SessionSetup : public StateBase {
+struct DC_ChargeParameterDiscovery : public StateBase {
 public:
-    SessionSetup(Context& ctx) : StateBase(ctx, StateID::SessionSetup) {
+    DC_ChargeParameterDiscovery(Context& ctx) : StateBase(ctx, StateID::DC_ChargeParameterDiscovery) {
     }
 
     void enter() final;
