@@ -22,6 +22,7 @@ enum class PayloadType : uint16_t {
     Part20Main = 0x8002,
     Part20AC = 0x8003,
     Part20DC = 0x8004,
+    Part20DER = 0x8010,
 };
 
 } // namespace iso15118::io::v2gtp

@@ -195,6 +195,43 @@ enum class ParkingStatus {
     ManualExternal = 4,
 };
 
+enum class PowerDuringCessation {
+    ActivePower,
+    ReactivePower,
+};
+
+enum class CurveDataPointsUnit {
+    V,
+    Hz,
+    W,
+    s,
+    var,
+    PercentageMaximumConfiguredDischargePower,
+    PercentageMaximumConfiguredDischargeReactivePower,
+    PercentageMaximumAvailableChargePower,
+    PercentageMaximumConfiguredChargeReactivePower,
+    PercentageMaximumAvailableDischargePower,
+    PercentageMaximumAvailableDischargeReactivePower,
+};
+
+enum class LockValueUnit {
+    V,
+    Hz,
+    W,
+    s,
+    var,
+};
+
+enum class PowerFactorExcitation {
+    OverExcited,
+    UnderExcited
+};
+
+enum class PowerReference {
+    MaximumDischargePower,
+    PresentActivePower
+};
+
 struct RationalNumber {
     int16_t value{0};
     int8_t exponent{0};
@@ -351,6 +388,180 @@ struct Signature {
 struct ContractCertificateChain {
     Certificate certificate;
     SubCertificate sub_certificates;
+};
+
+struct ThreePhase {
+    RationalNumber phase_l1;
+    RationalNumber phase_l2;
+    RationalNumber phase_l3;
+};
+
+struct Phase {
+    RationalNumber any_phase;
+    ThreePhase three_phase;
+};
+
+struct DataTuple {
+    RationalNumber x;
+    RationalNumber y;
+};
+
+struct DERCurve {
+    std::optional<bool> enable;
+    std::optional<uint16_t> priority;
+    CurveDataPointsUnit x_unit;
+    CurveDataPointsUnit y_unit;
+    std::vector<DataTuple> curve_data_points;
+    std::optional<LockValueUnit> lock_in_value;
+    std::optional<LockValueUnit> lock_out_value;
+    std::optional<RationalNumber> open_loop_response_time;
+    std::optional<int32_t> time_constant_pt1;
+    std::optional<RationalNumber> intentional_delay;
+};
+
+struct VoltageTrip {
+    DERCurve over_voltage_must_trip_curve;
+    DERCurve under_voltage_must_trip_curve;
+    DERCurve over_voltage_momentary_cessation_trip_curve;
+    DERCurve under_voltage_momentary_cessation_trip_curve;
+    std::optional<DERCurve> over_voltage_may_trip_curve;
+    std::optional<DERCurve> under_voltage_max_trip_curve;
+    std::optional<RationalNumber> over_voltage_mean_value_10min;
+    std::optional<RationalNumber> over_voltage_10_min_mean_triple_delay;
+    std::optional<PowerDuringCessation> power_during_cessation;
+};
+
+struct FrequencyTrip {
+    DERCurve over_frequency_must_trip_curve;
+    DERCurve under_frequency_must_trip_curve;
+    std::optional<DERCurve> over_frequency_may_trip_curve;
+    std::optional<DERCurve> under_frequency_may_trip_curve;
+};
+
+struct DeadBand {
+    RationalNumber mid_low;
+    RationalNumber mid_high;
+    std::optional<RationalNumber> low;
+    std::optional<RationalNumber> high;
+};
+
+struct FaultRideThrough {
+    std::optional<RationalNumber> over_voltage_ride_through_positive_curve_k_factor;
+    std::optional<RationalNumber> oder_voltage_ride_through_negative_curve_k_factor;
+    std::optional<RationalNumber> under_voltage_ride_through_positive_curve_k_factor;
+    std::optional<RationalNumber> under_voltage_ride_through_negative_curve_k_factor;
+    std::optional<DeadBand> dead_band;
+};
+
+struct EnterService {
+    std::optional<bool> permit_service;
+    RationalNumber voltage_high;
+    RationalNumber voltage_low;
+    RationalNumber frequency_high;
+    RationalNumber frequency_low;
+    RationalNumber delay;
+    RationalNumber randomized_delay;
+    RationalNumber ramp_time;
+    std::optional<RationalNumber> gradient;
+};
+
+struct ConstantPowerFactor {
+    std::optional<bool> enable;
+    std::optional<uint16_t> priority;
+    RationalNumber power_factor_value;
+    PowerFactorExcitation power_factor_excitation;
+};
+
+struct ConstantVar {
+    std::optional<bool> enable;
+    std::optional<uint16_t> priority;
+    RationalNumber set_point;
+    CurveDataPointsUnit unit;
+};
+
+struct ReactivePowerSupport {
+    std::optional<ConstantPowerFactor> constant_power_factor;
+    std::optional<DERCurve> volt_var;
+    std::optional<DERCurve> watt_var;
+    std::optional<ConstantVar> constant_var;
+    std::optional<DERCurve> watt_cos_phi;
+};
+
+struct HysteresisControl {
+    RationalNumber f_stop;
+    uint16_t power_up_ramp;
+    std::optional<RationalNumber> intentional_delay_f_stop;
+};
+
+struct EuFrequencyDroopSettings {
+    RationalNumber f_start;
+    RationalNumber s;
+    std::optional<RationalNumber> deactivation_time;
+    std::optional<RationalNumber> intentional_delay_power_control;
+    PowerReference power_reference;
+    std::optional<HysteresisControl> hysteresis_control;
+    std::optional<RationalNumber> max_reaction_time;
+};
+
+struct UsFrequencyDroopSettings {
+    RationalNumber db;
+    RationalNumber k;
+    PowerReference power_reference;
+    std::optional<RationalNumber> open_loop_response_time;
+};
+
+struct FrequencyDroop {
+    std::optional<bool> enable;
+    std::optional<uint16_t> priority;
+};
+
+struct EuFrequencyDroop : FrequencyDroop {
+    std::optional<EuFrequencyDroopSettings> over_frequency_droop;
+    std::optional<EuFrequencyDroopSettings> under_frequency_droop;
+};
+
+struct UsFrequencyDroop : FrequencyDroop {
+    std::optional<UsFrequencyDroopSettings> over_frequency_droop;
+    std::optional<UsFrequencyDroopSettings> under_frequency_droop;
+};
+
+struct FrequencyWattCurve {
+    std::optional<bool> enable;
+    std::optional<uint16_t> priority;
+    CurveDataPointsUnit x_unit;
+    CurveDataPointsUnit y_unit;
+    std::vector<DataTuple> curve_data_points;
+    std::optional<RationalNumber> open_loop_response_time;
+    std::optional<RationalNumber> hysteresis_high;
+    std::optional<RationalNumber> hysteresis_low;
+    std::optional<RationalNumber> hysteresis_delay;
+    std::optional<RationalNumber> hysteresis_gradient;
+};
+
+struct LimitMaxDischargePower {
+    std::optional<bool> enable;
+    std::optional<uint16_t> priority;
+    uint16_t percentage_value;
+    std::optional<DERCurve> power_monitoring_must_trip_curve;
+};
+
+struct ActivePowerSupport {
+    std::optional<std::variant<EuFrequencyDroop, UsFrequencyDroop>> frequency_droop;
+    std::optional<FrequencyWattCurve> frequency_watt;
+    std::optional<DERCurve> volt_watt;
+    std::optional<LimitMaxDischargePower> limit_max_discharge_power;
+};
+
+struct DERControl {
+    std::optional<VoltageTrip> voltage_trip;
+    std::optional<FrequencyTrip> frequency_trip;
+    std::optional<FaultRideThrough> fault_ride_through;
+    std::optional<EnterService> enter_service;
+    std::optional<ReactivePowerSupport> reactive_power_support;
+    std::optional<ActivePowerSupport> active_power_support;
+    std::optional<RationalNumber> max_level_1_dc_injection;
+    std::optional<RationalNumber> max_level_2_dc_injection;
+    std::optional<RationalNumber> sc_rat_poc;
 };
 
 float from_RationalNumber(const RationalNumber& in);
