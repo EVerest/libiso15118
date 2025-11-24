@@ -55,7 +55,9 @@ Result SessionStop::feed(Event ev) {
             ev_termination_explanation = req->ev_termination_explanation.value().c_str();
         }
 
-        m_ctx.feedback.ev_termination(ev_termination_code, ev_termination_explanation);
+        if (req->ev_termination_code.has_value() or req->ev_termination_explanation.has_value()) {
+            m_ctx.feedback.ev_termination(ev_termination_code, ev_termination_explanation);
+        }
         m_ctx.respond(res);
 
         // Todo(sl): Tell the reason why the charger is stopping. Shutdown, Error, etc.
