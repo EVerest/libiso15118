@@ -59,6 +59,11 @@ void Feedback::ev_information(const d20::EVInformation& ev_information) const {
     call_if_available(callbacks.ev_information, ev_information);
 }
 
+void Feedback::ev_termination(const std::string& ev_termination_code,
+                              const std::string& ev_termination_explanation) const {
+    call_if_available(callbacks.ev_termination, ev_termination_code, ev_termination_explanation);
+}
+
 std::optional<dt::ServiceParameterList> Feedback::get_vas_parameters(uint16_t vas_id) const {
 
     logf_warning("Caution: This feedback call can block the entire state machine");

@@ -85,6 +85,7 @@ struct Callbacks {
     std::function<std::optional<dt::ServiceParameterList>(uint16_t)> get_vas_parameters;
     std::function<void(const dt::VasSelectedServiceList&)> selected_vas_services;
     std::function<void(const AcLimits&)> ac_limits;
+    std::function<void(const std::string&, const std::string&)> ev_termination;
 };
 
 } // namespace feedback
@@ -112,6 +113,7 @@ public:
     std::optional<dt::ServiceParameterList> get_vas_parameters(uint16_t) const;
     void selected_vas_services(const dt::VasSelectedServiceList&) const;
     void ac_limits(const feedback::AcLimits&) const;
+    void ev_termination(const std::string&, const std::string&) const;
 
 private:
     feedback::Callbacks callbacks;

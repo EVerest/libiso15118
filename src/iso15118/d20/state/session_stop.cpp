@@ -43,13 +43,21 @@ Result SessionStop::feed(Event ev) {
     if (const auto req = variant->get_if<message_20::SessionStopRequest>()) {
         const auto res = handle_request(*req, m_ctx.session);
 
+        std::string ev_termination_code;
+        std::string ev_termination_explanation;
+
         if (req->ev_termination_code.has_value()) {
             logf_info("EV termination code: %s", req->ev_termination_code.value().c_str());
+            ev_termination_code = req->ev_termination_code.value();
         }
         if (req->ev_termination_explanation.has_value()) {
             logf_info("EV Termination explanation: %s", req->ev_termination_explanation.value().c_str());
+            ev_termination_explanation = req->ev_termination_explanation.value();
         }
 
+        if (req->ev_termination_code.has_value() or req->ev_termination_explanation.has_value()) {
+            m_ctx.feedback.ev_termination(ev_termination_code, ev_termination_explanation);
+        }
         m_ctx.respond(res);
 
         // Todo(sl): Tell the reason why the charger is stopping. Shutdown, Error, etc.
