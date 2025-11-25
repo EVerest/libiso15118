@@ -48,11 +48,11 @@ Result SessionStop::feed(Event ev) {
 
         if (req->ev_termination_code.has_value()) {
             logf_info("EV termination code: %s", req->ev_termination_code.value().c_str());
-            ev_termination_code = req->ev_termination_code.value().c_str();
+            ev_termination_code = req->ev_termination_code.value();
         }
         if (req->ev_termination_explanation.has_value()) {
             logf_info("EV Termination explanation: %s", req->ev_termination_explanation.value().c_str());
-            ev_termination_explanation = req->ev_termination_explanation.value().c_str();
+            ev_termination_explanation = req->ev_termination_explanation.value();
         }
 
         if (req->ev_termination_code.has_value() or req->ev_termination_explanation.has_value()) {
