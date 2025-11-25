@@ -122,7 +122,7 @@ Result DC_ChargeParameterDiscovery::feed(Event ev) {
             m_ctx.session_ev_info.ev_transfer_limits.emplace<BPT_DC_ModeReq>(*mode);
         }
 
-        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config.dc_limits);
+        const auto res = handle_request(*req, m_ctx.session, m_ctx.session_config.powersupply_limits);
 
         m_ctx.respond(res);
 

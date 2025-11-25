@@ -158,6 +158,35 @@ SCENARIO("Se/Deserialize dc charge loop messages") {
         }
     }
 
+    GIVEN("Serialize dc_charge_loop_res dynamic dc_bpt") {
+
+        message_20::DC_ChargeLoopResponse res;
+
+        res.header = message_20::Header{{0x3D, 0x4C, 0xBF, 0x93, 0x37, 0x4E, 0xD8, 0x9B}, 1725456334};
+        res.response_code = message_20::datatypes::ResponseCode::OK;
+        auto& mode = res.control_mode.emplace<message_20::datatypes::Dynamic_DC_CLResControlMode>();
+
+        mode.max_charge_power = {150, 3};
+        mode.min_charge_power = {100, 0};
+        mode.max_charge_current = {60, 1};
+        mode.max_voltage = {9, 2};
+
+        res.current_limit_achieved = true;
+        res.power_limit_achieved = true;
+        res.voltage_limit_achieved = true;
+        res.present_current = {1000, -3};
+        res.present_voltage = {4000, -1};
+
+        std::vector<uint8_t> expected = {0x80, 0x38, 0x04, 0x1E, 0xA6, 0x5F, 0xC9, 0x9B, 0xA7, 0x6C, 0x4D,
+                                         0x8C, 0xEB, 0xFE, 0x1B, 0x60, 0x62, 0x00, 0x63, 0xE8, 0x74, 0x03,
+                                         0x81, 0xFC, 0x28, 0x07, 0xC2, 0x22, 0x70, 0x83, 0x09, 0x60, 0x10,
+                                         0x40, 0x03, 0x20, 0x20, 0x40, 0xF0, 0x10, 0x40, 0x12, 0x00};
+
+        THEN("It should be serialized successfully") {
+            REQUIRE(serialize_helper(res) == expected);
+        }
+    }
+
     GIVEN("Deserialize dc_charge_loop res ongoing") {
 
         uint8_t doc_raw[] = {0x80, 0x38, 0x04, 0x1e, 0xa6, 0x5f, 0xc9, 0x9b, 0xa7, 0x6c, 0x4d, 0x8c, 0xeb, 0xfe, 0x1b,

@@ -20,10 +20,14 @@ static void log_and_raise(const std::string& error_msg) {
     throw std::runtime_error(error_msg);
 }
 
-void log_and_raise_openssl_error(const std::string& error_msg) {
+std::string log_openssl_error(const std::string& error_msg) {
     std::string error_message = {error_msg};
     ERR_print_errors_cb(&add_error_str, &error_message);
-    log_and_raise(error_message);
+    return error_message;
+}
+
+void log_and_raise_openssl_error(const std::string& error_msg) {
+    log_and_raise(log_openssl_error(error_msg));
 }
 
 } // namespace iso15118::io

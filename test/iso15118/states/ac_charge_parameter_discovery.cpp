@@ -26,12 +26,13 @@ SCENARIO("AC charge parameter discovery state handling") {
         const std::vector<uint16_t> vas_services{};
         const d20::DcTransferLimits dc_limits;
         const d20::AcTransferLimits ac_limits;
+        const d20::DcTransferLimits powersupply_limits;
         const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
             {dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
 
         const d20::EvseSetupConfig evse_setup{
             evse_id,   supported_energy_services, auth_services, vas_services, cert_install, dc_limits,
-            ac_limits, control_mobility_modes};
+            ac_limits, control_mobility_modes,    std::nullopt,  std::nullopt, std::nullopt, powersupply_limits};
 
         message_20::AC_ChargeParameterDiscoveryRequest req;
         req.header.session_id = session.get_id();
@@ -69,12 +70,13 @@ SCENARIO("AC charge parameter discovery state handling") {
         const std::vector<uint16_t> vas_services{};
         const d20::DcTransferLimits dc_limits;
         const d20::AcTransferLimits ac_limits;
+        const d20::DcTransferLimits powersupply_limits;
         const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
             {dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
 
         const d20::EvseSetupConfig evse_setup{
             evse_id,   supported_energy_services, auth_services, vas_services, cert_install, dc_limits,
-            ac_limits, control_mobility_modes};
+            ac_limits, control_mobility_modes,    std::nullopt,  std::nullopt, std::nullopt, powersupply_limits};
 
         auto session = d20::Session(service_parameters);
 
@@ -113,12 +115,13 @@ SCENARIO("AC charge parameter discovery state handling") {
         const std::vector<uint16_t> vas_services{};
         const d20::DcTransferLimits dc_limits;
         const d20::AcTransferLimits ac_limits;
+        const d20::DcTransferLimits powersupply_limits;
         const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
             {dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
 
         const d20::EvseSetupConfig evse_setup{
             evse_id,   supported_energy_services, auth_services, vas_services, cert_install, dc_limits,
-            ac_limits, control_mobility_modes};
+            ac_limits, control_mobility_modes,    std::nullopt,  std::nullopt, std::nullopt, powersupply_limits};
 
         auto session = d20::Session(service_parameters);
 
@@ -161,12 +164,13 @@ SCENARIO("AC charge parameter discovery state handling") {
         const std::vector<uint16_t> vas_services{};
         const d20::DcTransferLimits dc_limits;
         const d20::AcTransferLimits ac_limits;
+        const d20::DcTransferLimits powersupply_limits;
         const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
             {dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
 
         const d20::EvseSetupConfig evse_setup{
             evse_id,   supported_energy_services, auth_services, vas_services, cert_install, dc_limits,
-            ac_limits, control_mobility_modes};
+            ac_limits, control_mobility_modes,    std::nullopt,  std::nullopt, std::nullopt, powersupply_limits};
 
         d20::SessionConfig config = d20::SessionConfig(evse_setup);
 
@@ -220,12 +224,13 @@ SCENARIO("AC charge parameter discovery state handling") {
         const std::vector<uint16_t> vas_services{};
         const d20::DcTransferLimits dc_limits;
         const d20::AcTransferLimits ac_limits;
+        const d20::DcTransferLimits powersupply_limits;
         const std::vector<d20::ControlMobilityNeedsModes> control_mobility_modes = {
             {dt::ControlMode::Scheduled, dt::MobilityNeedsMode::ProvidedByEvcc}};
 
         const d20::EvseSetupConfig evse_setup{
             evse_id,   supported_energy_services, auth_services, vas_services, cert_install, dc_limits,
-            ac_limits, control_mobility_modes};
+            ac_limits, control_mobility_modes,    std::nullopt,  std::nullopt, std::nullopt, powersupply_limits};
 
         auto config = d20::SessionConfig(evse_setup);
 

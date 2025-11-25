@@ -285,4 +285,10 @@ void Session::handle_connection_event(io::ConnectionEvent event) {
     }
 }
 
+void Session::close() {
+    connection->close();
+    ctx.feedback.signal(session::feedback::Signal::DLINK_TERMINATE);
+    ctx.session_stopped = true;
+}
+
 } // namespace iso15118
