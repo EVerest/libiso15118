@@ -14,7 +14,10 @@ using namespace iso15118;
 
 SCENARIO("ISO15118-20 EV session setup state transitions") {
 
-    auto state_helper = FsmStateHelper();
+    const ev::d20::session::feedback::Callbacks callbacks{};
+
+    auto state_helper = FsmStateHelper(callbacks);
+
     auto ctx = state_helper.get_context();
 
     GIVEN("Good case - new session") {

@@ -13,7 +13,7 @@ using namespace iso15118;
 
 class FsmStateHelper {
 public:
-    FsmStateHelper() : ctx(msg_exch){};
+    FsmStateHelper(const ev::d20::session::feedback::Callbacks& callbacks) : ctx(callbacks, msg_exch){};
 
     ev::d20::Context& get_context();
 

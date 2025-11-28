@@ -4,6 +4,7 @@
 
 #include <array>
 #include <cstdint>
+#include <iso15118/io/sha_hash.hpp>
 
 namespace iso15118::ev::d20 {
 
