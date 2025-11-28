@@ -89,7 +89,6 @@ Result PowerDelivery::feed(Event ev) {
             m_ctx.respond(res);
             m_ctx.session_stopped = true;
             m_ctx.feedback.response_code(res.response_code);
-
         }
         return {};
     }
