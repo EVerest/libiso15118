@@ -344,7 +344,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         d20::DcTransferLimits powersupply_limits;
         powersupply_limits.charge_limits.power.max = {22, 3};
         powersupply_limits.charge_limits.current.max = {25, 0};
-        powersupply_limits.voltage.max = {900, 0};
+        powersupply_limits.voltage.max = {450, 0};
         dt::RationalNumber power_ramp_limit = {20, 0};
         powersupply_limits.power_ramp_limit.emplace<>(power_ramp_limit);
 
@@ -375,7 +375,7 @@ SCENARIO("DC charge parameter discovery state handling") {
             REQUIRE(transfer_mode.max_charge_current.exponent == 0);
             REQUIRE(transfer_mode.min_charge_current.value == 0);
             REQUIRE(transfer_mode.min_charge_current.exponent == 0);
-            REQUIRE(transfer_mode.max_voltage.value == 900);
+            REQUIRE(transfer_mode.max_voltage.value == 450);
             REQUIRE(transfer_mode.max_voltage.exponent == 0);
             REQUIRE(transfer_mode.min_voltage.value == 0);
             REQUIRE(transfer_mode.min_voltage.exponent == 0);
@@ -397,7 +397,7 @@ SCENARIO("DC charge parameter discovery state handling") {
         d20::DcTransferLimits powersupply_limits;
         powersupply_limits.charge_limits.power.max = {22, 3};
         powersupply_limits.charge_limits.current.max = {25, 0};
-        powersupply_limits.voltage.max = {900, 0};
+        powersupply_limits.voltage.max = {450, 0};
 
         auto& discharge_limits = powersupply_limits.discharge_limits.emplace();
         discharge_limits.power.max = {11, 3};
@@ -434,7 +434,7 @@ SCENARIO("DC charge parameter discovery state handling") {
             REQUIRE(transfer_mode.max_charge_current.exponent == 0);
             REQUIRE(transfer_mode.min_charge_current.value == 0);
             REQUIRE(transfer_mode.min_charge_current.exponent == 0);
-            REQUIRE(transfer_mode.max_voltage.value == 900);
+            REQUIRE(transfer_mode.max_voltage.value == 450);
             REQUIRE(transfer_mode.max_voltage.exponent == 0);
             REQUIRE(transfer_mode.min_voltage.value == 0);
             REQUIRE(transfer_mode.min_voltage.exponent == 0);
