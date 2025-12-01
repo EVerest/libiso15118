@@ -104,9 +104,9 @@ bool handle_compatibility_check(const d20::DcTransferLimits& evse_dc_limits, con
     // CC.5.6 2.c
     float ev_power_max = ev_max_power;
     if (ev_power_max == 0) {
-        ev_power_max = std::max(evse_max_voltage * evse_max_current, MAX_POWER_LIMIT);
+        ev_power_max = std::max(ev_max_voltage * ev_max_current, MAX_POWER_LIMIT);
     }
-    if (ev_power_max > std::min(ev_power_max, evse_max_power)) {
+    if (evse_max_power > std::min(ev_power_max, evse_max_power)) {
         logf_error("EVSE max power %.1f W > EV max power %.1f W", evse_max_power, ev_power_max);
         compatiblity_flag = false;
     }
