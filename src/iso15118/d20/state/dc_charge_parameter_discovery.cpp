@@ -42,6 +42,91 @@ template <> void convert(BPT_DC_ModeRes& out, const d20::DcTransferLimits& in) {
     }
 }
 
+template <typename DCMode>
+bool handle_compatibility_check(const d20::DcTransferLimits& evse_dc_limits, const DCMode& ev_limits) {
+    // In IEC 61851-23-3 a compatibility check is required
+
+    constexpr auto MAX_VOLTAGE_OFFSET = 50.f;
+    constexpr auto MAX_VOLTAGE_THREASHOLD = 500.f;
+    constexpr auto MAX_VOLTAGE_FACTOR = 1.1f;
+    constexpr auto MAX_POWER_LIMIT = 200000.f;
+    bool compatiblity_flag = true;
+    float ev_max_power;
+    float ev_max_current;
+    float ev_max_voltage;
+
+    if (const auto* mode = std::get_if<DC_ModeReq>(&ev_limits)) {
+        ev_max_power = dt::from_RationalNumber(mode->max_charge_power);
+        ev_max_current = dt::from_RationalNumber(mode->max_charge_current);
+        ev_max_voltage = dt::from_RationalNumber(mode->max_voltage);
+    } else if (const auto* mode = std::get_if<BPT_DC_ModeReq>(&ev_limits)) {
+        ev_max_power = dt::from_RationalNumber(mode->max_charge_power);
+        ev_max_current = dt::from_RationalNumber(mode->max_charge_current);
+        ev_max_voltage = dt::from_RationalNumber(mode->max_voltage);
+    } else {
+        return false;
+    }
+
+    const float evse_max_voltage = dt::from_RationalNumber(evse_dc_limits.voltage.max);
+    const float evse_min_voltage = dt::from_RationalNumber(evse_dc_limits.voltage.min);
+    const float evse_max_current = dt::from_RationalNumber(evse_dc_limits.charge_limits.current.max);
+    const float evse_min_current = dt::from_RationalNumber(evse_dc_limits.charge_limits.current.min);
+    const float evse_max_power = dt::from_RationalNumber(evse_dc_limits.charge_limits.power.max);
+    const float evse_min_power = dt::from_RationalNumber(evse_dc_limits.charge_limits.power.min);
+
+    // CC.5.6 2.a
+    if (ev_max_voltage <= MAX_VOLTAGE_THREASHOLD) {
+        if (evse_max_voltage >
+            std::min({ev_max_voltage + MAX_VOLTAGE_OFFSET, evse_max_voltage, MAX_VOLTAGE_THREASHOLD})) {
+            if (evse_max_voltage > MAX_VOLTAGE_THREASHOLD) {
+                logf_error("EVSE max voltage %.1f V > EV max voltage 500V", evse_max_voltage);
+            } else {
+                logf_error("EVSE max voltage %.1f V > EV max voltage + 50V: %.1f V", evse_max_voltage,
+                           ev_max_voltage + MAX_VOLTAGE_OFFSET);
+            }
+            compatiblity_flag = false;
+        }
+    }
+    if (ev_max_voltage > MAX_VOLTAGE_THREASHOLD) {
+        if (evse_max_voltage > std::min(ev_max_voltage * MAX_VOLTAGE_FACTOR, evse_max_voltage)) {
+            logf_error("EVSE max voltage %.1f V > EV max voltage (> 500 V) multiplied by 1,1: %.1f V", evse_max_voltage,
+                       ev_max_voltage * MAX_VOLTAGE_FACTOR);
+            compatiblity_flag = false;
+        }
+    }
+
+    // CC.5.6 2.b
+    if (evse_max_current > std::min(ev_max_current, evse_max_current)) {
+        logf_error("EVSE max current %.1f A > EV max current %.1f A", evse_max_current, ev_max_current);
+        compatiblity_flag = false;
+    }
+
+    // CC.5.6 2.c
+    float ev_power_max = ev_max_power;
+    if (ev_power_max == 0) {
+        ev_power_max = std::max(ev_max_voltage * ev_max_current, MAX_POWER_LIMIT);
+    }
+    if (evse_max_power > std::min(ev_power_max, evse_max_power)) {
+        logf_error("EVSE max power %.1f W > EV max power %.1f W", evse_max_power, ev_power_max);
+        compatiblity_flag = false;
+    }
+    // CC.5.6 2.d-f here not implemented because we make no difference between CPD and RATED
+    // CC.5.6 2.g
+    if (evse_min_power >= ev_power_max) {
+        logf_error("EVSE min power %.1f W >= EV max power %.1f W!", evse_min_power, ev_max_power);
+        compatiblity_flag = false;
+    }
+    if (evse_min_voltage >= ev_max_voltage) {
+        logf_error("EVSE min voltage %.1f V >= EV max voltage %.1f V!", evse_min_voltage, ev_max_voltage);
+        compatiblity_flag = false;
+    }
+    if (evse_min_current >= ev_max_current) {
+        logf_error("EVSE min current %.1f A >= EV max current %.1f A!", evse_min_current, ev_max_current);
+        compatiblity_flag = false;
+    }
+    return compatiblity_flag;
+}
+
 message_20::DC_ChargeParameterDiscoveryResponse
 handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const d20::Session& session,
                const d20::DcTransferLimits& dc_limits) {
@@ -81,6 +166,10 @@ handle_request(const message_20::DC_ChargeParameterDiscoveryRequest& req, const 
         // Not supported transfer_mode
         return response_with_code(res, dt::ResponseCode::FAILED_WrongChargeParameter);
     }
+
+    // Do compatibility check IEC61851-23-3 CC.5.6
+    if (not handle_compatibility_check(dc_limits, req.transfer_mode))
+        return response_with_code(res, dt::ResponseCode::FAILED_WrongChargeParameter);
 
     return response_with_code(res, dt::ResponseCode::OK);
 }
@@ -127,6 +216,7 @@ Result DC_ChargeParameterDiscovery::feed(Event ev) {
         m_ctx.respond(res);
 
         m_ctx.feedback.dc_max_limits(dc_max_limits);
+        m_ctx.feedback.response_code(res.response_code);
 
         if (res.response_code >= dt::ResponseCode::FAILED) {
             m_ctx.session_stopped = true;
@@ -139,6 +229,7 @@ Result DC_ChargeParameterDiscovery::feed(Event ev) {
 
         m_ctx.respond(res);
         m_ctx.session_stopped = true;
+        m_ctx.feedback.response_code(res.response_code);
 
         return {};
     } else {
@@ -148,6 +239,8 @@ Result DC_ChargeParameterDiscovery::feed(Event ev) {
         // Sequence Error
         const message_20::Type req_type = variant->get_type();
         send_sequence_error(req_type, m_ctx);
+
+        m_ctx.feedback.response_code(dt::ResponseCode::FAILED_SequenceError);
 
         return {};
     }
