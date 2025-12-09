@@ -2,7 +2,7 @@
 // Copyright 2025 Pionix GmbH and Contributors to EVerest
 #pragma once
 
-#include <iso15118/message/supported_app_protocol.hpp>
+#include <iso15118/message_d20/supported_app_protocol.hpp>
 
 namespace iso15118::d20 {
 

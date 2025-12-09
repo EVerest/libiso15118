@@ -7,7 +7,7 @@
 #include <iso15118/d20/state/authorization_setup.hpp>
 #include <iso15118/d20/state/session_setup.hpp>
 
-#include <iso15118/message/session_setup.hpp>
+#include <iso15118/message_d20/session_setup.hpp>
 
 using namespace iso15118;
 
