@@ -10,11 +10,6 @@
 
 #include <iso15118/ev/d20/evse_session_info.hpp>
 #include <iso15118/ev/d20/session.hpp>
-#include <iso15118/message/dc_charge_loop.hpp>
-#include <iso15118/message/dc_charge_parameter_discovery.hpp>
-#include <iso15118/message/schedule_exchange.hpp>
-#include <iso15118/message/service_detail.hpp>
-#include <iso15118/message/service_selection.hpp>
 #include <iso15118/message/type.hpp>
 
 namespace iso15118::ev::d20::session {

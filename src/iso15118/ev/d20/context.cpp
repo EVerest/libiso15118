@@ -28,7 +28,7 @@ std::unique_ptr<message_20::Variant> MessageExchange::pull_response() {
 
 message_20::Type MessageExchange::peek_response_type() const {
     if (not response) {
-        iso15118::logf_warning("Tried to access V2G message, but there is none");
+        logf_warning("Tried to access V2G message, but there is none");
         return message_20::Type::None;
     }
     return response->get_type();

@@ -53,12 +53,10 @@ Result AuthorizationSetup::feed([[maybe_unused]] Event ev) {
         // the EV.
         m_ctx.evse_session_info.auth_services = res->authorization_services;
 
-        if (res->authorization_mode.index() == 1) { // PnC
+        if (std::holds_alternative<message_20::datatypes::PnC_ASResAuthorizationMode>(res->authorization_mode)) {
             const auto& pnc_auth_mode =
                 std::get<message_20::datatypes::PnC_ASResAuthorizationMode>(res->authorization_mode);
-            if (pnc_auth_mode.supported_providers.has_value()) {
-                m_ctx.evse_session_info.supported_providers = pnc_auth_mode.supported_providers.value();
-            }
+            m_ctx.evse_session_info.supported_providers = pnc_auth_mode.supported_providers.value();
             m_ctx.evse_session_info.gen_challenge = pnc_auth_mode.gen_challenge;
         } else {
             // EIM selected, nothing to do here for now since authorization_mode is empty for EIM
@@ -81,12 +79,7 @@ Result AuthorizationSetup::feed([[maybe_unused]] Event ev) {
             req.authorization_mode = message_20::datatypes::EIM_ASReqAuthorizationMode{};
         } else if (req.selected_authorization_service == message_20::datatypes::Authorization::PnC) {
             // TODO(RB): Fill in the PnC authorization mode data
-            // For now, we just fill in dummy data
-            message_20::datatypes::PnC_ASReqAuthorizationMode pnc_mode;
-            pnc_mode.id = "dummy_id";                                       // TODO(RB): Replace with actual ID
-            pnc_mode.gen_challenge = m_ctx.evse_session_info.gen_challenge; // Use the challenge from the evse
-            // TODO(RB): Fill in the contract certificate chain
-            req.authorization_mode = pnc_mode;
+            req.authorization_mode = message_20::datatypes::PnC_ASReqAuthorizationMode{};
         } else {
             logf_error("Unknown authorization service selected. Abort the session.");
             m_ctx.stop_session(true); // Tell stack to close the tcp/tls connection
