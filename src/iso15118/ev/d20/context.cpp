@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2025 Pionix GmbH and Contributors to EVerest
-#include <iso15118/ev/d20/context.hpp>
-
 #include <iso15118/detail/helper.hpp>
+#include <iso15118/ev/d20/context.hpp>
+#include <iso15118/ev/detail/d20/context_helper.hpp>
 
 namespace iso15118::ev::d20 {
 
@@ -34,7 +34,8 @@ message_20::Type MessageExchange::peek_response_type() const {
     return response->get_type();
 }
 
-Context::Context(MessageExchange& message_exchange_) : message_exchange(message_exchange_) {
+Context::Context(session::feedback::Callbacks feedback_callbacks, MessageExchange& message_exchange_) :
+    feedback(std::move(feedback_callbacks)), message_exchange(message_exchange_) {
 }
 
 std::unique_ptr<message_20::Variant> Context::pull_response() {
