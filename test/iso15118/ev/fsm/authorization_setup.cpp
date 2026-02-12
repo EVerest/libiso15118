@@ -116,5 +116,4 @@ SCENARIO("ISO15118-20 EV authorization setup state transitions") {
                 std::holds_alternative<message_20::datatypes::EIM_ASReqAuthorizationMode>(request.authorization_mode));
         }
     }
-
 }
