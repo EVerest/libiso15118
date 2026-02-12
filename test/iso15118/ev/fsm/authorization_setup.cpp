@@ -85,4 +85,36 @@ SCENARIO("ISO15118-20 EV authorization setup state transitions") {
     }
     // TODO(RB): Add more test cases (bad response codes, unsupported authorization modes,
     // more than one authorization mode, certificate installation service, etc)
+
+    GIVEN("Bad case - authorization setup response with FAILED and EIM") {
+
+        // setup the state and context to something reasonable
+        const auto header = message_20::Header{{0x10, 0x34, 0xAB, 0x7A, 0x01, 0xF3, 0x95, 0x02}, 1691411798};
+
+        ctx.get_session().set_id(header.session_id);
+
+        fsm::v2::FSM<ev::d20::StateBase> fsm{ctx.create_state<ev::d20::state::AuthorizationSetup>()};
+
+        const auto res = message_20::AuthorizationSetupResponse{
+            header, message_20::datatypes::ResponseCode::FAILED, {message_20::datatypes::Authorization::EIM}, false};
+
+        state_helper.handle_response(res);
+
+        const auto result = fsm.feed(ev::d20::Event::V2GTP_MESSAGE);
+
+        THEN("Check if passes to authorization state and sends EIM AuthorizationRequest") {
+            REQUIRE(result.transitioned() == true);
+            REQUIRE(fsm.get_current_state_id() == ev::d20::StateID::Authorization);
+
+            const auto request_message = ctx.get_request<message_20::AuthorizationRequest>();
+            REQUIRE(request_message.has_value());
+
+            const auto& request = request_message.value();
+            REQUIRE(request.header.session_id == header.session_id);
+            REQUIRE(request.selected_authorization_service == message_20::datatypes::Authorization::EIM);
+            REQUIRE(
+                std::holds_alternative<message_20::datatypes::EIM_ASReqAuthorizationMode>(request.authorization_mode));
+        }
+    }
+
 }

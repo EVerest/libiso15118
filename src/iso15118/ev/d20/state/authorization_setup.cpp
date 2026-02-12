@@ -17,9 +17,9 @@ bool check_response_code(ResponseCode response_code) {
     switch (response_code) {
     case ResponseCode::OK:
         return true;
-        [[fallthrough]];
     default:
-        return false;
+        logf_warning("Unexpected response code received: %d", static_cast<int>(response_code));
+        return iso15118::ev::d20::check_response_code(response_code);
     }
 }
 } // namespace
@@ -56,7 +56,7 @@ Result AuthorizationSetup::feed([[maybe_unused]] Event ev) {
         if (std::holds_alternative<message_20::datatypes::PnC_ASResAuthorizationMode>(res->authorization_mode)) {
             const auto& pnc_auth_mode =
                 std::get<message_20::datatypes::PnC_ASResAuthorizationMode>(res->authorization_mode);
-            m_ctx.evse_session_info.supported_providers = pnc_auth_mode.supported_providers.value();
+            m_ctx.evse_session_info.supported_providers = pnc_auth_mode.supported_providers;
             m_ctx.evse_session_info.gen_challenge = pnc_auth_mode.gen_challenge;
         } else {
             // EIM selected, nothing to do here for now since authorization_mode is empty for EIM
