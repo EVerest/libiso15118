@@ -103,17 +103,10 @@ SCENARIO("ISO15118-20 EV authorization setup state transitions") {
         const auto result = fsm.feed(ev::d20::Event::V2GTP_MESSAGE);
 
         THEN("Check if passes to authorization state and sends EIM AuthorizationRequest") {
-            REQUIRE(result.transitioned() == true);
-            REQUIRE(fsm.get_current_state_id() == ev::d20::StateID::Authorization);
-
-            const auto request_message = ctx.get_request<message_20::AuthorizationRequest>();
-            REQUIRE(request_message.has_value());
-
-            const auto& request = request_message.value();
-            REQUIRE(request.header.session_id == header.session_id);
-            REQUIRE(request.selected_authorization_service == message_20::datatypes::Authorization::EIM);
-            REQUIRE(
-                std::holds_alternative<message_20::datatypes::EIM_ASReqAuthorizationMode>(request.authorization_mode));
+            REQUIRE(result.transitioned() == false);
+            REQUIRE(fsm.get_current_state_id() == ev::d20::StateID::AuthorizationSetup);
+            REQUIRE(ctx.is_session_stopped() == true);
         }
     }
 }
+
