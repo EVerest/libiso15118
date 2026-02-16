@@ -109,4 +109,3 @@ SCENARIO("ISO15118-20 EV authorization setup state transitions") {
         }
     }
 }
-
