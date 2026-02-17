@@ -26,9 +26,9 @@ bool check_response_code(ResponseCode response_code) {
         return true;
     case ResponseCode::OK_OldSessionJoined:
         return true;
-        [[fallthrough]];
     default:
-        return false;
+        logf_warning("Unexpected response code received: %d", static_cast<int>(response_code));
+        return iso15118::ev::d20::check_response_code(response_code);
     }
 }
 

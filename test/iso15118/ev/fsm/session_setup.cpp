@@ -14,16 +14,17 @@ using namespace iso15118;
 
 SCENARIO("ISO15118-20 EV session setup state transitions") {
 
-    auto state_helper = FsmStateHelper();
+    const ev::d20::session::feedback::Callbacks callbacks{};
+
+    auto state_helper = FsmStateHelper(callbacks);
+
     auto ctx = state_helper.get_context();
 
     GIVEN("Good case - new session") {
         fsm::v2::FSM<ev::d20::StateBase> fsm{ctx.create_state<ev::d20::state::SessionSetup>()};
 
-        const auto header = message_20::Header{
-            .session_id = std::array<uint8_t, 8>{0x10, 0x34, 0xAB, 0x7A, 0x01, 0xF3, 0x95, 0x02},
-            .timestamp = 1691411798,
-        };
+        const auto header = message_20::Header{{0x10, 0x34, 0xAB, 0x7A, 0x01, 0xF3, 0x95, 0x02}, 1691411798};
+
         const auto res = message_20::SessionSetupResponse{
             header, message_20::datatypes::ResponseCode::OK_NewSessionEstablished, "everest se"};
 
@@ -60,10 +61,8 @@ SCENARIO("ISO15118-20 EV session setup state transitions") {
             0x51, 0x13, 0xbb, 0x5,  0x95, 0x30, 0x66, 0x11, 0x46, 0xb8, 0x94, 0x3e, 0x59, 0x6d, 0x35, 0xae,
             0x9,  0x76, 0xfa, 0x2a, 0x3b, 0xb0, 0x63, 0x6e, 0x12, 0x7f, 0x10, 0xdb, 0x60, 0xd6, 0xb7, 0x4d});
 
-        const auto header = message_20::Header{
-            .session_id = std::array<uint8_t, 8>{0x10, 0x34, 0xAB, 0x7A, 0x01, 0xF3, 0x95, 0x02},
-            .timestamp = 1691411798,
-        };
+        const auto header = message_20::Header{{0x10, 0x34, 0xAB, 0x7A, 0x01, 0xF3, 0x95, 0x02}, 1691411798};
+
         const auto res = message_20::SessionSetupResponse{
             header, message_20::datatypes::ResponseCode::OK_OldSessionJoined, "everest se"};
 
@@ -101,10 +100,8 @@ SCENARIO("ISO15118-20 EV session setup state transitions") {
             0x51, 0x13, 0xbb, 0x5,  0x95, 0x30, 0x66, 0x11, 0x46, 0xb8, 0x94, 0x3e, 0x59, 0x6d, 0x35, 0xae,
             0x9,  0x76, 0xfa, 0x2a, 0x3b, 0xb0, 0x63, 0x6e, 0x12, 0x7f, 0x10, 0xdb, 0x60, 0xd6, 0xb7, 0x4d});
 
-        const auto header = message_20::Header{
-            .session_id = std::array<uint8_t, 8>{0x10, 0x34, 0xAB, 0x7A, 0x01, 0xF3, 0x95, 0x03},
-            .timestamp = 1691411798,
-        };
+        const auto header = message_20::Header{{0x10, 0x34, 0xAB, 0x7A, 0x01, 0xF3, 0x95, 0x03}, 1691411798};
+
         const auto res = message_20::SessionSetupResponse{
             header, message_20::datatypes::ResponseCode::OK_OldSessionJoined, "everest se"};
 
@@ -124,10 +121,7 @@ SCENARIO("ISO15118-20 EV session setup state transitions") {
         // Set the session ID to match the one in the SessionSetupResponse
         ctx.get_session().set_id(std::array<uint8_t, 8>{0x10, 0x34, 0xAB, 0x7A, 0x01, 0xF3, 0x95, 0x02});
 
-        const auto header = message_20::Header{
-            .session_id = std::array<uint8_t, 8>{0x10, 0x34, 0xAB, 0x7A, 0x01, 0xF3, 0x95, 0x02},
-            .timestamp = 1691411798,
-        };
+        const auto header = message_20::Header{{0x10, 0x34, 0xAB, 0x7A, 0x01, 0xF3, 0x95, 0x02}, 1691411798};
 
         // Set a different charger cert hash than the one that was used to create the session
         ctx.set_charger_cert_hash(io::sha512_hash_t{
